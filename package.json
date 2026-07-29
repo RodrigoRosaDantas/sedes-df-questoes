@@ -1,10 +1,10 @@
 {
   "name": "sedes-df-questoes",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node scripts/validate-data.mjs && node scripts/smoke-test.mjs && node scripts/validate-exam.mjs",
-    "check": "node --check assets/app.js && node --check assets/home-enhancements.js && npm test"
+    "test": "node scripts/validate-data.mjs && node scripts/smoke-test.mjs && node scripts/validate-incremental-update.mjs && node scripts/validate-exam.mjs",
+    "check": "node --check assets/app.js && node --check assets/data-updates.js && node --check assets/home-enhancements.js && npm test"
   }
 }
