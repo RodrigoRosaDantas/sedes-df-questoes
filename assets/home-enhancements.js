@@ -2,6 +2,7 @@
   const CONFIG_URL = "./data/concurso.json";
   const CATALOG_URL = "./data/catalogo.json";
   const HISTORY_KEY = "sedes.questoes.history.v2";
+  const DISPLAY_TIME_ZONE = "America/Sao_Paulo";
 
   let exam;
   let catalog;
@@ -36,7 +37,7 @@
   };
 
   const formatDate = (date) => new Date(`${date}T12:00:00-03:00`).toLocaleDateString("pt-BR", {
-    day: "2-digit", month: "long", year: "numeric",
+    day: "2-digit", month: "long", year: "numeric", timeZone: DISPLAY_TIME_ZONE,
   });
 
   const countdownUnit = (value, label) => `<div class="countdown-unit"><strong data-countdown-${label}>${String(value).padStart(2, "0")}</strong><span>${label}</span></div>`;
@@ -47,11 +48,13 @@
     const dailyPace = countdown.totalDays ? Math.max(1, Math.ceil(questions / countdown.totalDays)) : 0;
     const locationDate = formatDate(exam.divulgacao_locais_horarios);
     const date = examDateObject();
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = new Intl.DateTimeFormat("pt-BR", {month: "short"}).format(date).replace(".", "");
-    const year = date.getFullYear();
-    const weekday = new Intl.DateTimeFormat("pt-BR", {weekday: "long"}).format(date);
-    const numericDate = date.toLocaleDateString("pt-BR");
+    const day = new Intl.DateTimeFormat("pt-BR", {day: "2-digit", timeZone: DISPLAY_TIME_ZONE}).format(date);
+    const month = new Intl.DateTimeFormat("pt-BR", {month: "short", timeZone: DISPLAY_TIME_ZONE}).format(date).replace(".", "");
+    const year = new Intl.DateTimeFormat("pt-BR", {year: "numeric", timeZone: DISPLAY_TIME_ZONE}).format(date);
+    const weekday = new Intl.DateTimeFormat("pt-BR", {weekday: "long", timeZone: DISPLAY_TIME_ZONE}).format(date);
+    const numericDate = new Intl.DateTimeFormat("pt-BR", {
+      day: "2-digit", month: "2-digit", year: "numeric", timeZone: DISPLAY_TIME_ZONE,
+    }).format(date);
 
     return `<section id="exam-countdown" class="exam-focus card" aria-labelledby="exam-title">
       <div class="exam-main">
@@ -138,7 +141,9 @@
 
     const topActions = document.querySelector(".top-actions");
     if (topActions && !document.querySelector("#exam-top-pill")) {
-      const examDate = examDateObject().toLocaleDateString("pt-BR", {day: "2-digit", month: "2-digit"});
+      const examDate = new Intl.DateTimeFormat("pt-BR", {
+        day: "2-digit", month: "2-digit", timeZone: DISPLAY_TIME_ZONE,
+      }).format(examDateObject());
       topActions.insertAdjacentHTML("afterbegin", `<span id="exam-top-pill" class="exam-top-pill">Prova ${escapeHTML(examDate)} · <b data-exam-days></b></span>`);
     }
     bindEnhancementEvents();
