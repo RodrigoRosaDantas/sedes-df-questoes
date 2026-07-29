@@ -12,14 +12,14 @@ Plataforma independente para resolução de provas e simulados destinados à pre
 
 ### Materiais disponíveis
 
-1. PROG01 — Cartão Prato Cheio;
-2. PROG02 — Programa Cartão Gás;
-3. PROG03 — Plano DF Social;
-4. PROG04 — Benefícios eventuais da assistência social do DF;
+1. PROG01 — Programas e Benefícios do DF;
+2. PROG02 — Programas e Benefícios do DF;
+3. PROG03 — Programas e Benefícios do DF;
+4. PROG04 — Programas e Benefícios do DF;
 5. PROG05 — SISAN e Restaurantes Comunitários;
 6. CONST01 — Direito Constitucional;
 7. ADM01 — Direito Administrativo;
-8. ARQ01 — Arquivologia e rotinas administrativas;
+8. ARQ01 — Arquivologia;
 9. MAT01 — Recursos Materiais e Patrimônio.
 
 ## Funcionalidades
@@ -53,15 +53,18 @@ GitHub Pages
 
 Somente questões com transcrição conferida, gabarito conferido e sem marcação de duplicidade foram incluídas nesta publicação.
 
-## Estrutura publicada
+## Estrutura de dados
 
 ```text
 data/
 ├── catalogo.json
-└── materiais.bundle.b64  # nove materiais e 180 questões, compactados com gzip
+└── bundle/
+    ├── part-01.txt
+    ├── ...
+    └── part-12.txt
 ```
 
-O catálogo inicial é leve. O banco completo é transferido apenas quando o usuário abre um material e permanece em cache durante a sessão.
+O catálogo inicial é leve. O banco completo está compactado com gzip, codificado em Base64 e dividido em 12 fragmentos com integridade verificável. Os fragmentos são reunidos apenas quando o usuário abre um material e permanecem em cache durante a sessão.
 
 ## Validação
 
@@ -69,7 +72,14 @@ O catálogo inicial é leve. O banco completo é transferido apenas quando o usu
 npm test
 ```
 
-O validador verifica o catálogo e o bundle publicado, incluindo IDs e códigos duplicados, enunciados, comentários, alternativas A–E, gabaritos e totais gerais.
+O validador reúne os 12 fragmentos, descompacta o banco e verifica:
+
+- nove materiais e 180 questões;
+- IDs e códigos duplicados;
+- enunciados e comentários;
+- alternativas A–E;
+- gabaritos válidos;
+- quantidades por material e total geral.
 
 ## Publicação
 
