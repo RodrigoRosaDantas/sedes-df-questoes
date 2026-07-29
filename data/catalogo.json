@@ -1,14 +1,16 @@
 {
-  "schema_version": "2.1",
-  "exported_at": "2026-07-29T18:53:00-03:00",
+  "schema_version": "3.0",
+  "exported_at": "2026-07-29T19:25:00-03:00",
   "source": {
     "name": "Banco Mestre — Provas e Simulados SEDES/DF",
     "notion_url": "https://app.notion.com/p/a1d5fc8f8e434105861faba90dc156d9",
-    "criteria": "Base v1.0 preservada; atualização manual incremental com Auditoria de conteúdo = Ajustada, transcrição conferida, sem duplicidade e autorização editorial expressa em 29/07/2026"
+    "criteria": "Banco Mestre com 570 registros estruturalmente completos; pacote público atual preservado com 183 questões enquanto a exportação integral aguarda renovação da cota de consulta do Notion."
   },
   "summary": {
+    "banco_mestre": 570,
     "materiais": 12,
     "questoes": 183,
+    "aguardando_exportacao": 387,
     "provas": 0,
     "simulados": 12
   },
