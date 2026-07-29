@@ -107,12 +107,13 @@
   };
 
   const bindEnhancementEvents = () => {
-    document.querySelector("[data-exam-train]")?.addEventListener("click", () => {
-      document.querySelector("[data-random]")?.click();
-    }, {once: true});
-    document.querySelector("[data-exam-catalog]")?.addEventListener("click", () => {
+    const trainingButton = document.querySelector("[data-exam-train]");
+    if (trainingButton) trainingButton.onclick = () => document.querySelector("[data-random]")?.click();
+
+    const catalogButton = document.querySelector("[data-exam-catalog]");
+    if (catalogButton) catalogButton.onclick = () => {
       document.querySelector("#catalogo")?.scrollIntoView({behavior: "smooth", block: "start"});
-    }, {once: true});
+    };
   };
 
   const enhanceHome = () => {
