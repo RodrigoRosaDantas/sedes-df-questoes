@@ -1,47 +1,93 @@
 # SEDES/DF Questões
 
-Plataforma independente para resolução de provas e simulados destinados à preparação para concursos da Secretaria de Desenvolvimento Social do Distrito Federal.
+Plataforma independente e compartilhada para preparação para o concurso da Secretaria de Desenvolvimento Social do Distrito Federal.
 
-## Publicação atual
+## Situação do acervo
 
-- **183 questões publicadas**;
-- **12 materiais disponíveis**;
-- **9 simulados completos**, com 20 questões cada;
-- **3 materiais de Português em publicação parcial**, com uma questão ajustada cada;
-- cargo inicial: **TDAS — Técnico Administrativo — código 202**;
-- fonte editorial: **Banco Mestre — Provas e Simulados SEDES/DF**, no Notion;
-- autoria dos simulados publicados: **Emília Adelino**.
+- **570 questões** cadastradas e estruturalmente completas no Banco Mestre do Notion;
+- **183 questões** disponíveis atualmente no site;
+- **387 questões** aguardando exportação integral;
+- **12 materiais publicados**, sendo 9 simulados completos e 3 materiais parciais;
+- nenhuma questão oficial é apresentada como sendo da Quadrix quando sua origem é autoral.
 
-### Materiais disponíveis
+A diferença entre Banco Mestre e site é mostrada de forma explícita na página inicial. A exportação integral foi interrompida pelo limite temporário de consultas do conector do Notion; o pacote de 183 questões foi preservado para não retirar conteúdo já utilizável.
 
-1. PROG01 — Programas e Benefícios do DF;
-2. PROG02 — Programas e Benefícios do DF;
-3. PROG03 — Programas e Benefícios do DF;
-4. PROG04 — Programas e Benefícios do DF;
-5. PROG05 — SISAN e Restaurantes Comunitários;
-6. CONST01 — Direito Constitucional;
-7. ADM01 — Direito Administrativo;
-8. ARQ01 — Arquivologia;
-9. MAT01 — Recursos Materiais e Patrimônio;
-10. PT03 — Ortografia oficial — publicação parcial;
-11. PT05 — Tempos e modos verbais — publicação parcial;
-12. PT15 — Reescrita de frases e parágrafos — publicação parcial.
+## Perfis locais
 
-## Funcionalidades
+A versão 2.0 inclui três perfis:
 
-- catálogo com separação entre **Provas anteriores** e **Simulados**;
-- busca e filtro por disciplina;
-- modo treino com correção imediata;
-- modo prova com correção apenas ao final;
-- treino aleatório entre os materiais;
+- Rodrigo;
+- Amanda;
+- Andressa.
+
+Cada perfil possui, de forma independente neste navegador:
+
+- histórico de tentativas;
+- caderno de erros;
+- questões marcadas;
+- progresso e aproveitamento;
+- tentativa salva para continuar depois;
+- seleção dos cargos acompanhados.
+
+O histórico da versão anterior é migrado para o perfil Rodrigo. Os dados não são enviados a um servidor e não aparecem automaticamente em outro aparelho.
+
+## Cargos acompanhados
+
+### Nível médio
+
+- TDAS 200 — Agente Social;
+- TDAS 202 — Técnico Administrativo.
+
+### Nível superior
+
+- EDAS 400 — Administração;
+- EDAS 403 — Direito e Legislação;
+- EDAS 405 — Educador Social.
+
+## Áreas da plataforma
+
+### Início
+
+Dashboard compacto com perfil ativo, contador da prova, situação do banco, próxima ação, estatísticas e materiais em destaque.
+
+### Estudar
+
+- catálogo de simulados e provas;
+- treino personalizado;
+- filtros por cargo e disciplina;
+- seleção de 10, 20, 30 ou 50 questões;
+- somente inéditas, erradas ou marcadas;
+- modo treino ou modo prova;
+- progresso e melhor resultado por material.
+
+### Revisar
+
+- caderno de erros;
+- erros recorrentes;
+- questões marcadas;
+- revisão das dez questões mais críticas;
+- revisão por material.
+
+### Desempenho
+
+- aproveitamento geral;
+- cobertura do acervo publicado;
+- tempo acumulado;
+- estatísticas por disciplina;
+- histórico de tentativas.
+
+## Resolução de questões
+
+A plataforma mantém:
+
+- correção imediata no modo treino;
+- correção ao final no modo prova;
 - cronômetro total e por questão;
-- mapa de navegação e marcação para revisão;
-- resultado detalhado, comentários, fundamentos e pegadinhas;
-- histórico de tentativas salvo localmente;
-- caderno de erros por material;
-- refação de questões erradas e em branco;
-- contador regressivo para a prova da SEDES/DF;
-- tema claro/escuro e interface responsiva.
+- mapa de navegação;
+- marcação para revisão;
+- comentários, fundamentos e pegadinhas;
+- confirmação antes de finalizar com questões em branco;
+- opção de salvar e continuar a tentativa depois.
 
 ## Arquitetura editorial
 
@@ -50,29 +96,14 @@ Fontes e provas
       ↓
 Banco Mestre no Notion
       ↓
-Critérios de publicação e validação
+Validação editorial
       ↓
-Catálogo JSON versionado
+Catálogo e pacote versionados
       ↓
 GitHub Pages
 ```
 
-A base v1.0 com 180 questões permanece imutável. A atualização manual de 29/07/2026 acrescenta três questões de Português e substitui três itens ajustados, sem alterar rotinas programadas, o contador da prova ou o pacote-base.
-
-## Estrutura de dados
-
-```text
-data/
-├── catalogo.json
-├── bundle/
-│   ├── part-01.txt
-│   ├── ...
-│   └── part-12.txt
-└── updates/
-    └── update-2026-07-29.json
-```
-
-O pacote-base está compactado com gzip, codificado em Base64 e dividido em 12 fragmentos com integridade verificável. A camada incremental é aplicada somente durante o carregamento e mantém o histórico da base preservado.
+A base v1.0 com 180 questões permanece preservada. Uma camada incremental aplica três correções e acrescenta três questões, resultando nas 183 atualmente publicadas.
 
 ## Validação
 
@@ -80,16 +111,16 @@ O pacote-base está compactado com gzip, codificado em Base64 e dividido em 12 f
 npm run check
 ```
 
-Os validadores verificam:
+O pipeline verifica:
 
-- base imutável com nove materiais e 180 questões;
-- aplicação incremental com três correções e três novos itens;
-- resultado final com 12 materiais e 183 questões;
-- IDs e códigos duplicados;
-- enunciados e comentários;
-- alternativas A–E;
-- gabaritos válidos;
-- configuração e contador da prova;
+- integridade dos 12 fragmentos do pacote-base;
+- aplicação incremental;
+- 570 questões declaradas no Banco Mestre e 183 publicadas;
+- IDs, códigos, alternativas e gabaritos;
+- data da prova e cinco cargos oficiais;
+- três perfis e quatro áreas principais;
+- isolamento de dados por perfil;
+- retomada de sessão;
 - sintaxe dos arquivos JavaScript.
 
 ## Publicação
