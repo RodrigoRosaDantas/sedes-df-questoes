@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#08111f">
+  <meta name="description" content="Plataforma independente de provas e simulados para concursos da SEDES/DF.">
+  <title>SEDES/DF Questões</title>
+  <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+  <a class="skip" href="#app">Pular para o conteúdo</a>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="SEDES/DF Questões — início">
+      <span class="brand-mark">SQ</span>
+      <span><strong>SEDES/DF Questões</strong><small>Projeto independente</small></span>
+    </a>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Alternar tema">◐</button>
+  </header>
+  <main id="app" class="container" tabindex="-1">
+    <section class="card loading"><h1>Carregando plataforma…</h1><p>Preparando o lote piloto.</p></section>
+  </main>
+  <footer>Banco editorial no Notion · aplicação independente · MVP de validação</footer>
+  <template id="error-template"><section class="card error"><h1>Não foi possível carregar as questões.</h1><p>Confira o arquivo <code>data/questoes.json</code>.</p></section></template>
+  <script type="module" src="./assets/app.js"></script>
+</body>
+</html>
