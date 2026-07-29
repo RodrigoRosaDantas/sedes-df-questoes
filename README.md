@@ -1,29 +1,67 @@
 # SEDES/DF Questões
 
-Projeto **independente** para resolução interativa de provas e simulados relacionados aos concursos da SEDES/DF.
+Plataforma independente para resolução de provas e simulados destinados à preparação para concursos da Secretaria de Desenvolvimento Social do Distrito Federal.
 
-Este repositório não pertence ao dashboard TDAS e não depende dele.
+## Publicação atual
 
-## Arquitetura
+- **180 questões validadas**;
+- **9 simulados completos**, com 20 questões cada;
+- cargo inicial: **TDAS — Técnico Administrativo — código 202**;
+- fonte editorial: **Banco Mestre — Provas e Simulados SEDES/DF**, no Notion;
+- autoria dos simulados publicados: **Emília Adelino**.
+
+### Materiais disponíveis
+
+1. PROG01 — Cartão Prato Cheio;
+2. PROG02 — Programa Cartão Gás;
+3. PROG03 — Plano DF Social;
+4. PROG04 — Benefícios eventuais da assistência social do DF;
+5. PROG05 — SISAN e Restaurantes Comunitários;
+6. CONST01 — Direito Constitucional;
+7. ADM01 — Direito Administrativo;
+8. ARQ01 — Arquivologia e rotinas administrativas;
+9. MAT01 — Recursos Materiais e Patrimônio.
+
+## Funcionalidades
+
+- catálogo com separação entre **Provas anteriores** e **Simulados**;
+- busca e filtro por disciplina;
+- modo treino com correção imediata;
+- modo prova com correção apenas ao final;
+- treino aleatório entre os materiais;
+- cronômetro total e por questão;
+- mapa de navegação e marcação para revisão;
+- resultado detalhado, comentários, fundamentos e pegadinhas;
+- histórico de tentativas salvo localmente;
+- caderno de erros por material;
+- refação de questões erradas e em branco;
+- tema claro/escuro e interface responsiva.
+
+## Arquitetura editorial
 
 ```text
+Fontes e provas
+      ↓
 Banco Mestre no Notion
-→ exportação validada
-→ data/questoes.json
-→ site estático
-→ GitHub Pages
+      ↓
+Critérios de publicação e validação
+      ↓
+Catálogo JSON versionado
+      ↓
+GitHub Pages
 ```
 
-## MVP incluído
+Somente questões com transcrição conferida, gabarito conferido e sem marcação de duplicidade foram incluídas nesta publicação.
 
-- lote piloto PT01 com 10 questões;
-- modo treino com correção imediata;
-- modo prova com correção ao final;
-- cronômetro total e por questão;
-- mapa e marcação para revisão;
-- resultado, comentários e refação das erradas;
-- histórico local no navegador;
-- tema claro/escuro e layout responsivo.
+## Estrutura publicada
+
+```text
+data/
+├── catalogo.json
+└── materiais.bundle.b64  # nove materiais e 180 questões, compactados com gzip
+```
+
+O catálogo inicial é leve. O banco completo é transferido apenas quando o usuário abre um material e permanece em cache durante a sessão.
 
 ## Validação
 
@@ -31,19 +69,8 @@ Banco Mestre no Notion
 npm test
 ```
 
+O validador verifica o catálogo e o bundle publicado, incluindo IDs e códigos duplicados, enunciados, comentários, alternativas A–E, gabaritos e totais gerais.
+
 ## Publicação
 
-1. Crie um repositório público chamado `sedes-df-questoes`.
-2. Envie estes arquivos para a branch `main`.
-3. Em **Settings → Pages**, selecione **GitHub Actions** como fonte.
-4. O workflow `.github/workflows/pages.yml` validará os dados e publicará o site.
-
-Endereço esperado:
-
-```text
-https://rodrigorosadantas.github.io/sedes-df-questoes/
-```
-
-## Regra editorial
-
-O Notion é a fonte de verdade. Apenas questões selecionadas e tecnicamente aptas devem ser exportadas. O lote atual é um MVP de validação e permanece identificado como material em revisão.
+O workflow em `.github/workflows/pages.yml` executa a validação e publica automaticamente a branch `main` no GitHub Pages.
