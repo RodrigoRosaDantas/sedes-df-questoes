@@ -34,7 +34,7 @@ if (enhancementScriptPosition < 0) fail("Script da página inicial não está re
 if (appScriptPosition < 0) fail("Aplicação principal não está referenciada no HTML.");
 if (enhancementScriptPosition > appScriptPosition) fail("As melhorias da página inicial devem ser carregadas antes da aplicação principal.");
 if (!script.includes('DISPLAY_TIME_ZONE = "America/Sao_Paulo"')) fail("A exibição da data deve estar fixada no horário de Brasília.");
-if (!script.includes("data-exam-days") || !script.includes("data-countdown-dias")) fail("Contador regressivo incompleto.");
+if (!script.includes("data-exam-days") || !script.includes("data-countdown-${label}") || !script.includes('countdownUnit(countdown.days, "dias")')) fail("Contador regressivo incompleto.");
 if (!styles.includes(".exam-focus") || !styles.includes(".countdown-grid")) fail("Estilos do painel da prova incompletos.");
 
 console.log(`✓ Prova validada: ${exam.cargo} em ${exam.data_prova}, com contador no horário de Brasília.`);
