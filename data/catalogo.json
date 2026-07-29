@@ -1,0 +1,27 @@
+{
+  "schema_version": "2.0",
+  "exported_at": "2026-07-29T15:49:00-03:00",
+  "source": {
+    "name": "Banco Mestre — Provas e Simulados SEDES/DF",
+    "notion_url": "https://app.notion.com/p/a1d5fc8f8e434105861faba90dc156d9",
+    "criteria": "Transcrição conferida = Sim; Gabarito conferido = Sim; Duplicada = Não; autorização do usuário em 29/07/2026"
+  },
+  "summary": {
+    "materiais": 9,
+    "questoes": 180,
+    "provas": 0,
+    "simulados": 9
+  },
+  "materials": [
+    {"id":"sim-emilia-2026-tdas-prog01","tipo_material":"simulado","fonte":"Emília Adelino","nome":"Simulado PROG01 — Programas e Benefícios do DF","ano":2026,"orgao":"SEDES/DF","cargo":"TDAS — Técnico Administrativo","codigo_cargo":"202","disciplina":"Programas e Benefícios do DF","quantidade_questoes":20,"tempo_sugerido_minutos":40,"status":"publicado"},
+    {"id":"sim-emilia-2026-tdas-prog02","tipo_material":"simulado","fonte":"Emília Adelino","nome":"Simulado PROG02 — Programas e Benefícios do DF","ano":2026,"orgao":"SEDES/DF","cargo":"TDAS — Técnico Administrativo","codigo_cargo":"202","disciplina":"Programas e Benefícios do DF","quantidade_questoes":20,"tempo_sugerido_minutos":40,"status":"publicado"},
+    {"id":"sim-emilia-2026-tdas-prog03","tipo_material":"simulado","fonte":"Emília Adelino","nome":"Simulado PROG03 — Programas e Benefícios do DF","ano":2026,"orgao":"SEDES/DF","cargo":"TDAS — Técnico Administrativo","codigo_cargo":"202","disciplina":"Programas e Benefícios do DF","quantidade_questoes":20,"tempo_sugerido_minutos":40,"status":"publicado"},
+    {"id":"sim-emilia-2026-tdas-prog04","tipo_material":"simulado","fonte":"Emília Adelino","nome":"Simulado PROG04 — Programas e Benefícios do DF","ano":2026,"orgao":"SEDES/DF","cargo":"TDAS — Técnico Administrativo","codigo_cargo":"202","disciplina":"Programas e Benefícios do DF","quantidade_questoes":20,"tempo_sugerido_minutos":40,"status":"publicado"},
+    {"id":"sim-emilia-2026-tdas-prog05","tipo_material":"simulado","fonte":"Emília Adelino","nome":"Simulado PROG05 — SISAN e Restaurantes Comunitários","ano":2026,"orgao":"SEDES/DF","cargo":"TDAS — Técnico Administrativo","codigo_cargo":"202","disciplina":"Programas e Benefícios do DF","quantidade_questoes":20,"tempo_sugerido_minutos":40,"status":"publicado"},
+    {"id":"sim-emilia-2026-tdas-const01","tipo_material":"simulado","fonte":"Emília Adelino","nome":"Simulado CONST01 — Direito Constitucional","ano":2026,"orgao":"SEDES/DF","cargo":"TDAS — Técnico Administrativo","codigo_cargo":"202","disciplina":"Direito Constitucional","quantidade_questoes":20,"tempo_sugerido_minutos":40,"status":"publicado"},
+    {"id":"sim-emilia-2026-tdas-adm01","tipo_material":"simulado","fonte":"Emília Adelino","nome":"Simulado ADM01 — Direito Administrativo","ano":2026,"orgao":"SEDES/DF","cargo":"TDAS — Técnico Administrativo","codigo_cargo":"202","disciplina":"Direito Administrativo","quantidade_questoes":20,"tempo_sugerido_minutos":40,"status":"publicado"},
+    {"id":"sim-emilia-2026-tdas-arq01","tipo_material":"simulado","fonte":"Emília Adelino","nome":"Simulado ARQ01 — Arquivologia","ano":2026,"orgao":"SEDES/DF","cargo":"TDAS — Técnico Administrativo","codigo_cargo":"202","disciplina":"Arquivologia","quantidade_questoes":20,"tempo_sugerido_minutos":40,"status":"publicado"},
+    {"id":"sim-emilia-2026-tdas-mat01","tipo_material":"simulado","fonte":"Emília Adelino","nome":"Simulado MAT01 — Recursos Materiais e Patrimônio","ano":2026,"orgao":"SEDES/DF","cargo":"TDAS — Técnico Administrativo","codigo_cargo":"202","disciplina":"Recursos Materiais e Patrimônio","quantidade_questoes":20,"tempo_sugerido_minutos":40,"status":"publicado"}
+  ],
+  "bundle": "./data/materiais.bundle.b64"
+}
