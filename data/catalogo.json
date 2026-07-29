@@ -1,16 +1,16 @@
 {
-  "schema_version": "2.0",
-  "exported_at": "2026-07-29T15:49:00-03:00",
+  "schema_version": "2.1",
+  "exported_at": "2026-07-29T18:53:00-03:00",
   "source": {
     "name": "Banco Mestre — Provas e Simulados SEDES/DF",
     "notion_url": "https://app.notion.com/p/a1d5fc8f8e434105861faba90dc156d9",
-    "criteria": "Transcrição conferida = Sim; Gabarito conferido = Sim; Duplicada = Não; autorização do usuário em 29/07/2026"
+    "criteria": "Base v1.0 preservada; atualização manual incremental com Auditoria de conteúdo = Ajustada, transcrição conferida, sem duplicidade e autorização editorial expressa em 29/07/2026"
   },
   "summary": {
-    "materiais": 9,
-    "questoes": 180,
+    "materiais": 12,
+    "questoes": 183,
     "provas": 0,
-    "simulados": 9
+    "simulados": 12
   },
   "materials": [
     {
@@ -138,6 +138,48 @@
       "quantidade_questoes": 20,
       "tempo_sugerido_minutos": 40,
       "status": "publicado"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-pt03",
+      "tipo_material": "simulado",
+      "fonte": "Emília Adelino",
+      "nome": "Simulado PT03 — Ortografia oficial",
+      "ano": 2026,
+      "orgao": "SEDES/DF",
+      "cargo": "TDAS — Técnico Administrativo",
+      "codigo_cargo": "202",
+      "disciplina": "Língua Portuguesa",
+      "quantidade_questoes": 1,
+      "tempo_sugerido_minutos": 2,
+      "status": "publicado_parcial"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-pt05",
+      "tipo_material": "simulado",
+      "fonte": "Emília Adelino",
+      "nome": "Simulado PT05 — Tempos e modos verbais",
+      "ano": 2026,
+      "orgao": "SEDES/DF",
+      "cargo": "TDAS — Técnico Administrativo",
+      "codigo_cargo": "202",
+      "disciplina": "Língua Portuguesa",
+      "quantidade_questoes": 1,
+      "tempo_sugerido_minutos": 2,
+      "status": "publicado_parcial"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-pt15",
+      "tipo_material": "simulado",
+      "fonte": "Emília Adelino",
+      "nome": "Simulado PT15 — Reescrita de frases e parágrafos",
+      "ano": 2026,
+      "orgao": "SEDES/DF",
+      "cargo": "TDAS — Técnico Administrativo",
+      "codigo_cargo": "202",
+      "disciplina": "Língua Portuguesa",
+      "quantidade_questoes": 1,
+      "tempo_sugerido_minutos": 2,
+      "status": "publicado_parcial"
     }
   ],
   "bundle": "./data/materiais.bundle.b64",
@@ -154,5 +196,6 @@
     "./data/bundle/part-10.txt",
     "./data/bundle/part-11.txt",
     "./data/bundle/part-12.txt"
-  ]
+  ],
+  "incremental_update": "./data/updates/update-2026-07-29.json"
 }
