@@ -4,8 +4,10 @@ Plataforma independente para resolução de provas e simulados destinados à pre
 
 ## Publicação atual
 
-- **180 questões validadas**;
+- **183 questões publicadas**;
+- **12 materiais disponíveis**;
 - **9 simulados completos**, com 20 questões cada;
+- **3 materiais de Português em publicação parcial**, com uma questão ajustada cada;
 - cargo inicial: **TDAS — Técnico Administrativo — código 202**;
 - fonte editorial: **Banco Mestre — Provas e Simulados SEDES/DF**, no Notion;
 - autoria dos simulados publicados: **Emília Adelino**.
@@ -20,7 +22,10 @@ Plataforma independente para resolução de provas e simulados destinados à pre
 6. CONST01 — Direito Constitucional;
 7. ADM01 — Direito Administrativo;
 8. ARQ01 — Arquivologia;
-9. MAT01 — Recursos Materiais e Patrimônio.
+9. MAT01 — Recursos Materiais e Patrimônio;
+10. PT03 — Ortografia oficial — publicação parcial;
+11. PT05 — Tempos e modos verbais — publicação parcial;
+12. PT15 — Reescrita de frases e parágrafos — publicação parcial.
 
 ## Funcionalidades
 
@@ -35,6 +40,7 @@ Plataforma independente para resolução de provas e simulados destinados à pre
 - histórico de tentativas salvo localmente;
 - caderno de erros por material;
 - refação de questões erradas e em branco;
+- contador regressivo para a prova da SEDES/DF;
 - tema claro/escuro e interface responsiva.
 
 ## Arquitetura editorial
@@ -51,36 +57,41 @@ Catálogo JSON versionado
 GitHub Pages
 ```
 
-Somente questões com transcrição conferida, gabarito conferido e sem marcação de duplicidade foram incluídas nesta publicação.
+A base v1.0 com 180 questões permanece imutável. A atualização manual de 29/07/2026 acrescenta três questões de Português e substitui três itens ajustados, sem alterar rotinas programadas, o contador da prova ou o pacote-base.
 
 ## Estrutura de dados
 
 ```text
 data/
 ├── catalogo.json
-└── bundle/
-    ├── part-01.txt
-    ├── ...
-    └── part-12.txt
+├── bundle/
+│   ├── part-01.txt
+│   ├── ...
+│   └── part-12.txt
+└── updates/
+    └── update-2026-07-29.json
 ```
 
-O catálogo inicial é leve. O banco completo está compactado com gzip, codificado em Base64 e dividido em 12 fragmentos com integridade verificável. Os fragmentos são reunidos apenas quando o usuário abre um material e permanecem em cache durante a sessão.
+O pacote-base está compactado com gzip, codificado em Base64 e dividido em 12 fragmentos com integridade verificável. A camada incremental é aplicada somente durante o carregamento e mantém o histórico da base preservado.
 
 ## Validação
 
 ```bash
-npm test
+npm run check
 ```
 
-O validador reúne os 12 fragmentos, descompacta o banco e verifica:
+Os validadores verificam:
 
-- nove materiais e 180 questões;
+- base imutável com nove materiais e 180 questões;
+- aplicação incremental com três correções e três novos itens;
+- resultado final com 12 materiais e 183 questões;
 - IDs e códigos duplicados;
 - enunciados e comentários;
 - alternativas A–E;
 - gabaritos válidos;
-- quantidades por material e total geral.
+- configuração e contador da prova;
+- sintaxe dos arquivos JavaScript.
 
 ## Publicação
 
-O workflow em `.github/workflows/pages.yml` executa a validação e publica automaticamente a branch `main` no GitHub Pages.
+O workflow em `.github/workflows/pages.yml` executa `npm run check` e publica automaticamente a branch `main` no GitHub Pages.
