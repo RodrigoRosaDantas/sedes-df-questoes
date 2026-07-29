@@ -5,6 +5,6 @@
   "type": "module",
   "scripts": {
     "test": "node scripts/validate-data.mjs && node scripts/smoke-test.mjs && node scripts/validate-incremental-update.mjs && node scripts/validate-exam.mjs && node scripts/validate-dashboard.mjs",
-    "check": "node --check assets/app-v3.js && node --check assets/data-updates.js && npm test"
+    "check": "node --check assets/app-v3.js && node --check assets/data-updates.js && node --check assets/cargo-filter.js && npm test"
   }
 }
