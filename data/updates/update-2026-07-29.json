@@ -1,0 +1,224 @@
+{
+  "schema_version": "1.0",
+  "updated_at": "2026-07-29T18:53:00-03:00",
+  "source": {
+    "name": "Banco Mestre — Provas e Simulados SEDES/DF",
+    "notion_url": "https://app.notion.com/p/a1d5fc8f8e434105861faba90dc156d9",
+    "criteria": "Auditoria de conteúdo = Ajustada; transcrição conferida; sem duplicidade; status/autorização editorial legados e autorização expressa do usuário em 29/07/2026"
+  },
+  "materials": [
+    {
+      "id": "sim-emilia-2026-tdas-arq01",
+      "mode": "merge",
+      "questoes": [
+        {
+          "id": "sim-emilia-2026-tdas-arq01-378",
+          "codigo": "SIM-EMILIA-2026-TDAS-ARQ01-378",
+          "numero": 378,
+          "titulo": "Pronomes de tratamento",
+          "disciplina": "Arquivologia",
+          "assunto": "Atendimento, comunicação oficial e arquivologia",
+          "subassunto": null,
+          "texto_base": null,
+          "enunciado": "Segundo o Manual de Comunicação Oficial do Distrito Federal de 2023, o pronome de tratamento empregado no corpo do texto para o Governador do Distrito Federal e para o Secretário de Estado do Distrito Federal é:",
+          "alternativas": {
+            "A": "Vossa Excelência.",
+            "B": "Vossa Magnificência.",
+            "C": "Vossa Senhoria.",
+            "D": "Vossa Alteza.",
+            "E": "Vossa Reverendíssima."
+          },
+          "gabarito": "A",
+          "comentario": "O quadro de formas de tratamento do manual indica “Vossa Excelência” no corpo do texto tanto para o Governador do Distrito Federal quanto para o Secretário de Estado do Distrito Federal.",
+          "fundamento": "Manual de Comunicação Oficial do Distrito Federal.",
+          "pegadinha": null,
+          "status_editorial": "Ajustada",
+          "transcricao_conferida": true,
+          "gabarito_conferido": true,
+          "pode_publicar": true
+        },
+        {
+          "id": "sim-emilia-2026-tdas-arq01-379",
+          "codigo": "SIM-EMILIA-2026-TDAS-ARQ01-379",
+          "numero": 379,
+          "titulo": "Fechos da comunicação oficial",
+          "disciplina": "Arquivologia",
+          "assunto": "Atendimento, comunicação oficial e arquivologia",
+          "subassunto": null,
+          "texto_base": null,
+          "enunciado": "Segundo o Manual de Comunicação Oficial do Distrito Federal de 2023, o fecho utilizado para as demais autoridades, não incluídas no grupo específico destinatário de “Respeitosamente”, independentemente da hierarquia, é:",
+          "alternativas": {
+            "A": "Respeitosamente.",
+            "B": "Atenciosamente.",
+            "C": "Cordialmente.",
+            "D": "Saudações.",
+            "E": "Sem mais."
+          },
+          "gabarito": "B",
+          "comentario": "“Atenciosamente” é o fecho destinado às demais autoridades, independentemente da hierarquia. “Respeitosamente” fica reservado ao Presidente da República, ao Presidente do Congresso Nacional, ao Presidente do Supremo Tribunal Federal, ao Governador do Distrito Federal e ao Presidente da Câmara Legislativa do Distrito Federal.",
+          "fundamento": "Manual de Comunicação Oficial do Distrito Federal.",
+          "pegadinha": null,
+          "status_editorial": "Ajustada",
+          "transcricao_conferida": true,
+          "gabarito_conferido": true,
+          "pode_publicar": true
+        }
+      ]
+    },
+    {
+      "id": "sim-emilia-2026-tdas-mat01",
+      "mode": "merge",
+      "questoes": [
+        {
+          "id": "sim-emilia-2026-tdas-mat01-399",
+          "codigo": "SIM-EMILIA-2026-TDAS-MAT01-399",
+          "numero": 399,
+          "titulo": "Transferência de guarda patrimonial",
+          "disciplina": "Recursos Materiais e Patrimônio",
+          "assunto": "Administração de materiais, patrimônio e licitações",
+          "subassunto": null,
+          "texto_base": null,
+          "enunciado": "Na hipótese de afastamento temporário do titular do órgão usuário, a transferência da responsabilidade pela guarda dos bens patrimoniais ao substituto deve ser formalizada por:",
+          "alternativas": {
+            "A": "inventário anual denominado obrigatoriamente “Inventário de Transferência de Responsabilidade”.",
+            "B": "Termo de Transferência de Guarda e Responsabilidade.",
+            "C": "nota de empenho emitida pelo setor financeiro.",
+            "D": "termo de referência aprovado pela autoridade competente.",
+            "E": "baixa automática de todos os bens vinculados ao titular anterior."
+          },
+          "gabarito": "B",
+          "comentario": "O art. 27 do Decreto Distrital nº 16.109/1994 prevê que, no afastamento temporário do titular do órgão usuário, a responsabilidade pela guarda dos bens será transferida ao substituto mediante emissão do Termo de Transferência de Guarda e Responsabilidade.",
+          "fundamento": "Decreto Distrital nº 16.109/1994, conforme a página consolidada CONSOL-MAT01.",
+          "pegadinha": null,
+          "status_editorial": "Ajustada",
+          "transcricao_conferida": true,
+          "gabarito_conferido": true,
+          "pode_publicar": true
+        }
+      ]
+    },
+    {
+      "id": "sim-emilia-2026-tdas-pt03",
+      "mode": "append",
+      "nome": "Simulado PT03 — Ortografia oficial",
+      "disciplina": "Língua Portuguesa",
+      "fonte": "Emília Adelino",
+      "tipo_material": "simulado",
+      "ano": 2026,
+      "orgao": "SEDES/DF",
+      "cargo": "TDAS — Técnico Administrativo",
+      "codigo_cargo": "202",
+      "tempo_sugerido_minutos": 2,
+      "questoes": [
+        {
+          "id": "sim-emilia-2026-tdas-pt03-26",
+          "codigo": "SIM-EMILIA-2026-TDAS-PT03-26",
+          "numero": 26,
+          "titulo": "Palavra sem acento",
+          "disciplina": "Língua Portuguesa",
+          "assunto": "Acentuação gráfica",
+          "subassunto": "Palavra sem acento",
+          "texto_base": null,
+          "enunciado": "Assinale a alternativa cuja palavra não recebe acento gráfico segundo a ortografia oficial.",
+          "alternativas": {
+            "A": "Saúde.",
+            "B": "Século.",
+            "C": "Renda.",
+            "D": "Vulneráveis.",
+            "E": "Público."
+          },
+          "gabarito": "C",
+          "comentario": "“Renda” é paroxítona terminada em “a” e não recebe acento gráfico. As demais palavras recebem acento gráfico segundo as regras da ortografia oficial.",
+          "fundamento": null,
+          "pegadinha": null,
+          "status_editorial": "Ajustada",
+          "transcricao_conferida": true,
+          "gabarito_conferido": true,
+          "pode_publicar": true
+        }
+      ]
+    },
+    {
+      "id": "sim-emilia-2026-tdas-pt05",
+      "mode": "append",
+      "nome": "Simulado PT05 — Tempos e modos verbais",
+      "disciplina": "Língua Portuguesa",
+      "fonte": "Emília Adelino",
+      "tipo_material": "simulado",
+      "ano": 2026,
+      "orgao": "SEDES/DF",
+      "cargo": "TDAS — Técnico Administrativo",
+      "codigo_cargo": "202",
+      "tempo_sugerido_minutos": 2,
+      "questoes": [
+        {
+          "id": "sim-emilia-2026-tdas-pt05-09",
+          "codigo": "SIM-EMILIA-2026-TDAS-PT05-09",
+          "numero": 9,
+          "titulo": "Erro de correlação verbal",
+          "disciplina": "Língua Portuguesa",
+          "assunto": "Tempos e modos verbais",
+          "subassunto": "Erro de correlação",
+          "texto_base": null,
+          "enunciado": "Indique a opção em que a alteração do tempo verbal provoca erro de correlação.",
+          "alternativas": {
+            "A": "Se a Administração investisse, os gargalos seriam sanados.",
+            "B": "Se a Administração investir, os gargalos serão sanados.",
+            "C": "Se a Administração investiu, os gargalos foram sanados.",
+            "D": "Se a Administração investisse, os gargalos serão sanados.",
+            "E": "Caso a Administração invista, os gargalos serão sanados."
+          },
+          "gabarito": "D",
+          "comentario": "O pretérito imperfeito do subjuntivo combina regularmente com o futuro do pretérito, não com o futuro do presente nessa construção hipotética.",
+          "fundamento": null,
+          "pegadinha": null,
+          "status_editorial": "Ajustada",
+          "transcricao_conferida": true,
+          "gabarito_conferido": true,
+          "pode_publicar": true
+        }
+      ]
+    },
+    {
+      "id": "sim-emilia-2026-tdas-pt15",
+      "mode": "append",
+      "nome": "Simulado PT15 — Reescrita de frases e parágrafos",
+      "disciplina": "Língua Portuguesa",
+      "fonte": "Emília Adelino",
+      "tipo_material": "simulado",
+      "ano": 2026,
+      "orgao": "SEDES/DF",
+      "cargo": "TDAS — Técnico Administrativo",
+      "codigo_cargo": "202",
+      "tempo_sugerido_minutos": 2,
+      "questoes": [
+        {
+          "id": "sim-emilia-2026-tdas-pt15-60",
+          "codigo": "SIM-EMILIA-2026-TDAS-PT15-60",
+          "numero": 60,
+          "titulo": "Emprego do pronome relativo cujo",
+          "disciplina": "Língua Portuguesa",
+          "assunto": "Reescrita de frases e parágrafos",
+          "subassunto": "Pronome relativo cuja",
+          "texto_base": null,
+          "enunciado": "Assinale a reescrita gramaticalmente inadequada para “O assistente social, cuja atuação é essencial, acompanha o cidadão diariamente”.",
+          "alternativas": {
+            "A": "O assistente social, que tem uma atuação essencial, acompanha o cidadão diariamente.",
+            "B": "O assistente social acompanha o cidadão diariamente, visto que sua atuação é essencial.",
+            "C": "O assistente social, cuja a atuação é essencial, acompanha o cidadão diariamente.",
+            "D": "Diariamente, o cidadão é acompanhado pelo assistente social, cuja atuação é essencial.",
+            "E": "Sendo sua atuação essencial, o assistente social acompanha o cidadão diariamente."
+          },
+          "gabarito": "C",
+          "comentario": "O pronome relativo “cujo” e suas flexões não admitem artigo depois deles. Portanto, a construção correta seria “cuja atuação”, sem o artigo “a”.",
+          "fundamento": null,
+          "pegadinha": null,
+          "status_editorial": "Ajustada",
+          "transcricao_conferida": true,
+          "gabarito_conferido": true,
+          "pode_publicar": true
+        }
+      ]
+    }
+  ]
+}
