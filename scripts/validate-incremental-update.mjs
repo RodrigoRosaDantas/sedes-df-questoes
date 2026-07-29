@@ -42,6 +42,7 @@ const codes = new Set();
 if (bundle.materials.length !== catalog.summary.materiais) fail(`Materiais divergentes: pacote ${bundle.materials.length}, catálogo ${catalog.summary.materiais}.`);
 if (questions.length !== catalog.summary.questoes) fail(`Questões divergentes: pacote ${questions.length}, catálogo ${catalog.summary.questoes}.`);
 if (catalog.summary.materiais !== 12 || catalog.summary.questoes !== 183) fail("A atualização deve resultar em 12 materiais e 183 questões.");
+if (catalog.summary.banco_mestre !== 570 || catalog.summary.aguardando_exportacao !== 387) fail("Resumo do Banco Mestre divergente.");
 
 for (const {material, question} of questions) {
   if (!question.id || !question.codigo || !question.enunciado || !question.comentario) fail(`Questão incompleta em ${material.id}.`);
@@ -74,9 +75,9 @@ for (const id of replacements) {
 
 const bundleScriptPosition = index.indexOf("assets/bundle-fetch.js");
 const updateScriptPosition = index.indexOf("assets/data-updates.js");
-const appScriptPosition = index.indexOf("assets/app.js");
+const appScriptPosition = index.indexOf("assets/app-v3.js");
 if (bundleScriptPosition < 0 || updateScriptPosition < 0 || appScriptPosition < 0) fail("Scripts obrigatórios não estão referenciados no HTML.");
 if (!(bundleScriptPosition < updateScriptPosition && updateScriptPosition < appScriptPosition)) fail("A ordem dos scripts de dados está incorreta.");
 if (!updateScript.includes("CompressionStream") || !updateScript.includes("DecompressionStream")) fail("Camada incremental não recompõe o pacote compactado.");
 
-console.log("✓ Atualização incremental válida: 3 correções, 3 novas questões, 12 materiais e 183 questões no total.");
+console.log("✓ Atualização incremental válida: 3 correções, 3 novas questões, 12 materiais, 183 publicadas e 570 no Banco Mestre.");
