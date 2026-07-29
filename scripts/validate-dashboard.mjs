@@ -8,6 +8,8 @@ const fail = message => { throw new Error(message); };
 const app = read("assets/app-v3.js");
 const index = read("index.html");
 const styles = read("assets/dashboard.css");
+const cargoFilter = read("assets/cargo-filter.js");
+const exam = JSON.parse(read("data/concurso.json"));
 
 for (const profile of ["Rodrigo", "Amanda", "Andressa"]) if (!app.includes(`name: "${profile}"`)) fail(`Perfil padrão ausente: ${profile}`);
 for (const route of ["inicio", "estudar", "revisar", "desempenho", "perfil"]) {
@@ -18,4 +20,9 @@ for (const feature of ["saveSession", "resumeSession", "renderReview", "renderPe
 if (!app.includes("profileKey") || !app.includes("activeProfile")) fail("Isolamento de dados por perfil ausente.");
 if (!app.includes("LEGACY_HISTORY_KEY") || !app.includes("migrateLegacyData")) fail("Migração do histórico anterior ausente.");
 if (!styles.includes(".mobile-nav") || !styles.includes(".profile-grid") || !styles.includes(".training-builder")) fail("Estilos estruturais do dashboard incompletos.");
-console.log("✓ Dashboard válido: 3 perfis, 4 áreas principais, sessão recuperável, revisão e desempenho separados por perfil.");
+if (!index.includes("assets/cargo-filter.js")) fail("Filtro complementar de cargos não está referenciado no HTML.");
+if (!cargoFilter.includes("#builder-cargo") || !cargoFilter.includes("data.cargos")) fail("Filtro complementar não utiliza os cargos oficiais.");
+const expectedCodes = ["200", "202", "400", "403", "405"];
+const codes = exam.cargos.map(role => String(role.codigo)).sort();
+if (codes.join(",") !== [...expectedCodes].sort().join(",")) fail(`Filtro deve receber os cinco códigos oficiais: ${codes.join(", ")}`);
+console.log("✓ Dashboard válido: 3 perfis, 4 áreas principais, 5 cargos, sessão recuperável, revisão e desempenho separados por perfil.");
