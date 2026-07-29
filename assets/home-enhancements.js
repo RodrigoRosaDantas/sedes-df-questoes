@@ -19,6 +19,8 @@
     catch { return []; }
   };
 
+  const examDateObject = () => new Date(`${exam.data_prova}T12:00:00-03:00`);
+
   const getCountdown = () => {
     const difference = new Date(exam.alvo_contagem).getTime() - Date.now();
     if (difference <= 0) return {finished: true, days: 0, hours: 0, minutes: 0, seconds: 0, totalDays: 0};
@@ -44,16 +46,22 @@
     const questions = catalog?.summary?.questoes || 0;
     const dailyPace = countdown.totalDays ? Math.max(1, Math.ceil(questions / countdown.totalDays)) : 0;
     const locationDate = formatDate(exam.divulgacao_locais_horarios);
+    const date = examDateObject();
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = new Intl.DateTimeFormat("pt-BR", {month: "short"}).format(date).replace(".", "");
+    const year = date.getFullYear();
+    const weekday = new Intl.DateTimeFormat("pt-BR", {weekday: "long"}).format(date);
+    const numericDate = date.toLocaleDateString("pt-BR");
 
     return `<section id="exam-countdown" class="exam-focus card" aria-labelledby="exam-title">
       <div class="exam-main">
         <div class="exam-heading">
-          <div class="exam-date-badge"><strong>06</strong><span>set 2026</span></div>
+          <div class="exam-date-badge"><strong>${day}</strong><span>${escapeHTML(month)} ${year}</span></div>
           <div class="exam-copy">
             <p class="eyebrow">Próxima prova da SEDES/DF</p>
             <h2 id="exam-title">${escapeHTML(exam.cargo)}</h2>
             <p>${escapeHTML(exam.etapa)} · ${escapeHTML(exam.banca)} · código ${escapeHTML(exam.codigo_cargo)}</p>
-            <div class="exam-meta-line"><span>Domingo</span><span>06/09/2026</span><span>Brasília/DF</span></div>
+            <div class="exam-meta-line"><span>${escapeHTML(weekday)}</span><span>${escapeHTML(numericDate)}</span><span>Brasília/DF</span></div>
           </div>
         </div>
         <div class="countdown-label"><strong>${countdown.finished ? "Data da prova alcançada" : "Tempo até o dia da prova"}</strong><span>Contagem pelo horário de Brasília</span></div>
@@ -101,9 +109,11 @@
       });
     });
     document.querySelectorAll("[data-exam-days]").forEach(element => {
-      element.textContent = countdown.finished ? "prova realizada" : `${countdown.totalDays} dias`;
+      element.textContent = countdown.finished ? "prova realizada" : `${countdown.days}d ${String(countdown.hours).padStart(2, "0")}h`;
     });
-    document.title = countdown.finished ? "SEDES/DF Questões" : `${countdown.totalDays} dias para a prova | SEDES/DF Questões`;
+    document.title = countdown.finished
+      ? "SEDES/DF Questões"
+      : `${countdown.days}d ${countdown.hours}h para a prova | SEDES/DF Questões`;
   };
 
   const bindEnhancementEvents = () => {
@@ -128,7 +138,8 @@
 
     const topActions = document.querySelector(".top-actions");
     if (topActions && !document.querySelector("#exam-top-pill")) {
-      topActions.insertAdjacentHTML("afterbegin", `<span id="exam-top-pill" class="exam-top-pill">Prova 06/09 · <b data-exam-days></b></span>`);
+      const examDate = examDateObject().toLocaleDateString("pt-BR", {day: "2-digit", month: "2-digit"});
+      topActions.insertAdjacentHTML("afterbegin", `<span id="exam-top-pill" class="exam-top-pill">Prova ${escapeHTML(examDate)} · <b data-exam-days></b></span>`);
     }
     bindEnhancementEvents();
     updateCountdown();
