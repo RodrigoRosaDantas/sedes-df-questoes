@@ -151,7 +151,7 @@
   ]).then(([examData, catalogData]) => {
     exam = examData;
     catalog = catalogData;
-    new MutationObserver(queueEnhancement).observe(document.querySelector("#app"), {childList: true, subtree: true});
+    new MutationObserver(queueEnhancement).observe(document.querySelector("#app"), {childList: true});
     enhanceHome();
     countdownTimer = window.setInterval(updateCountdown, 1000);
     window.addEventListener("pagehide", () => window.clearInterval(countdownTimer), {once: true});
