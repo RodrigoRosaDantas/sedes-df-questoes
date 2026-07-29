@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-29T15:49:00-03:00",
+  "source": {
+    "name": "Banco Mestre — Provas e Simulados SEDES/DF",
+    "notion_url": "https://app.notion.com/p/a1d5fc8f8e434105861faba90dc156d9",
+    "criteria": "Transcrição conferida = Sim; Gabarito conferido = Sim; Duplicada = Não; autorização do usuário em 29/07/2026"
+  },
+  "release": {
+    "materials": 9,
+    "questions": 180,
+    "catalog_sha256": "1fe6e9f76fb637bf010517f39c6d9ec6a7736d85bb63b8c1d08920d49a90c7c1",
+    "encoded_bundle_sha256": "8d404b25cb3340ffeaa9a1c6096b6cf576ad5f88a2b207842444f1e46d889137",
+    "decoded_bundle_sha256": "16de8248d583b1fca6b006c122d7ab3e56966358f6ab026231941c38574d636f"
+  },
+  "chunks": [
+    {"path":"./data/bundle/part-01.txt","bytes":4000,"sha256":"bb41ab49f04a4c245849c2c49fc0d906ddd4393785c8da2dd87f3b8f1a0b6105"},
+    {"path":"./data/bundle/part-02.txt","bytes":4000,"sha256":"b162dc366ee562e1b54a2f72ea4da0c2771dfb8943292fbe9cff3454f00258d8"},
+    {"path":"./data/bundle/part-03.txt","bytes":4000,"sha256":"914bb10b57eb2a999a98376199afece39026bb5477a9bf4bfa67c0a04a34967e"},
+    {"path":"./data/bundle/part-04.txt","bytes":4000,"sha256":"bc51a0a7666a842f64015d4ea0945110f6996c41b27c309e8964aa955ae3a7ef"},
+    {"path":"./data/bundle/part-05.txt","bytes":4000,"sha256":"2e20937d55ad5086dd6780bb3c9ec930a203f5665a4c09f9cf66c83a7b1934da"},
+    {"path":"./data/bundle/part-06.txt","bytes":4000,"sha256":"b0d726a950bdbfc84d316865db246e11a07e6b69d768a615e928b52ebf737eb8"},
+    {"path":"./data/bundle/part-07.txt","bytes":4000,"sha256":"1304f32d6f23249718672af64464680cbc4b45dd143de66671a402a0dd63af76"},
+    {"path":"./data/bundle/part-08.txt","bytes":4000,"sha256":"45482cb4846bf585bbfe8e129606ef965f6763078225c9cbd71dd0200408b7da"},
+    {"path":"./data/bundle/part-09.txt","bytes":4000,"sha256":"f8aa5a61192b378606771d644b7b9bfb17f520fcdebe7c264ae3f9765e40e71a"},
+    {"path":"./data/bundle/part-10.txt","bytes":4000,"sha256":"fea25a6a66a8c43776417e903c89c2e0646fc89f13bce8f6ea7f44170a942daa"},
+    {"path":"./data/bundle/part-11.txt","bytes":4000,"sha256":"d817abb5a1415556d1b455c66a2cbbf27d74a8191469505a795a358904705bab"},
+    {"path":"./data/bundle/part-12.txt","bytes":3684,"sha256":"88dcddc1fda8dc1e6e7afa0e39afab8709dd14e9102aeb3728f404b2c3414048"}
+  ],
+  "materials": [
+    {"id":"sim-emilia-2026-tdas-adm01","name":"Simulado ADM01 — Direito Administrativo","questions":20},
+    {"id":"sim-emilia-2026-tdas-arq01","name":"Simulado ARQ01 — Arquivologia","questions":20},
+    {"id":"sim-emilia-2026-tdas-const01","name":"Simulado CONST01 — Direito Constitucional","questions":20},
+    {"id":"sim-emilia-2026-tdas-mat01","name":"Simulado MAT01 — Recursos Materiais e Patrimônio","questions":20},
+    {"id":"sim-emilia-2026-tdas-prog01","name":"Simulado PROG01 — Programas e Benefícios do DF","questions":20},
+    {"id":"sim-emilia-2026-tdas-prog02","name":"Simulado PROG02 — Programas e Benefícios do DF","questions":20},
+    {"id":"sim-emilia-2026-tdas-prog03","name":"Simulado PROG03 — Programas e Benefícios do DF","questions":20},
+    {"id":"sim-emilia-2026-tdas-prog04","name":"Simulado PROG04 — Programas e Benefícios do DF","questions":20},
+    {"id":"sim-emilia-2026-tdas-prog05","name":"Simulado PROG05 — SISAN e Restaurantes Comunitários","questions":20}
+  ]
+}
