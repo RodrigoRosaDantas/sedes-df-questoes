@@ -122,7 +122,7 @@ test("relatório respeita fuso, períodos e conteúdo exportado", async ({page})
   expect(backup.app_version).toBe("2.10.1");
   expect(backup.data.notes.Q3.text).toBe("Revisar planejamento");
   expect(backup.data.reviewSchedule.Q3.stage).toBe(0);
-  expect(backup.data.reviewProcessedAttempts).toEqual(["attempt-current"]);
+  expect([...backup.data.reviewProcessedAttempts].sort()).toEqual(["attempt-current", "attempt-night", "attempt-old", "attempt-previous"].sort());
 });
 
 test("restauração identifica o perfil de origem e substitui todos os dados", async ({page}) => {
