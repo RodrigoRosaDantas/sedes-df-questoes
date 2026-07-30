@@ -6,7 +6,7 @@ on:
     types: [opened, synchronize, reopened]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   compare:
@@ -27,9 +27,25 @@ jobs:
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         run: node scripts/compare-notion-release.mjs
-      - name: Validar plataforma completa
-        if: success()
+      - name: Gerar snapshot autorizado do Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/export-notion-snapshot.mjs
+      - name: Validar plataforma completa com o snapshot
         run: npm run check
+      - name: Consolidar snapshot na branch isolada
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'sedes-df-notion-sync[bot]'
+          git config user.email 'sedes-df-notion-sync[bot]@users.noreply.github.com'
+          git add data/notion/published.json
+          if git diff --cached --quiet; then
+            echo 'Snapshot já está atualizado.'
+            exit 0
+          fi
+          git commit -m 'Atualizar snapshot público do Banco Mestre'
+          git push origin HEAD:integration/notion-bank-master-v2
       - name: Guardar relatório comparativo
         if: always()
         uses: actions/upload-artifact@v4
