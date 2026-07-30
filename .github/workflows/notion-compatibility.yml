@@ -1,0 +1,37 @@
+name: Validar integração do Banco Mestre
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  compare:
+    if: github.event.pull_request.head.ref == 'integration/notion-bank-master-v2'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: integration/notion-bank-master-v2
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Gerar release pública atual
+        run: npm run build
+      - name: Comparar Banco Mestre com a release
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/compare-notion-release.mjs
+      - name: Validar plataforma completa
+        run: npm run check
+      - name: Guardar relatório comparativo
+        uses: actions/upload-artifact@v4
+        with:
+          name: notion-release-comparison
+          path: /tmp/notion-release-comparison.json
+          retention-days: 7
