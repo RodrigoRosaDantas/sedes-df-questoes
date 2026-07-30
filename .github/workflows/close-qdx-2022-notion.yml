@@ -1,0 +1,33 @@
+name: Fechar release 2.5 no Notion
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/mark-qdx-2022-published.mjs
+      - .github/workflows/close-qdx-2022-notion.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fechar-rastreabilidade:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validar release publicada
+        run: npm run check
+
+      - name: Atualizar 120 registros no Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          RELEASE_COMMIT: c8acc1ca772b8d5175cdadc55f998def563833eb
+        run: node scripts/mark-qdx-2022-published.mjs
