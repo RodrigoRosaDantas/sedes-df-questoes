@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build-release-v2-4.mjs",
-    "test": "node scripts/validate-data.mjs && node scripts/validate-release-v2-4.mjs && node scripts/validate-exam-v4.mjs",
-    "check": "npm run build && node --check assets/progress-migration-v2-3.js && node --check assets/app-v4.js && node --check scripts/build-release.mjs && node --check scripts/build-release-v2-4.mjs && node --check scripts/validate-release-v2-4.mjs && npm test"
+    "test": "node scripts/validate-data.mjs && node scripts/validate-true-false-plan.mjs && node scripts/validate-release-v2-4.mjs && node scripts/validate-exam-v4.mjs",
+    "check": "npm run build && node --check assets/progress-migration-v2-3.js && node --check assets/app-v4.js && node --check scripts/build-release.mjs && node --check scripts/build-release-v2-4.mjs && node --check scripts/validate-true-false-plan.mjs && node --check scripts/validate-release-v2-4.mjs && npm test"
   }
 }
