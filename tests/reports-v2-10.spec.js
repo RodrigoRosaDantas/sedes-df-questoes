@@ -4,8 +4,9 @@ import {test, expect} from "@playwright/test";
 const FIXED_NOW = Date.parse("2026-07-30T15:00:00.000Z");
 
 async function seedProfile(page) {
-  await page.addInitScript(({now}) => {
-    Date.now = () => now;
+  await page.addInitScript(({now}) => { Date.now = () => now; }, {now: FIXED_NOW});
+  await page.goto("/");
+  await page.evaluate(({now}) => {
     localStorage.setItem("sedes.questoes.activeProfile.v3", "rodrigo");
     localStorage.setItem("sedes.questoes.profiles.v3", JSON.stringify([
       {id: "rodrigo", name: "Rodrigo", roles: ["202", "400"]},
@@ -149,16 +150,18 @@ test("restauração identifica o perfil de origem e substitui todos os dados", a
     },
   };
 
+  const nextLoad = page.waitForEvent("load");
   await page.locator("[data-import-complete]").setInputFiles({
     name: "backup-amanda.json",
     mimeType: "application/json",
     buffer: Buffer.from(JSON.stringify(restoredPayload)),
   });
+  await nextLoad;
 
-  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem("sedes.questoes.rodrigo.history.v3"))[0].id)).toBe("restored-attempt");
   expect(dialogs[0]).toContain("Amanda");
   expect(dialogs[0]).toContain("Rodrigo");
   expect(dialogs.at(-1)).toContain("restaurado com sucesso");
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("sedes.questoes.rodrigo.history.v3"))[0].id)).toBe("restored-attempt");
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("sedes.questoes.rodrigo.notes.v1")).QX.text)).toBe("Anotação restaurada");
 });
 
