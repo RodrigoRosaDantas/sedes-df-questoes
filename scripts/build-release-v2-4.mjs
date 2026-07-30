@@ -22,6 +22,8 @@ const manifestPath = resolve("data/release/manifest.json");
 const catalog = JSON.parse(fs.readFileSync(catalogPath, "utf8"));
 const knownIds = new Set(Object.keys(catalog.question_index || {}));
 const knownCodes = new Set();
+let addedQuestions = 0;
+let addedMaterials = 0;
 
 for (const meta of catalog.materials) {
   const material = readJSON(meta.file);
@@ -54,6 +56,7 @@ function validateQuestion(question, material) {
   const pendingComment = question.comentario_status === "pendente" || material.comentarios_status === "pendente";
   if (!question.comentario && !pendingComment) fail(`${question.codigo}: comentário ausente sem indicação editorial.`);
   if (pendingComment && material.tipo_material !== "prova") fail(`${question.codigo}: comentário pendente permitido somente em prova anterior.`);
+  if (question.possui_imagem && (!question.imagem || !question.descricao_imagem)) fail(`${question.codigo}: recurso visual incompleto.`);
   knownIds.add(question.id);
   knownCodes.add(question.codigo);
 }
@@ -64,6 +67,7 @@ for (const entry of index.materials || []) {
   const material = readJSON(sourcePath);
   if (!material.id || !material.nome || !Array.isArray(material.questoes)) fail(`${sourcePath}: material inválido.`);
   if (catalog.materials.some(item => item.id === material.id)) fail(`Material duplicado: ${material.id}`);
+  if (entry.expected_questions && material.questoes.length !== Number(entry.expected_questions)) fail(`${material.id}: contagem divergente do índice editorial.`);
   material.formato_questao = material.formato_questao || "Certo / Errado";
   material.questoes.forEach(question => validateQuestion(question, material));
   material.quantidade_questoes = material.questoes.length;
@@ -74,18 +78,21 @@ for (const entry of index.materials || []) {
   const {questoes, ...metadata} = material;
   catalog.materials.push({...metadata, file: outputFile});
   for (const question of questoes) catalog.question_index[question.id] = material.id;
+  addedQuestions += questoes.length;
+  addedMaterials += 1;
 }
 
-catalog.summary.materials = catalog.materials.length;
+catalog.summary.materiais = catalog.materials.length;
 catalog.summary.questoes = Object.keys(catalog.question_index).length;
 catalog.summary.provas = catalog.materials.filter(item => String(item.tipo_material).toLowerCase() === "prova").length;
 catalog.summary.simulados = catalog.materials.filter(item => String(item.tipo_material).toLowerCase() === "simulado").length;
+catalog.summary.aguardando_auditoria = Math.max(0, Number(catalog.summary.aguardando_auditoria || 0) - addedQuestions);
 catalog.source.criteria = `${catalog.summary.questoes} questões publicadas nos formatos A–E e Certo/Errado; ${catalog.summary.aguardando_auditoria} registros permanecem em auditoria editorial.`;
 const catalogContent = `${JSON.stringify(catalog, null, 2)}\n`;
 fs.writeFileSync(catalogPath, catalogContent);
 
 const manifest = {
-  schema_version: "2.0",
+  schema_version: "2.1",
   release_version: catalog.release_version,
   generated_at: new Date().toISOString(),
   summary: catalog.summary,
@@ -96,4 +103,4 @@ const manifest = {
   }),
 };
 fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
-console.log(`✓ Release híbrida gerada: ${catalog.summary.materials} materiais e ${catalog.summary.questoes} questões.`);
+console.log(`✓ Release híbrida gerada: ${catalog.summary.materiais} materiais e ${catalog.summary.questoes} questões (${addedMaterials} material e ${addedQuestions} questões adicionadas).`);
