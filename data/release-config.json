@@ -1,6 +1,6 @@
 {
   "schema_version": "1.2",
-  "release_version": "2.5.0",
+  "release_version": "2.6.0",
   "banco_mestre": 2439,
   "aguardando_auditoria": 1869,
   "expected_questions": 570,
