@@ -40,6 +40,8 @@ if (materialFiles !== materialCount) throw new Error(`Arquivos de material diver
 
 const buildInfo = {
   version: packageData.version,
+  data_release_version: catalog.release_version || null,
+  catalog_schema_version: catalog.schema_version || null,
   generated_at: new Date().toISOString(),
   source_sha: process.env.GITHUB_SHA || "local",
   questions: questionCount,
