@@ -14,11 +14,11 @@ for (const file of [
 ]) if (!exists(file)) fail(`Arquivo da plataforma inteligente ausente: ${file}`);
 
 const index = read("dist/index.html");
-for (const feature of ["manifest.webmanifest", "intelligence-v2-9.css", "app-v4.js?v=6", "learning-v2-9.js", "pwa-v2-9.js"]) if (!index.includes(feature)) fail(`Integração ausente no HTML: ${feature}`);
+for (const feature of ["manifest.webmanifest", "intelligence-v2-9.css", "app-v4.js?v=7", "learning-v2-9.js", "pwa-v2-9.js"]) if (!index.includes(feature)) fail(`Integração ausente no HTML: ${feature}`);
 const learning = read("dist/assets/learning-v2-9.js");
 for (const feature of ["reviewSchedule", "D0/D7/D20", "data-smart-today", "Por que eu errei?", "Exportar para Anki", "Simulado por cargo", "Selecionar pontos fracos", "Minha anotação"]) if (!learning.includes(feature)) fail(`Recurso inteligente ausente: ${feature}`);
 const serviceWorker = read("dist/service-worker.js");
-for (const feature of ["data/release/catalogo.json", "CACHE_VERSION", "networkFirst"]) if (!serviceWorker.includes(feature)) fail(`Cache offline incompleto: ${feature}`);
+for (const feature of ["data/release/catalogo.json", "CACHE_VERSION", "networkFirst", "sedes-questoes-v2-11-1"]) if (!serviceWorker.includes(feature)) fail(`Cache offline incompleto: ${feature}`);
 if (!/release\\\/materials/.test(serviceWorker)) fail("Cache offline dos materiais não está ativo.");
 const catalog = JSON.parse(read("dist/data/release/catalogo.json"));
 const study = JSON.parse(read("dist/data/release/study-index.json"));
@@ -27,5 +27,7 @@ const materialCount = (catalog.materials || []).length;
 if (catalog.summary.questoes !== questionCount || catalog.summary.materiais !== materialCount) fail("Catálogo final divergente.");
 if (study.summary.questions !== questionCount || study.summary.disciplines !== 17 || study.summary.topics !== 95) fail("Índice por matéria divergente.");
 const workflow = read(".github/workflows/pages.yml");
-if (!workflow.includes("path: dist") || !workflow.includes("playwright") || !workflow.includes("verify-deployment.mjs")) fail("Workflow não publica dist, não executa navegador real ou não confirma o deploy.");
-console.log(`✓ Plataforma inteligente validada: ${questionCount} questões, ${materialCount} materiais, revisão espaçada, painel Hoje, tópicos, Anki, PWA e verificação pós-deploy.`);
+for (const marker of ["path: dist", "playwright", "verify-deployment.mjs", "playwright.public.config.js", "rollback-deployment.mjs"]) {
+  if (!workflow.includes(marker)) fail(`Workflow incompleto: ${marker}`);
+}
+console.log(`✓ Plataforma inteligente validada: ${questionCount} questões, ${materialCount} materiais, revisão espaçada, PWA e auditoria pública com rollback.`);
