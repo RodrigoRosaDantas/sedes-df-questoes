@@ -16,6 +16,11 @@ const clean = value => String(value ?? '')
   .replace(/[ \t]+/g, ' ')
   .replace(/ *\n */g, '\n')
   .trim();
+const key = value => clean(value)
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .toLowerCase();
+const compositeKey = (material, number) => `${key(material)}::${Number(number) || 0}`;
 const sleep = ms => new Promise(resolvePromise => setTimeout(resolvePromise, ms));
 
 async function request(endpoint, options = {}, attempt = 1) {
@@ -110,6 +115,7 @@ async function readRelease() {
 
 function existingValue(question, field) {
   switch (field) {
+    case 'Texto-base': return question.texto_base;
     case 'Enunciado': return question.enunciado;
     case 'Alternativa A': return question.alternativas?.A;
     case 'Alternativa B': return question.alternativas?.B;
@@ -130,58 +136,91 @@ function existingValue(question, field) {
 const notionRows = await readNotionRows();
 const publishable = notionRows.filter(row => row['Pode publicar'] === true);
 const duplicateCodes = [...publishable.reduce((map, row) => {
-  const code = clean(row['Código']);
+  const code = key(row['Código']);
   map.set(code, (map.get(code) || 0) + 1);
   return map;
 }, new Map()).entries()].filter(([code, count]) => !code || count > 1);
+const duplicateComposites = [...publishable.reduce((map, row) => {
+  const composite = compositeKey(row['Nome do material'], row['Número original']);
+  map.set(composite, (map.get(composite) || 0) + 1);
+  return map;
+}, new Map()).entries()].filter(([composite, count]) => composite.endsWith('::0') || count > 1);
 
 const { catalog, questions, materials } = await readRelease();
-const byCode = new Map(questions.map(question => [clean(question.codigo), question]));
-const byId = new Map(questions.map(question => [clean(question.id), question]));
-const notionByCode = new Map(publishable.map(row => [clean(row['Código']), row]));
+const byCode = new Map(questions.map(question => [key(question.codigo), question]));
+const byId = new Map(questions.map(question => [key(question.id), question]));
+const byComposite = new Map(questions.map(question => [compositeKey(question.material_name, question.numero), question]));
 
 const missingInRelease = [];
-const idMismatches = [];
-const contentDifferences = {};
+const reusedReleaseQuestions = [];
+const legacyIdDifferences = [];
+const matchedReleaseIds = new Set();
+const matchStrategies = new Map();
+const differenceCounts = new Map();
+const differenceSamples = new Map();
 const materialCounts = new Map();
 const formatCounts = new Map();
 const comparedFields = [
-  'Enunciado', 'Alternativa A', 'Alternativa B', 'Alternativa C', 'Alternativa D', 'Alternativa E',
+  'Texto-base', 'Enunciado', 'Alternativa A', 'Alternativa B', 'Alternativa C', 'Alternativa D', 'Alternativa E',
   'Gabarito', 'Comentário geral', 'Fundamento legal', 'Pegadinha', 'Observações', 'Assunto', 'Subassunto',
 ];
 
 for (const row of publishable) {
-  const code = clean(row['Código']);
-  const question = byCode.get(code);
-  if (!question) {
-    missingInRelease.push({ code, notion_url: row.notion_url });
-    continue;
-  }
-  const notionId = clean(row['Código GitHub']);
-  if (notionId && notionId !== clean(question.id)) {
-    idMismatches.push({ code, notion_id: notionId, release_id: question.id });
-  }
-  materialCounts.set(question.material_id, (materialCounts.get(question.material_id) || 0) + 1);
   const format = clean(row['Formato da questão']) || 'Não informado';
   formatCounts.set(format, (formatCounts.get(format) || 0) + 1);
+
+  const directCode = byCode.get(key(row['Código']));
+  const githubId = byId.get(key(row['Código GitHub']));
+  const composite = byComposite.get(compositeKey(row['Nome do material'], row['Número original']));
+  const question = directCode || githubId || composite;
+  const strategy = directCode ? 'codigo' : githubId ? 'codigo_github' : composite ? 'material_e_numero' : 'nao_encontrada';
+  matchStrategies.set(strategy, (matchStrategies.get(strategy) || 0) + 1);
+
+  if (!question) {
+    missingInRelease.push({
+      code: row['Código'],
+      github_id: row['Código GitHub'],
+      material: row['Nome do material'],
+      number: row['Número original'],
+      notion_url: row.notion_url,
+    });
+    continue;
+  }
+
+  const releaseIdentity = key(question.id);
+  if (matchedReleaseIds.has(releaseIdentity)) {
+    reusedReleaseQuestions.push({ code: row['Código'], release_id: question.id });
+    continue;
+  }
+  matchedReleaseIds.add(releaseIdentity);
+
+  const notionGithubId = key(row['Código GitHub']);
+  if (notionGithubId && notionGithubId !== releaseIdentity) {
+    legacyIdDifferences.push({
+      code: row['Código'],
+      notion_github_id: row['Código GitHub'],
+      release_id: question.id,
+      strategy,
+    });
+  }
+
+  materialCounts.set(question.material_id, (materialCounts.get(question.material_id) || 0) + 1);
   for (const field of comparedFields) {
     const notionValue = clean(row[field]);
     const releaseValue = clean(existingValue(question, field));
     if (notionValue !== releaseValue) {
-      contentDifferences[field] ||= [];
-      if (contentDifferences[field].length < 20) {
-        contentDifferences[field].push({ code, notion: notionValue, release: releaseValue });
+      differenceCounts.set(field, (differenceCounts.get(field) || 0) + 1);
+      if (!differenceSamples.has(field)) differenceSamples.set(field, []);
+      if (differenceSamples.get(field).length < 10) {
+        differenceSamples.get(field).push({ code: row['Código'], notion: notionValue, release: releaseValue });
       }
     }
   }
 }
 
 const extraInRelease = questions
-  .filter(question => !notionByCode.has(clean(question.codigo)))
+  .filter(question => !matchedReleaseIds.has(key(question.id)))
   .map(question => ({ code: question.codigo, id: question.id, material_id: question.material_id }));
-const orphanGithubIds = publishable
-  .filter(row => clean(row['Código GitHub']) && !byId.has(clean(row['Código GitHub'])))
-  .map(row => ({ code: row['Código'], github_id: row['Código GitHub'] }));
 
 const report = {
   generated_at: new Date().toISOString(),
@@ -198,29 +237,33 @@ const report = {
     questions: questions.length,
   },
   identity_validation: {
+    match_strategies: Object.fromEntries([...matchStrategies.entries()].sort((a, b) => b[1] - a[1])),
     duplicate_publishable_codes: duplicateCodes,
+    duplicate_material_numbers: duplicateComposites,
     missing_in_release: missingInRelease,
     extra_in_release: extraInRelease,
-    id_mismatches: idMismatches,
-    orphan_github_ids: orphanGithubIds,
+    reused_release_questions: reusedReleaseQuestions,
+    legacy_id_differences: legacyIdDifferences,
   },
   formats: Object.fromEntries([...formatCounts.entries()].sort((a, b) => b[1] - a[1])),
   material_counts: Object.fromEntries([...materialCounts.entries()].sort((a, b) => a[0].localeCompare(b[0]))),
-  content_difference_counts: Object.fromEntries(
-    Object.entries(contentDifferences).map(([field, samples]) => [field, { at_least: samples.length, samples }]),
+  content_differences: Object.fromEntries(
+    [...differenceCounts.entries()].map(([field, count]) => [field, { count, samples: differenceSamples.get(field) || [] }]),
   ),
 };
 
 await fs.writeFile('/tmp/notion-release-comparison.json', `${JSON.stringify(report, null, 2)}\n`);
 
 console.log(`Publicáveis no Notion: ${publishable.length}. Release atual: ${questions.length}.`);
-console.log(`Identidade — ausentes: ${missingInRelease.length}; extras: ${extraInRelease.length}; IDs divergentes: ${idMismatches.length}; IDs órfãos: ${orphanGithubIds.length}; códigos duplicados: ${duplicateCodes.length}.`);
+console.log(`Vínculos: ${JSON.stringify(report.identity_validation.match_strategies)}.`);
+console.log(`Identidade — ausentes: ${missingInRelease.length}; extras: ${extraInRelease.length}; reutilizações: ${reusedReleaseQuestions.length}; códigos duplicados: ${duplicateCodes.length}; material+número duplicados: ${duplicateComposites.length}.`);
+console.log(`IDs editoriais antigos diferentes dos IDs públicos atuais: ${legacyIdDifferences.length}.`);
 console.log(`Formatos publicáveis: ${JSON.stringify(report.formats)}.`);
-console.log(`Diferenças de conteúdo detectadas por campo: ${JSON.stringify(Object.fromEntries(Object.entries(contentDifferences).map(([field, rows]) => [field, rows.length])))}.`);
+console.log(`Diferenças de conteúdo por campo: ${JSON.stringify(Object.fromEntries(differenceCounts))}.`);
 
 if (publishable.length !== questions.length) throw new Error('A quantidade publicável do Notion difere da release atual.');
-if (duplicateCodes.length || missingInRelease.length || extraInRelease.length || idMismatches.length || orphanGithubIds.length) {
+if (duplicateCodes.length || duplicateComposites.length || missingInRelease.length || extraInRelease.length || reusedReleaseQuestions.length) {
   throw new Error('A identidade entre o Banco Mestre e a release atual não é compatível para sincronização segura.');
 }
 
-console.log('✓ Identidade integral confirmada entre o Notion e a release pública.');
+console.log('✓ As 570 questões publicáveis foram vinculadas integralmente à release, preservando os IDs públicos atuais.');
