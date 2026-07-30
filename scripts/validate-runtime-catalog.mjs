@@ -21,6 +21,7 @@ for (const feature of [
 ]) {
   if (!app.includes(feature)) fail(`Validação dinâmica ausente: ${feature}`);
 }
-if (!index.includes("assets/app-v4.js?v=2")) fail("Cache-busting do aplicativo não foi atualizado para o hotfix.");
+const cacheVersion = index.match(/assets\/app-v4\.js\?v=(\d+)/)?.[1];
+if (!cacheVersion || Number(cacheVersion) < 2) fail("Cache-busting do aplicativo não foi renovado.");
 
-console.log("✓ Runtime validado: catálogo dinâmico, sem totais fixos e com cache renovado.");
+console.log(`✓ Runtime validado: catálogo dinâmico, sem totais fixos e com cache v${cacheVersion}.`);

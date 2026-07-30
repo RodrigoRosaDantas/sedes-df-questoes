@@ -1,0 +1,191 @@
+function getFilteredMaterials() {
+  const query = state.filters.search.trim().toLocaleLowerCase("pt-BR");
+  return state.catalog.materials.filter(material => {
+    const levelOk = state.filters.level === "all" || roleLevel(material.codigo_cargo) === state.filters.level;
+    const typeOk = !state.filters.type || normalizeType(material.tipo_material) === state.filters.type;
+    const disciplineOk = !state.filters.discipline || material.disciplina === state.filters.discipline;
+    const cargoOk = !state.filters.cargo || String(material.codigo_cargo) === state.filters.cargo;
+    const haystack = `${material.nome} ${material.disciplina} ${material.fonte} ${material.cargo} ${material.codigo_cargo}`.toLocaleLowerCase("pt-BR");
+    return levelOk && typeOk && disciplineOk && cargoOk && (!query || haystack.includes(query));
+  });
+}
+
+function currentStudyView() {
+  return ["materias", "simulados", "provas"].includes(state.studyView) ? state.studyView : "materias";
+}
+
+function studyViewTabs() {
+  const disciplines = state.studyIndex?.summary?.disciplines || 0;
+  const simulations = state.catalog.materials.filter(item => normalizeType(item.tipo_material) === "simulado").length;
+  const exams = state.catalog.materials.filter(item => normalizeType(item.tipo_material) === "prova").length;
+  const view = currentStudyView();
+  return `<div class="study-view-tabs card" role="tablist" aria-label="Forma de estudar">
+    <button class="study-view-tab ${view === "materias" ? "active" : ""}" role="tab" aria-selected="${view === "materias"}" data-study-view="materias"><span>Matérias</span><b>${disciplines}</b><small>Escolha os tópicos</small></button>
+    <button class="study-view-tab ${view === "simulados" ? "active" : ""}" role="tab" aria-selected="${view === "simulados"}" data-study-view="simulados"><span>Simulados</span><b>${simulations}</b><small>Materiais completos</small></button>
+    <button class="study-view-tab ${view === "provas" ? "active" : ""}" role="tab" aria-selected="${view === "provas"}" data-study-view="provas"><span>Provas anteriores</span><b>${exams}</b><small>Cadernos oficiais</small></button>
+  </div>`;
+}
+
+function studySearchToolbar({showLevel = false, placeholder = "Buscar"} = {}) {
+  return `<div class="study-toolbar card">
+    <label class="search"><span aria-hidden="true">⌕</span><span class="sr-only">${esc(placeholder)}</span><input id="study-search" value="${esc(state.filters.search)}" placeholder="${esc(placeholder)}"></label>
+    ${showLevel ? `<label class="study-level"><span>Nível</span><select id="study-level"><option value="all" ${state.filters.level === "all" ? "selected" : ""}>Todos</option><option value="medio" ${state.filters.level === "medio" ? "selected" : ""}>Médio</option><option value="superior" ${state.filters.level === "superior" ? "selected" : ""}>Superior</option></select></label>` : ""}
+  </div>`;
+}
+
+function filteredDisciplines() {
+  const query = state.filters.search.trim().toLocaleLowerCase("pt-BR");
+  return (state.studyIndex?.disciplines || []).filter(discipline => {
+    const haystack = `${discipline.name} ${discipline.topics.map(topic => topic.name).join(" ")}`.toLocaleLowerCase("pt-BR");
+    return !query || haystack.includes(query);
+  });
+}
+
+function materialsForStudyView(view) {
+  const expectedType = view === "provas" ? "prova" : "simulado";
+  const query = state.filters.search.trim().toLocaleLowerCase("pt-BR");
+  return state.catalog.materials.filter(material => {
+    if (normalizeType(material.tipo_material) !== expectedType) return false;
+    const levelOk = view === "provas" || state.filters.level === "all" || roleLevel(material.codigo_cargo) === state.filters.level;
+    const haystack = `${material.nome} ${material.disciplina} ${material.fonte} ${material.cargo || ""}`.toLocaleLowerCase("pt-BR");
+    return levelOk && (!query || haystack.includes(query));
+  });
+}
+
+function renderStudy() {
+  stopTimer();
+  if (state.selectedDiscipline && currentStudyView() === "materias") return renderDisciplineTopics();
+  const view = currentStudyView();
+  let content = "";
+  if (view === "materias") {
+    const disciplines = filteredDisciplines();
+    content = `${studySearchToolbar({placeholder: "Buscar matéria ou tópico"})}
+      <section class="section"><div class="section-head"><div><p class="eyebrow">Organização por conteúdo</p><h2>Escolha uma matéria</h2><p>Depois, selecione exatamente os tópicos que deseja responder.</p></div><span class="stamp">${state.studyIndex.summary.questions} questões indexadas</span></div>
+      ${disciplines.length ? `<div class="discipline-grid">${disciplines.map(disciplineCard).join("")}</div>` : `<div class="empty-state card"><div class="empty-icon">⌕</div><h3>Nenhuma matéria encontrada.</h3><p>Limpe a busca para visualizar todas as disciplinas.</p></div>`}</section>`;
+  } else {
+    const materials = materialsForStudyView(view);
+    const isExam = view === "provas";
+    content = `${studySearchToolbar({showLevel: !isExam, placeholder: isExam ? "Buscar prova anterior" : "Buscar simulado"})}
+      ${isExam ? `<div class="study-notice card"><strong>Provas sempre visíveis</strong><p>Esta lista não é ocultada por filtros de nível. Provas correlatas permanecem disponíveis para todos os perfis.</p></div>` : ""}
+      <section class="section"><div class="section-head"><div><p class="eyebrow">${isExam ? "Cadernos oficiais" : "Materiais completos"}</p><h2>${isExam ? "Provas anteriores" : "Simulados"}</h2><p>${isExam ? "Abra a prova completa e escolha entre modo treino ou modo prova." : "Cada card representa um material completo do banco."}</p></div><span class="stamp">${materials.reduce((sum, item) => sum + Number(item.quantidade_questoes || 0), 0)} questões</span></div>
+      ${materials.length ? `<div class="material-grid">${materials.map(materialCard).join("")}</div>` : `<div class="empty-state card"><div class="empty-icon">⌕</div><h3>Nenhum material encontrado.</h3><p>Limpe a busca ou altere o nível selecionado.</p></div>`}</section>`;
+  }
+
+  app.innerHTML = `<section class="page-heading"><div><p class="eyebrow">Estudar</p><h1>Escolha como organizar seu treino.</h1><p>Navegue por matéria e tópico, resolva simulados completos ou abra provas anteriores.</p></div><button class="btn" data-route="inicio">← Início</button></section>${studyViewTabs()}${content}`;
+  bindStudyEvents();
+  updateShell();
+}
+
+function disciplineCard(discipline) {
+  const topicPreview = discipline.topics.slice(0, 3).map(topic => topic.name).join(" · ");
+  return `<article class="discipline-card card"><div class="discipline-card-head"><span class="discipline-icon" aria-hidden="true">▤</span><div><p class="eyebrow">${discipline.material_count} material(is)</p><h3>${esc(discipline.name)}</h3></div></div><p>${esc(topicPreview || "Tópicos classificados")}${discipline.topics.length > 3 ? "…" : ""}</p><div class="discipline-stats"><span><b>${discipline.question_count}</b> questões</span><span><b>${discipline.topics.length}</b> tópicos</span></div><button class="btn primary full" data-open-discipline="${esc(discipline.name)}">Selecionar tópicos</button></article>`;
+}
+
+function materialCard(material) {
+  const progress = materialProgress(material);
+  const errorCount = Object.values(loadErrors()).filter(item => item.open && item.materialId === material.id).length;
+  const status = progress.attempts ? `${progress.progress}% respondido` : "Não iniciado";
+  return `<article class="material-card card"><div class="material-top"><span class="type-badge">${humanType(material.tipo_material)}</span><span class="year-badge">${material.ano}</span></div><div><p class="discipline">${esc(material.disciplina)}</p><h3>${esc(material.nome)}</h3><p class="material-source">${esc(material.fonte)} · ${esc(roleName(material.codigo_cargo))}</p></div><div class="material-progress"><div><span>${status}</span><b>${progress.best === null ? "—" : `${progress.best}% melhor nota`}</b></div><div class="progress"><span style="width:${progress.progress}%"></span></div></div><div class="material-stats"><span><b>${material.quantidade_questoes}</b> questões</span><span><b>${material.tempo_sugerido_minutos}</b> min</span>${errorCount ? `<span class="error-count"><b>${errorCount}</b> erros</span>` : ""}</div><div class="material-actions"><button class="btn primary" data-open-material="${esc(material.id)}">${progress.attempts ? "Continuar estudando" : "Abrir material"}</button>${errorCount ? `<button class="btn compact" data-review-material="${esc(material.id)}">Revisar erros</button>` : ""}</div></article>`;
+}
+
+function bindStudyEvents() {
+  document.querySelectorAll("[data-study-view]").forEach(button => button.addEventListener("click", () => {
+    state.studyView = button.dataset.studyView;
+    state.selectedDiscipline = null;
+    state.filters.search = "";
+    state.filters.type = state.studyView === "simulados" ? "simulado" : state.studyView === "provas" ? "prova" : "";
+    if (state.studyView === "provas") state.filters.level = "all";
+    renderStudy();
+  }));
+  document.querySelector("#study-search")?.addEventListener("input", event => {
+    state.filters.search = event.target.value;
+    const cursor = event.target.selectionStart;
+    renderStudy();
+    const next = document.querySelector("#study-search");
+    next?.focus();
+    next?.setSelectionRange(cursor, cursor);
+  });
+  document.querySelector("#study-level")?.addEventListener("change", event => {
+    state.filters.level = event.target.value;
+    state.filters.level === "all" ? localStorage.removeItem(LEVEL_KEY) : localStorage.setItem(LEVEL_KEY, state.filters.level);
+    renderStudy();
+  });
+  document.querySelectorAll("[data-open-discipline]").forEach(button => button.addEventListener("click", () => {
+    state.selectedDiscipline = button.dataset.openDiscipline;
+    state.filters.search = "";
+    renderDisciplineTopics();
+  }));
+  bindMaterialButtons();
+}
+
+function renderDisciplineTopics() {
+  stopTimer();
+  const discipline = (state.studyIndex?.disciplines || []).find(item => item.name === state.selectedDiscipline);
+  if (!discipline) {
+    state.selectedDiscipline = null;
+    return renderStudy();
+  }
+  app.innerHTML = `<section class="page-heading"><div><p class="eyebrow">Treino por matéria</p><h1>${esc(discipline.name)}</h1><p>Selecione um ou mais tópicos. O treino reunirá questões de todos os materiais publicados.</p></div><button class="btn" data-back-disciplines>← Voltar às matérias</button></section>
+  <section class="topic-builder card">
+    <div class="topic-builder-head"><div><p class="eyebrow">Conteúdo disponível</p><h2>${discipline.question_count} questões em ${discipline.topics.length} tópicos</h2></div><div class="topic-bulk-actions"><button class="btn compact" data-topics-all>Selecionar todos</button><button class="btn compact" data-topics-none>Limpar</button></div></div>
+    <div class="topic-list" role="group" aria-label="Tópicos de ${esc(discipline.name)}">${discipline.topics.map(topic => `<label class="topic-option"><input type="checkbox" value="${esc(topic.name)}" data-topic checked><span><strong>${esc(topic.name)}</strong><small>${topic.question_count} questão(ões)</small></span></label>`).join("")}</div>
+    <div class="topic-config">
+      <label><span>Situação</span><select id="topic-scope"><option value="all">Todas</option><option value="unanswered">Inéditas</option><option value="errors">Erradas</option><option value="marked">Marcadas</option></select></label>
+      <label><span>Quantidade</span><select id="topic-count"><option value="10">10 questões</option><option value="20" selected>20 questões</option><option value="30">30 questões</option><option value="50">50 questões</option><option value="all">Todas disponíveis</option></select></label>
+      <label><span>Modo</span><select id="topic-mode"><option value="treino">Treino com correção</option><option value="prova">Simulação de prova</option></select></label>
+      <button class="btn primary topic-start" data-start-topic-training>Iniciar treino</button>
+    </div>
+    <p class="topic-selection-summary" data-topic-summary>${discipline.question_count} questões selecionadas.</p>
+  </section>`;
+  bindDisciplineTopicEvents(discipline);
+  updateShell();
+}
+
+function bindDisciplineTopicEvents(discipline) {
+  const selectedTopics = () => new Set([...document.querySelectorAll("[data-topic]:checked")].map(input => input.value));
+  const selectedIds = () => discipline.topics.filter(topic => selectedTopics().has(topic.name)).flatMap(topic => topic.question_ids);
+  const updateSummary = () => {
+    const ids = selectedIds();
+    const summary = document.querySelector("[data-topic-summary]");
+    if (summary) summary.textContent = ids.length ? `${ids.length} questões selecionadas.` : "Selecione pelo menos um tópico.";
+    const start = document.querySelector("[data-start-topic-training]");
+    if (start) start.disabled = !ids.length;
+  };
+  document.querySelector("[data-back-disciplines]")?.addEventListener("click", () => {
+    state.selectedDiscipline = null;
+    renderStudy();
+  });
+  document.querySelector("[data-topics-all]")?.addEventListener("click", () => {
+    document.querySelectorAll("[data-topic]").forEach(input => { input.checked = true; });
+    updateSummary();
+  });
+  document.querySelector("[data-topics-none]")?.addEventListener("click", () => {
+    document.querySelectorAll("[data-topic]").forEach(input => { input.checked = false; });
+    updateSummary();
+  });
+  document.querySelectorAll("[data-topic]").forEach(input => input.addEventListener("change", updateSummary));
+  document.querySelector("[data-start-topic-training]")?.addEventListener("click", async () => {
+    const ids = selectedIds();
+    if (!ids.length || !await ensureCanStartNewAttempt()) return;
+    const scope = document.querySelector("#topic-scope")?.value || "all";
+    const mode = document.querySelector("#topic-mode")?.value || "treino";
+    const requested = document.querySelector("#topic-count")?.value || "20";
+    renderLoading(`Preparando treino de ${discipline.name}…`);
+    try {
+      let questions = await loadQuestionsByIds(ids);
+      const status = questionPoolStatus();
+      if (scope === "unanswered") questions = questions.filter(question => !status.answered.has(question.id));
+      if (scope === "errors") questions = questions.filter(question => status.errors.has(question.id));
+      if (scope === "marked") questions = questions.filter(question => status.marked.has(question.id));
+      questions = shuffle(questions);
+      if (requested !== "all") questions = questions.slice(0, Math.min(Number(requested), questions.length));
+      if (!questions.length) return renderRuntimeError("Não há questões disponíveis para os tópicos e a situação selecionados.", "estudar");
+      const material = {id: `materia-${discipline.name.toLocaleLowerCase("pt-BR").replace(/[^a-z0-9]+/g, "-")}`, nome: `Treino por matéria — ${discipline.name}`, disciplina: discipline.name, fonte: "Banco Mestre", tipo_material: "simulado", ano: 2026, codigo_cargo: "multicargo", tempo_sugerido_minutos: questions.length * 2, questoes: questions};
+      beginAttempt(mode, questions, material);
+    } catch (error) {
+      console.error(error);
+      renderRuntimeError("Não foi possível montar o treino por tópicos.", "estudar");
+    }
+  });
+  updateSummary();
+}

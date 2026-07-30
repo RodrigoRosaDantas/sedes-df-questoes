@@ -1,11 +1,11 @@
 {
   "name": "sedes-df-questoes",
-  "version": "2.5.1",
+  "version": "2.6.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/build-release-v2-4.mjs && node scripts/patch-runtime-catalog.mjs",
-    "test": "node scripts/validate-data.mjs && node scripts/validate-true-false-plan.mjs && node scripts/validate-release-v2-4.mjs && node scripts/validate-exam-v4.mjs",
-    "check": "npm run build && node --check assets/progress-migration-v2-3.js && node --check assets/question-images-v2-5.js && node --check assets/app-v4.js && node --check scripts/build-release.mjs && node --check scripts/build-release-v2-4.mjs && node --check scripts/export-qdx-2022-gppgadm.mjs && node --check scripts/export-notion-snapshot.mjs && node --check scripts/apply-notion-snapshot.mjs && node --check scripts/patch-runtime-catalog.mjs && node --check scripts/validate-notion-snapshot.mjs && node --check scripts/validate-true-false-plan.mjs && node --check scripts/validate-release-v2-4.mjs && node --check scripts/validate-runtime-catalog.mjs && node scripts/validate-runtime-catalog.mjs && npm test"
+    "build": "node scripts/build-release-v2-4.mjs && node scripts/patch-runtime-catalog.mjs && node scripts/build-study-index.mjs && node scripts/patch-study-navigation-v2-6.mjs",
+    "test": "node scripts/validate-data.mjs && node scripts/validate-true-false-plan.mjs && node scripts/validate-release-v2-4.mjs && node scripts/validate-exam-v4.mjs && node scripts/validate-study-navigation-v2-6.mjs",
+    "check": "npm run build && node --check assets/progress-migration-v2-3.js && node --check assets/question-images-v2-5.js && node --check assets/app-v4.js && node --check scripts/build-release.mjs && node --check scripts/build-release-v2-4.mjs && node --check scripts/build-study-index.mjs && node --check scripts/export-qdx-2022-gppgadm.mjs && node --check scripts/export-notion-snapshot.mjs && node --check scripts/apply-notion-snapshot.mjs && node --check scripts/patch-runtime-catalog.mjs && node --check scripts/patch-study-navigation-v2-6.mjs && node --check scripts/validate-notion-snapshot.mjs && node --check scripts/validate-true-false-plan.mjs && node --check scripts/validate-release-v2-4.mjs && node --check scripts/validate-runtime-catalog.mjs && node --check scripts/validate-study-navigation-v2-6.mjs && node scripts/validate-runtime-catalog.mjs && npm test"
   }
 }
