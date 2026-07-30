@@ -10,9 +10,9 @@ const fail = message => { throw new Error(message); };
 
 const catalog = readJSON("data/release/catalogo.json");
 const study = readJSON("data/release/study-index.json");
-const app = read("assets/app-v4.js");
-const html = read("index.html");
-const css = read("assets/study-navigation-v2-6.css");
+const app = read("dist/assets/app-v4.js");
+const html = read("dist/index.html");
+const css = read("dist/assets/study-navigation-v2-6.css");
 
 if (study.release_version !== catalog.release_version) fail("Índice de estudos pertence a outra release.");
 if (study.summary.questions !== catalog.summary.questoes) fail("Total do índice de estudos divergente do catálogo.");
@@ -52,11 +52,11 @@ for (const feature of [
   'data-start-topic-training',
   'view === "provas" || state.filters.level === "all"',
   '_discipline: question.disciplina || material.disciplina',
-]) if (!app.includes(feature)) fail(`Funcionalidade de estudos ausente: ${feature}`);
+]) if (!app.includes(feature)) fail(`Funcionalidade de estudos ausente no pacote público: ${feature}`);
 
 if (!html.includes("assets/study-navigation-v2-6.css?v=1")) fail("Estilos da navegação de estudos não estão ativos.");
 const appVersion = Number(html.match(/assets\/app-v4\.js\?v=(\d+)/)?.[1] || 0);
-if (appVersion < 3) fail("Cache do aplicativo não foi renovado para a navegação nova.");
+if (appVersion < 6) fail("Cache do aplicativo não foi renovado para o build consolidado.");
 for (const selector of [".study-view-tabs", ".discipline-grid", ".topic-list", ".topic-config"]) if (!css.includes(selector)) fail(`Estilo ausente: ${selector}`);
 
-console.log(`✓ Navegação validada: ${study.summary.disciplines} matérias, ${study.summary.topics} tópicos, ${catalog.summary.simulados} simulados e ${catalog.summary.provas} prova(s).`);
+console.log(`✓ Navegação pública validada: ${study.summary.disciplines} matérias, ${study.summary.topics} tópicos, ${catalog.summary.simulados} simulados e ${catalog.summary.provas} prova(s).`);
