@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import {fileURLToPath} from "node:url";
@@ -5,11 +6,7 @@ import {fileURLToPath} from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dist = path.join(root, "dist");
 const read = relative => fs.readFileSync(path.join(root, relative), "utf8");
-const writeDist = (relative, content) => {
-  const target = path.join(dist, relative);
-  fs.mkdirSync(path.dirname(target), {recursive: true});
-  fs.writeFileSync(target, content);
-};
+const sha256 = value => crypto.createHash("sha256").update(value).digest("hex");
 const copy = (source, target = source) => {
   const sourcePath = path.join(root, source);
   if (!fs.existsSync(sourcePath)) throw new Error(`Arquivo obrigatório ausente: ${source}`);
@@ -19,131 +16,46 @@ const requireMarker = (content, marker, context) => {
   if (!content.includes(marker)) throw new Error(`${context}: marcador obrigatório ausente: ${marker}`);
 };
 
-function compileApplication() {
-  let app = read("assets/app-v4.js");
-  const fragment = read("scripts/fragments/study-navigation-v2-6.js.txt").trim();
-
-  const staleGuard = 'if (state.catalog.summary.questoes !== 570 || state.catalog.summary.materiais !== 35) throw new Error("Release incompleta.");';
-  const dynamicGuard = `const declaredQuestions = Number(state.catalog?.summary?.questoes);
-    const declaredMaterials = Number(state.catalog?.summary?.materiais);
-    const indexedQuestions = Object.keys(state.catalog?.question_index || {}).length;
-    const listedMaterials = Array.isArray(state.catalog?.materials) ? state.catalog.materials.length : 0;
-    if (!Number.isInteger(declaredQuestions) || declaredQuestions <= 0 ||
-        !Number.isInteger(declaredMaterials) || declaredMaterials <= 0 ||
-        declaredQuestions !== indexedQuestions || declaredMaterials !== listedMaterials) {
-      throw new Error("Catálogo inconsistente.");
-    }`;
-  if (!app.includes(staleGuard)) throw new Error("Fonte-base: validação antiga do catálogo não localizada.");
-  app = app.replace(staleGuard, dynamicGuard);
-
-  app = app.replace(
-    'const EXAM_URL = "./data/concurso.json";',
-    'const EXAM_URL = "./data/concurso.json";\nconst STUDY_INDEX_URL = "./data/release/study-index.json";'
-  );
-  app = app.replace(
-    "  exam: null,",
-    '  exam: null,\n  studyIndex: null,\n  studyView: "materias",\n  selectedDiscipline: null,'
-  );
-  app = app.replace(
-    "_discipline: material.disciplina, _cargo:",
-    "_discipline: question.disciplina || material.disciplina, _cargo:"
-  );
-
-  const studyBlock = /function getFilteredMaterials\(\) \{[\s\S]*?\nfunction bindMaterialButtons\(\) \{/;
-  if (!studyBlock.test(app)) throw new Error("Fonte-base: área Estudar antiga não localizada.");
-  app = app.replace(studyBlock, `${fragment}\n\nfunction bindMaterialButtons() {`);
-
-  const oldFetch = `const [catalogResponse, examResponse] = await Promise.all([\n      fetch(CATALOG_URL, {cache: "no-store"}),\n      fetch(EXAM_URL, {cache: "no-store"}),\n    ]);`;
-  const newFetch = `const [catalogResponse, examResponse, studyIndexResponse] = await Promise.all([\n      fetch(CATALOG_URL, {cache: "no-store"}),\n      fetch(EXAM_URL, {cache: "no-store"}),\n      fetch(STUDY_INDEX_URL, {cache: "no-store"}),\n    ]);`;
-  if (!app.includes(oldFetch)) throw new Error("Fonte-base: inicialização antiga não localizada.");
-  app = app.replace(oldFetch, newFetch);
-  app = app.replace(
-    'if (!examResponse.ok) throw new Error(`Concurso: HTTP ${examResponse.status}`);',
-    'if (!examResponse.ok) throw new Error(`Concurso: HTTP ${examResponse.status}`);\n    if (!studyIndexResponse.ok) throw new Error(`Índice de estudos: HTTP ${studyIndexResponse.status}`);'
-  );
-  app = app.replace(
-    "    state.exam = await examResponse.json();",
-    "    state.exam = await examResponse.json();\n    state.studyIndex = await studyIndexResponse.json();"
-  );
-
-  for (const marker of [
-    "const indexedQuestions = Object.keys(state.catalog?.question_index || {}).length;",
-    'const STUDY_INDEX_URL = "./data/release/study-index.json";',
-    'data-study-view="materias"',
-    'data-study-view="simulados"',
-    'data-study-view="provas"',
-    "function renderDisciplineTopics()",
-    "Catálogo inconsistente.",
-  ]) requireMarker(app, marker, "Aplicação compilada");
-
-  return app;
-}
-
-function compileIndex() {
-  let index = read("index.html");
-
-  if (!index.includes('rel="manifest"')) {
-    index = index.replace(
-      '<meta name="description"',
-      '<link rel="manifest" href="./manifest.webmanifest">\n  <meta name="apple-mobile-web-app-capable" content="yes">\n  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">\n  <meta name="description"'
-    );
-  }
-  if (!index.includes("assets/study-navigation-v2-6.css")) {
-    index = index.replace(
-      '  <link rel="stylesheet" href="./assets/question-images-v2-5.css?v=1">',
-      '  <link rel="stylesheet" href="./assets/question-images-v2-5.css?v=1">\n  <link rel="stylesheet" href="./assets/study-navigation-v2-6.css?v=1">'
-    );
-  }
-  if (!index.includes("assets/intelligence-v2-9.css")) {
-    index = index.replace(
-      '  <link rel="stylesheet" href="./assets/study-navigation-v2-6.css?v=1">',
-      '  <link rel="stylesheet" href="./assets/study-navigation-v2-6.css?v=1">\n  <link rel="stylesheet" href="./assets/intelligence-v2-9.css?v=1">'
-    );
-  }
-  if (!index.includes("assets/reports-v2-10.css")) {
-    index = index.replace(
-      '  <link rel="stylesheet" href="./assets/intelligence-v2-9.css?v=1">',
-      '  <link rel="stylesheet" href="./assets/intelligence-v2-9.css?v=1">\n  <link rel="stylesheet" href="./assets/reports-v2-10.css?v=2">'
-    );
-  }
-
-  index = index.replace(/assets\/app-v4\.js\?v=\d+/, "assets/app-v4.js?v=6");
-  if (!index.includes("assets/learning-v2-9.js")) {
-    index = index.replace(
-      '  <script type="module" src="./assets/app-v4.js?v=6"></script>',
-      '  <script type="module" src="./assets/app-v4.js?v=6"></script>\n  <script type="module" src="./assets/learning-v2-9.js?v=1"></script>\n  <script type="module" src="./assets/pwa-v2-9.js?v=1"></script>\n  <script type="module" src="./assets/reports-v2-10.js?v=2"></script>'
-    );
-  }
-
-  for (const marker of [
-    "manifest.webmanifest",
-    "study-navigation-v2-6.css?v=1",
-    "intelligence-v2-9.css?v=1",
-    "reports-v2-10.css?v=2",
-    "app-v4.js?v=6",
-    "learning-v2-9.js?v=1",
-    "pwa-v2-9.js?v=1",
-    "reports-v2-10.js?v=2",
-  ]) requireMarker(index, marker, "HTML compilado");
-
-  return index;
-}
+const sourceIndex = read("index.html");
+const sourceApp = read("assets/app-v4.js");
+for (const marker of [
+  "manifest.webmanifest",
+  "study-navigation-v2-6.css?v=1",
+  "intelligence-v2-9.css?v=1",
+  "reports-v2-10.css?v=2",
+  "app-v4.js?v=7",
+  "learning-v2-9.js?v=1",
+  "pwa-v2-9.js?v=1",
+  "reports-v2-10.js?v=2",
+]) requireMarker(sourceIndex, marker, "HTML canônico");
+for (const marker of [
+  'const STUDY_INDEX_URL = "./data/release/study-index.json";',
+  "const indexedQuestions = Object.keys(state.catalog?.question_index || {}).length;",
+  'data-study-view="materias"',
+  'data-study-view="simulados"',
+  'data-study-view="provas"',
+  "function renderDisciplineTopics()",
+  "Catálogo inconsistente.",
+]) requireMarker(sourceApp, marker, "Aplicação canônica");
+if (sourceApp.includes("Release incompleta.")) throw new Error("A fonte canônica ainda contém a trava antiga de totais fixos.");
 
 fs.rmSync(dist, {recursive: true, force: true});
 fs.mkdirSync(dist, {recursive: true});
+copy("index.html");
 copy("manifest.webmanifest");
 copy("service-worker.js");
 copy("assets");
 copy("data/concurso.json");
 copy("data/release");
-writeDist("index.html", compileIndex());
-writeDist("assets/app-v4.js", compileApplication());
-writeDist(".nojekyll", "");
+fs.writeFileSync(path.join(dist, ".nojekyll"), "");
 
-const forbidden = ["scripts", ".github", "data/consolidated", "data/true-false"];
-for (const entry of forbidden) {
-  if (fs.existsSync(path.join(dist, entry))) throw new Error(`Conteúdo de desenvolvimento exposto no dist: ${entry}`);
+for (const forbidden of ["scripts", ".github", "data/consolidated", "data/true-false"]) {
+  if (fs.existsSync(path.join(dist, forbidden))) throw new Error(`Conteúdo de desenvolvimento exposto no dist: ${forbidden}`);
 }
+
+const distIndex = fs.readFileSync(path.join(dist, "index.html"), "utf8");
+const distApp = fs.readFileSync(path.join(dist, "assets", "app-v4.js"), "utf8");
+if (distIndex !== sourceIndex || distApp !== sourceApp) throw new Error("O pacote público diverge das fontes canônicas.");
 
 const catalog = JSON.parse(fs.readFileSync(path.join(dist, "data/release/catalogo.json"), "utf8"));
 const packageData = JSON.parse(read("package.json"));
@@ -161,13 +73,16 @@ const buildInfo = {
   version: packageData.version,
   data_release_version: catalog.release_version || null,
   catalog_schema_version: catalog.schema_version || null,
-  generated_at: new Date().toISOString(),
   source_sha: process.env.GITHUB_SHA || "local",
-  builder: "build-public-v2-11",
+  builder: "copy-public-v2-11-1",
+  source_files_sha256: {
+    index_html: sha256(sourceIndex),
+    app_js: sha256(sourceApp),
+  },
   questions: questionCount,
   materials: materialCount,
   material_files: materialFiles,
 };
-writeDist("data/release/build-info.json", `${JSON.stringify(buildInfo, null, 2)}\n`);
+fs.writeFileSync(path.join(dist, "data/release/build-info.json"), `${JSON.stringify(buildInfo, null, 2)}\n`);
 
-console.log(`✓ Build público determinístico ${packageData.version}: ${questionCount} questões, ${materialCount} materiais, sem mutação do código-fonte.`);
+console.log(`✓ Build público canônico ${packageData.version}: ${questionCount} questões, ${materialCount} materiais e fontes copiadas sem transformação.`);

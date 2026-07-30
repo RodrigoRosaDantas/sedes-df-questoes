@@ -22,7 +22,7 @@ for (const entry of required) {
 }
 
 const index = fs.readFileSync(path.join(dist, "index.html"), "utf8");
-for (const reference of ["reports-v2-10.css?v=2", "reports-v2-10.js?v=2", "app-v4.js?v=6"]) {
+for (const reference of ["reports-v2-10.css?v=2", "reports-v2-10.js?v=2", "app-v4.js?v=7"]) {
   if (!index.includes(reference)) throw new Error(`Referência ausente no HTML: ${reference}`);
 }
 
@@ -33,9 +33,11 @@ const materialFiles = fs.readdirSync(path.join(dist, "data/release/materials")).
 const questionCount = Object.keys(catalog.question_index || {}).length;
 const materialCount = (catalog.materials || []).length;
 
-if (packageData.version !== "2.11.0") throw new Error(`Versão inesperada: ${packageData.version}`);
+if (packageData.version !== "2.11.1") throw new Error(`Versão inesperada: ${packageData.version}`);
 if (buildInfo.version !== packageData.version) throw new Error("Versão do build-info diverge do package.json.");
-if (buildInfo.builder !== "build-public-v2-11") throw new Error("Compilador público 2.11 não identificado.");
+if (buildInfo.builder !== "copy-public-v2-11-1") throw new Error("Cópia canônica 2.11.1 não identificada.");
+if (!buildInfo.source_files_sha256?.index_html || !buildInfo.source_files_sha256?.app_js) throw new Error("Hashes das fontes canônicas ausentes.");
+if ("generated_at" in buildInfo) throw new Error("Build-info contém horário variável.");
 if (buildInfo.data_release_version !== (catalog.release_version || null)) throw new Error("Versão da base diverge do catálogo publicado.");
 if (buildInfo.catalog_schema_version !== (catalog.schema_version || null)) throw new Error("Schema da base diverge do catálogo publicado.");
 if (buildInfo.questions !== questionCount || buildInfo.materials !== materialCount || buildInfo.material_files !== materialFiles) throw new Error("Proveniência do pacote diverge do catálogo publicado.");
@@ -47,10 +49,10 @@ for (const marker of ["data-progress-reports", "schema_version: \"2.10\"", "Amer
 }
 
 const worker = fs.readFileSync(path.join(dist, "service-worker.js"), "utf8");
-if (!worker.includes('sedes-questoes-v2-11') || !worker.includes("app-v4.js?v=6") || !worker.includes("reports-v2-10.js?v=2") || !worker.includes("build-info.json")) throw new Error("Service worker não foi atualizado para a release 2.11.");
+if (!worker.includes('sedes-questoes-v2-11-1') || !worker.includes("app-v4.js?v=7") || !worker.includes("reports-v2-10.js?v=2") || !worker.includes("build-info.json")) throw new Error("Service worker não foi atualizado para a release 2.11.1.");
 
 for (const forbidden of ["scripts", ".github", "data/consolidated", "data/true-false"]) {
   if (fs.existsSync(path.join(dist, forbidden))) throw new Error(`Conteúdo privado exposto no dist: ${forbidden}`);
 }
 
-console.log(`✓ Dist 2.11 validado: ${questionCount} questões, ${materialCount} materiais, compilação determinística e proveniência consistente.`);
+console.log(`✓ Dist 2.11.1 validado: ${questionCount} questões, ${materialCount} materiais, fontes canônicas e proveniência reproduzível.`);

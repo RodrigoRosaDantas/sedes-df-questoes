@@ -24,28 +24,33 @@ const fetchText = async relative => {
 let lastError;
 for (let attempt = 1; attempt <= 30; attempt += 1) {
   try {
-    const [buildInfo, catalog, index, app] = await Promise.all([
+    const [buildInfo, catalog, index, app, worker, reports] = await Promise.all([
       fetchJSON("data/release/build-info.json"),
       fetchJSON("data/release/catalogo.json"),
       fetchText("index.html"),
       fetchText("assets/app-v4.js"),
+      fetchText("service-worker.js"),
+      fetchText("assets/reports-v2-10.js"),
     ]);
 
     const questions = Object.keys(catalog.question_index || {}).length;
     const materials = Array.isArray(catalog.materials) ? catalog.materials.length : 0;
     if (buildInfo.version !== packageData.version) throw new Error(`Versão pública ${buildInfo.version}; esperada ${packageData.version}.`);
     if (expectedSha && buildInfo.source_sha !== expectedSha) throw new Error(`Commit público ${buildInfo.source_sha}; esperado ${expectedSha}.`);
-    if (buildInfo.builder !== "build-public-v2-11") throw new Error("Pacote público ainda não foi gerado pelo compilador 2.11.");
+    if (buildInfo.builder !== "copy-public-v2-11-1") throw new Error("Pacote público não foi copiado das fontes canônicas 2.11.1.");
+    if (!buildInfo.source_files_sha256?.index_html || !buildInfo.source_files_sha256?.app_js) throw new Error("Hashes das fontes canônicas ausentes.");
     if (buildInfo.questions !== questions || buildInfo.materials !== materials) throw new Error("Totais públicos divergem do catálogo entregue.");
     if (questions !== Number(catalog.summary?.questoes) || materials !== Number(catalog.summary?.materiais)) throw new Error("Resumo público diverge dos dados reais.");
-    for (const marker of ["app-v4.js?v=6", "reports-v2-10.js?v=2", "manifest.webmanifest"]) {
+    for (const marker of ["app-v4.js?v=7", "reports-v2-10.js?v=2", "manifest.webmanifest"]) {
       if (!index.includes(marker)) throw new Error(`HTML público sem ${marker}.`);
     }
     for (const marker of ["Catálogo inconsistente.", 'data-study-view="provas"', "function renderDisciplineTopics()"] ) {
       if (!app.includes(marker)) throw new Error(`Aplicação pública sem ${marker}.`);
     }
+    if (!worker.includes('sedes-questoes-v2-11-1') || !worker.includes("app-v4.js?v=7")) throw new Error("Service worker público desatualizado.");
+    if (!reports.includes("restoreBackupTransaction")) throw new Error("Relatórios e backup não foram publicados.");
 
-    console.log(`✓ Deploy confirmado em ${base}: versão ${buildInfo.version}, commit ${buildInfo.source_sha}, ${questions} questões e ${materials} materiais.`);
+    console.log(`✓ Deploy estático confirmado em ${base}: versão ${buildInfo.version}, commit ${buildInfo.source_sha}, ${questions} questões e ${materials} materiais.`);
     process.exit(0);
   } catch (error) {
     lastError = error;

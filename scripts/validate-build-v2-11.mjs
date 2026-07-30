@@ -8,9 +8,9 @@ const exists = relative => fs.existsSync(path.join(root, relative));
 const fail = message => { throw new Error(message); };
 
 const packageData = JSON.parse(read("package.json"));
-if (packageData.version !== "2.11.0") fail(`Versão inesperada: ${packageData.version}`);
+if (packageData.version !== "2.11.1") fail(`Versão inesperada: ${packageData.version}`);
 const buildCommand = String(packageData.scripts?.build || "");
-if (!buildCommand.includes("build-public.mjs")) fail("Build público 2.11 não está ativo.");
+if (!buildCommand.includes("build-public.mjs") || !buildCommand.includes("fixed-build-time.mjs")) fail("Build canônico ou relógio reproduzível não estão ativos.");
 for (const legacy of ["patch-runtime-catalog", "patch-study-navigation", "patch-intelligence", "build-dist.mjs"]) {
   if (buildCommand.includes(legacy)) fail(`Build ainda depende de ${legacy}.`);
 }
@@ -19,21 +19,37 @@ for (const legacyFile of [
   "scripts/patch-study-navigation-v2-6.mjs",
   "scripts/patch-intelligence-v2-9.mjs",
   "scripts/build-dist.mjs",
-]) if (exists(legacyFile)) fail(`Script mutável legado ainda existe: ${legacyFile}`);
+  "scripts/fragments/study-navigation-v2-6.js.txt",
+  "scripts/consolidate-source-once.mjs",
+  ".github/workflows/consolidate-source-once.yml",
+]) if (exists(legacyFile)) fail(`Artefato temporário ou mutável ainda existe: ${legacyFile}`);
+
+const builder = read("scripts/build-public.mjs");
+for (const forbidden of [".replace(", "staleGuard", "compileApplication", "compileIndex", "study-navigation-v2-6.js.txt"]) {
+  if (builder.includes(forbidden)) fail(`Build público ainda transforma fontes: ${forbidden}`);
+}
 
 const buildInfo = JSON.parse(read("dist/data/release/build-info.json"));
-if (buildInfo.version !== packageData.version || buildInfo.builder !== "build-public-v2-11") fail("Proveniência do compilador 2.11 ausente.");
+if (buildInfo.version !== packageData.version || buildInfo.builder !== "copy-public-v2-11-1") fail("Proveniência da cópia canônica 2.11.1 ausente.");
+if (!buildInfo.source_files_sha256?.index_html || !buildInfo.source_files_sha256?.app_js) fail("Hashes das fontes canônicas ausentes.");
+if ("generated_at" in buildInfo) fail("Build-info ainda contém horário variável.");
 
-const index = read("dist/index.html");
-const app = read("dist/assets/app-v4.js");
-for (const marker of ["app-v4.js?v=6", "study-navigation-v2-6.css?v=1", "reports-v2-10.js?v=2"]) {
-  if (!index.includes(marker)) fail(`HTML compilado sem ${marker}.`);
+const sourceIndex = read("index.html");
+const sourceApp = read("assets/app-v4.js");
+const distIndex = read("dist/index.html");
+const distApp = read("dist/assets/app-v4.js");
+if (sourceIndex !== distIndex || sourceApp !== distApp) fail("O dist não é cópia exata das fontes canônicas.");
+for (const marker of ["app-v4.js?v=7", "study-navigation-v2-6.css?v=1", "reports-v2-10.js?v=2"]) {
+  if (!sourceIndex.includes(marker)) fail(`HTML canônico sem ${marker}.`);
 }
 for (const marker of ["Catálogo inconsistente.", 'data-study-view="materias"', 'data-study-view="provas"', "function renderDisciplineTopics()"] ) {
-  if (!app.includes(marker)) fail(`Aplicação compilada sem ${marker}.`);
+  if (!sourceApp.includes(marker)) fail(`Aplicação canônica sem ${marker}.`);
 }
+if (sourceApp.includes("Release incompleta.")) fail("Aplicação canônica ainda contém trava antiga.");
 
 const workflow = read(".github/workflows/pages.yml");
-if (!workflow.includes("verify-deployment.mjs") || !workflow.includes("steps.deployment.outputs.page_url")) fail("Verificação pós-deploy não está configurada.");
+for (const marker of ["verify-deployment.mjs", "playwright.public.config.js", "rollback-deployment.mjs", "actions: write"]) {
+  if (!workflow.includes(marker)) fail(`Workflow sem proteção de produção: ${marker}`);
+}
 
-console.log("✓ Build 2.11 validado: compilação determinística, scripts mutáveis removidos e verificação pós-deploy ativa.");
+console.log("✓ Build 2.11.1 validado: fontes canônicas, cópia sem transformação, reprodutibilidade e rollback configurados.");

@@ -9,6 +9,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  actions: write
 concurrency:
   group: pages-${{ github.ref }}
   cancel-in-progress: true
@@ -52,5 +53,30 @@ jobs:
       - name: Publicar
         id: deployment
         uses: actions/deploy-pages@v4
-      - name: Confirmar conteúdo efetivamente publicado
+      - name: Confirmar arquivos efetivamente publicados
+        id: static_verify
+        continue-on-error: true
         run: node scripts/verify-deployment.mjs "${{ steps.deployment.outputs.page_url }}" "${{ github.sha }}"
+      - name: Instalar Chromium para auditoria pública
+        if: steps.static_verify.outcome == 'success'
+        run: |
+          npm install --no-save @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Abrir e testar o endereço público
+        id: browser_verify
+        if: steps.static_verify.outcome == 'success'
+        continue-on-error: true
+        env:
+          PUBLIC_BASE_URL: ${{ steps.deployment.outputs.page_url }}
+          EXPECTED_SHA: ${{ github.sha }}
+        run: npx playwright test --config=playwright.public.config.js
+      - name: Acionar rollback para a última release aprovada
+        if: steps.static_verify.outcome == 'failure' || steps.browser_verify.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/rollback-deployment.mjs
+      - name: Reprovar publicação inconsistente
+        if: steps.static_verify.outcome == 'failure' || steps.browser_verify.outcome == 'failure'
+        run: |
+          echo "A publicação não passou na auditoria pública; o rollback foi acionado."
+          exit 1
