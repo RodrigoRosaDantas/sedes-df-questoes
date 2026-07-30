@@ -14,6 +14,7 @@ const config = readJSON("data/release-config.json");
 const catalog = readJSON("data/release/catalogo.json");
 const manifest = readJSON("data/release/manifest.json");
 const app = read("assets/app-v4.js");
+const migration = read("assets/progress-migration-v2-3.js");
 const index = read("index.html");
 const styles = read("assets/quality-v2-3.css");
 
@@ -55,7 +56,7 @@ if (questions !== config.expected_questions || ids.size !== config.expected_ques
 for (const legacy of ["bundle-fetch.js", "data-updates.js", "consolidated-data-v2.js", "profile-defaults.js", "ux-improvements.js", "app-v3.js"]) {
   if (index.includes(legacy)) fail(`Camada legada ainda ativa no HTML: ${legacy}`);
 }
-if (!index.includes("assets/app-v4.js") || !index.includes("assets/quality-v2-3.css")) fail("Aplicativo ou estilos da release 2.3 não estão ativos.");
+if (!index.includes("assets/progress-migration-v2-3.js") || !index.includes("assets/app-v4.js") || !index.includes("assets/quality-v2-3.css")) fail("Migração, aplicativo ou estilos da release 2.3 não estão ativos.");
 if (!app.includes('const CATALOG_URL = "./data/release/catalogo.json"')) fail("Aplicativo não referencia o catálogo estático final.");
 if (app.includes("CompressionStream") || app.includes("DecompressionStream") || app.includes("window.fetch =")) fail("O navegador ainda executa montagem ou recompressão do banco.");
 
@@ -75,6 +76,9 @@ for (const feature of [
   "result-options",
 ]) if (!app.includes(feature)) fail(`Melhoria obrigatória ausente: ${feature}`);
 
+for (const feature of ["progressMigration.v2.3", "answeredQuestionIds", "metricsMigrated", "answerEvidence"]) {
+  if (!migration.includes(feature)) fail(`Proteção de migração ausente: ${feature}`);
+}
 if (app.includes("questions: state.questions")) fail("A sessão ainda armazena o conteúdo completo das questões.");
 for (const assignment of [
   '{id: "rodrigo", name: "Rodrigo", roles: ["202", "400"]}',
