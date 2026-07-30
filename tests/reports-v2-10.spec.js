@@ -119,7 +119,7 @@ test("relatório respeita fuso, períodos e conteúdo exportado", async ({page})
   const backupPath = await backupDownload.path();
   const backup = JSON.parse(await fs.readFile(backupPath, "utf8"));
   expect(backup.schema_version).toBe("2.10");
-  expect(backup.app_version).toBe("2.10.1");
+  expect(backup.app_version).toBe("2.11.1");
   expect(backup.data.notes.Q3.text).toBe("Revisar planejamento");
   expect(backup.data.reviewSchedule.Q3.stage).toBe(0);
   expect([...backup.data.reviewProcessedAttempts].sort()).toEqual(["attempt-current", "attempt-night", "attempt-old", "attempt-previous"].sort());
@@ -212,8 +212,8 @@ test("publica build-info consistente com o catálogo e o compilador", async ({re
   expect(buildResponse.ok()).toBeTruthy();
   const catalog = await catalogResponse.json();
   const build = await buildResponse.json();
-  expect(build.version).toBe("2.11.0");
-  expect(build.builder).toBe("build-public-v2-11");
+  expect(build.version).toBe("2.11.1");
+  expect(build.builder).toBe("copy-public-v2-11-1");
   expect(build.data_release_version).toBe(catalog.release_version);
   expect(build.catalog_schema_version).toBe(catalog.schema_version);
   expect(build.questions).toBe(catalog.summary.questoes);

@@ -286,7 +286,7 @@ function exportReport() {
 function completeBackupPayload() {
   return {
     schema_version: "2.10",
-    app_version: "2.10.1",
+    app_version: "2.11.1",
     exported_at: new Date().toISOString(),
     profile: activeProfile(),
     data: {
