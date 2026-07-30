@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "status": "auditoria_editorial",
+  "description": "Lotes Certo/Errado somente entram na release após estrutura, gabarito e identificação editorial serem validados.",
+  "planned": [
+    {
+      "prefix": "PROVA-QDX-SEEDF-2022-GPPGADM-A-",
+      "name": "Gestor PPGE — Administração — SEEDF/DF — Quadrix 2022 — Tipo A",
+      "questions": 120,
+      "publication_status": "pendente"
+    },
+    {
+      "prefix": "PROVA-QDX-SEEDF-2025-PROFADM-A-",
+      "name": "Professor de Educação Básica — Administração — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "questions": 120,
+      "publication_status": "pendente"
+    }
+  ],
+  "materials": []
+}

@@ -1,0 +1,32 @@
+/* Release 2.4 — suporte nativo a itens Certo/Errado */
+.option .letter {
+  min-width: 2.25rem;
+  width: auto;
+  padding-inline: .55rem;
+  white-space: nowrap;
+}
+
+.options:has(input[value="Certo"]) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.options:has(input[value="Certo"]) .option {
+  min-height: 4rem;
+  align-items: center;
+}
+
+.options:has(input[value="Certo"]) .letter {
+  min-width: 4.75rem;
+  text-align: center;
+}
+
+.result-options .result-option[data-answer="Certo"],
+.result-options .result-option[data-answer="Errado"] {
+  list-style: none;
+}
+
+@media (max-width: 640px) {
+  .options:has(input[value="Certo"]) {
+    grid-template-columns: 1fr;
+  }
+}

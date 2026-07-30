@@ -1,0 +1,5 @@
+Release 2.4.0
+
+Suporte técnico nativo: concluído na branch.
+Publicação das 240 questões C/E: bloqueada até auditoria editorial.
+Site público durante a validação: permanece com 570 questões.
