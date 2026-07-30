@@ -13,14 +13,18 @@ if (!index.includes("assets/intelligence-v2-9.css")) {
   index = index.replace('  <link rel="stylesheet" href="./assets/study-navigation-v2-6.css?v=1">', '  <link rel="stylesheet" href="./assets/study-navigation-v2-6.css?v=1">\n  <link rel="stylesheet" href="./assets/intelligence-v2-9.css?v=1">');
 }
 if (!index.includes("assets/reports-v2-10.css")) {
-  index = index.replace('  <link rel="stylesheet" href="./assets/intelligence-v2-9.css?v=1">', '  <link rel="stylesheet" href="./assets/intelligence-v2-9.css?v=1">\n  <link rel="stylesheet" href="./assets/reports-v2-10.css?v=1">');
+  index = index.replace('  <link rel="stylesheet" href="./assets/intelligence-v2-9.css?v=1">', '  <link rel="stylesheet" href="./assets/intelligence-v2-9.css?v=1">\n  <link rel="stylesheet" href="./assets/reports-v2-10.css?v=2">');
+} else {
+  index = index.replace(/assets\/reports-v2-10\.css\?v=\d+/, "assets/reports-v2-10.css?v=2");
 }
 index = index.replace(/assets\/app-v4\.js\?v=\d+/, "assets/app-v4.js?v=5");
 if (!index.includes("assets/learning-v2-9.js")) {
   index = index.replace('  <script type="module" src="./assets/app-v4.js?v=5"></script>', '  <script type="module" src="./assets/app-v4.js?v=5"></script>\n  <script type="module" src="./assets/learning-v2-9.js?v=1"></script>\n  <script type="module" src="./assets/pwa-v2-9.js?v=1"></script>');
 }
 if (!index.includes("assets/reports-v2-10.js")) {
-  index = index.replace('  <script type="module" src="./assets/pwa-v2-9.js?v=1"></script>', '  <script type="module" src="./assets/pwa-v2-9.js?v=1"></script>\n  <script type="module" src="./assets/reports-v2-10.js?v=1"></script>');
+  index = index.replace('  <script type="module" src="./assets/pwa-v2-9.js?v=1"></script>', '  <script type="module" src="./assets/pwa-v2-9.js?v=1"></script>\n  <script type="module" src="./assets/reports-v2-10.js?v=2"></script>');
+} else {
+  index = index.replace(/assets\/reports-v2-10\.js\?v=\d+/, "assets/reports-v2-10.js?v=2");
 }
 fs.writeFileSync(indexPath, index);
-console.log("✓ Camadas inteligentes, relatórios e PWA integrados ao pacote final.");
+console.log("✓ Camadas inteligentes, relatórios auditados e PWA integrados ao pacote final.");
