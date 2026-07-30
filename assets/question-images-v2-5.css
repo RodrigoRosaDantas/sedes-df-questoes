@@ -1,0 +1,31 @@
+.question-visual {
+  display: grid;
+  justify-items: center;
+  gap: .55rem;
+  margin: 1rem 0 1.25rem;
+  padding: 1rem;
+  border: 1px solid var(--line, rgba(148, 163, 184, .22));
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .035);
+}
+
+.question-visual img {
+  display: block;
+  width: min(112px, 35vw);
+  height: auto;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .18);
+}
+
+.question-visual figcaption {
+  color: var(--muted, #94a3b8);
+  font-size: .82rem;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.result-question .question-visual {
+  max-width: 260px;
+}

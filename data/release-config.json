@@ -1,10 +1,10 @@
 {
-  "schema_version": "1.1",
-  "release_version": "2.4.0",
+  "schema_version": "1.2",
+  "release_version": "2.5.0",
   "banco_mestre": 2439,
   "aguardando_auditoria": 1869,
   "expected_questions": 570,
   "expected_materials": 35,
-  "source": "CONSOL01 e pipeline híbrido A–E/Certo-Errado",
-  "source_url": "https://app.notion.com/p/3aacf5a2673181a2bfa2f45dad8db0f4"
+  "source": "CONSOL01 e pipeline híbrido A–E/Certo-Errado com lotes oficiais do Notion",
+  "source_url": "https://app.notion.com/p/a1d5fc8f8e434105861faba90dc156d9"
 }

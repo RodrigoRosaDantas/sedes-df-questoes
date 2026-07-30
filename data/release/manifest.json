@@ -1,0 +1,268 @@
+{
+  "schema_version": "2.1",
+  "release_version": "2.5.0",
+  "generated_at": "2026-07-30T17:08:12.027Z",
+  "summary": {
+    "banco_mestre": 2439,
+    "materiais": 36,
+    "questoes": 690,
+    "aguardando_auditoria": 1749,
+    "provas": 1,
+    "simulados": 35
+  },
+  "catalog_sha256": "e849860fe3103d1d45cd99d694e4158766bf1eb2c25c15d91337feda6dcd62f6",
+  "materials": [
+    {
+      "id": "sim-emilia-2026-tdas-adm01",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-adm01.json",
+      "questions": 20,
+      "bytes": 17283,
+      "sha256": "47b81433b6c796c64b1786c9ebe1e801cf49da06a4fe99527f58dc28645b8ac7"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-arq01",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-arq01.json",
+      "questions": 20,
+      "bytes": 18555,
+      "sha256": "499bde443d80f9fd34d3f3e41b1a09cbad40deea83e715c5576b17a92330437d"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-const01",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-const01.json",
+      "questions": 20,
+      "bytes": 15929,
+      "sha256": "fce1a2933161ce10822a7e8a0673ce8bd5819d59bb225e556c65f871de1d741c"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-mat01",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-mat01.json",
+      "questions": 20,
+      "bytes": 19295,
+      "sha256": "f56fd590702cf7d9df60d366b706c2d9788fccef1c815a812e31d10cf2ba02e5"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-prog01",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-prog01.json",
+      "questions": 20,
+      "bytes": 23563,
+      "sha256": "a68ab374e659e221056ce18b5e592658a589028223b8d7dab8f856d6612837cc"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-prog02",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-prog02.json",
+      "questions": 20,
+      "bytes": 21393,
+      "sha256": "a5c895514c88a40fd812537ec3e1a2203043cbcda73f3e21badaf4b6e6c73897"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-prog03",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-prog03.json",
+      "questions": 20,
+      "bytes": 22272,
+      "sha256": "e4ddd94ec727972f133b70be512b229c5636134d9af112174dd06d6e65593254"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-prog04",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-prog04.json",
+      "questions": 20,
+      "bytes": 21456,
+      "sha256": "f70456605db274d2184ccd4c729fde7e840e7f8cbe328e538cc25720a02665f6"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-prog05",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-prog05.json",
+      "questions": 20,
+      "bytes": 21405,
+      "sha256": "0b8846b90e8f1139971a4508c94d7c7965237157043980752d7f444d948917eb"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-dfr01",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-dfr01.json",
+      "questions": 20,
+      "bytes": 18446,
+      "sha256": "f34cdd5b4fe27ecdac6cefaa2e08a4f17bf936439ae1a2119627a2a5063017a8"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-pt01",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-pt01.json",
+      "questions": 10,
+      "bytes": 20823,
+      "sha256": "f6f4a0f5e2779164b502b565734fd2bf90c77feb4358823d30a0617f767648f3"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-pt02",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-pt02.json",
+      "questions": 10,
+      "bytes": 20878,
+      "sha256": "b2a51beeccae504479fd64be4c4c24a7588bb216eac92484ea3441387be87267"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-pt03",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-pt03.json",
+      "questions": 10,
+      "bytes": 7711,
+      "sha256": "9bb2d4055e82f32dc33f003b41a47937e19abd4f2f5e94c97432ab1c26c6ec69"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-pt04",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-pt04.json",
+      "questions": 10,
+      "bytes": 19500,
+      "sha256": "679c1fdd54eec8ecb77cdd0f7747ca47664870d022bd2d29fb79a332ea272517"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-pt05",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-pt05.json",
+      "questions": 10,
+      "bytes": 19571,
+      "sha256": "7597a0381abca59a511a81a1b448b575201cb02d02f5554dbdf805daaff7d4de"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-pt06",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-pt06.json",
+      "questions": 10,
+      "bytes": 17993,
+      "sha256": "3df3096e4b15cdb1aaf819e3019015867ad67d7213e60f7d63e6307c2cc00a44"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-pt07",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-pt07.json",
+      "questions": 10,
+      "bytes": 18532,
+      "sha256": "e02aaeb617d0f14ed38eeb44c01e5969b7882fd88f29de57045f6c8f09169185"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-pt08",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-pt08.json",
+      "questions": 10,
+      "bytes": 17523,
+      "sha256": "fa6dd3f1f04cbe9fba0777e672eef79d380d553c9ca85a663ab252921f53b6ed"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-pt09",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-pt09.json",
+      "questions": 10,
+      "bytes": 17498,
+      "sha256": "54b62cbb752d69efe6ae9764c1e225c362e4376e904437383a802501e401b207"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-pt10",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-pt10.json",
+      "questions": 10,
+      "bytes": 18542,
+      "sha256": "adeb4c9e0b6519eac333060d2825d06d3ef3e85302a1e1b257d3f778b2acdcb6"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-pt11",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-pt11.json",
+      "questions": 10,
+      "bytes": 17528,
+      "sha256": "f93c388acba965cd5dcc501372a77e13b6f3d57954231bd9c4bee01e1359fe3c"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-pt12",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-pt12.json",
+      "questions": 10,
+      "bytes": 17335,
+      "sha256": "df4be58c0394d558732f6777620069535aa5c6f9444f40b339a44f9925ea63b4"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-pt13",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-pt13.json",
+      "questions": 10,
+      "bytes": 17325,
+      "sha256": "9261c7df82dcd8134f23ab34193ca0eb1a1eb74ffb9ccd313719d6f69be4d214"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-pt14",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-pt14.json",
+      "questions": 10,
+      "bytes": 18447,
+      "sha256": "5d383ae6168c41c5fd263bf5aeb2259cae27560d815c2ef73f82a6ceb3e191c1"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-pt15",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-pt15.json",
+      "questions": 10,
+      "bytes": 19244,
+      "sha256": "48d99729a4d6b01b7ecae5b382ca05a0836605d29bf07fff24f16443da48910b"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-pt16",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-pt16.json",
+      "questions": 10,
+      "bytes": 8117,
+      "sha256": "917e06d084efec8f09fca8f3f0c60fe1def1d7396c9cd3d40e41df5c3791242b"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-mul01",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-mul01.json",
+      "questions": 20,
+      "bytes": 21995,
+      "sha256": "ad213f531e5f95b60cfb0d5b5148495ee770c97ecada15de0a23d99be740be5e"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-mul02",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-mul02.json",
+      "questions": 20,
+      "bytes": 19091,
+      "sha256": "c4d43cf1c86d70f63e697f7be5c31bde1200ff5f55a016e657558cdc70084472"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-leg01",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-leg01.json",
+      "questions": 20,
+      "bytes": 20727,
+      "sha256": "b144e0069065af91f251e441c56947faf538fd49d7311b83d87d4272b2142ba9"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-leg02",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-leg02.json",
+      "questions": 20,
+      "bytes": 17415,
+      "sha256": "c17b0f11a32bf58a10d420c24db9f39a0ef0a30c2c392d1c253fc7c9fe361020"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-leg03",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-leg03.json",
+      "questions": 20,
+      "bytes": 18228,
+      "sha256": "0ae1b8bea745cd7e1ab4afc769e0e75c2b8539644ca78964fc9016708ce63103"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-soc01",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-soc01.json",
+      "questions": 20,
+      "bytes": 20812,
+      "sha256": "8d7145691eff82bf35c4611ecb5e4270701f10eda7e5e8ad6a360761a9e0b795"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-as01",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-as01.json",
+      "questions": 30,
+      "bytes": 29854,
+      "sha256": "8d76a05bb7b59413926ff587547299c459864d6003fe85e7358d33bc73cd1fb2"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-as02",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-as02.json",
+      "questions": 30,
+      "bytes": 30778,
+      "sha256": "dad7b0e2c92e1e84a25f33f7b96b02092aa16f512fe3637a8b45fe49345a3bae"
+    },
+    {
+      "id": "sim-emilia-2026-tdas-as03",
+      "file": "./data/release/materials/sim-emilia-2026-tdas-as03.json",
+      "questions": 30,
+      "bytes": 31765,
+      "sha256": "88baedb48af8e62dc0dbfadb186aa72b503e289502e483734c94f9e027b161ea"
+    },
+    {
+      "id": "prova-qdx-seedf-2022-gppgadm-a",
+      "file": "./data/release/materials/prova-qdx-seedf-2022-gppgadm-a.json",
+      "questions": 120,
+      "bytes": 239579,
+      "sha256": "65e42d9ae188259c7498a8f1f3afb3476cb2e97fc9e1c4c57d8cf3452e856718"
+    }
+  ]
+}

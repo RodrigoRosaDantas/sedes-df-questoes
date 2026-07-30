@@ -1,0 +1,54 @@
+name: Release Quadrix 2022 — 120 itens
+
+on:
+  push:
+    branches:
+      - release/qdx-2022-gppgadm-120
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-qdx-2022-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  exportar-validar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Exportar 120 itens liberados no Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/export-qdx-2022-gppgadm.mjs
+
+      - name: Validar release completa
+        run: npm run check
+
+      - name: Versionar snapshot editorial gerado
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/true-false/index.json data/true-false/qdx-seedf-2022-gppgadm-a.json assets/images/excel-analise-rapida-q23.svg data/release
+          if git diff --cached --quiet; then
+            echo "Snapshot já está atualizado."
+          else
+            git commit -m "data: publica prova Quadrix 2022 com 120 itens [skip ci]"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
+
+      - name: Resumo da release
+        run: |
+          node -e 'const c=require("./data/release/catalogo.json"); console.log(JSON.stringify(c.summary,null,2))'
