@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "release_version": "2.3.0",
+  "banco_mestre": 870,
+  "aguardando_auditoria": 300,
+  "expected_questions": 570,
+  "expected_materials": 35,
+  "source": "CONSOL01 — Caderno final saneado para aplicação",
+  "source_url": "https://app.notion.com/p/3aacf5a2673181a2bfa2f45dad8db0f4"
+}
