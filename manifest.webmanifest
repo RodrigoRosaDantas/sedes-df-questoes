@@ -1,0 +1,14 @@
+{
+  "name": "SEDES/DF Questões",
+  "short_name": "SEDES Questões",
+  "description": "Plataforma de estudo com questões, revisões e provas anteriores da SEDES/DF.",
+  "start_url": "./#/inicio",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#08131f",
+  "theme_color": "#08131f",
+  "lang": "pt-BR",
+  "icons": [
+    {"src": "./assets/app-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+  ]
+}
