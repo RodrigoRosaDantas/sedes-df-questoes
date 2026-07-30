@@ -22,6 +22,15 @@ jobs:
           node-version: 22
       - name: Gerar e validar aplicação, banco e informações da prova
         run: npm run check
+      - name: Instalar navegador de teste
+        run: |
+          npm install --no-save @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Testar a plataforma como usuário real
+        run: |
+          python3 -m http.server 4173 --directory dist >/tmp/sedes-http.log 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:4173/ >/dev/null && break; sleep 1; done
+          npx playwright test
   deploy:
     if: github.event_name != 'pull_request'
     needs: validate
@@ -39,7 +48,7 @@ jobs:
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: dist
       - name: Publicar
         id: deployment
         uses: actions/deploy-pages@v4
