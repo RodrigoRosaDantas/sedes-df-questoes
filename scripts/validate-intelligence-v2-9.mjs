@@ -18,7 +18,8 @@ for (const feature of ["manifest.webmanifest", "intelligence-v2-9.css", "app-v4.
 const learning = read("dist/assets/learning-v2-9.js");
 for (const feature of ["reviewSchedule", "D0/D7/D20", "data-smart-today", "Por que eu errei?", "Exportar para Anki", "Simulado por cargo", "Selecionar pontos fracos", "Minha anotação"]) if (!learning.includes(feature)) fail(`Recurso inteligente ausente: ${feature}`);
 const serviceWorker = read("dist/service-worker.js");
-for (const feature of ["data/release/catalogo.json", "data/release/materials", "CACHE_VERSION", "networkFirst"]) if (!serviceWorker.includes(feature)) fail(`Cache offline incompleto: ${feature}`);
+for (const feature of ["data/release/catalogo.json", "CACHE_VERSION", "networkFirst"]) if (!serviceWorker.includes(feature)) fail(`Cache offline incompleto: ${feature}`);
+if (!/release\\\/materials/.test(serviceWorker)) fail("Cache offline dos materiais não está ativo.");
 const catalog = JSON.parse(read("dist/data/release/catalogo.json"));
 const study = JSON.parse(read("dist/data/release/study-index.json"));
 if (catalog.summary.questoes !== 690 || catalog.summary.materiais !== 36) fail("Catálogo final divergente.");
