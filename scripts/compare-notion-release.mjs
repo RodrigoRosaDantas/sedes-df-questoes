@@ -76,17 +76,13 @@ async function release(){
  return{catalog,questions,materials};
 }
 
-function editorialCode(row){
- const match=clean(row['Código']).match(/-([A-Z0-9]+)-(\d+)$/i);
- return match?`consol-${match[1]}-${Number(match[2])}`:'';
-}
+const rowPrefix=row=>clean(row['Código']).match(/-([A-Z0-9]+)-(\d+)$/i)?.[1]?.toUpperCase()||'';
+const questionPrefix=q=>clean(q.codigo).match(/(?:CONSOL|SIM-[^-]+(?:-[^-]+)*)-([A-Z]+\d+)-\d+$/i)?.[1]?.toUpperCase()||clean(q.material_id).match(/-([a-z]+\d+)$/i)?.[1]?.toUpperCase()||'';
+const editorialCode=row=>{const m=clean(row['Código']).match(/-([A-Z0-9]+)-(\d+)$/i);return m?`consol-${m[1]}-${Number(m[2])}`:''};
+const fingerprint=(prefix,enunciado,alternatives,gabarito)=>key([prefix,enunciado,...Object.values(alternatives||{}),gabarito].join('\u241f'));
+const rowAlternatives=row=>({A:row['Alternativa A'],B:row['Alternativa B'],C:row['Alternativa C'],D:row['Alternativa D'],E:row['Alternativa E']});
 function currentField(q,field){
- const map={
-  'Texto-base':q.texto_base,'Enunciado':q.enunciado,'Alternativa A':q.alternativas?.A,'Alternativa B':q.alternativas?.B,
-  'Alternativa C':q.alternativas?.C,'Alternativa D':q.alternativas?.D,'Alternativa E':q.alternativas?.E,'Gabarito':q.gabarito,
-  'Comentário geral':q.comentario,'Fundamento legal':q.fundamento,'Pegadinha':q.pegadinha,'Observações':q.observacoes,
-  'Assunto':q.assunto,'Subassunto':q.subassunto,
- };
+ const map={'Texto-base':q.texto_base,'Enunciado':q.enunciado,'Alternativa A':q.alternativas?.A,'Alternativa B':q.alternativas?.B,'Alternativa C':q.alternativas?.C,'Alternativa D':q.alternativas?.D,'Alternativa E':q.alternativas?.E,'Gabarito':q.gabarito,'Comentário geral':q.comentario,'Fundamento legal':q.fundamento,'Pegadinha':q.pegadinha,'Observações':q.observacoes,'Assunto':q.assunto,'Subassunto':q.subassunto};
  return map[field];
 }
 
@@ -99,6 +95,13 @@ const{catalog,questions,materials}=await release();
 const byCode=new Map(questions.map(q=>[key(q.codigo),q]));
 const byId=new Map(questions.map(q=>[key(q.id),q]));
 const byComposite=new Map(questions.map(q=>[composite(q.material_name,q.numero),q]));
+const byFingerprint=new Map();
+for(const q of questions){
+ const fp=fingerprint(questionPrefix(q),q.enunciado,q.alternativas,q.gabarito);
+ if(!byFingerprint.has(fp))byFingerprint.set(fp,[]);
+ byFingerprint.get(fp).push(q);
+}
+
 const matched=new Set();const missing=[];const reused=[];const oldIds=[];
 const strategies=new Map();const formats=new Map();const materialCounts=new Map();
 const diffCounts=new Map();const diffSamples=new Map();
@@ -108,10 +111,13 @@ for(const row of published){
  const format=clean(row['Formato da questão'])||'Não informado';formats.set(format,(formats.get(format)||0)+1);
  const direct=byCode.get(key(row['Código']));
  const github=byId.get(key(row['Código GitHub']));
+ const fp=fingerprint(rowPrefix(row),row['Enunciado'],rowAlternatives(row),row['Gabarito']);
+ const fingerprintMatches=byFingerprint.get(fp)||[];
+ const exact=fingerprintMatches.length===1?fingerprintMatches[0]:null;
  const derived=byCode.get(key(editorialCode(row)));
  const grouped=byComposite.get(composite(row['Nome do material'],row['Número original']));
- const q=direct||github||derived||grouped;
- const strategy=direct?'codigo':github?'codigo_github':derived?'codigo_editorial_derivado':grouped?'material_e_numero':'nao_encontrada';
+ const q=direct||github||exact||derived||grouped;
+ const strategy=direct?'codigo':github?'codigo_github':exact?'conteudo_integral':derived?'codigo_editorial_derivado':grouped?'material_e_numero':'nao_encontrada';
  strategies.set(strategy,(strategies.get(strategy)||0)+1);
  if(!q){missing.push({code:row['Código'],github_id:row['Código GitHub'],material:row['Nome do material'],number:row['Número original'],notion_url:row.notion_url});continue}
  const identity=key(q.id);if(matched.has(identity)){reused.push({code:row['Código'],release_id:q.id});continue}matched.add(identity);
@@ -126,15 +132,7 @@ for(const row of published){
 }
 
 const extra=questions.filter(q=>!matched.has(key(q.id))).map(q=>({code:q.codigo,id:q.id,material_id:q.material_id}));
-const report={
- generated_at:new Date().toISOString(),
- source:{database:'Banco Mestre — Provas e Simulados SEDES/DF',data_source_id:SOURCE,total_rows:rows.length,publishable_rows:published.length,pending_rows:rows.length-published.length},
- release:{version:catalog.release_version,materials:materials.size,questions:questions.length},
- identity_validation:{match_strategies:Object.fromEntries([...strategies].sort((a,b)=>b[1]-a[1])),duplicate_publishable_codes:duplicateCodes,duplicate_material_numbers:duplicateComposite,missing_in_release:missing,extra_in_release:extra,reused_release_questions:reused,legacy_id_differences:oldIds},
- formats:Object.fromEntries([...formats].sort((a,b)=>b[1]-a[1])),
- material_counts:Object.fromEntries([...materialCounts].sort((a,b)=>a[0].localeCompare(b[0]))),
- content_differences:Object.fromEntries([...diffCounts].map(([field,count])=>[field,{count,samples:diffSamples.get(field)||[]}]))
-};
+const report={generated_at:new Date().toISOString(),source:{database:'Banco Mestre — Provas e Simulados SEDES/DF',data_source_id:SOURCE,total_rows:rows.length,publishable_rows:published.length,pending_rows:rows.length-published.length},release:{version:catalog.release_version,materials:materials.size,questions:questions.length},identity_validation:{match_strategies:Object.fromEntries([...strategies].sort((a,b)=>b[1]-a[1])),duplicate_publishable_codes:duplicateCodes,duplicate_material_numbers:duplicateComposite,missing_in_release:missing,extra_in_release:extra,reused_release_questions:reused,legacy_id_differences:oldIds},formats:Object.fromEntries([...formats].sort((a,b)=>b[1]-a[1])),material_counts:Object.fromEntries([...materialCounts].sort((a,b)=>a[0].localeCompare(b[0]))),content_differences:Object.fromEntries([...diffCounts].map(([field,count])=>[field,{count,samples:diffSamples.get(field)||[]}]))};
 await fs.writeFile('/tmp/notion-release-comparison.json',`${JSON.stringify(report,null,2)}\n`);
 
 console.log(`Publicáveis no Notion: ${published.length}. Release atual: ${questions.length}.`);
