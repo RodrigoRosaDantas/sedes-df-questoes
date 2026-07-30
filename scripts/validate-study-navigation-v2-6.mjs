@@ -55,7 +55,8 @@ for (const feature of [
 ]) if (!app.includes(feature)) fail(`Funcionalidade de estudos ausente: ${feature}`);
 
 if (!html.includes("assets/study-navigation-v2-6.css?v=1")) fail("Estilos da navegação de estudos não estão ativos.");
-if (!html.includes("assets/app-v4.js?v=3")) fail("Cache do aplicativo não foi renovado para a navegação nova.");
+const appVersion = Number(html.match(/assets\/app-v4\.js\?v=(\d+)/)?.[1] || 0);
+if (appVersion < 3) fail("Cache do aplicativo não foi renovado para a navegação nova.");
 for (const selector of [".study-view-tabs", ".discipline-grid", ".topic-list", ".topic-config"]) if (!css.includes(selector)) fail(`Estilo ausente: ${selector}`);
 
 console.log(`✓ Navegação validada: ${study.summary.disciplines} matérias, ${study.summary.topics} tópicos, ${catalog.summary.simulados} simulados e ${catalog.summary.provas} prova(s).`);
