@@ -28,8 +28,10 @@ jobs:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         run: node scripts/compare-notion-release.mjs
       - name: Validar plataforma completa
+        if: success()
         run: npm run check
       - name: Guardar relatório comparativo
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: notion-release-comparison
