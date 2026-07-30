@@ -1,0 +1,36 @@
+name: Auditar integração Notion
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: integration/notion-sync-audit-20260730
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Ler e auditar Banco Mestre do Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          TZ: America/Sao_Paulo
+        run: node scripts/audit-notion-source.mjs
+      - name: Validar aplicação existente
+        run: npm run check
+      - name: Publicar relatório da auditoria como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: notion-source-audit
+          path: data/audit/notion-source-report.json
+          if-no-files-found: error
