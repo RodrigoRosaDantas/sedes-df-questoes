@@ -203,7 +203,7 @@ test("falha de armazenamento restaura o estado anterior", async ({page}) => {
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("sedes.questoes.rodrigo.history.v3"))[0].id)).toBe("attempt-night");
 });
 
-test("publica build-info consistente com o catálogo", async ({request}) => {
+test("publica build-info consistente com o catálogo e o compilador", async ({request}) => {
   const [catalogResponse, buildResponse] = await Promise.all([
     request.get("/data/release/catalogo.json"),
     request.get("/data/release/build-info.json"),
@@ -212,7 +212,8 @@ test("publica build-info consistente com o catálogo", async ({request}) => {
   expect(buildResponse.ok()).toBeTruthy();
   const catalog = await catalogResponse.json();
   const build = await buildResponse.json();
-  expect(build.version).toBe("2.10.1");
+  expect(build.version).toBe("2.11.0");
+  expect(build.builder).toBe("build-public-v2-11");
   expect(build.data_release_version).toBe(catalog.release_version);
   expect(build.catalog_schema_version).toBe(catalog.schema_version);
   expect(build.questions).toBe(catalog.summary.questoes);
