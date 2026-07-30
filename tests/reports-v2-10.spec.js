@@ -72,7 +72,7 @@ async function seedProfile(page) {
       },
     ]));
     localStorage.setItem("sedes.questoes.rodrigo.errorReasons.v1", JSON.stringify({
-      Q3: {reason: "Confundi a regra ou a lei", updatedAt: new Date(now).toISOString()},
+      Q3: {reason: "Confundi a regra ou a lei", updatedAt: new Date(now - 1000).toISOString()},
       Q5: {reason: "Distração", updatedAt: new Date(now - 60 * 86400000).toISOString()},
     }));
     localStorage.setItem("sedes.questoes.rodrigo.notes.v1", JSON.stringify({Q3: {text: "Revisar planejamento", updatedAt: new Date(now).toISOString()}}));
