@@ -1,4 +1,4 @@
-const CACHE_VERSION = "sedes-questoes-v2-10-1";
+const CACHE_VERSION = "sedes-questoes-v2-11";
 const SHELL = [
   "./",
   "./index.html",
@@ -13,7 +13,7 @@ const SHELL = [
   "./assets/reports-v2-10.css?v=2",
   "./assets/progress-migration-v2-3.js?v=1",
   "./assets/question-images-v2-5.js?v=1",
-  "./assets/app-v4.js?v=5",
+  "./assets/app-v4.js?v=6",
   "./assets/learning-v2-9.js?v=1",
   "./assets/pwa-v2-9.js?v=1",
   "./assets/reports-v2-10.js?v=2",
