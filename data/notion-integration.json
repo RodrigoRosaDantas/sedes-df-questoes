@@ -1,0 +1,8 @@
+{
+  "name": "Banco Mestre — Provas e Simulados SEDES/DF",
+  "database_url": "https://app.notion.com/p/a1d5fc8f8e434105861faba90dc156d9?v=85b47b4a2e17461e9d3482724b13fab8",
+  "data_source_id": "784234ae-deca-4514-b60d-19524e122a89",
+  "publication_field": "Pode publicar",
+  "publication_value": true,
+  "mode": "identity_validation_before_automatic_sync"
+}
