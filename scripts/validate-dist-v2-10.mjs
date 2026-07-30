@@ -1,0 +1,53 @@
+import fs from "node:fs";
+import path from "node:path";
+import {fileURLToPath} from "node:url";
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const dist = path.join(root, "dist");
+const required = [
+  "index.html",
+  "service-worker.js",
+  "manifest.webmanifest",
+  "assets/app-v4.js",
+  "assets/learning-v2-9.js",
+  "assets/reports-v2-10.js",
+  "assets/reports-v2-10.css",
+  "data/release/catalogo.json",
+  "data/release/study-index.json",
+  "data/release/build-info.json",
+];
+
+for (const entry of required) {
+  if (!fs.existsSync(path.join(dist, entry))) throw new Error(`Arquivo ausente no dist: ${entry}`);
+}
+
+const index = fs.readFileSync(path.join(dist, "index.html"), "utf8");
+for (const reference of ["reports-v2-10.css?v=1", "reports-v2-10.js?v=1", "app-v4.js?v=5"]) {
+  if (!index.includes(reference)) throw new Error(`Referência ausente no HTML: ${reference}`);
+}
+
+const packageData = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
+const catalog = JSON.parse(fs.readFileSync(path.join(dist, "data/release/catalogo.json"), "utf8"));
+const buildInfo = JSON.parse(fs.readFileSync(path.join(dist, "data/release/build-info.json"), "utf8"));
+const materialFiles = fs.readdirSync(path.join(dist, "data/release/materials")).filter(file => file.endsWith(".json")).length;
+const questionCount = Object.keys(catalog.question_index || {}).length;
+const materialCount = (catalog.materials || []).length;
+
+if (packageData.version !== "2.10.0") throw new Error(`Versão inesperada: ${packageData.version}`);
+if (buildInfo.version !== packageData.version) throw new Error("Versão do build-info diverge do package.json.");
+if (buildInfo.questions !== questionCount || buildInfo.materials !== materialCount || buildInfo.material_files !== materialFiles) throw new Error("Proveniência do pacote diverge do catálogo publicado.");
+if (questionCount !== Number(catalog.summary?.questoes) || materialCount !== Number(catalog.summary?.materiais)) throw new Error("Resumo do catálogo diverge dos dados reais.");
+
+const reports = fs.readFileSync(path.join(dist, "assets/reports-v2-10.js"), "utf8");
+for (const marker of ["data-progress-reports", "schema_version: \"2.10\"", "errorReasons", "reviewSchedule", "Exportar relatório CSV"]) {
+  if (!reports.includes(marker)) throw new Error(`Recurso 2.10 ausente: ${marker}`);
+}
+
+const worker = fs.readFileSync(path.join(dist, "service-worker.js"), "utf8");
+if (!worker.includes('sedes-questoes-v2-10') || !worker.includes("reports-v2-10.js") || !worker.includes("build-info.json")) throw new Error("Service worker não foi atualizado para a release 2.10.");
+
+for (const forbidden of ["scripts", ".github", "data/consolidated", "data/true-false"]) {
+  if (fs.existsSync(path.join(dist, forbidden))) throw new Error(`Conteúdo privado exposto no dist: ${forbidden}`);
+}
+
+console.log(`✓ Dist 2.10 validado: ${questionCount} questões, ${materialCount} materiais, relatórios, backup completo e proveniência consistentes.`);

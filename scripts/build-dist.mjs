@@ -24,6 +24,27 @@ const forbidden = ["scripts", ".github", "data/consolidated", "data/true-false"]
 for (const entry of forbidden) {
   if (fs.existsSync(path.join(dist, entry))) throw new Error(`Conteúdo de desenvolvimento exposto no dist: ${entry}`);
 }
-const catalog = JSON.parse(fs.readFileSync(path.join(dist, "data/release/catalogo.json"), "utf8"));
-if (catalog.summary.questoes !== 690 || catalog.summary.materiais !== 36) throw new Error("Dist gerado com totais divergentes.");
-console.log(`✓ Pacote dist gerado: ${catalog.summary.questoes} questões, ${catalog.summary.materiais} materiais e somente arquivos públicos.`);
+
+const catalogPath = path.join(dist, "data/release/catalogo.json");
+const catalog = JSON.parse(fs.readFileSync(catalogPath, "utf8"));
+const packageData = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
+const materialCount = Array.isArray(catalog.materials) ? catalog.materials.length : 0;
+const questionCount = Object.keys(catalog.question_index || {}).length;
+const materialDir = path.join(dist, "data/release/materials");
+const materialFiles = fs.existsSync(materialDir) ? fs.readdirSync(materialDir).filter(file => file.endsWith(".json")).length : 0;
+
+if (!materialCount || !questionCount) throw new Error("Dist gerado sem materiais ou questões.");
+if (Number(catalog.summary?.questoes) !== questionCount) throw new Error(`Catálogo divergente: summary.questoes=${catalog.summary?.questoes}, índice=${questionCount}.`);
+if (Number(catalog.summary?.materiais) !== materialCount) throw new Error(`Catálogo divergente: summary.materiais=${catalog.summary?.materiais}, lista=${materialCount}.`);
+if (materialFiles !== materialCount) throw new Error(`Arquivos de material divergentes: ${materialFiles} arquivos para ${materialCount} materiais.`);
+
+const buildInfo = {
+  version: packageData.version,
+  generated_at: new Date().toISOString(),
+  source_sha: process.env.GITHUB_SHA || "local",
+  questions: questionCount,
+  materials: materialCount,
+  material_files: materialFiles,
+};
+fs.writeFileSync(path.join(dist, "data/release/build-info.json"), `${JSON.stringify(buildInfo, null, 2)}\n`);
+console.log(`✓ Pacote dist ${packageData.version}: ${questionCount} questões, ${materialCount} materiais e proveniência registrada.`);
