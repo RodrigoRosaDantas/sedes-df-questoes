@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
-  "status": "auditoria_editorial",
+  "status": "publicacao_parcial_concluida",
   "description": "Lotes Certo/Errado somente entram na release após estrutura, gabarito e identificação editorial serem validados.",
   "planned": [
     {
       "prefix": "PROVA-QDX-SEEDF-2022-GPPGADM-A-",
       "name": "Gestor PPGE — Administração — SEEDF/DF — Quadrix 2022 — Tipo A",
       "questions": 120,
-      "publication_status": "pendente"
+      "publication_status": "publicado"
     },
     {
       "prefix": "PROVA-QDX-SEEDF-2025-PROFADM-A-",
@@ -16,5 +16,11 @@
       "publication_status": "pendente"
     }
   ],
-  "materials": []
+  "materials": [
+    {
+      "file": "./data/true-false/qdx-seedf-2022-gppgadm-a.json",
+      "expected_questions": 120,
+      "lote_publicacao": "REL-2026-07-QDX-2022-GPPGADM"
+    }
+  ]
 }
