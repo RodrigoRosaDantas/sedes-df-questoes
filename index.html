@@ -8,7 +8,7 @@
   <title>SEDES/DF Questões</title>
   <link rel="stylesheet" href="./assets/styles.css?v=2">
   <link rel="stylesheet" href="./assets/dashboard.css?v=1">
-  <link rel="stylesheet" href="./assets/ux-improvements.css?v=1">
+  <link rel="stylesheet" href="./assets/quality-v2-3.css?v=1">
 </head>
 <body>
   <a class="skip" href="#app">Pular para o conteúdo</a>
@@ -25,8 +25,12 @@
     </nav>
     <div class="top-actions">
       <span class="sync-pill"><i></i><span id="sync-label">Carregando catálogo</span></span>
-      <button id="profile-button" class="profile-button" type="button" aria-label="Trocar perfil"><i>●</i><span id="profile-button-label">Perfil</span></button>
-      <button id="theme-toggle" class="icon-btn" type="button" aria-label="Alternar tema">◐</button>
+      <button id="profile-button" class="profile-button profile-switcher" type="button" aria-label="Trocar perfil">
+        <i id="profile-button-avatar" class="profile-switcher-avatar" aria-hidden="true">R</i>
+        <span class="profile-switcher-copy"><small>Perfil ativo</small><strong id="profile-button-label">Perfil</strong></span>
+        <span class="profile-switcher-action">Trocar</span>
+      </button>
+      <button id="theme-toggle" class="icon-btn" type="button" aria-label="Alternar tema" aria-pressed="true">◐</button>
     </div>
   </header>
 
@@ -39,10 +43,10 @@
   </main>
 
   <nav class="mobile-nav" aria-label="Navegação móvel">
-    <a href="#/inicio" data-route="inicio"><b>⌂</b><span>Início</span></a>
-    <a href="#/estudar" data-route="estudar"><b>▣</b><span>Estudar</span></a>
-    <a href="#/revisar" data-route="revisar"><b>◎</b><span>Revisar</span></a>
-    <a href="#/desempenho" data-route="desempenho"><b>◔</b><span>Desempenho</span></a>
+    <a href="#/inicio" data-route="inicio"><b aria-hidden="true">⌂</b><span>Início</span></a>
+    <a href="#/estudar" data-route="estudar"><b aria-hidden="true">▣</b><span>Estudar</span></a>
+    <a href="#/revisar" data-route="revisar"><b aria-hidden="true">◎</b><span>Revisar</span></a>
+    <a href="#/desempenho" data-route="desempenho"><b aria-hidden="true">◔</b><span>Desempenho</span></a>
   </nav>
 
   <template id="error-template">
@@ -58,11 +62,6 @@
     <span>SEDES/DF Questões</span>
     <span>Notion → validação → GitHub Pages</span>
   </footer>
-  <script src="./assets/bundle-fetch.js?v=2"></script>
-  <script src="./assets/data-updates.js?v=1"></script>
-  <script src="./assets/consolidated-data-v2.js?v=1"></script>
-  <script src="./assets/profile-defaults.js?v=1"></script>
-  <script src="./assets/ux-improvements.js?v=1"></script>
-  <script type="module" src="./assets/app-v3.js?v=1"></script>
+  <script type="module" src="./assets/app-v4.js?v=1"></script>
 </body>
 </html>
