@@ -1,269 +1,148 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import {fileURLToPath} from 'node:url';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const resolve = relative => path.resolve(root, String(relative).replace(/^\.\//, ''));
-const TOKEN = process.env.NOTION_TOKEN;
-const DATA_SOURCE_ID = '784234ae-deca-4514-b60d-19524e122a89';
-const API_VERSION = '2026-03-11';
-const API = 'https://api.notion.com/v1';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const resolve=p=>path.resolve(root,String(p).replace(/^\.\//,''));
+const TOKEN=process.env.NOTION_TOKEN;
+const SOURCE='784234ae-deca-4514-b60d-19524e122a89';
+const API='https://api.notion.com/v1';
+const VERSION='2026-03-11';
+if(!TOKEN)throw new Error('NOTION_TOKEN não está disponível neste repositório.');
 
-if (!TOKEN) throw new Error('NOTION_TOKEN não está disponível neste repositório.');
+const clean=v=>String(v??'').replace(/\r/g,'').replace(/[ \t]+/g,' ').replace(/ *\n */g,'\n').trim();
+const key=v=>clean(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const composite=(material,number)=>`${key(material)}::${Number(number)||0}`;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
-const clean = value => String(value ?? '')
-  .replace(/\r/g, '')
-  .replace(/[ \t]+/g, ' ')
-  .replace(/ *\n */g, '\n')
-  .trim();
-const key = value => clean(value)
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '')
-  .toLowerCase();
-const compositeKey = (material, number) => `${key(material)}::${Number(number) || 0}`;
-const sleep = ms => new Promise(resolvePromise => setTimeout(resolvePromise, ms));
-
-async function request(endpoint, options = {}, attempt = 1) {
-  const response = await fetch(`${API}${endpoint}`, {
-    ...options,
-    headers: {
-      Authorization: `Bearer ${TOKEN}`,
-      'Notion-Version': API_VERSION,
-      'Content-Type': 'application/json',
-      ...(options.headers || {}),
-    },
-  });
-  if (response.ok) return response.json();
-  const body = await response.text();
-  if ((response.status === 429 || response.status >= 500) && attempt < 7) {
-    const retryAfter = Number(response.headers.get('retry-after') || 0);
-    await sleep(Math.max(retryAfter * 1000, 500 * 2 ** (attempt - 1)));
-    return request(endpoint, options, attempt + 1);
-  }
-  throw new Error(`Notion API ${response.status}: ${body.slice(0, 600)}`);
+async function request(endpoint,options={},attempt=1){
+ const response=await fetch(`${API}${endpoint}`,{...options,headers:{Authorization:`Bearer ${TOKEN}`,'Notion-Version':VERSION,'Content-Type':'application/json',...(options.headers||{})}});
+ if(response.ok)return response.json();
+ const body=await response.text();
+ if((response.status===429||response.status>=500)&&attempt<7){
+  await sleep(Math.max(Number(response.headers.get('retry-after')||0)*1000,500*2**(attempt-1)));
+  return request(endpoint,options,attempt+1);
+ }
+ throw new Error(`Notion API ${response.status}: ${body.slice(0,600)}`);
 }
 
-function richText(items = []) {
-  return items.map(item => item.plain_text ?? item.text?.content ?? '').join('').trim();
+const rich=items=>(items||[]).map(x=>x.plain_text??x.text?.content??'').join('').trim();
+function value(p){
+ if(!p)return null;
+ if(p.type==='title')return rich(p.title);
+ if(p.type==='rich_text')return rich(p.rich_text);
+ if(p.type==='select')return p.select?.name??null;
+ if(p.type==='status')return p.status?.name??null;
+ if(p.type==='multi_select')return(p.multi_select||[]).map(x=>x.name);
+ if(p.type==='checkbox')return Boolean(p.checkbox);
+ if(p.type==='number')return p.number;
+ if(p.type==='url')return p.url;
+ if(p.type==='date')return p.date?.start??null;
+ if(p.type==='created_time'||p.type==='last_edited_time')return p[p.type];
+ if(p.type==='unique_id')return p.unique_id?`${p.unique_id.prefix||''}${p.unique_id.number}`:null;
+ if(p.type==='formula'){
+  const f=p.formula;if(!f)return null;
+  if(f.type==='string')return f.string;
+  if(f.type==='boolean')return f.boolean;
+  if(f.type==='number')return f.number;
+  if(f.type==='date')return f.date?.start??null;
+ }
+ return null;
 }
 
-function propertyValue(property) {
-  if (!property) return null;
-  switch (property.type) {
-    case 'title': return richText(property.title);
-    case 'rich_text': return richText(property.rich_text);
-    case 'select': return property.select?.name ?? null;
-    case 'status': return property.status?.name ?? null;
-    case 'multi_select': return (property.multi_select || []).map(item => item.name);
-    case 'checkbox': return Boolean(property.checkbox);
-    case 'number': return property.number;
-    case 'url': return property.url;
-    case 'date': return property.date?.start ?? null;
-    case 'created_time': return property.created_time;
-    case 'last_edited_time': return property.last_edited_time;
-    case 'unique_id': return property.unique_id ? `${property.unique_id.prefix || ''}${property.unique_id.number}` : null;
-    case 'formula': {
-      const formula = property.formula;
-      if (!formula) return null;
-      if (formula.type === 'string') return formula.string;
-      if (formula.type === 'boolean') return formula.boolean;
-      if (formula.type === 'number') return formula.number;
-      if (formula.type === 'date') return formula.date?.start ?? null;
-      return null;
-    }
-    default: return null;
+async function notionRows(){
+ const rows=[];let cursor;let batches=0;
+ do{
+  const body={page_size:100};if(cursor)body.start_cursor=cursor;
+  const page=await request(`/data_sources/${SOURCE}/query`,{method:'POST',body:JSON.stringify(body)});
+  for(const item of page.results||[]){
+   const props=Object.fromEntries(Object.entries(item.properties||{}).map(([name,p])=>[name,value(p)]));
+   rows.push({notion_id:item.id,notion_url:item.url,...props});
   }
+  batches++;cursor=page.has_more?page.next_cursor:null;
+ }while(cursor);
+ console.log(`Notion: ${rows.length} registros lidos em ${batches} lotes.`);
+ return rows;
 }
 
-async function readNotionRows() {
-  const rows = [];
-  let cursor;
-  let batches = 0;
-  do {
-    const body = { page_size: 100 };
-    if (cursor) body.start_cursor = cursor;
-    const page = await request(`/data_sources/${DATA_SOURCE_ID}/query`, {
-      method: 'POST',
-      body: JSON.stringify(body),
-    });
-    batches += 1;
-    for (const item of page.results || []) {
-      const values = Object.fromEntries(
-        Object.entries(item.properties || {}).map(([name, property]) => [name, propertyValue(property)]),
-      );
-      rows.push({ notion_id: item.id, notion_url: item.url, ...values });
-    }
-    cursor = page.has_more ? page.next_cursor : null;
-  } while (cursor);
-  console.log(`Notion: ${rows.length} registros lidos em ${batches} lotes.`);
-  return rows;
+async function release(){
+ const catalog=JSON.parse(await fs.readFile(resolve('data/release/catalogo.json'),'utf8'));
+ const questions=[];const materials=new Map();
+ for(const meta of catalog.materials||[]){
+  const material=JSON.parse(await fs.readFile(resolve(meta.file),'utf8'));
+  materials.set(material.id,material);
+  for(const q of material.questoes||[])questions.push({...q,material_id:material.id,material_name:material.nome});
+ }
+ return{catalog,questions,materials};
 }
 
-async function readRelease() {
-  const catalog = JSON.parse(await fs.readFile(resolve('data/release/catalogo.json'), 'utf8'));
-  const questions = [];
-  const materials = new Map();
-  for (const metadata of catalog.materials || []) {
-    const material = JSON.parse(await fs.readFile(resolve(metadata.file), 'utf8'));
-    materials.set(material.id, material);
-    for (const question of material.questoes || []) {
-      questions.push({ ...question, material_id: material.id, material_name: material.nome });
-    }
-  }
-  return { catalog, questions, materials };
+function editorialCode(row){
+ const match=clean(row['Código']).match(/-([A-Z0-9]+)-(\d+)$/i);
+ return match?`consol-${match[1]}-${Number(match[2])}`:'';
+}
+function currentField(q,field){
+ const map={
+  'Texto-base':q.texto_base,'Enunciado':q.enunciado,'Alternativa A':q.alternativas?.A,'Alternativa B':q.alternativas?.B,
+  'Alternativa C':q.alternativas?.C,'Alternativa D':q.alternativas?.D,'Alternativa E':q.alternativas?.E,'Gabarito':q.gabarito,
+  'Comentário geral':q.comentario,'Fundamento legal':q.fundamento,'Pegadinha':q.pegadinha,'Observações':q.observacoes,
+  'Assunto':q.assunto,'Subassunto':q.subassunto,
+ };
+ return map[field];
 }
 
-function existingValue(question, field) {
-  switch (field) {
-    case 'Texto-base': return question.texto_base;
-    case 'Enunciado': return question.enunciado;
-    case 'Alternativa A': return question.alternativas?.A;
-    case 'Alternativa B': return question.alternativas?.B;
-    case 'Alternativa C': return question.alternativas?.C;
-    case 'Alternativa D': return question.alternativas?.D;
-    case 'Alternativa E': return question.alternativas?.E;
-    case 'Gabarito': return question.gabarito;
-    case 'Comentário geral': return question.comentario;
-    case 'Fundamento legal': return question.fundamento;
-    case 'Pegadinha': return question.pegadinha;
-    case 'Observações': return question.observacoes;
-    case 'Assunto': return question.assunto;
-    case 'Subassunto': return question.subassunto;
-    default: return null;
-  }
+const rows=await notionRows();
+const published=rows.filter(r=>r['Pode publicar']===true);
+const duplicateCodes=[...published.reduce((m,r)=>{const k=key(r['Código']);m.set(k,(m.get(k)||0)+1);return m},new Map())].filter(([k,n])=>!k||n>1);
+const duplicateComposite=[...published.reduce((m,r)=>{const k=composite(r['Nome do material'],r['Número original']);m.set(k,(m.get(k)||0)+1);return m},new Map())].filter(([k,n])=>k.endsWith('::0')||n>1);
+
+const{catalog,questions,materials}=await release();
+const byCode=new Map(questions.map(q=>[key(q.codigo),q]));
+const byId=new Map(questions.map(q=>[key(q.id),q]));
+const byComposite=new Map(questions.map(q=>[composite(q.material_name,q.numero),q]));
+const matched=new Set();const missing=[];const reused=[];const oldIds=[];
+const strategies=new Map();const formats=new Map();const materialCounts=new Map();
+const diffCounts=new Map();const diffSamples=new Map();
+const fields=['Texto-base','Enunciado','Alternativa A','Alternativa B','Alternativa C','Alternativa D','Alternativa E','Gabarito','Comentário geral','Fundamento legal','Pegadinha','Observações','Assunto','Subassunto'];
+
+for(const row of published){
+ const format=clean(row['Formato da questão'])||'Não informado';formats.set(format,(formats.get(format)||0)+1);
+ const direct=byCode.get(key(row['Código']));
+ const github=byId.get(key(row['Código GitHub']));
+ const derived=byCode.get(key(editorialCode(row)));
+ const grouped=byComposite.get(composite(row['Nome do material'],row['Número original']));
+ const q=direct||github||derived||grouped;
+ const strategy=direct?'codigo':github?'codigo_github':derived?'codigo_editorial_derivado':grouped?'material_e_numero':'nao_encontrada';
+ strategies.set(strategy,(strategies.get(strategy)||0)+1);
+ if(!q){missing.push({code:row['Código'],github_id:row['Código GitHub'],material:row['Nome do material'],number:row['Número original'],notion_url:row.notion_url});continue}
+ const identity=key(q.id);if(matched.has(identity)){reused.push({code:row['Código'],release_id:q.id});continue}matched.add(identity);
+ if(key(row['Código GitHub'])&&key(row['Código GitHub'])!==identity)oldIds.push({code:row['Código'],notion_github_id:row['Código GitHub'],release_id:q.id,strategy});
+ materialCounts.set(q.material_id,(materialCounts.get(q.material_id)||0)+1);
+ for(const field of fields){
+  const a=clean(row[field]),b=clean(currentField(q,field));if(a===b)continue;
+  diffCounts.set(field,(diffCounts.get(field)||0)+1);
+  if(!diffSamples.has(field))diffSamples.set(field,[]);
+  if(diffSamples.get(field).length<10)diffSamples.get(field).push({code:row['Código'],notion:a,release:b});
+ }
 }
 
-const notionRows = await readNotionRows();
-const publishable = notionRows.filter(row => row['Pode publicar'] === true);
-const duplicateCodes = [...publishable.reduce((map, row) => {
-  const code = key(row['Código']);
-  map.set(code, (map.get(code) || 0) + 1);
-  return map;
-}, new Map()).entries()].filter(([code, count]) => !code || count > 1);
-const duplicateComposites = [...publishable.reduce((map, row) => {
-  const composite = compositeKey(row['Nome do material'], row['Número original']);
-  map.set(composite, (map.get(composite) || 0) + 1);
-  return map;
-}, new Map()).entries()].filter(([composite, count]) => composite.endsWith('::0') || count > 1);
-
-const { catalog, questions, materials } = await readRelease();
-const byCode = new Map(questions.map(question => [key(question.codigo), question]));
-const byId = new Map(questions.map(question => [key(question.id), question]));
-const byComposite = new Map(questions.map(question => [compositeKey(question.material_name, question.numero), question]));
-
-const missingInRelease = [];
-const reusedReleaseQuestions = [];
-const legacyIdDifferences = [];
-const matchedReleaseIds = new Set();
-const matchStrategies = new Map();
-const differenceCounts = new Map();
-const differenceSamples = new Map();
-const materialCounts = new Map();
-const formatCounts = new Map();
-const comparedFields = [
-  'Texto-base', 'Enunciado', 'Alternativa A', 'Alternativa B', 'Alternativa C', 'Alternativa D', 'Alternativa E',
-  'Gabarito', 'Comentário geral', 'Fundamento legal', 'Pegadinha', 'Observações', 'Assunto', 'Subassunto',
-];
-
-for (const row of publishable) {
-  const format = clean(row['Formato da questão']) || 'Não informado';
-  formatCounts.set(format, (formatCounts.get(format) || 0) + 1);
-
-  const directCode = byCode.get(key(row['Código']));
-  const githubId = byId.get(key(row['Código GitHub']));
-  const composite = byComposite.get(compositeKey(row['Nome do material'], row['Número original']));
-  const question = directCode || githubId || composite;
-  const strategy = directCode ? 'codigo' : githubId ? 'codigo_github' : composite ? 'material_e_numero' : 'nao_encontrada';
-  matchStrategies.set(strategy, (matchStrategies.get(strategy) || 0) + 1);
-
-  if (!question) {
-    missingInRelease.push({
-      code: row['Código'],
-      github_id: row['Código GitHub'],
-      material: row['Nome do material'],
-      number: row['Número original'],
-      notion_url: row.notion_url,
-    });
-    continue;
-  }
-
-  const releaseIdentity = key(question.id);
-  if (matchedReleaseIds.has(releaseIdentity)) {
-    reusedReleaseQuestions.push({ code: row['Código'], release_id: question.id });
-    continue;
-  }
-  matchedReleaseIds.add(releaseIdentity);
-
-  const notionGithubId = key(row['Código GitHub']);
-  if (notionGithubId && notionGithubId !== releaseIdentity) {
-    legacyIdDifferences.push({
-      code: row['Código'],
-      notion_github_id: row['Código GitHub'],
-      release_id: question.id,
-      strategy,
-    });
-  }
-
-  materialCounts.set(question.material_id, (materialCounts.get(question.material_id) || 0) + 1);
-  for (const field of comparedFields) {
-    const notionValue = clean(row[field]);
-    const releaseValue = clean(existingValue(question, field));
-    if (notionValue !== releaseValue) {
-      differenceCounts.set(field, (differenceCounts.get(field) || 0) + 1);
-      if (!differenceSamples.has(field)) differenceSamples.set(field, []);
-      if (differenceSamples.get(field).length < 10) {
-        differenceSamples.get(field).push({ code: row['Código'], notion: notionValue, release: releaseValue });
-      }
-    }
-  }
-}
-
-const extraInRelease = questions
-  .filter(question => !matchedReleaseIds.has(key(question.id)))
-  .map(question => ({ code: question.codigo, id: question.id, material_id: question.material_id }));
-
-const report = {
-  generated_at: new Date().toISOString(),
-  source: {
-    database: 'Banco Mestre — Provas e Simulados SEDES/DF',
-    data_source_id: DATA_SOURCE_ID,
-    total_rows: notionRows.length,
-    publishable_rows: publishable.length,
-    pending_rows: notionRows.length - publishable.length,
-  },
-  release: {
-    version: catalog.release_version,
-    materials: materials.size,
-    questions: questions.length,
-  },
-  identity_validation: {
-    match_strategies: Object.fromEntries([...matchStrategies.entries()].sort((a, b) => b[1] - a[1])),
-    duplicate_publishable_codes: duplicateCodes,
-    duplicate_material_numbers: duplicateComposites,
-    missing_in_release: missingInRelease,
-    extra_in_release: extraInRelease,
-    reused_release_questions: reusedReleaseQuestions,
-    legacy_id_differences: legacyIdDifferences,
-  },
-  formats: Object.fromEntries([...formatCounts.entries()].sort((a, b) => b[1] - a[1])),
-  material_counts: Object.fromEntries([...materialCounts.entries()].sort((a, b) => a[0].localeCompare(b[0]))),
-  content_differences: Object.fromEntries(
-    [...differenceCounts.entries()].map(([field, count]) => [field, { count, samples: differenceSamples.get(field) || [] }]),
-  ),
+const extra=questions.filter(q=>!matched.has(key(q.id))).map(q=>({code:q.codigo,id:q.id,material_id:q.material_id}));
+const report={
+ generated_at:new Date().toISOString(),
+ source:{database:'Banco Mestre — Provas e Simulados SEDES/DF',data_source_id:SOURCE,total_rows:rows.length,publishable_rows:published.length,pending_rows:rows.length-published.length},
+ release:{version:catalog.release_version,materials:materials.size,questions:questions.length},
+ identity_validation:{match_strategies:Object.fromEntries([...strategies].sort((a,b)=>b[1]-a[1])),duplicate_publishable_codes:duplicateCodes,duplicate_material_numbers:duplicateComposite,missing_in_release:missing,extra_in_release:extra,reused_release_questions:reused,legacy_id_differences:oldIds},
+ formats:Object.fromEntries([...formats].sort((a,b)=>b[1]-a[1])),
+ material_counts:Object.fromEntries([...materialCounts].sort((a,b)=>a[0].localeCompare(b[0]))),
+ content_differences:Object.fromEntries([...diffCounts].map(([field,count])=>[field,{count,samples:diffSamples.get(field)||[]}]))
 };
+await fs.writeFile('/tmp/notion-release-comparison.json',`${JSON.stringify(report,null,2)}\n`);
 
-await fs.writeFile('/tmp/notion-release-comparison.json', `${JSON.stringify(report, null, 2)}\n`);
-
-console.log(`Publicáveis no Notion: ${publishable.length}. Release atual: ${questions.length}.`);
+console.log(`Publicáveis no Notion: ${published.length}. Release atual: ${questions.length}.`);
 console.log(`Vínculos: ${JSON.stringify(report.identity_validation.match_strategies)}.`);
-console.log(`Identidade — ausentes: ${missingInRelease.length}; extras: ${extraInRelease.length}; reutilizações: ${reusedReleaseQuestions.length}; códigos duplicados: ${duplicateCodes.length}; material+número duplicados: ${duplicateComposites.length}.`);
-console.log(`IDs editoriais antigos diferentes dos IDs públicos atuais: ${legacyIdDifferences.length}.`);
+console.log(`Identidade — ausentes: ${missing.length}; extras: ${extra.length}; reutilizações: ${reused.length}; códigos duplicados: ${duplicateCodes.length}; material+número duplicados: ${duplicateComposite.length}.`);
+console.log(`IDs editoriais antigos diferentes dos IDs públicos atuais: ${oldIds.length}.`);
 console.log(`Formatos publicáveis: ${JSON.stringify(report.formats)}.`);
-console.log(`Diferenças de conteúdo por campo: ${JSON.stringify(Object.fromEntries(differenceCounts))}.`);
-
-if (publishable.length !== questions.length) throw new Error('A quantidade publicável do Notion difere da release atual.');
-if (duplicateCodes.length || duplicateComposites.length || missingInRelease.length || extraInRelease.length || reusedReleaseQuestions.length) {
-  throw new Error('A identidade entre o Banco Mestre e a release atual não é compatível para sincronização segura.');
-}
-
+console.log(`Diferenças de conteúdo por campo: ${JSON.stringify(Object.fromEntries(diffCounts))}.`);
+if(published.length!==questions.length)throw new Error('A quantidade publicável do Notion difere da release atual.');
+if(duplicateCodes.length||duplicateComposite.length||missing.length||extra.length||reused.length)throw new Error('A identidade entre o Banco Mestre e a release atual não é compatível para sincronização segura.');
 console.log('✓ As 570 questões publicáveis foram vinculadas integralmente à release, preservando os IDs públicos atuais.');
