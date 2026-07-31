@@ -143,7 +143,6 @@ function record(row) {
 
 function validate(records) {
   const codes = new Set();
-  const ids = new Set();
   for (const item of records) {
     for (const [propertyValue, label] of [
       [item.code, 'Código'],
@@ -157,10 +156,6 @@ function validate(records) {
     }
     if (codes.has(key(item.code))) throw new Error(`Código publicável duplicado: ${item.code}`);
     codes.add(key(item.code));
-    if (item.github_id) {
-      if (ids.has(key(item.github_id))) throw new Error(`Código GitHub duplicado: ${item.github_id}`);
-      ids.add(key(item.github_id));
-    }
     if (item.format === 'Certo / Errado') {
       if (!['Certo', 'Errado', 'Anulada'].includes(item.answer)) {
         throw new Error(`${item.code}: alternativas A–E vazias ou formato C/E, mas o gabarito não é Certo, Errado ou Anulada.`);

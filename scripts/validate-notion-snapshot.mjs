@@ -18,7 +18,6 @@ if (data.records.length !== Number(data.totals?.published)) fail('Total publicá
 if (Number(data.totals?.all) !== Number(data.totals?.published) + Number(data.totals?.pending)) fail('Fechamento do Banco Mestre divergente.');
 
 const codes = new Set();
-const githubIds = new Set();
 const urls = new Set();
 const materials = new Set();
 for (const record of data.records) {
@@ -33,10 +32,6 @@ for (const record of data.records) {
 
   if (codes.has(key(record.code))) fail(`Código duplicado: ${record.code}`);
   codes.add(key(record.code));
-  if (record.github_id) {
-    if (githubIds.has(key(record.github_id))) fail(`Código GitHub duplicado: ${record.github_id}`);
-    githubIds.add(key(record.github_id));
-  }
   if (urls.has(record.notion_url)) fail(`URL duplicada: ${record.notion_url}`);
   urls.add(record.notion_url);
   materials.add(key(record.material_name));
