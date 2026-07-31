@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  actions: write
 
 concurrency:
   group: verify-public-245
@@ -27,25 +28,24 @@ jobs:
         with:
           node-version: 22
 
-      - name: Confirmar estrutura pública e os 245 códigos
+      - name: Acionar deploy oficial no branch main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref main
+
+      - name: Aguardar o catálogo público conter os 245 códigos
         id: public
         env:
           PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes
         run: |
           node --input-type=module <<'NODE'
           const base = process.env.PUBLIC_BASE_URL.replace(/\/+$/, '');
+          const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
           const fetchText = async relative => {
             const response = await fetch(`${base}/${relative}?verify=${Date.now()}`, {cache: 'no-store'});
             if (!response.ok) throw new Error(`${relative}: HTTP ${response.status}`);
             return response.text();
           };
-
-          const [buildText, catalogText] = await Promise.all([
-            fetchText('data/release/build-info.json'),
-            fetchText('data/release/catalogo.json'),
-          ]);
-          const build = JSON.parse(buildText);
-          const catalog = JSON.parse(catalogText);
 
           const targets = new Set();
           const addRange = (prefix, start, end, excluded = new Set()) => {
@@ -61,19 +61,39 @@ jobs:
           addRange('PROVA-QDX-CRTR12-2026-AUXILIAR-ADMINISTRATIVO-200-', 36, 120);
           if (targets.size !== 245) throw new Error(`Seleção interna inválida: ${targets.size}.`);
 
-          const missing = [...targets].filter(code => !catalogText.includes(code));
-          if (missing.length) {
-            throw new Error(`Site público ainda não contém ${missing.length}/245 códigos. Primeiros ausentes: ${missing.slice(0, 20).join(', ')}`);
+          let lastError;
+          for (let attempt = 1; attempt <= 90; attempt += 1) {
+            try {
+              const [buildText, catalogText] = await Promise.all([
+                fetchText('data/release/build-info.json'),
+                fetchText('data/release/catalogo.json'),
+              ]);
+              const build = JSON.parse(buildText);
+              const catalog = JSON.parse(catalogText);
+              const missing = [...targets].filter(code => !catalogText.includes(code));
+              const publicQuestions = Object.keys(catalog.question_index || {}).length;
+              const publicMaterials = Array.isArray(catalog.materials) ? catalog.materials.length : 0;
+
+              console.log(`Tentativa ${attempt}/90: commit ${build.source_sha || 'ausente'}, ${publicQuestions} questões, ${publicMaterials} materiais, ${missing.length}/245 códigos ausentes.`);
+
+              if (!missing.length) {
+                if (!build.source_sha) throw new Error('build-info público sem source_sha.');
+                if (Number(build.questions) !== publicQuestions) throw new Error('Contagem pública divergente do question_index.');
+                console.log(`✓ Site público contém os 245 códigos; commit ${build.source_sha}; ${publicQuestions} questões e ${publicMaterials} materiais.`);
+                const fs = await import('node:fs');
+                fs.appendFileSync(process.env.GITHUB_OUTPUT, `source_sha=${build.source_sha}\nquestions=${publicQuestions}\nmaterials=${publicMaterials}\n`);
+                process.exit(0);
+              }
+
+              lastError = new Error(`Site público ainda não contém ${missing.length}/245 códigos.`);
+            } catch (error) {
+              lastError = error;
+              console.log(`Tentativa ${attempt}/90: ${error.message}`);
+            }
+            if (attempt < 90) await sleep(10000);
           }
 
-          const publicQuestions = Object.keys(catalog.question_index || {}).length;
-          const publicMaterials = Array.isArray(catalog.materials) ? catalog.materials.length : 0;
-          if (!build.source_sha) throw new Error('build-info público sem source_sha.');
-          if (Number(build.questions) !== publicQuestions) throw new Error('Contagem pública divergente do question_index.');
-
-          console.log(`✓ Site público contém os 245 códigos; commit ${build.source_sha}; ${publicQuestions} questões e ${publicMaterials} materiais.`);
-          console.log(`source_sha=${build.source_sha}`);
-          await import('node:fs').then(fs => fs.appendFileSync(process.env.GITHUB_OUTPUT, `source_sha=${build.source_sha}\nquestions=${publicQuestions}\nmaterials=${publicMaterials}\n`));
+          throw lastError || new Error('O deploy público não foi confirmado dentro da janela de validação.');
           NODE
 
       - name: Verificar pacote público completo
