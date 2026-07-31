@@ -18,6 +18,23 @@ if (!/^\d+-\d+-\d+$/.test(versionToken)) fail(`Versão inválida: ${packageData.
 const expectedCacheVersion = `sedes-questoes-v${versionToken}`;
 const expectedBuilder = `copy-public-v${versionToken}`;
 
+const workflowDirectory = path.join(root, ".github", "workflows");
+const workflowFiles = fs.readdirSync(workflowDirectory)
+  .filter(file => /\.ya?ml$/i.test(file))
+  .sort();
+const deprecatedWorkflowMarkers = [
+  "actions/checkout@v4",
+  "actions/setup-node@v4",
+  "actions/configure-pages@v5",
+  "actions/upload-pages-artifact@v3",
+  "actions/deploy-pages@v4",
+  "@playwright/test@1.55.0",
+  "ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION",
+];
+for (const file of workflowFiles) {
+  forbidMarkers(read(path.join(".github", "workflows", file)), deprecatedWorkflowMarkers, `Workflow ${file}`);
+}
+
 const pages = read(".github/workflows/pages.yml");
 requireMarkers(pages, [
   "push:",
@@ -27,9 +44,14 @@ requireMarkers(pages, [
   "pages: write",
   "id-token: write",
   "actions: write",
-  "actions/configure-pages@v5",
-  "actions/upload-pages-artifact@v3",
-  "actions/deploy-pages@v4",
+  "PLAYWRIGHT_VERSION: 1.61.1",
+  "actions/checkout@v6",
+  "actions/setup-node@v6",
+  "package-manager-cache: false",
+  "actions/configure-pages@v6",
+  "actions/upload-pages-artifact@v5",
+  "actions/deploy-pages@v5",
+  "npm audit --audit-level=high",
   "verify-deployment.mjs",
   "playwright.public.config.js",
   "mark-notion-published.mjs",
@@ -50,6 +72,9 @@ requireMarkers(notion, [
   "workflow_dispatch:",
   "schedule:",
   "contents: write",
+  "actions/checkout@v6",
+  "actions/setup-node@v6",
+  "package-manager-cache: false",
   "ref: main",
   "export-notion-snapshot.mjs",
   "npm run check",
@@ -103,5 +128,5 @@ if (!builder.includes("builder: expectedBuilder") || !verifier.includes("buildIn
   fail(`Builder dinâmico ${expectedBuilder} não está protegido de ponta a ponta.`);
 }
 
-console.log(`✓ Workflows auditados: versão ${packageData.version}, cache ${expectedCacheVersion}, deploy Pages sem mutação administrativa, rastreabilidade Notion compatível e sincronização sem recursão.`);
-// Este teste existe para impedir que commits automáticos voltem a criar loops de Actions.
+console.log(`✓ ${workflowFiles.length} workflows auditados: Actions em Node 24, Playwright 1.61.1, auditoria npm de severidade alta, deploy Pages sem mutação administrativa, rastreabilidade Notion compatível e sincronização sem recursão.`);
+// Este teste existe para impedir que commits automáticos voltem a criar loops de Actions ou dependências obsoletas no CI.
