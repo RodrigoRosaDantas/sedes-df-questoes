@@ -16,10 +16,16 @@ const manifest = readJSON("data/release/manifest.json");
 const tfIndex = readJSON("data/true-false/index.json");
 const activeEntries = Array.isArray(tfIndex.materials) ? tfIndex.materials : [];
 const activeQuestions = activeEntries.reduce((sum, item) => sum + Number(item.expected_questions || 0), 0);
-const expectedQuestions = Number(config.expected_questions) + activeQuestions;
-const expectedMaterials = Number(config.expected_materials) + activeEntries.length;
-const expectedBank = Number(config.banco_mestre);
-const expectedPending = Number(config.aguardando_auditoria) - activeQuestions;
+const snapshotPath = resolve("data/notion/published.json");
+const snapshotInstalled = fs.existsSync(snapshotPath) && read("data/notion/published.json").trim();
+const snapshot = snapshotInstalled ? readJSON("data/notion/published.json") : null;
+const expectedQuestions = snapshot ? Number(catalog.summary.questoes) : Number(config.expected_questions) + activeQuestions;
+const expectedMaterials = snapshot ? Number(catalog.summary.materiais) : Number(config.expected_materials) + activeEntries.length;
+const expectedBank = snapshot ? Number(snapshot.totals.all) : Number(config.banco_mestre);
+const expectedPending = snapshot ? Math.max(0, Number(snapshot.totals.all) - expectedQuestions) : Number(config.aguardando_auditoria) - activeQuestions;
+const expectedTrueFalse = snapshot
+  ? null
+  : activeQuestions;
 const app = read("assets/app-v4.js");
 const migration = read("assets/progress-migration-v2-3.js");
 const imageSupport = read("assets/question-images-v2-5.js");
@@ -57,6 +63,7 @@ function validateAlternatives(question, material) {
 
 const ids = new Set();
 const codes = new Set();
+const sourceCodes = new Set();
 let questions = 0;
 let trueFalseQuestions = 0;
 for (const meta of catalog.materials) {
@@ -76,13 +83,19 @@ for (const meta of catalog.materials) {
     if (question.possui_imagem && (!question.imagem || !question.descricao_imagem || !fs.existsSync(resolve(question.imagem)))) fail(`${question.codigo}: recurso visual publicado está incompleto.`);
     if (ids.has(question.id) || codes.has(question.codigo)) fail(`Questão duplicada: ${question.id}/${question.codigo}.`);
     ids.add(question.id); codes.add(question.codigo);
+    if (question.codigo_fonte) sourceCodes.add(question.codigo_fonte);
     if (catalog.question_index[question.id] !== meta.id) fail(`${question.id}: índice aponta para material incorreto.`);
     if (validateAlternatives(question, material) === "Certo / Errado") trueFalseQuestions += 1;
   }
 }
 if (questions !== expectedQuestions || ids.size !== expectedQuestions || codes.size !== expectedQuestions) fail("Fechamento global da release inválido.");
-if (trueFalseQuestions !== activeQuestions) fail(`Total C/E ativo divergente: esperado ${activeQuestions}, encontrado ${trueFalseQuestions}.`);
+if (snapshot ? trueFalseQuestions < activeQuestions : trueFalseQuestions !== expectedTrueFalse) fail(`Total C/E ativo divergente: mínimo/esperado ${snapshot ? activeQuestions : expectedTrueFalse}, encontrado ${trueFalseQuestions}.`);
 
+if (snapshot) {
+  for (const record of snapshot.records) {
+    if (!codes.has(record.code) && !sourceCodes.has(record.code)) fail(`${record.code}: registro publicável do Notion não entrou na release.`);
+  }
+}
 for (const entry of activeEntries) {
   const source = readJSON(entry.file);
   if (source.questoes.length !== Number(entry.expected_questions)) fail(`${source.id}: lote ativo incompleto.`);

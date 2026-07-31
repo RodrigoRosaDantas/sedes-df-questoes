@@ -213,7 +213,7 @@ test("publica build-info consistente com o catálogo e o compilador", async ({re
   expect(buildResponse.ok()).toBeTruthy();
   const catalog = await catalogResponse.json();
   const build = await buildResponse.json();
-  expect(build.version).toBe("2.11.1");
+  expect(build.version).toBe("2.12.0");
   expect(build.builder).toBe("copy-public-v2-11-1");
   expect(build.data_release_version).toBe(catalog.release_version);
   expect(build.catalog_schema_version).toBe(catalog.schema_version);

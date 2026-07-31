@@ -1,4 +1,4 @@
-const CACHE_VERSION = "sedes-questoes-v2-11-1";
+const CACHE_VERSION = "sedes-questoes-v2-12";
 const SHELL = [
   "./",
   "./index.html",

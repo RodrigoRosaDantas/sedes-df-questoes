@@ -21,6 +21,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Ler snapshot atual do Banco Mestre
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/export-notion-snapshot.mjs
       - name: Gerar e validar aplicação, banco e informações da prova
         run: npm run check
       - name: Instalar navegador de teste
@@ -44,6 +48,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Ler snapshot definitivo do Banco Mestre
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/export-notion-snapshot.mjs
       - name: Gerar pacote final
         run: npm run build
       - uses: actions/configure-pages@v5
@@ -70,6 +78,12 @@ jobs:
           PUBLIC_BASE_URL: ${{ steps.deployment.outputs.page_url }}
           EXPECTED_SHA: ${{ github.sha }}
         run: npx playwright test --config=playwright.public.config.js
+      - name: Fechar rastreabilidade dos novos lotes no Notion
+        if: steps.static_verify.outcome == 'success' && steps.browser_verify.outcome == 'success'
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          RELEASE_COMMIT: ${{ github.sha }}
+        run: node scripts/mark-notion-published.mjs
       - name: Acionar rollback para a última release aprovada
         if: steps.static_verify.outcome == 'failure' || steps.browser_verify.outcome == 'failure'
         env:

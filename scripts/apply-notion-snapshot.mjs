@@ -3,140 +3,227 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 
-const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
-const resolve=p=>path.resolve(root,String(p).replace(/^\.\//,''));
-const snapshotPath=resolve('data/notion/published.json');
-if(!fs.existsSync(snapshotPath)){console.log('✓ Snapshot do Notion ainda não instalado; release estática preservada.');process.exit(0)}
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const resolve = relative => path.resolve(root, String(relative).replace(/^\.\//, ''));
+const snapshotPath = resolve('data/notion/published.json');
 
-const snapshot=JSON.parse(fs.readFileSync(snapshotPath,'utf8'));
-const catalogPath=resolve('data/release/catalogo.json');
-const manifestPath=resolve('data/release/manifest.json');
-const materialsDir=resolve('data/release/materials');
-const catalog=JSON.parse(fs.readFileSync(catalogPath,'utf8'));
-const clean=v=>String(v??'').replace(/\r/g,'').replace(/[ \t]+/g,' ').replace(/ *\n */g,'\n').trim();
-const key=v=>clean(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
-const slug=v=>key(v).replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,100);
-const composite=(material,number)=>`${key(material)}::${Number(number)||0}`;
-const sha256=value=>crypto.createHash('sha256').update(value).digest('hex');
-const prefixFromRecord=r=>clean(r.code).match(/-([A-Z0-9]+)-(\d+)$/i)?.[1]?.toUpperCase()||'';
-const prefixFromQuestion=q=>clean(q.codigo).match(/(?:CONSOL|SIM-[^-]+(?:-[^-]+)*)-([A-Z]+\d+)-\d+$/i)?.[1]?.toUpperCase()||clean(q.material_id).match(/-([a-z]+\d+)$/i)?.[1]?.toUpperCase()||'';
-const editorialCode=r=>{const m=clean(r.code).match(/-([A-Z0-9]+)-(\d+)$/i);return m?`consol-${m[1]}-${Number(m[2])}`:''};
-const fingerprint=(prefix,enunciado,alternatives,gabarito)=>key([prefix,enunciado,...Object.values(alternatives||{}),gabarito].join('\u241f'));
-
-const currentMaterials=new Map();const questions=[];
-for(const meta of catalog.materials||[]){
- const material=JSON.parse(fs.readFileSync(resolve(meta.file),'utf8'));
- currentMaterials.set(material.id,material);
- for(const q of material.questoes||[])questions.push({...q,material_id:material.id,material_name:material.nome});
-}
-const byCode=new Map(questions.map(q=>[key(q.codigo),q]));
-const byId=new Map(questions.map(q=>[key(q.id),q]));
-const byComposite=new Map(questions.map(q=>[composite(q.material_name,q.numero),q]));
-const byFingerprint=new Map();const materialByPrefix=new Map();const materialByName=new Map();
-for(const q of questions){
- const fp=fingerprint(prefixFromQuestion(q),q.enunciado,q.alternativas,q.gabarito);
- if(!byFingerprint.has(fp))byFingerprint.set(fp,[]);byFingerprint.get(fp).push(q);
- const prefix=prefixFromQuestion(q);if(prefix&&!materialByPrefix.has(prefix))materialByPrefix.set(prefix,q.material_id);
-}
-for(const material of currentMaterials.values())materialByName.set(key(material.nome),material.id);
-
-function matchRecord(r){
- const direct=byCode.get(key(r.code));if(direct)return direct;
- const github=byId.get(key(r.github_id));if(github)return github;
- const fp=fingerprint(prefixFromRecord(r),r.prompt,r.alternatives,r.answer);
- const exact=byFingerprint.get(fp)||[];if(exact.length===1)return exact[0];
- const derived=byCode.get(key(editorialCode(r)));if(derived)return derived;
- return byComposite.get(composite(r.material_name,r.original_number))||null;
-}
-function materialIdFor(r,matched){
- if(matched)return matched.material_id;
- const byName=materialByName.get(key(r.material_name));if(byName)return byName;
- const byPrefix=materialByPrefix.get(prefixFromRecord(r));if(byPrefix)return byPrefix;
- return `notion-${slug(r.material_name||r.code)}`;
-}
-function updatedQuestion(r,current){
- const id=current?.id||clean(r.github_id)||slug(r.code);
- const code=current?.codigo||r.code;
- const numero=current?.numero||Number(r.original_number)||0;
- const use=(source,fallback)=>clean(source)||clean(fallback);
- return{
-  ...(current||{}),
-  id, codigo:code, numero,
-  assunto:use(r.subject,current?.assunto),
-  subassunto:use(r.subsubject,current?.subassunto),
-  texto_base:use(r.text_base,current?.texto_base),
-  enunciado:r.prompt,
-  alternativas:r.format==='Certo / Errado'?{Certo:'Certo',Errado:'Errado'}:r.alternatives,
-  gabarito:r.annulled?'Anulada':r.answer,
-  comentario:r.comment,
-  comentarios_alternativas:r.alternative_comments,
-  fundamento:use(r.foundation,current?.fundamento),
-  pegadinha:use(r.trap,current?.pegadinha),
-  observacoes:use(r.observations,current?.observacoes),
-  formato_questao:r.format,
-  fonte_consolidada:r.source_url||r.notion_url,
-  auditoria:'Banco Mestre — Pode publicar = true',
-  notion_url:r.notion_url,
-  codigo_fonte:r.code
- };
-}
-function baseMaterial(id,r,current){
- const type=key(r.material_type).includes('prova')?'prova':'simulado';
- return{
-  ...(current?Object.fromEntries(Object.entries(current).filter(([k])=>k!=='questoes')):{}),
-  id,
-  tipo_material:type,
-  fonte:r.source_board||current?.fonte||'Banco Mestre do Notion',
-  nome:r.material_name||current?.nome||id,
-  ano:r.year||current?.ano||null,
-  orgao:r.organization||current?.orgao||'SEDES/DF',
-  cargo:r.cargo||current?.cargo||'',
-  codigo_cargo:r.cargo_code||current?.codigo_cargo||'',
-  disciplina:r.discipline||current?.disciplina||'',
-  bloco:r.block||current?.bloco||'',
-  status:'publicado',
-  source_url:r.source_url||r.notion_url||current?.source_url||snapshot.source.database_url,
-  formato_questao:r.format,
-  questoes:[]
- };
+if (!fs.existsSync(snapshotPath) || !fs.readFileSync(snapshotPath, 'utf8').trim()) {
+  console.log('✓ Snapshot do Notion ainda não instalado; release estática preservada.');
+  process.exit(0);
 }
 
-const finalMaterials=new Map();const usedIds=new Set();const usedCodes=new Set();
-for(const r of snapshot.records||[]){
- const current=matchRecord(r);
- const materialId=materialIdFor(r,current);
- if(!finalMaterials.has(materialId))finalMaterials.set(materialId,baseMaterial(materialId,r,currentMaterials.get(materialId)));
- const q=updatedQuestion(r,current);
- if(!q.id||!q.codigo||!q.enunciado||!q.comentario)throw new Error(`${r.code}: questão incompleta após aplicação do snapshot.`);
- if(usedIds.has(key(q.id)))throw new Error(`ID duplicado após sincronização: ${q.id}`);
- if(usedCodes.has(key(q.codigo)))throw new Error(`Código duplicado após sincronização: ${q.codigo}`);
- usedIds.add(key(q.id));usedCodes.add(key(q.codigo));
- finalMaterials.get(materialId).questoes.push(q);
+const snapshot = JSON.parse(fs.readFileSync(snapshotPath, 'utf8'));
+const catalogPath = resolve('data/release/catalogo.json');
+const manifestPath = resolve('data/release/manifest.json');
+const materialsDir = resolve('data/release/materials');
+const catalog = JSON.parse(fs.readFileSync(catalogPath, 'utf8'));
+const clean = value => String(value ?? '')
+  .replace(/\r/g, '')
+  .replace(/[ \t]+/g, ' ')
+  .replace(/ *\n */g, '\n')
+  .trim();
+const key = value => clean(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+const slug = value => key(value).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 100);
+const composite = (material, number) => `${key(material)}::${Number(number) || 0}`;
+const sha256 = value => crypto.createHash('sha256').update(value).digest('hex');
+const editorialCode = record => clean(record.code);
+const fingerprint = (prompt, alternatives, answer) => key([prompt, ...Object.values(alternatives || {}), answer].join('\u241f'));
+
+const currentMaterials = new Map();
+const currentQuestions = [];
+for (const metadata of catalog.materials || []) {
+  const material = JSON.parse(fs.readFileSync(resolve(metadata.file), 'utf8'));
+  currentMaterials.set(material.id, material);
+  for (const question of material.questoes || []) {
+    currentQuestions.push({...question, material_id: material.id, material_name: material.nome});
+  }
 }
 
-for(const material of finalMaterials.values()){
- material.questoes.sort((a,b)=>Number(a.numero)-Number(b.numero)||a.codigo.localeCompare(b.codigo));
- material.quantidade_questoes=material.questoes.length;
- material.tempo_sugerido_minutos=material.tempo_sugerido_minutos||material.questoes.length*(material.formato_questao==='Certo / Errado'?1:2);
- const formats=new Set(material.questoes.map(q=>q.formato_questao));
- if(formats.size>1)material.formato_questao='Híbrido';
+const byCode = new Map(currentQuestions.map(question => [key(question.codigo), question]));
+const byId = new Map(currentQuestions.map(question => [key(question.id), question]));
+const byComposite = new Map(currentQuestions.map(question => [composite(question.material_name, question.numero), question]));
+const byFingerprint = new Map();
+const materialByName = new Map();
+for (const question of currentQuestions) {
+  const itemFingerprint = fingerprint(question.enunciado, question.alternativas, question.gabarito);
+  if (!byFingerprint.has(itemFingerprint)) byFingerprint.set(itemFingerprint, []);
+  byFingerprint.get(itemFingerprint).push(question);
+}
+for (const material of currentMaterials.values()) materialByName.set(key(material.nome), material.id);
+
+function matchRecord(record) {
+  const direct = byCode.get(key(editorialCode(record)));
+  if (direct) return direct;
+  const github = byId.get(key(record.github_id));
+  if (github) return github;
+  const exact = byFingerprint.get(fingerprint(record.prompt, record.alternatives, record.answer)) || [];
+  if (exact.length === 1) return exact[0];
+  return byComposite.get(composite(record.material_name, record.original_number)) || null;
 }
 
-fs.rmSync(materialsDir,{recursive:true,force:true});fs.mkdirSync(materialsDir,{recursive:true});
-const catalogMaterials=[];const questionIndex={};
-for(const material of [...finalMaterials.values()].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'))){
- const file=`./data/release/materials/${material.id}.json`;
- const content=`${JSON.stringify(material)}\n`;
- fs.writeFileSync(resolve(file),content);
- for(const q of material.questoes)questionIndex[q.id]=material.id;
- const{questoes,...meta}=material;catalogMaterials.push({...meta,file});
+const assignedMaterialIds = new Map();
+function materialIdFor(record, matched) {
+  const materialKey = key(record.material_name);
+  if (assignedMaterialIds.has(materialKey)) return assignedMaterialIds.get(materialKey);
+  const selected = materialByName.get(materialKey) || matched?.material_id || `notion-${slug(record.material_name || record.code)}`;
+  assignedMaterialIds.set(materialKey, selected);
+  return selected;
 }
 
-catalog.exported_at=new Date().toISOString();
-catalog.source={name:snapshot.source.name,notion_url:snapshot.source.database_url,criteria:`${snapshot.totals.published} questões liberadas por “Pode publicar = true”; ${snapshot.totals.pending} registros permanecem em revisão editorial.`};
-catalog.summary={banco_mestre:snapshot.totals.all,materiais:catalogMaterials.length,questoes:snapshot.totals.published,aguardando_auditoria:snapshot.totals.pending,provas:catalogMaterials.filter(m=>m.tipo_material==='prova').length,simulados:catalogMaterials.filter(m=>m.tipo_material==='simulado').length};
-catalog.materials=catalogMaterials;catalog.question_index=questionIndex;
-const catalogContent=`${JSON.stringify(catalog,null,2)}\n`;fs.writeFileSync(catalogPath,catalogContent);
-const manifest={schema_version:'3.0',release_version:catalog.release_version,generated_at:new Date().toISOString(),summary:catalog.summary,catalog_sha256:sha256(catalogContent),materials:catalogMaterials.map(meta=>{const content=fs.readFileSync(resolve(meta.file));return{id:meta.id,file:meta.file,questions:meta.quantidade_questoes,bytes:content.length,sha256:sha256(content)}})};
-fs.writeFileSync(manifestPath,`${JSON.stringify(manifest,null,2)}\n`);
+function updatedQuestion(record, current) {
+  const use = (source, fallback) => clean(source) || clean(fallback);
+  return {
+    ...(current || {}),
+    id: current?.id || clean(record.github_id) || slug(record.code),
+    codigo: current?.codigo || record.code,
+    numero: current?.numero || Number(record.original_number) || 0,
+    numero_original: Number(record.original_number) || current?.numero_original || current?.numero || 0,
+    bloco: use(record.block, current?.bloco),
+    disciplina: use(record.discipline, current?.disciplina),
+    assunto: use(record.subject, current?.assunto),
+    subassunto: use(record.subsubject, current?.subassunto),
+    texto_base: use(record.text_base, current?.texto_base),
+    enunciado: record.prompt,
+    alternativas: record.format === 'Certo / Errado' ? {Certo: 'Certo', Errado: 'Errado'} : record.alternatives,
+    gabarito: record.annulled ? 'Anulada' : record.answer,
+    comentario: record.comment,
+    comentarios_alternativas: record.alternative_comments,
+    fundamento: use(record.foundation, current?.fundamento),
+    pegadinha: use(record.trap, current?.pegadinha),
+    observacoes: use(record.observations, current?.observacoes),
+    formato_questao: record.format,
+    pagina_pdf: use(record.pdf_page, current?.pagina_pdf),
+    fonte_oficial: record.source_url || record.notion_url,
+    fonte_consolidada: record.source_url || record.notion_url,
+    auditoria: 'Banco Mestre — Pode publicar = true',
+    notion_url: record.notion_url,
+    codigo_fonte: record.code,
+    anulada: Boolean(record.annulled),
+    possui_imagem: Boolean(record.has_image),
+    descricao_imagem: use(record.image_description, current?.descricao_imagem),
+    imagem: current?.imagem || '',
+  };
+}
+
+function baseMaterial(id, record, current) {
+  const type = key(record.material_type).includes('prova') ? 'prova' : 'simulado';
+  return {
+    ...(current ? Object.fromEntries(Object.entries(current).filter(([property]) => property !== 'questoes')) : {}),
+    id,
+    tipo_material: type,
+    fonte: record.source_board || current?.fonte || 'Banco Mestre do Notion',
+    nome: record.material_name || current?.nome || id,
+    ano: record.year || current?.ano || null,
+    orgao: record.organization || current?.orgao || 'SEDES/DF',
+    cargo: record.cargo || current?.cargo || '',
+    codigo_cargo: record.cargo_code || current?.codigo_cargo || '',
+    disciplina: record.discipline || current?.disciplina || '',
+    bloco: record.block || current?.bloco || '',
+    status: 'publicado',
+    source_url: record.source_url || record.notion_url || current?.source_url || snapshot.source.database_url,
+    formato_questao: record.format,
+    lote_publicacao: record.publication_lot || current?.lote_publicacao || '',
+    comentarios_status: 'concluido',
+    questoes: [],
+  };
+}
+
+const finalMaterials = new Map();
+const usedIds = new Set();
+const usedCodes = new Set();
+for (const record of snapshot.records || []) {
+  const current = matchRecord(record);
+  const materialId = materialIdFor(record, current);
+  if (!finalMaterials.has(materialId)) {
+    finalMaterials.set(materialId, baseMaterial(materialId, record, currentMaterials.get(materialId)));
+  }
+  const question = updatedQuestion(record, current);
+  if (!question.id || !question.codigo || !question.enunciado || !question.comentario) {
+    throw new Error(`${record.code}: questão incompleta após aplicação do snapshot.`);
+  }
+  if (usedIds.has(key(question.id))) throw new Error(`ID duplicado após sincronização: ${question.id}`);
+  if (usedCodes.has(key(question.codigo))) throw new Error(`Código duplicado após sincronização: ${question.codigo}`);
+  usedIds.add(key(question.id));
+  usedCodes.add(key(question.codigo));
+  finalMaterials.get(materialId).questoes.push(question);
+}
+
+// Preservar questões atuais ausentes do snapshot: o Notion acrescenta e atualiza,
+// mas não remove automaticamente conteúdo já publicado.
+for (const currentMaterial of currentMaterials.values()) {
+  if (!finalMaterials.has(currentMaterial.id)) {
+    const {questoes, ...metadata} = currentMaterial;
+    finalMaterials.set(currentMaterial.id, {...metadata, questoes: []});
+  }
+  const target = finalMaterials.get(currentMaterial.id);
+  for (const currentQuestion of currentMaterial.questoes || []) {
+    if (usedIds.has(key(currentQuestion.id)) || usedCodes.has(key(currentQuestion.codigo))) continue;
+    target.questoes.push(currentQuestion);
+    usedIds.add(key(currentQuestion.id));
+    usedCodes.add(key(currentQuestion.codigo));
+  }
+}
+
+for (const material of finalMaterials.values()) {
+  material.questoes.sort((left, right) => Number(left.numero) - Number(right.numero) || left.codigo.localeCompare(right.codigo));
+  material.quantidade_questoes = material.questoes.length;
+  material.tempo_sugerido_minutos ||= material.questoes.length * (material.formato_questao === 'Certo / Errado' ? 1 : 2);
+  const formats = new Set(material.questoes.map(question => question.formato_questao));
+  const disciplines = new Set(material.questoes.map(question => clean(question.disciplina)).filter(Boolean));
+  const blocks = new Set(material.questoes.map(question => clean(question.bloco)).filter(Boolean));
+  if (formats.size > 1) material.formato_questao = 'Híbrido';
+  if (disciplines.size > 1) material.disciplina = 'Múltiplas matérias';
+  if (blocks.size > 1 && material.tipo_material === 'prova') material.bloco = 'Prova completa';
+}
+
+fs.rmSync(materialsDir, {recursive: true, force: true});
+fs.mkdirSync(materialsDir, {recursive: true});
+const catalogMaterials = [];
+const questionIndex = {};
+for (const material of [...finalMaterials.values()].sort((left, right) => left.nome.localeCompare(right.nome, 'pt-BR'))) {
+  const file = `./data/release/materials/${material.id}.json`;
+  const content = `${JSON.stringify(material)}\n`;
+  fs.writeFileSync(resolve(file), content);
+  for (const question of material.questoes) questionIndex[question.id] = material.id;
+  const {questoes, ...metadata} = material;
+  catalogMaterials.push({...metadata, file});
+}
+
+catalog.exported_at = new Date().toISOString();
+catalog.source = {
+  name: snapshot.source.name,
+  notion_url: snapshot.source.database_url,
+  criteria: `${snapshot.totals.published} registros atualmente liberados pelo Notion foram mesclados à release existente; alternativas A–E vazias são tratadas como Certo/Errado.`,
+};
+catalog.summary = {
+  banco_mestre: snapshot.totals.all,
+  materiais: catalogMaterials.length,
+  questoes: [...finalMaterials.values()].reduce((sum, material) => sum + material.questoes.length, 0),
+  aguardando_auditoria: Math.max(0, snapshot.totals.all - [...finalMaterials.values()].reduce((sum, material) => sum + material.questoes.length, 0)),
+  provas: catalogMaterials.filter(material => material.tipo_material === 'prova').length,
+  simulados: catalogMaterials.filter(material => material.tipo_material === 'simulado').length,
+};
+catalog.materials = catalogMaterials;
+catalog.question_index = questionIndex;
+const catalogContent = `${JSON.stringify(catalog, null, 2)}\n`;
+fs.writeFileSync(catalogPath, catalogContent);
+
+const manifest = {
+  schema_version: '3.1',
+  release_version: catalog.release_version,
+  generated_at: new Date().toISOString(),
+  summary: catalog.summary,
+  catalog_sha256: sha256(catalogContent),
+  materials: catalogMaterials.map(metadata => {
+    const content = fs.readFileSync(resolve(metadata.file));
+    return {
+      id: metadata.id,
+      file: metadata.file,
+      questions: metadata.quantidade_questoes,
+      bytes: content.length,
+      sha256: sha256(content),
+    };
+  }),
+};
+fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 console.log(`✓ Snapshot do Notion aplicado: ${catalog.summary.questoes} questões em ${catalog.summary.materiais} materiais; IDs públicos preservados quando já existentes.`);

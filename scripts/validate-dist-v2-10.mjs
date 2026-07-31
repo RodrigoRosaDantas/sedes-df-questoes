@@ -33,9 +33,9 @@ const materialFiles = fs.readdirSync(path.join(dist, "data/release/materials")).
 const questionCount = Object.keys(catalog.question_index || {}).length;
 const materialCount = (catalog.materials || []).length;
 
-if (packageData.version !== "2.11.1") throw new Error(`Versão inesperada: ${packageData.version}`);
+if (packageData.version !== "2.12.0") throw new Error(`Versão inesperada: ${packageData.version}`);
 if (buildInfo.version !== packageData.version) throw new Error("Versão do build-info diverge do package.json.");
-if (buildInfo.builder !== "copy-public-v2-11-1") throw new Error("Cópia canônica 2.11.1 não identificada.");
+if (buildInfo.builder !== "copy-public-v2-11-1") throw new Error("Cópia canônica não identificada.");
 if (!buildInfo.source_files_sha256?.index_html || !buildInfo.source_files_sha256?.app_js) throw new Error("Hashes das fontes canônicas ausentes.");
 if ("generated_at" in buildInfo) throw new Error("Build-info contém horário variável.");
 if (buildInfo.data_release_version !== (catalog.release_version || null)) throw new Error("Versão da base diverge do catálogo publicado.");
@@ -49,10 +49,10 @@ for (const marker of ["data-progress-reports", "schema_version: \"2.10\"", "Amer
 }
 
 const worker = fs.readFileSync(path.join(dist, "service-worker.js"), "utf8");
-if (!worker.includes('sedes-questoes-v2-11-1') || !worker.includes("app-v4.js?v=7") || !worker.includes("reports-v2-10.js?v=2") || !worker.includes("build-info.json")) throw new Error("Service worker não foi atualizado para a release 2.11.1.");
+if (!worker.includes('sedes-questoes-v2-12') || !worker.includes("app-v4.js?v=7") || !worker.includes("reports-v2-10.js?v=2") || !worker.includes("build-info.json")) throw new Error("Service worker não foi atualizado para a release 2.12.");
 
-for (const forbidden of ["scripts", ".github", "data/consolidated", "data/true-false"]) {
+for (const forbidden of ["scripts", ".github", "data/consolidated", "data/true-false", "data/notion"]) {
   if (fs.existsSync(path.join(dist, forbidden))) throw new Error(`Conteúdo privado exposto no dist: ${forbidden}`);
 }
 
-console.log(`✓ Dist 2.11.1 validado: ${questionCount} questões, ${materialCount} materiais, fontes canônicas e proveniência reproduzível.`);
+console.log(`✓ Dist 2.12 validado: ${questionCount} questões, ${materialCount} materiais, snapshot do Notion e proveniência reproduzível.`);
