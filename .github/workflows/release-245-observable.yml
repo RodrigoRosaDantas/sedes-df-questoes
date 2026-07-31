@@ -1,0 +1,98 @@
+name: Publicar lote 245 com verificação observável
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/release-245-observable.yml'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: release-245-observable
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.head_ref == 'agent/final-deploy-245'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Ler snapshot definitivo do Banco Mestre
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/export-notion-snapshot.mjs
+
+      - name: Gerar e validar aplicação e banco
+        run: npm run check
+
+      - name: Instalar Chromium
+        run: |
+          npm install --no-save @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Testar pacote local como usuário real
+        run: |
+          python3 -m http.server 4173 --directory dist >/tmp/sedes-http.log 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:4173/ >/dev/null && break; sleep 1; done
+          npx playwright test
+
+      - name: Gerar pacote final
+        run: npm run build
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Enviar artefato do site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Publicar no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Confirmar arquivos efetivamente publicados
+        id: static_verify
+        run: node scripts/verify-deployment.mjs "${{ steps.deployment.outputs.page_url }}" "${{ github.sha }}"
+
+      - name: Abrir e testar o endereço público
+        id: browser_verify
+        env:
+          PUBLIC_BASE_URL: ${{ steps.deployment.outputs.page_url }}
+          EXPECTED_SHA: ${{ github.sha }}
+        run: npx playwright test --config=playwright.public.config.js
+
+      - name: Fechar rastreabilidade das questões no Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          RELEASE_COMMIT: ${{ github.sha }}
+        run: node scripts/mark-notion-published.mjs
+
+      - name: Registrar resultado no resumo do job
+        run: |
+          {
+            echo '## Deploy aprovado'
+            echo
+            echo '- Lote: `REL-2026-07-QDX-2026-LOTE-245-001`'
+            echo '- Questões: **245**'
+            echo '- Commit publicado: `${{ github.sha }}`'
+            echo '- Endereço: ${{ steps.deployment.outputs.page_url }}'
+            echo '- Verificação estática: aprovada'
+            echo '- Teste público no Chromium: aprovado'
+            echo '- Rastreabilidade no Notion: atualizada'
+          } >> "$GITHUB_STEP_SUMMARY"
