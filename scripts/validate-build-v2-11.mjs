@@ -82,19 +82,44 @@ for (const marker of ['updateViaCache: "none"', "controllerchange", "registratio
 }
 
 const pagesWorkflow = read(".github/workflows/pages.yml");
-for (const marker of ["verify-deployment.mjs", "playwright.public.config.js", "rollback-deployment.mjs", "mark-notion-published.mjs", "actions: write", "contents: read"]) {
+for (const marker of [
+  "verify-deployment.mjs",
+  "playwright.public.config.js",
+  "rollback-deployment.mjs",
+  "mark-notion-published.mjs",
+  "PUBLICATION_PLAN_PATH",
+  "source_sha:",
+  "steps.traceability.outcome == 'failure'",
+  "actions: write",
+  "contents: read",
+]) {
   if (!pagesWorkflow.includes(marker)) fail(`Workflow sem proteção de produção: ${marker}`);
 }
-for (const forbidden of ["contents: write", "deployment-receipt.json", "git push origin HEAD:main"]) {
-  if (pagesWorkflow.includes(forbidden)) fail(`Workflow de Pages ainda pode gerar loop: ${forbidden}`);
+for (const forbidden of ["contents: write", "deployment-receipt.json", "git push origin HEAD:main", "export-notion-snapshot.mjs"]) {
+  if (pagesWorkflow.includes(forbidden)) fail(`Workflow de Pages ainda pode gerar loop ou build não versionado: ${forbidden}`);
 }
+
 const notionWorkflow = read(".github/workflows/notion-sync.yml");
-for (const marker of ["workflow_dispatch:", "schedule:", "export-notion-snapshot.mjs", "git push origin HEAD:main"]) {
+for (const marker of [
+  "workflow_dispatch:",
+  "schedule:",
+  "export-notion-snapshot.mjs",
+  "create-publication-plan.mjs",
+  "git push origin HEAD:main",
+  "actions: write",
+  "build-info.json",
+  "gh workflow run pages.yml",
+  "-f source_sha=",
+  "gh run watch",
+  "--exit-status",
+]) {
   if (!notionWorkflow.includes(marker)) fail(`Workflow do Notion incompleto: ${marker}`);
 }
 if (/^  push:/m.test(notionWorkflow)) fail("Workflow do Notion não pode reagir ao próprio push.");
-for (const forbidden of ["gh workflow run pages.yml", "Preparar branch isolada", "refs/heads/"]) {
-  if (notionWorkflow.includes(forbidden)) fail(`Workflow do Notion ainda gera duplicidade: ${forbidden}`);
+for (const forbidden of ["Preparar branch isolada", "refs/heads/"]) {
+  if (notionWorkflow.includes(forbidden)) fail(`Workflow do Notion mantém mecanismo recursivo ou obsoleto: ${forbidden}`);
 }
+const dispatchCount = (notionWorkflow.match(/gh workflow run pages\.yml/g) || []).length;
+if (dispatchCount !== 1) fail(`Workflow do Notion deve criar uma única publicação explícita; encontrado: ${dispatchCount}.`);
 
-console.log("✓ Build 2.12.3 validado: cache coerente, atualização PWA segura e workflows sem recursão ou deploy duplicado.");
+console.log("✓ Build 2.12.3 validado: cache coerente, snapshot versionado, plano restrito e dispatch único acompanhado sem recursão.");
