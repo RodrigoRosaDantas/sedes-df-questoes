@@ -64,6 +64,17 @@ forbidMarkers(notion, [
   "refs/heads/",
 ], "Workflow do Notion");
 
+const notionTraceability = read("scripts/mark-notion-published.mjs");
+requireMarkers(notionTraceability, [
+  "Código GitHub",
+  "Data da publicação",
+  "Status editorial — registro manual anterior",
+  "publicationProperties",
+], "Fechamento da rastreabilidade no Notion");
+forbidMarkers(notionTraceability, [
+  "Status editorial - registro manual anterior",
+], "Fechamento da rastreabilidade no Notion");
+
 const worker = read("service-worker.js");
 requireMarkers(worker, [
   expectedCacheVersion,
@@ -92,5 +103,5 @@ if (!builder.includes("builder: expectedBuilder") || !verifier.includes("buildIn
   fail(`Builder dinâmico ${expectedBuilder} não está protegido de ponta a ponta.`);
 }
 
-console.log(`✓ Workflows auditados: versão ${packageData.version}, cache ${expectedCacheVersion}, deploy Pages sem mutação administrativa e sincronização sem recursão.`);
+console.log(`✓ Workflows auditados: versão ${packageData.version}, cache ${expectedCacheVersion}, deploy Pages sem mutação administrativa, rastreabilidade Notion compatível e sincronização sem recursão.`);
 // Este teste existe para impedir que commits automáticos voltem a criar loops de Actions.
