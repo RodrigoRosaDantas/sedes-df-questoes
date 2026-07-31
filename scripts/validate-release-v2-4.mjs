@@ -63,6 +63,7 @@ function validateAlternatives(question, material) {
 
 const ids = new Set();
 const codes = new Set();
+const sourceCodes = new Set();
 let questions = 0;
 let trueFalseQuestions = 0;
 for (const meta of catalog.materials) {
@@ -82,6 +83,7 @@ for (const meta of catalog.materials) {
     if (question.possui_imagem && (!question.imagem || !question.descricao_imagem || !fs.existsSync(resolve(question.imagem)))) fail(`${question.codigo}: recurso visual publicado está incompleto.`);
     if (ids.has(question.id) || codes.has(question.codigo)) fail(`Questão duplicada: ${question.id}/${question.codigo}.`);
     ids.add(question.id); codes.add(question.codigo);
+    if (question.codigo_fonte) sourceCodes.add(question.codigo_fonte);
     if (catalog.question_index[question.id] !== meta.id) fail(`${question.id}: índice aponta para material incorreto.`);
     if (validateAlternatives(question, material) === "Certo / Errado") trueFalseQuestions += 1;
   }
@@ -91,7 +93,7 @@ if (snapshot ? trueFalseQuestions < activeQuestions : trueFalseQuestions !== exp
 
 if (snapshot) {
   for (const record of snapshot.records) {
-    if (!codes.has(record.code)) fail(`${record.code}: registro publicável do Notion não entrou na release.`);
+    if (!codes.has(record.code) && !sourceCodes.has(record.code)) fail(`${record.code}: registro publicável do Notion não entrou na release.`);
   }
 }
 for (const entry of activeEntries) {
