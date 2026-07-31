@@ -6,7 +6,7 @@ on:
     branches: [main]
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
   actions: write
@@ -84,6 +84,32 @@ jobs:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           RELEASE_COMMIT: ${{ github.sha }}
         run: node scripts/mark-notion-published.mjs
+      - name: Registrar recibo do deploy aprovado
+        if: steps.static_verify.outcome == 'success' && steps.browser_verify.outcome == 'success'
+        env:
+          DEPLOY_URL: ${{ steps.deployment.outputs.page_url }}
+          RELEASE_COMMIT: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          git config user.name 'sedes-df-pages[bot]'
+          git config user.email 'sedes-df-pages[bot]@users.noreply.github.com'
+          mkdir -p data/release
+          cat > data/release/deployment-receipt.json <<JSON
+          {
+            "status": "approved",
+            "lot": "REL-2026-07-QDX-2026-LOTE-245-001",
+            "questions": 245,
+            "source_commit": "${RELEASE_COMMIT}",
+            "public_url": "${DEPLOY_URL}",
+            "verified_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "static_verification": "passed",
+            "browser_verification": "passed"
+          }
+          JSON
+          git add data/release/deployment-receipt.json
+          git commit -m "Registrar deploy aprovado do lote 245 [skip ci]"
+          git pull --rebase origin main
+          git push origin HEAD:main
       - name: Acionar rollback para a última release aprovada
         if: steps.static_verify.outcome == 'failure' || steps.browser_verify.outcome == 'failure'
         env:
