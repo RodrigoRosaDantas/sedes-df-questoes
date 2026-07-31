@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
-      EXPECTED_SHA: 92593e0aa1454f0bbbf444be5c0a790ca2201d70
+      EXPECTED_SHA: d9e30f9d6fe1800d043c7d4d1bdc1ebe2b052f4b
       PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes
       GH_TOKEN: ${{ github.token }}
     steps:
