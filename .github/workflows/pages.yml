@@ -119,12 +119,20 @@ jobs:
           PUBLICATION_PLAN_PATH: ${{ env.PUBLICATION_PLAN_PATH }}
         run: node scripts/mark-notion-published.mjs
       - name: Acionar rollback para a última release aprovada
-        if: steps.static_verify.outcome == 'failure' || steps.browser_verify.outcome == 'failure' || steps.traceability.outcome == 'failure'
+        if: steps.static_verify.outcome == 'failure' || steps.browser_verify.outcome == 'failure'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/rollback-deployment.mjs
       - name: Reprovar publicação inconsistente
         if: steps.static_verify.outcome == 'failure' || steps.browser_verify.outcome == 'failure' || steps.traceability.outcome == 'failure'
+        env:
+          STATIC_OUTCOME: ${{ steps.static_verify.outcome }}
+          BROWSER_OUTCOME: ${{ steps.browser_verify.outcome }}
+          TRACEABILITY_OUTCOME: ${{ steps.traceability.outcome }}
         run: |
-          echo "A publicação não passou na auditoria pública ou na rastreabilidade restrita; o rollback foi acionado."
+          if [ "${TRACEABILITY_OUTCOME}" = 'failure' ] && [ "${STATIC_OUTCOME}" = 'success' ] && [ "${BROWSER_OUTCOME}" = 'success' ]; then
+            echo "O conteúdo público passou na auditoria e foi preservado; a rastreabilidade idempotente deverá ser concluída no próximo ciclo."
+          else
+            echo "A publicação pública falhou e o rollback foi acionado."
+          fi
           exit 1
