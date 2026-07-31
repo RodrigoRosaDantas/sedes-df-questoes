@@ -1,0 +1,121 @@
+name: Verificar lote 245 no site público
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/verify-public-245.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-public-245
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    if: github.head_ref == 'agent/verify-public-245'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Confirmar estrutura pública e os 245 códigos
+        id: public
+        env:
+          PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes
+        run: |
+          node --input-type=module <<'NODE'
+          const base = process.env.PUBLIC_BASE_URL.replace(/\/+$/, '');
+          const fetchText = async relative => {
+            const response = await fetch(`${base}/${relative}?verify=${Date.now()}`, {cache: 'no-store'});
+            if (!response.ok) throw new Error(`${relative}: HTTP ${response.status}`);
+            return response.text();
+          };
+
+          const [buildText, catalogText] = await Promise.all([
+            fetchText('data/release/build-info.json'),
+            fetchText('data/release/catalogo.json'),
+          ]);
+          const build = JSON.parse(buildText);
+          const catalog = JSON.parse(catalogText);
+
+          const targets = new Set();
+          const addRange = (prefix, start, end, excluded = new Set()) => {
+            for (let number = start; number <= end; number += 1) {
+              if (!excluded.has(number)) targets.add(`${prefix}${String(number).padStart(3, '0')}`);
+            }
+          };
+          addRange('PROVA-QDX-CRMVRN-2026-AGENTE-ADMINISTRATIVO-200-', 1, 120, new Set([107]));
+          addRange('PROVA-QDX-CRBM6-2026-AUXILIAR-ADMINISTRATIVO-200-', 29, 55);
+          addRange('PROVA-QDX-CRTR12-2026-AUXILIAR-ADMINISTRATIVO-200-', 17, 18);
+          addRange('PROVA-QDX-CRTR12-2026-AUXILIAR-ADMINISTRATIVO-200-', 21, 22);
+          addRange('PROVA-QDX-CRTR12-2026-AUXILIAR-ADMINISTRATIVO-200-', 25, 34);
+          addRange('PROVA-QDX-CRTR12-2026-AUXILIAR-ADMINISTRATIVO-200-', 36, 120);
+          if (targets.size !== 245) throw new Error(`Seleção interna inválida: ${targets.size}.`);
+
+          const missing = [...targets].filter(code => !catalogText.includes(code));
+          if (missing.length) {
+            throw new Error(`Site público ainda não contém ${missing.length}/245 códigos. Primeiros ausentes: ${missing.slice(0, 20).join(', ')}`);
+          }
+
+          const publicQuestions = Object.keys(catalog.question_index || {}).length;
+          const publicMaterials = Array.isArray(catalog.materials) ? catalog.materials.length : 0;
+          if (!build.source_sha) throw new Error('build-info público sem source_sha.');
+          if (Number(build.questions) !== publicQuestions) throw new Error('Contagem pública divergente do question_index.');
+
+          console.log(`✓ Site público contém os 245 códigos; commit ${build.source_sha}; ${publicQuestions} questões e ${publicMaterials} materiais.`);
+          console.log(`source_sha=${build.source_sha}`);
+          await import('node:fs').then(fs => fs.appendFileSync(process.env.GITHUB_OUTPUT, `source_sha=${build.source_sha}\nquestions=${publicQuestions}\nmaterials=${publicMaterials}\n`));
+          NODE
+
+      - name: Verificar pacote público completo
+        env:
+          EXPECTED_SHA: ${{ steps.public.outputs.source_sha }}
+        run: node scripts/verify-deployment.mjs "https://rodrigorosadantas.github.io/sedes-df-questoes" "$EXPECTED_SHA"
+
+      - name: Instalar Chromium
+        run: |
+          npm install --no-save @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Testar o endereço público no Chromium
+        env:
+          PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes
+          EXPECTED_SHA: ${{ steps.public.outputs.source_sha }}
+        run: npx playwright test --config=playwright.public.config.js
+
+      - name: Ler snapshot correspondente do Banco Mestre
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/export-notion-snapshot.mjs
+
+      - name: Gerar catálogo local correspondente
+        run: npm run build
+
+      - name: Fechar rastreabilidade no Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          RELEASE_COMMIT: ${{ steps.public.outputs.source_sha }}
+        run: node scripts/mark-notion-published.mjs
+
+      - name: Resumo
+        run: |
+          {
+            echo '## Lote 245 confirmado no site público'
+            echo
+            echo '- Presença dos 245 códigos: aprovada'
+            echo '- Verificação estática: aprovada'
+            echo '- Teste público em Chromium: aprovado'
+            echo '- Rastreabilidade no Notion: fechada'
+            echo '- Commit público: `${{ steps.public.outputs.source_sha }}`'
+            echo '- Questões públicas: `${{ steps.public.outputs.questions }}`'
+            echo '- Materiais públicos: `${{ steps.public.outputs.materials }}`'
+          } >> "$GITHUB_STEP_SUMMARY"
