@@ -8,6 +8,7 @@ const expectedBuilder = `copy-public-v${versionToken}`;
 const expectedCache = `sedes-questoes-v${versionToken}`;
 const expectedSha = String(process.env.EXPECTED_SHA || "").trim();
 const publicBase = new URL(`${String(process.env.PUBLIC_BASE_URL || "").replace(/\/+$/, "")}/`);
+const releaseLot = "REL-2026-07-QDX-2026-LOTE-245-001";
 
 if (!/^\d+\.\d+\.\d+$/.test(expectedVersion)) throw new Error(`Versão inválida no package.json: ${expectedVersion || "ausente"}.`);
 if (!publicBase.href.startsWith("http")) throw new Error("PUBLIC_BASE_URL não informada para o teste público.");
@@ -55,6 +56,20 @@ function releaseTargets() {
   return targets;
 }
 
+async function publicCodesForLot(request, catalog, lot) {
+  const metadata = (catalog.materials || []).filter(material => material.lote_publicacao === lot);
+  expect(metadata.length, `Nenhum material público encontrado para o lote ${lot}.`).toBeGreaterThanOrEqual(3);
+  const materials = await Promise.all(metadata.map(material => fetchEventually(request, material.file, "json")));
+  const codes = new Set();
+  for (const material of materials) {
+    for (const question of material.questoes || []) {
+      if (question.codigo) codes.add(String(question.codigo).trim());
+      if (question.codigo_fonte) codes.add(String(question.codigo_fonte).trim());
+    }
+  }
+  return codes;
+}
+
 test("GitHub Pages serve a release completa e executável", async ({page, request}) => {
   const build = await fetchEventually(request, "data/release/build-info.json", "json", value =>
     value?.version === expectedVersion && (!expectedSha || value?.source_sha === expectedSha));
@@ -82,8 +97,8 @@ test("GitHub Pages serve a release completa e executável", async ({page, reques
 
   const targets = releaseTargets();
   expect(targets.size).toBe(245);
-  const catalogText = JSON.stringify(catalog);
-  const missingTargets = [...targets].filter(code => !catalogText.includes(code));
+  const publicCodes = await publicCodesForLot(request, catalog, releaseLot);
+  const missingTargets = [...targets].filter(code => !publicCodes.has(code));
   expect(missingTargets, `Questões do lote ausentes: ${missingTargets.slice(0, 20).join(", ")}`).toEqual([]);
 
   const homeURL = resourceURL("");
