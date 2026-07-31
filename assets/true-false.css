@@ -11,18 +11,41 @@
 }
 
 .options:has(input[value="Certo"]) .option {
+  grid-template-columns: minmax(0, 1fr);
   min-height: 4rem;
   align-items: center;
+  justify-items: center;
 }
 
 .options:has(input[value="Certo"]) .letter {
   min-width: 4.75rem;
+  width: 100%;
+  height: auto;
+  min-height: 2.75rem;
+  padding: .65rem 1rem;
   text-align: center;
+}
+
+/* Proteção para clientes que ainda estejam executando o JS anterior. */
+.options:has(input[value="Certo"]) .option > span:not(.letter) {
+  display: none;
 }
 
 .result-options .result-option[data-answer="Certo"],
 .result-options .result-option[data-answer="Errado"] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  text-align: center;
   list-style: none;
+}
+
+.result-options .result-option[data-answer="Certo"] .letter,
+.result-options .result-option[data-answer="Errado"] .letter {
+  width: 100%;
+  height: auto;
+  min-height: 2.75rem;
+  padding: .65rem 1rem;
 }
 
 @media (max-width: 640px) {
@@ -30,3 +53,5 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Rótulo único protegido por teste público em navegador. */

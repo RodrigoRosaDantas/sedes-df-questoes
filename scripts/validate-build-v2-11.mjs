@@ -67,7 +67,7 @@ const distPwa = read("dist/assets/pwa-v2-9.js");
 if (sourceIndex !== distIndex || sourceApp !== distApp || sourceWorker !== distWorker || sourcePwa !== distPwa) {
   fail("O dist não é cópia exata das fontes canônicas.");
 }
-for (const marker of ["app-v4.js?v=7", "study-navigation-v2-6.css?v=1", "reports-v2-10.js?v=2"]) {
+for (const marker of ["app-v4.js?v=8", "study-navigation-v2-6.css?v=1", "reports-v2-10.js?v=2"]) {
   if (!sourceIndex.includes(marker)) fail(`HTML canônico sem ${marker}.`);
 }
 for (const marker of ["Catálogo inconsistente.", 'data-study-view="materias"', 'data-study-view="provas"', "function renderDisciplineTopics()"] ) {

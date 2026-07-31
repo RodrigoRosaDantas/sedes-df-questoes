@@ -31,7 +31,7 @@ for (const marker of [
   "study-navigation-v2-6.css?v=1",
   "intelligence-v2-9.css?v=1",
   "reports-v2-10.css?v=2",
-  "app-v4.js?v=7",
+  "app-v4.js?v=8",
   "learning-v2-9.js?v=1",
   "pwa-v2-9.js?v=1",
   "reports-v2-10.js?v=2",
