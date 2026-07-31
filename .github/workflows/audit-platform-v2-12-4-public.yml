@@ -1,0 +1,50 @@
+name: Auditar plataforma pública 2.12.4
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/audit-platform-v2-12-4-public.yml'
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      SOURCE_SHA: 545fdd588e363e0b3cc099770317b6107b89f43b
+    steps:
+      - name: Acionar e acompanhar publicação auditada
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          DISPATCHED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          gh workflow run pages.yml --repo "${GITHUB_REPOSITORY}" --ref main -f source_sha="${SOURCE_SHA}"
+
+          RUN_ID=''
+          for attempt in $(seq 1 60); do
+            gh api "repos/${GITHUB_REPOSITORY}/actions/runs?event=workflow_dispatch&branch=main&per_page=50" > /tmp/runs.json
+            RUN_ID=$(jq -r --arg sha "${SOURCE_SHA}" --arg since "${DISPATCHED_AT}" '
+              .workflow_runs[]
+              | select(.head_sha == $sha)
+              | select(.name == "Validar e publicar GitHub Pages")
+              | select(.event == "workflow_dispatch")
+              | select(.created_at >= $since)
+              | .id
+            ' /tmp/runs.json | head -n1)
+            if [ -n "${RUN_ID}" ]; then break; fi
+            echo "Aguardando execução pública (${attempt}/60)."
+            sleep 5
+          done
+
+          test -n "${RUN_ID}"
+          echo "Execução de Pages: ${RUN_ID}."
+          gh run watch "${RUN_ID}" --repo "${GITHUB_REPOSITORY}" --exit-status --interval 10
+
+      - name: Registrar aprovação pública
+        run: echo "✓ Plataforma 2.12.4, integração Notion → GitHub → site e downloads públicos aprovados no commit ${SOURCE_SHA}."
