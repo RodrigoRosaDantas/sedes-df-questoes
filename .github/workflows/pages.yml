@@ -61,24 +61,30 @@ jobs:
         run: node scripts/export-notion-snapshot.mjs
       - name: Gerar pacote final
         run: npm run build
-      - name: Garantir GitHub Actions como origem do Pages
+      - name: Confirmar GitHub Actions como origem do Pages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          status=$(curl -sS -o /tmp/pages-update.json -w '%{http_code}' \
-            -X PUT \
+          status=$(curl -sS -o /tmp/pages.json -w '%{http_code}' \
             -H 'Accept: application/vnd.github+json' \
             -H "Authorization: Bearer ${GITHUB_TOKEN}" \
             -H 'X-GitHub-Api-Version: 2026-03-10' \
-            "https://api.github.com/repos/${GITHUB_REPOSITORY}/pages" \
-            -d '{"build_type":"workflow"}')
-          if [ "$status" != '204' ]; then
-            echo "Falha ao configurar o Pages para GitHub Actions: HTTP ${status}"
-            cat /tmp/pages-update.json
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/pages")
+          if [ "$status" != '200' ]; then
+            echo "Falha ao consultar o GitHub Pages: HTTP ${status}"
+            cat /tmp/pages.json
             exit 1
           fi
-          echo '✓ Origem do GitHub Pages configurada como workflow.'
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const pages = JSON.parse(fs.readFileSync('/tmp/pages.json', 'utf8'));
+          if (pages.build_type !== 'workflow') {
+            console.error(`Origem atual do Pages: ${pages.build_type || 'não informada'}. Configure GitHub Actions em Settings > Pages.`);
+            process.exit(1);
+          }
+          console.log(`✓ Origem do GitHub Pages confirmada como workflow; site ${pages.html_url || 'sem URL informada'}.`);
+          NODE
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
