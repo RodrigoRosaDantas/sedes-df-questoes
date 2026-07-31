@@ -1,4 +1,5 @@
 let deferredInstallPrompt = null;
+let reloadingAfterWorkerUpdate = false;
 
 function installButton() {
   let button = document.querySelector("#install-app");
@@ -37,7 +38,35 @@ window.addEventListener("appinstalled", () => {
 window.addEventListener("offline", () => document.documentElement.dataset.offline = "true");
 window.addEventListener("online", () => delete document.documentElement.dataset.offline);
 
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js", {scope: "./"}).catch(error => console.error("Service worker não registrado:", error)));
+async function registerServiceWorker() {
+  try {
+    const registration = await navigator.serviceWorker.register("./service-worker.js", {
+      scope: "./",
+      updateViaCache: "none",
+    });
+
+    const activateWaitingWorker = () => registration.waiting?.postMessage({type: "SKIP_WAITING"});
+    if (registration.waiting) activateWaitingWorker();
+
+    registration.addEventListener("updatefound", () => {
+      const installingWorker = registration.installing;
+      if (!installingWorker) return;
+      installingWorker.addEventListener("statechange", () => {
+        if (installingWorker.state === "installed" && navigator.serviceWorker.controller) activateWaitingWorker();
+      });
+    });
+
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (reloadingAfterWorkerUpdate) return;
+      reloadingAfterWorkerUpdate = true;
+      window.location.reload();
+    });
+
+    await registration.update();
+  } catch (error) {
+    console.error("Service worker não registrado:", error);
+  }
 }
+
+if ("serviceWorker" in navigator) window.addEventListener("load", registerServiceWorker);
 installButton();
