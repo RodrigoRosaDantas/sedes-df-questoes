@@ -21638,7 +21638,7 @@
     {
       "notion_id": "3adcf5a2-6731-81a8-82d1-f58091145ba8",
       "notion_url": "https://app.notion.com/p/PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-037-3adcf5a2673181a882d1f58091145ba8",
-      "notion_last_edited_time": "2026-07-30T14:10:00.000Z",
+      "notion_last_edited_time": "2026-07-31T22:51:00.000Z",
       "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-037",
       "github_id": "",
       "title": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-037",
@@ -21658,7 +21658,7 @@
       "format_inference": "alternativas_A_E_vazias",
       "original_number": 37,
       "text_base": "Acerca da crise política, econômica e humanitária enfrentada pela Venezuela e de seus reflexos internacionais, julgue o item seguinte.",
-      "prompt": "Apesar da crise social, a economia venezuelana em 2024 e início de 2025 apresentou estabilidade absoluta de preços, eliminando completamente a dependência histórica do país em relação às exportações de petróleo. O Painel Intergovernamental sobre Mudanças Climáticas (IPCC) é o principal órgão das Nações Unidas para avaliar a ciência relacionada às mudanças climáticas, criado em 1988 pela OMM e PNUMA. Ele compila relatórios científicos abrangentes para orientar políticas públicas globais, sem realizar pesquisas próprias, focando na ação humana como principal motor do aquecimento. Com base nos relatórios do IPCC e nos compromissos internacionais acerca do clima, julgue os itens seguintes.",
+      "prompt": "Apesar da crise social, a economia venezuelana em 2024 e início de 2025 apresentou estabilidade absoluta de preços, eliminando completamente a dependência histórica do país em relação às exportações de petróleo.",
       "alternatives": {
         "Certo": "Certo",
         "Errado": "Errado"
@@ -21732,7 +21732,7 @@
     {
       "notion_id": "3adcf5a2-6731-8197-a455-ef6420124ec3",
       "notion_url": "https://app.notion.com/p/PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-039-3adcf5a267318197a455ef6420124ec3",
-      "notion_last_edited_time": "2026-07-30T14:10:00.000Z",
+      "notion_last_edited_time": "2026-07-31T22:51:00.000Z",
       "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-039",
       "github_id": "",
       "title": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-039",
@@ -21752,7 +21752,7 @@
       "format_inference": "alternativas_A_E_vazias",
       "original_number": 39,
       "text_base": "Com base nos relatórios do IPCC e nos compromissos internacionais acerca do clima, julgue o item seguinte.",
-      "prompt": "O efeito estufa é um fenômeno natural essencial para a vida na Terra; a crise climática atual é causada pelo agravamento desse efeito devido à emissão antropogênica de gases como o CO₂ e o metano. O presidente dos Estados Unidos tem ameaçado anexar a Groenlândia aos EUA desde que tomou posse para seu segundo mandato, um ano atrás. Segundo o republicano, o território é vital para o Domo de Ouro, escudo antimísseis que ele deseja construir para proteger o país. Internet: <g1.globo.com> (com adaptações). Acerca do estatuto da Groenlândia como território autônomo do Reino da Dinamarca e as implicações de uma hipotética ocupação estrangeira ou de um conflito de soberania na região, julgue o item a seguir.",
+      "prompt": "O efeito estufa é um fenômeno natural essencial para a vida na Terra; a crise climática atual é causada pelo agravamento desse efeito devido à emissão antropogênica de gases como o CO₂ e o metano.",
       "alternatives": {
         "Certo": "Certo",
         "Errado": "Errado"
@@ -22296,7 +22296,7 @@
     {
       "notion_id": "3adcf5a2-6731-8164-8a3b-e9d5e7117930",
       "notion_url": "https://app.notion.com/p/PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-052-3adcf5a2673181648a3be9d5e7117930",
-      "notion_last_edited_time": "2026-07-30T14:05:00.000Z",
+      "notion_last_edited_time": "2026-07-31T22:51:00.000Z",
       "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-052",
       "github_id": "",
       "title": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-052",
@@ -22316,7 +22316,7 @@
       "format_inference": "alternativas_A_E_vazias",
       "original_number": 52,
       "text_base": "",
-      "prompt": "A vedação do nepotismo não exige a edição de lei formal, já que a proibição decorre dos princípios insculpidos no texto constitucional que balizam a atuação da Administração Pública. Um farmacêutico, que foi contratado no regime celetista por uma empresa do Distrito Federal, furtou remédios para revender. Tendo sido descoberto, foi demitido e denunciado às autoridades. Irresignado, falou com seu cunhado, que é empregado público do Conselho Regional de Farmácia (CRF‑DF), para que ele fiscalizasse o estabelecimento à procura de irregularidades, apontando especificamente o que deveria procurar. Com base nessa situação hipotética e nas normas de referência, julgue os itens seguintes.",
+      "prompt": "A vedação do nepotismo não exige a edição de lei formal, já que a proibição decorre dos princípios insculpidos no texto constitucional que balizam a atuação da Administração Pública.",
       "alternatives": {
         "Certo": "Certo",
         "Errado": "Errado"
@@ -22531,7 +22531,7 @@
     {
       "notion_id": "3adcf5a2-6731-8161-afb7-c685a23a77eb",
       "notion_url": "https://app.notion.com/p/PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-057-3adcf5a267318161afb7c685a23a77eb",
-      "notion_last_edited_time": "2026-07-30T14:05:00.000Z",
+      "notion_last_edited_time": "2026-07-31T22:51:00.000Z",
       "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-057",
       "github_id": "",
       "title": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-057",
@@ -22551,7 +22551,7 @@
       "format_inference": "alternativas_A_E_vazias",
       "original_number": 57,
       "text_base": "Um farmacêutico contratado por empresa privada furtou remédios para revender.",
-      "prompt": "A conduta do farmacêutico de furtar remédios enseja sanção por improbidade administrativa, já que atenta contra a economia popular. No que diz respeito às sanções previstas na Lei nº 8.429/1992, julgue os itens a seguir.",
+      "prompt": "A conduta do farmacêutico de furtar remédios enseja sanção por improbidade administrativa, já que atenta contra a economia popular.",
       "alternatives": {
         "Certo": "Certo",
         "Errado": "Errado"
@@ -22719,7 +22719,7 @@
     {
       "notion_id": "3adcf5a2-6731-8194-8c03-ff2cd9820f59",
       "notion_url": "https://app.notion.com/p/PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-061-3adcf5a2673181948c03ff2cd9820f59",
-      "notion_last_edited_time": "2026-07-30T14:05:00.000Z",
+      "notion_last_edited_time": "2026-07-31T22:51:00.000Z",
       "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-061",
       "github_id": "",
       "title": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-061",
@@ -22739,7 +22739,7 @@
       "format_inference": "alternativas_A_E_vazias",
       "original_number": 61,
       "text_base": "",
-      "prompt": "As infrações estabelecidas na Lei de Improbidade Administrativa não estão sujeitas à prescrição. Prova aplicada",
+      "prompt": "As infrações estabelecidas na Lei de Improbidade Administrativa não estão sujeitas à prescrição.",
       "alternatives": {
         "Certo": "Certo",
         "Errado": "Errado"
@@ -22860,7 +22860,7 @@
     {
       "notion_id": "3adcf5a2-6731-815e-bd28-ddfca7bb48b5",
       "notion_url": "https://app.notion.com/p/PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-064-3adcf5a26731815ebd28ddfca7bb48b5",
-      "notion_last_edited_time": "2026-07-30T14:05:00.000Z",
+      "notion_last_edited_time": "2026-07-31T22:52:00.000Z",
       "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-064",
       "github_id": "",
       "title": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-064",
@@ -22880,7 +22880,7 @@
       "format_inference": "alternativas_A_E_vazias",
       "original_number": 64,
       "text_base": "",
-      "prompt": "O direito de recorrer de decisões administrativas é amplo, incluindo a alegação de suspeição. A transparência ativa é um dos pilares da Lei de Acesso à Informação, já que obriga a Administração Pública a se tornar proativa no âmbito da transparência, acessível, disponível e mais próxima de todos os que são afetados por suas decisões. Acerca dessa informação e do conteúdo que deve constar nos sites na Internet dos órgãos e das entidades da Administração Pública, julgue os itens a seguir.",
+      "prompt": "O direito de recorrer de decisões administrativas é amplo, incluindo a alegação de suspeição.",
       "alternatives": {
         "Certo": "Certo",
         "Errado": "Errado"
@@ -23001,7 +23001,7 @@
     {
       "notion_id": "3adcf5a2-6731-8196-83b2-ccda9a01b7f0",
       "notion_url": "https://app.notion.com/p/PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-067-3adcf5a26731819683b2ccda9a01b7f0",
-      "notion_last_edited_time": "2026-07-30T14:05:00.000Z",
+      "notion_last_edited_time": "2026-07-31T22:52:00.000Z",
       "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-067",
       "github_id": "",
       "title": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-067",
@@ -23021,7 +23021,7 @@
       "format_inference": "alternativas_A_E_vazias",
       "original_number": 67,
       "text_base": "",
-      "prompt": "Em relação à publicação de informações a respeito da remuneração, atende aos regulamentos de transparência ativa a publicação de apenas o vencimento, soldo ou subsídio e os proventos de aposentadoria e pensões dos respectivos servidores. A Lei nº 13.709/2018 – Lei Geral de Proteção de Dados Pessoais (LGPD) – apresenta uma salvaguarda especial aos chamados dados pessoais sensíveis. Acerca dessa informação, julgue os itens a seguir.",
+      "prompt": "Em relação à publicação de informações a respeito da remuneração, atende aos regulamentos de transparência ativa a publicação de apenas o vencimento, soldo ou subsídio e os proventos de aposentadoria e pensões dos respectivos servidores.",
       "alternatives": {
         "Certo": "Certo",
         "Errado": "Errado"
@@ -23142,7 +23142,7 @@
     {
       "notion_id": "3adcf5a2-6731-814c-938f-fbaf5739ec70",
       "notion_url": "https://app.notion.com/p/PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-070-3adcf5a26731814c938ffbaf5739ec70",
-      "notion_last_edited_time": "2026-07-30T14:05:00.000Z",
+      "notion_last_edited_time": "2026-07-31T22:52:00.000Z",
       "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-070",
       "github_id": "",
       "title": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-070",
@@ -23162,7 +23162,7 @@
       "format_inference": "alternativas_A_E_vazias",
       "original_number": 70,
       "text_base": "",
-      "prompt": "Considera‑se dado pessoal sensível aquele que disser respeito a origem racial ou étnica, convicção religiosa, opinião política, filiação a sindicato ou a organização de caráter religioso, filosófico ou político. RASCUNHO Prova aplicada",
+      "prompt": "Considera-se dado pessoal sensível aquele que disser respeito a origem racial ou étnica, convicção religiosa, opinião política, filiação a sindicato ou a organização de caráter religioso, filosófico ou político.",
       "alternatives": {
         "Certo": "Certo",
         "Errado": "Errado"
@@ -23189,7 +23189,7 @@
     {
       "notion_id": "3adcf5a2-6731-81ac-b5f9-c965eba96def",
       "notion_url": "https://app.notion.com/p/PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-071-3adcf5a2673181acb5f9c965eba96def",
-      "notion_last_edited_time": "2026-07-30T14:07:00.000Z",
+      "notion_last_edited_time": "2026-07-31T22:52:00.000Z",
       "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-071",
       "github_id": "",
       "title": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-071",
@@ -23223,7 +23223,7 @@
         "D": "",
         "E": ""
       },
-      "foundation": "Lei nº 13.709/2018, art. 11, incisos I e II.",
+      "foundation": "Referencial teórico de Administração: a função direção conduz, orienta e coordena a execução do trabalho planejado.",
       "trap": "Confusão entre direção, planejamento e controle.",
       "observations": "",
       "annulled": false,
@@ -23236,7 +23236,7 @@
     {
       "notion_id": "3adcf5a2-6731-81fd-8082-ec9e713b011c",
       "notion_url": "https://app.notion.com/p/PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-072-3adcf5a2673181fd8082ec9e713b011c",
-      "notion_last_edited_time": "2026-07-30T14:07:00.000Z",
+      "notion_last_edited_time": "2026-07-31T22:52:00.000Z",
       "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-072",
       "github_id": "",
       "title": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-072",
@@ -23270,7 +23270,7 @@
         "D": "",
         "E": ""
       },
-      "foundation": "Lei nº 13.709/2018, art. 11, § 5º.",
+      "foundation": "Referencial teórico de Administração: planejamento operacional é de curto prazo e do nível operacional; médio prazo e nível intermediário correspondem ao planejamento tático.",
       "trap": "Troca das características do planejamento tático pelas do operacional.",
       "observations": "",
       "annulled": false,
@@ -23283,7 +23283,7 @@
     {
       "notion_id": "3adcf5a2-6731-810f-b7c3-f73775ddc750",
       "notion_url": "https://app.notion.com/p/PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-073-3adcf5a26731810fb7c3f73775ddc750",
-      "notion_last_edited_time": "2026-07-30T14:07:00.000Z",
+      "notion_last_edited_time": "2026-07-31T22:52:00.000Z",
       "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-073",
       "github_id": "",
       "title": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-073",
@@ -23317,7 +23317,7 @@
         "D": "",
         "E": ""
       },
-      "foundation": "Lei nº 13.709/2018, art. 5º, inciso II.",
+      "foundation": "Estrutura Conceitual para Relatório Financeiro (CPC 00 R2/NBC TG): passivo é obrigação presente; patrimônio líquido representa participação residual, não dívida obrigatória.",
       "trap": "Inversão entre capital próprio, de natureza residual, e capital de terceiros, de natureza obrigacional.",
       "observations": "",
       "annulled": false,
@@ -24270,7 +24270,7 @@
     {
       "notion_id": "3adcf5a2-6731-81a1-bb64-df56854c2c19",
       "notion_url": "https://app.notion.com/p/PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-094-3adcf5a2673181a1bb64df56854c2c19",
-      "notion_last_edited_time": "2026-07-30T14:07:00.000Z",
+      "notion_last_edited_time": "2026-07-31T22:52:00.000Z",
       "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-094",
       "github_id": "",
       "title": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-094",
@@ -24290,7 +24290,7 @@
       "format_inference": "alternativas_A_E_vazias",
       "original_number": 94,
       "text_base": "",
-      "prompt": "A solicitação de verba a um ministério, o encaminhamento de processo administrativo a outro órgão e o convite formal para eventos oficiais são realizados, preferencialmente, mediante ofício. Prova aplicada",
+      "prompt": "A solicitação de verba a um ministério, o encaminhamento de processo administrativo a outro órgão e o convite formal para eventos oficiais são realizados, preferencialmente, mediante ofício.",
       "alternatives": {
         "Certo": "Certo",
         "Errado": "Errado"
@@ -24599,7 +24599,7 @@
     {
       "notion_id": "3adcf5a2-6731-812f-8b96-d9e585463f03",
       "notion_url": "https://app.notion.com/p/PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-101-3adcf5a26731812f8b96d9e585463f03",
-      "notion_last_edited_time": "2026-07-30T14:08:00.000Z",
+      "notion_last_edited_time": "2026-07-31T22:52:00.000Z",
       "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-101",
       "github_id": "",
       "title": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-101",
@@ -24619,7 +24619,7 @@
       "format_inference": "alternativas_A_E_vazias",
       "original_number": 101,
       "text_base": "",
-      "prompt": "Diana mostra presteza e Elton é impecável na tolerância durante o seu atendimento. Acerca do atendimento ao público nas organizações públicas, julgue os itens a seguir.",
+      "prompt": "Diana mostra presteza e Elton é impecável na tolerância durante o seu atendimento.",
       "alternatives": {
         "Certo": "Certo",
         "Errado": "Errado"
@@ -24975,7 +24975,7 @@
     {
       "notion_id": "3adcf5a2-6731-8192-ac0b-fe386ed266a3",
       "notion_url": "https://app.notion.com/p/PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-109-3adcf5a267318192ac0bfe386ed266a3",
-      "notion_last_edited_time": "2026-07-30T14:08:00.000Z",
+      "notion_last_edited_time": "2026-07-31T22:52:00.000Z",
       "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-109",
       "github_id": "",
       "title": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-109",
@@ -24995,7 +24995,7 @@
       "format_inference": "alternativas_A_E_vazias",
       "original_number": 109,
       "text_base": "",
-      "prompt": "O respeito à diversidade e às opiniões distintas dentro da equipe de trabalho, embora não promovam ambiente de aprendizagem, permitem a aceitação de visões divergentes. Em relação aos comportamentos receptivos e aos defensivos no trabalho em equipe nas organizações públicas, julgue os itens seguintes.",
+      "prompt": "O respeito à diversidade e às opiniões distintas dentro da equipe de trabalho, embora não promovam ambiente de aprendizagem, permitem a aceitação de visões divergentes.",
       "alternatives": {
         "Certo": "Certo",
         "Errado": "Errado"
@@ -72555,5 +72555,5 @@
       "released_for_export": false
     }
   ],
-  "generated_at": "2026-07-31T19:26:48.345Z"
+  "generated_at": "2026-07-31T23:13:34.241Z"
 }
