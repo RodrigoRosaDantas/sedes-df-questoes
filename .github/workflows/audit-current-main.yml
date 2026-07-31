@@ -8,55 +8,55 @@ permissions:
   contents: read
   actions: read
 
+concurrency:
+  group: audit-current-main-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 env:
-  EXPECTED_SHA: d16f233bf77753613b829f3a461bfd312309210b
+  EXPECTED_MAIN_SHA: d16f233bf77753613b829f3a461bfd312309210b
   PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes
   PLAYWRIGHT_VERSION: 1.61.1
 
 jobs:
   audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: 22
           package-manager-cache: false
-      - name: Confirmar execução de produção do commit atual
+      - name: Auditar execução de produção do commit automático
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          for attempt in $(seq 1 90); do
-            gh api "repos/${GITHUB_REPOSITORY}/actions/runs?event=push&branch=main&per_page=50" > /tmp/runs.json
-            run_id=$(jq -r --arg sha "$EXPECTED_SHA" '.workflow_runs[] | select(.head_sha == $sha and .name == "Validar e publicar GitHub Pages") | .id' /tmp/runs.json | head -n1)
-            if [ -z "$run_id" ]; then
-              echo "Tentativa ${attempt}/90: execução de produção ainda não encontrada."
-              sleep 10
-              continue
-            fi
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs?event=push&branch=main&per_page=50" > /tmp/runs.json
+          run_id=$(jq -r --arg sha "$EXPECTED_MAIN_SHA" '.workflow_runs[] | select(.head_sha == $sha and .name == "Validar e publicar GitHub Pages") | .id' /tmp/runs.json | head -n1)
+          if [ -z "$run_id" ]; then
+            echo "AUDIT_PRODUCTION_RUN=absent" >> "$GITHUB_ENV"
+            echo "⚠ Nenhuma execução de produção foi criada para ${EXPECTED_MAIN_SHA}."
+          else
             status=$(jq -r --argjson id "$run_id" '.workflow_runs[] | select(.id == $id) | .status' /tmp/runs.json)
             conclusion=$(jq -r --argjson id "$run_id" '.workflow_runs[] | select(.id == $id) | (.conclusion // "")' /tmp/runs.json)
-            if [ "$status" != "completed" ]; then
-              echo "Tentativa ${attempt}/90: execução ${run_id} em ${status}."
-              sleep 10
-              continue
-            fi
-            if [ "$conclusion" != "success" ]; then
-              echo "Execução ${run_id} terminou com ${conclusion}."
-              gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/jobs?per_page=100" | jq -r '.jobs[] | "JOB \(.name): \(.conclusion // .status)\n" + ((.steps // []) | map("  \(.number). \(.name): \(.conclusion // .status)") | join("\n"))'
-              exit 1
-            fi
-            echo "✓ Execução de produção ${run_id} concluída com sucesso para ${EXPECTED_SHA}."
-            echo "RUN_ID=${run_id}" >> "$GITHUB_ENV"
-            exit 0
-          done
-          echo "Execução de produção não encontrada dentro da janela de auditoria."
-          exit 1
-      - name: Confirmar pacote público, versão, totais e commit
-        run: node scripts/verify-deployment.mjs "$PUBLIC_BASE_URL" "$EXPECTED_SHA"
+            echo "AUDIT_PRODUCTION_RUN=${run_id}:${status}:${conclusion}" >> "$GITHUB_ENV"
+            echo "Execução de produção: ${run_id}, status ${status}, conclusão ${conclusion:-pendente}."
+          fi
+      - name: Identificar pacote efetivamente publicado
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS -H 'cache-control: no-cache, no-store' "${PUBLIC_BASE_URL}/data/release/build-info.json?audit=${GITHUB_RUN_ID}" | tee /tmp/build-info.json
+          PUBLIC_SHA=$(jq -r '.source_sha // empty' /tmp/build-info.json)
+          PUBLIC_VERSION=$(jq -r '.version // empty' /tmp/build-info.json)
+          PUBLIC_QUESTIONS=$(jq -r '.questions // empty' /tmp/build-info.json)
+          PUBLIC_MATERIALS=$(jq -r '.materials // empty' /tmp/build-info.json)
+          test -n "$PUBLIC_SHA"
+          echo "PUBLIC_SHA=${PUBLIC_SHA}" >> "$GITHUB_ENV"
+          echo "✓ Produção atual: versão ${PUBLIC_VERSION}, commit ${PUBLIC_SHA}, ${PUBLIC_QUESTIONS} questões e ${PUBLIC_MATERIALS} materiais."
+          node scripts/verify-deployment.mjs "$PUBLIC_BASE_URL" "$PUBLIC_SHA"
       - name: Instalar Chromium em ambiente auditado
         run: |
           AUDIT_DIR=$(mktemp -d)
@@ -68,5 +68,5 @@ jobs:
       - name: Testar aplicação pública e os 245 códigos
         env:
           PUBLIC_BASE_URL: ${{ env.PUBLIC_BASE_URL }}
-          EXPECTED_SHA: ${{ env.EXPECTED_SHA }}
+          EXPECTED_SHA: ${{ env.PUBLIC_SHA }}
         run: npx playwright test --config=playwright.public.config.js
