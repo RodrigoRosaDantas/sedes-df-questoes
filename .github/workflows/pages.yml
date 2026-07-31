@@ -17,24 +17,29 @@ concurrency:
   group: pages-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  PLAYWRIGHT_VERSION: 1.61.1
+
 jobs:
   validate:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
+          package-manager-cache: false
       - name: Ler snapshot atual do Banco Mestre
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         run: node scripts/export-notion-snapshot.mjs
       - name: Gerar e validar aplicação, banco e informações da prova
         run: npm run check
-      - name: Instalar navegador de teste
+      - name: Instalar navegador de teste e auditar dependências
         run: |
-          npm install --no-save @playwright/test@1.55.0
+          npm install --no-save "@playwright/test@${PLAYWRIGHT_VERSION}"
+          npm audit --audit-level=high
           npx playwright install --with-deps chromium
       - name: Testar a plataforma como usuário real
         run: |
@@ -51,10 +56,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
+          package-manager-cache: false
       - name: Ler snapshot definitivo do Banco Mestre
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
@@ -62,14 +68,14 @@ jobs:
       - name: Gerar pacote final
         run: npm run build
       - name: Preparar GitHub Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
       - name: Empacotar site
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: dist
       - name: Publicar
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
       - name: Confirmar arquivos efetivamente publicados
         id: static_verify
         continue-on-error: true
@@ -77,7 +83,8 @@ jobs:
       - name: Instalar Chromium para auditoria pública
         if: steps.static_verify.outcome == 'success'
         run: |
-          npm install --no-save @playwright/test@1.55.0
+          npm install --no-save "@playwright/test@${PLAYWRIGHT_VERSION}"
+          npm audit --audit-level=high
           npx playwright install --with-deps chromium
       - name: Abrir e testar o endereço público
         id: browser_verify
