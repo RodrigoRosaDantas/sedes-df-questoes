@@ -97,6 +97,12 @@ requireMarkers(notion, [
   "create-publication-plan.mjs",
   "data/notion/publication-plan.json",
   "npm run check",
+  "git reset --hard HEAD",
+  "git clean -fd",
+  "git status --porcelain",
+  "git fetch origin main",
+  "git merge-base --is-ancestor origin/main HEAD",
+  "git rebase origin/main",
   "git push origin HEAD:main",
   "PUBLIC_BASE_URL",
   "build-info.json",
@@ -107,10 +113,19 @@ requireMarkers(notion, [
 ], "Workflow do Notion");
 if (/^  push:/m.test(notion)) fail("Workflow do Notion não pode reagir ao próprio push no branch main.");
 forbidMarkers(notion, [
+  "git pull --rebase origin main",
   "Preparar branch isolada",
   "notion-sync/run-",
   "refs/heads/",
 ], "Workflow do Notion");
+const commitIndex = notion.indexOf("git commit -m 'Sincronizar questões publicáveis do Banco Mestre'");
+const resetIndex = notion.indexOf("git reset --hard HEAD");
+const fetchIndex = notion.indexOf("git fetch origin main");
+const rebaseIndex = notion.indexOf("git rebase origin/main");
+const pushIndex = notion.indexOf("git push origin HEAD:main");
+if (!(commitIndex >= 0 && commitIndex < resetIndex && resetIndex < fetchIndex && fetchIndex < rebaseIndex && rebaseIndex < pushIndex)) {
+  fail("Workflow do Notion deve preservar o commit semântico, limpar artefatos e somente depois rebasear e enviar.");
+}
 
 const planLibrary = read("scripts/publication-plan.mjs");
 requireMarkers(planLibrary, [
@@ -181,6 +196,6 @@ if (!builder.includes("builder: expectedBuilder") || !verifier.includes("buildIn
 }
 
 console.log(
-  `✓ ${workflowFiles.length} workflows auditados: snapshot versionado, plano explícito com códigos e contagens, `
-  + 'deploy automático acompanhado, rollback por falha de rastreabilidade, Actions em Node 24 e auditoria npm de severidade alta.',
+  `✓ ${workflowFiles.length} workflows auditados: snapshot versionado, plano explícito, limpeza determinística antes do rebase, `
+  + 'deploy automático acompanhado, Actions em Node 24 e auditoria npm de severidade alta.',
 );
