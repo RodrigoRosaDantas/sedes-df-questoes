@@ -1,0 +1,52 @@
+name: Corrigir rastreabilidade por código-fonte uma vez
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.head_ref == 'feature/notion-sync-ce-v2-12'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - name: Validar inclusão pelo código público ou código-fonte
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/validate-release-v2-4.mjs')
+          text = path.read_text()
+          text = text.replace(
+              'const ids = new Set();\nconst codes = new Set();',
+              'const ids = new Set();\nconst codes = new Set();\nconst sourceCodes = new Set();',
+          )
+          text = text.replace(
+              '    ids.add(question.id); codes.add(question.codigo);',
+              '    ids.add(question.id); codes.add(question.codigo);\n    if (question.codigo_fonte) sourceCodes.add(question.codigo_fonte);',
+          )
+          text = text.replace(
+              '    if (!codes.has(record.code)) fail(`${record.code}: registro publicável do Notion não entrou na release.`);',
+              '    if (!codes.has(record.code) && !sourceCodes.has(record.code)) fail(`${record.code}: registro publicável do Notion não entrou na release.`);',
+          )
+          for marker in ['const sourceCodes = new Set();', 'sourceCodes.add(question.codigo_fonte)', '!sourceCodes.has(record.code)']:
+              if marker not in text:
+                  raise SystemExit(f'Marcador não aplicado: {marker}')
+          path.write_text(text)
+          PY
+      - name: Registrar correção
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add scripts/validate-release-v2-4.mjs
+          if git diff --cached --quiet; then
+            echo 'Rastreabilidade já corrigida.'
+          else
+            git commit -m 'Valida registros do Notion pelo código-fonte preservado'
+            git push origin HEAD:${{ github.head_ref }}
+          fi
