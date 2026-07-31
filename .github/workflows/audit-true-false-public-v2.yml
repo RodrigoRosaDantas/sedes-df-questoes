@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
-      SOURCE_SHA: 250f9f20a0b971ed35a2b0ff67e555fd36e3e9a1
+      SOURCE_SHA: 04ea50611002f4a325fbfccfa1802607c1ce5107
     steps:
       - name: Acionar e acompanhar a publicação corrigida
         env:
