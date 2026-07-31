@@ -39,6 +39,7 @@ window.addEventListener("offline", () => document.documentElement.dataset.offlin
 window.addEventListener("online", () => delete document.documentElement.dataset.offline);
 
 async function registerServiceWorker() {
+  const controlledBeforeRegistration = Boolean(navigator.serviceWorker.controller);
   try {
     const registration = await navigator.serviceWorker.register("./service-worker.js", {
       scope: "./",
@@ -57,7 +58,7 @@ async function registerServiceWorker() {
     });
 
     navigator.serviceWorker.addEventListener("controllerchange", () => {
-      if (reloadingAfterWorkerUpdate) return;
+      if (!controlledBeforeRegistration || reloadingAfterWorkerUpdate) return;
       reloadingAfterWorkerUpdate = true;
       window.location.reload();
     });

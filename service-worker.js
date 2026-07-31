@@ -77,7 +77,7 @@ self.addEventListener("fetch", event => {
   }
 
   if (isMutableData || isVersionedApplicationAsset || isMaterial) {
-    event.respondWith(networkFirst(event.request));
+    event.respondWith(networkFirst(event.request, {noStore: true}));
     return;
   }
 
