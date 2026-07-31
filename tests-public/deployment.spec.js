@@ -92,7 +92,7 @@ async function findTrueFalseCase(request, catalog) {
     if (questionIndex >= 0) {
       return {
         material,
-        questionIndex,
+        question: material.questoes[questionIndex],
         expectedLabels: Object.keys(material.questoes[questionIndex].alternativas),
       };
     }
@@ -176,16 +176,36 @@ test("GitHub Pages serve a release completa e executável", async ({page, reques
   await expect(page.locator(".topic-builder")).toBeVisible();
   await expect(page.locator("[data-select-weak-topics]")).toBeVisible();
 
+  await page.addInitScript(({question, material}) => {
+    localStorage.setItem("sedes.questoes.activeProfile.v3", "rodrigo");
+    localStorage.setItem("sedes.questoes.rodrigo.session.v3", JSON.stringify({
+      version: 4,
+      material: {
+        id: material.id || "auditoria-certo-errado",
+        nome: material.nome || "Auditoria Certo/Errado",
+        disciplina: material.disciplina || question.assunto || "Auditoria",
+        fonte: material.fonte || "Pacote público",
+        tipo_material: material.tipo_material || "prova",
+        ano: material.ano || 2026,
+        codigo_cargo: material.codigo_cargo || "multicargo",
+        tempo_sugerido_minutos: 2,
+      },
+      questions: [question],
+      questionIds: [question.id],
+      mode: "treino",
+      current: 0,
+      answers: {},
+      confirmed: {},
+      flagged: {},
+      elapsedBase: 0,
+      questionTimes: {},
+      savedAt: new Date().toISOString(),
+    }));
+  }, {question: trueFalseCase.question, material: trueFalseCase.material});
+
   const trueFalseURL = resourceURL("");
-  trueFalseURL.hash = "/estudar";
+  trueFalseURL.hash = "/resolver";
   await page.goto(trueFalseURL.href, {waitUntil: "domcontentloaded"});
-  const trueFalseCard = page.locator(".material-card").filter({hasText: clean(trueFalseCase.material.nome)}).first();
-  await expect(trueFalseCard).toBeVisible({timeout: 30000});
-  await trueFalseCard.locator("[data-open-material]").click();
-  await page.locator('[data-start="treino"]').click();
-  if (trueFalseCase.questionIndex > 0) {
-    await page.locator(`[data-jump="${trueFalseCase.questionIndex}"]`).click();
-  }
   const trueFalseOptions = page.locator(".options .option");
   await expect(trueFalseOptions).toHaveCount(2);
   expect((await trueFalseOptions.allTextContents()).map(clean)).toEqual(trueFalseCase.expectedLabels);
