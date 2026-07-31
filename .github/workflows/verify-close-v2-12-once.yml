@@ -1,0 +1,39 @@
+name: Verificar site e fechar Notion — operação única 2.12
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify-and-close:
+    if: github.head_ref == 'ops/verificar-e-fechar-v2-12'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Reconstruir catálogo do snapshot versionado
+        run: npm run build
+      - name: Exigir a release pública correta
+        run: node scripts/verify-deployment.mjs 'https://rodrigorosadantas.github.io/sedes-df-questoes' '22e4f91f55709dae1546e8b9b0729d444b67d115'
+      - name: Instalar Chromium
+        run: |
+          npm install --no-save @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Testar o endereço público como usuário real
+        env:
+          PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes
+          EXPECTED_SHA: 22e4f91f55709dae1546e8b9b0729d444b67d115
+        run: npx playwright test --config=playwright.public.config.js
+      - name: Fechar rastreabilidade das questões publicadas
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          RELEASE_COMMIT: 22e4f91f55709dae1546e8b9b0729d444b67d115
+        run: node scripts/mark-notion-published.mjs
