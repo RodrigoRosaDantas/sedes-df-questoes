@@ -13,6 +13,7 @@ if (!/^\d+\.\d+\.\d+$/.test(expectedVersion)) throw new Error(`Versão inválida
 if (!publicBase.href.startsWith("http")) throw new Error("PUBLIC_BASE_URL não informada para o teste público.");
 
 const sleep = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
+const clean = value => String(value ?? "").trim();
 const resourceURL = relative => new URL(String(relative).replace(/^\/+/, ""), publicBase);
 
 async function fetchEventually(request, relative, type = "text", predicate = () => true) {
@@ -55,6 +56,30 @@ function releaseTargets() {
   return targets;
 }
 
+async function publishedCodesFromMaterials(request, catalog) {
+  const metadata = Array.isArray(catalog.materials) ? catalog.materials : [];
+  const missingFiles = metadata.filter(item => !clean(item?.file));
+  if (missingFiles.length) {
+    throw new Error(`${missingFiles.length} material(is) do catálogo não possuem caminho público.`);
+  }
+
+  const materials = await Promise.all(metadata.map(item => {
+    const relative = clean(item.file).replace(/^\.\//, "");
+    return fetchEventually(request, relative, "json", value => Array.isArray(value?.questoes));
+  }));
+
+  const codes = new Set();
+  for (const material of materials) {
+    for (const question of material.questoes || []) {
+      const code = clean(question.codigo);
+      const sourceCode = clean(question.codigo_fonte);
+      if (code) codes.add(code);
+      if (sourceCode) codes.add(sourceCode);
+    }
+  }
+  return codes;
+}
+
 test("GitHub Pages serve a release completa e executável", async ({page, request}) => {
   const build = await fetchEventually(request, "data/release/build-info.json", "json", value =>
     value?.version === expectedVersion && (!expectedSha || value?.source_sha === expectedSha));
@@ -82,9 +107,12 @@ test("GitHub Pages serve a release completa e executável", async ({page, reques
 
   const targets = releaseTargets();
   expect(targets.size).toBe(245);
-  const catalogText = JSON.stringify(catalog);
-  const missingTargets = [...targets].filter(code => !catalogText.includes(code));
-  expect(missingTargets, `Questões do lote ausentes: ${missingTargets.slice(0, 20).join(", ")}`).toEqual([]);
+  const publicCodes = await publishedCodesFromMaterials(request, catalog);
+  const missingTargets = [...targets].filter(code => !publicCodes.has(code));
+  expect(
+    missingTargets,
+    `Questões do lote ausentes dos materiais publicados: ${missingTargets.slice(0, 20).join(", ")}`,
+  ).toEqual([]);
 
   const homeURL = resourceURL("");
   homeURL.searchParams.set("verify", String(Date.now()));
