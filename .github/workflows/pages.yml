@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      source_sha:
+        description: Commit exato do snapshot autorizado que deve ser publicado
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -19,6 +24,7 @@ concurrency:
 
 env:
   PLAYWRIGHT_VERSION: 1.61.1
+  PUBLICATION_PLAN_PATH: data/notion/publication-plan.json
 
 jobs:
   validate:
@@ -30,11 +36,18 @@ jobs:
         with:
           node-version: 22
           package-manager-cache: false
-      - name: Ler snapshot atual do Banco Mestre
+      - name: Confirmar commit solicitado pela sincronização
         env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        run: node scripts/export-notion-snapshot.mjs
-      - name: Gerar e validar aplicação, banco e informações da prova
+          REQUESTED_SOURCE_SHA: ${{ inputs.source_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -n "${REQUESTED_SOURCE_SHA}" ] && [ "${REQUESTED_SOURCE_SHA}" != "${GITHUB_SHA}" ]; then
+            echo "Commit solicitado ${REQUESTED_SOURCE_SHA} diverge do checkout ${GITHUB_SHA}."
+            exit 1
+          fi
+          echo "✓ Build vinculado ao commit ${GITHUB_SHA} e ao snapshot versionado."
+      - name: Gerar e validar aplicação, banco, plano e informações da prova
         run: npm run check
       - name: Instalar navegador de teste e auditar dependências
         run: |
@@ -64,11 +77,7 @@ jobs:
         with:
           node-version: 22
           package-manager-cache: false
-      - name: Ler snapshot definitivo do Banco Mestre
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        run: node scripts/export-notion-snapshot.mjs
-      - name: Gerar pacote final
+      - name: Gerar pacote final a partir do snapshot versionado
         run: npm run build
       - name: Preparar GitHub Pages
         uses: actions/configure-pages@v6
@@ -100,11 +109,14 @@ jobs:
           PUBLIC_BASE_URL: ${{ steps.deployment.outputs.page_url }}
           EXPECTED_SHA: ${{ github.sha }}
         run: npx playwright test --config=playwright.public.config.js
-      - name: Fechar rastreabilidade dos novos lotes no Notion
+      - name: Fechar somente os lotes do plano explícito no Notion
+        id: traceability
         if: steps.static_verify.outcome == 'success' && steps.browser_verify.outcome == 'success'
+        continue-on-error: true
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           RELEASE_COMMIT: ${{ github.sha }}
+          PUBLICATION_PLAN_PATH: ${{ env.PUBLICATION_PLAN_PATH }}
         run: node scripts/mark-notion-published.mjs
       - name: Acionar rollback para a última release aprovada
         if: steps.static_verify.outcome == 'failure' || steps.browser_verify.outcome == 'failure'
@@ -112,7 +124,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/rollback-deployment.mjs
       - name: Reprovar publicação inconsistente
-        if: steps.static_verify.outcome == 'failure' || steps.browser_verify.outcome == 'failure'
+        if: steps.static_verify.outcome == 'failure' || steps.browser_verify.outcome == 'failure' || steps.traceability.outcome == 'failure'
+        env:
+          STATIC_OUTCOME: ${{ steps.static_verify.outcome }}
+          BROWSER_OUTCOME: ${{ steps.browser_verify.outcome }}
+          TRACEABILITY_OUTCOME: ${{ steps.traceability.outcome }}
         run: |
-          echo "A publicação não passou na auditoria pública; o rollback foi acionado."
+          if [ "${TRACEABILITY_OUTCOME}" = 'failure' ] && [ "${STATIC_OUTCOME}" = 'success' ] && [ "${BROWSER_OUTCOME}" = 'success' ]; then
+            echo "O conteúdo público passou na auditoria e foi preservado; a rastreabilidade idempotente deverá ser concluída no próximo ciclo."
+          else
+            echo "A publicação pública falhou e o rollback foi acionado."
+          fi
           exit 1

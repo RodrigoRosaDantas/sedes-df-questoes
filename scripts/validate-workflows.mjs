@@ -48,14 +48,17 @@ requireMarkers(pages, [
   "push:",
   "pull_request:",
   "workflow_dispatch:",
+  "source_sha:",
   "contents: read",
   "pages: write",
   "id-token: write",
   "actions: write",
   "PLAYWRIGHT_VERSION: 1.61.1",
+  "PUBLICATION_PLAN_PATH",
   "actions/checkout@v6",
   "actions/setup-node@v6",
   "package-manager-cache: false",
+  "Build vinculado ao commit",
   "actions/configure-pages@v6",
   "actions/upload-pages-artifact@v5",
   "actions/deploy-pages@v5",
@@ -64,11 +67,14 @@ requireMarkers(pages, [
   "npm audit --prefix \"$AUDIT_DIR\" --audit-level=high",
   "verify-deployment.mjs",
   "playwright.public.config.js",
+  "id: traceability",
   "mark-notion-published.mjs",
+  "steps.traceability.outcome == 'failure'",
   "rollback-deployment.mjs",
 ], "Workflow de Pages");
 forbidMarkers(pages, [
   "contents: write",
+  "export-notion-snapshot.mjs",
   "deployment-receipt.json",
   "Registrar recibo do deploy aprovado",
   "git push origin HEAD:main",
@@ -82,31 +88,67 @@ requireMarkers(notion, [
   "workflow_dispatch:",
   "schedule:",
   "contents: write",
+  "actions: write",
   "actions/checkout@v6",
   "actions/setup-node@v6",
   "package-manager-cache: false",
   "ref: main",
   "export-notion-snapshot.mjs",
+  "create-publication-plan.mjs",
+  "data/notion/publication-plan.json",
   "npm run check",
   "git push origin HEAD:main",
+  "PUBLIC_BASE_URL",
+  "build-info.json",
+  "gh workflow run pages.yml",
+  "source_sha=",
+  "gh run watch",
+  "--exit-status",
 ], "Workflow do Notion");
 if (/^  push:/m.test(notion)) fail("Workflow do Notion não pode reagir ao próprio push no branch main.");
 forbidMarkers(notion, [
-  "actions: write",
-  "gh workflow run pages.yml",
   "Preparar branch isolada",
   "notion-sync/run-",
   "refs/heads/",
 ], "Workflow do Notion");
+
+const planLibrary = read("scripts/publication-plan.mjs");
+requireMarkers(planLibrary, [
+  "buildPublicationPlan",
+  "validatePublicationPlan",
+  "snapshot_sha256",
+  "expected_count",
+  "codes_sha256",
+  "released_for_export !== true",
+], "Plano explícito de publicação");
+
+const planCreator = read("scripts/create-publication-plan.mjs");
+requireMarkers(planCreator, [
+  "PUBLICATION_PLAN_PATH",
+  "buildPublicationPlan",
+  "data/notion/publication-plan.json",
+], "Gerador do plano de publicação");
+
+const planValidator = read("scripts/validate-publication-plan.mjs");
+requireMarkers(planValidator, [
+  "validatePublicationPlan",
+  "nenhum plano explícito foi criado",
+], "Validador do plano de publicação");
 
 const notionTraceability = read("scripts/mark-notion-published.mjs");
 requireMarkers(notionTraceability, [
   "Código GitHub",
   "Data da publicação",
   "Status editorial — registro manual anterior",
+  "PUBLICATION_PLAN_PATH",
+  "validatePublicationPlan",
+  "plannedCodes",
+  "Lote autorizado",
   "publicationProperties",
+  "Rastreabilidade limitada ao plano",
 ], "Fechamento da rastreabilidade no Notion");
 forbidMarkers(notionTraceability, [
+  "const selected = (snapshot.records || []).filter(record => !clean(record.github_id))",
   "Status editorial - registro manual anterior",
 ], "Fechamento da rastreabilidade no Notion");
 
@@ -138,5 +180,7 @@ if (!builder.includes("builder: expectedBuilder") || !verifier.includes("buildIn
   fail(`Builder dinâmico ${expectedBuilder} não está protegido de ponta a ponta.`);
 }
 
-console.log(`✓ ${workflowFiles.length} workflows auditados: Actions em Node 24, Playwright 1.61.1, auditoria npm de severidade alta, deploy Pages sem mutação administrativa, rastreabilidade Notion compatível e sincronização sem recursão.`);
-// Este teste existe para impedir que commits automáticos voltem a criar loops de Actions ou dependências obsoletas no CI.
+console.log(
+  `✓ ${workflowFiles.length} workflows auditados: snapshot versionado, plano explícito com códigos e contagens, `
+  + 'deploy automático acompanhado, rollback por falha de rastreabilidade, Actions em Node 24 e auditoria npm de severidade alta.',
+);

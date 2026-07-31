@@ -1,9 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {buildPublicationPlan, validatePublicationPlan} from './publication-plan.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const snapshotPath = path.join(root, 'data', 'notion', 'published.json');
+const snapshotPath = path.resolve(root, process.env.NOTION_SNAPSHOT_PATH || 'data/notion/published.json');
+const planPath = path.resolve(root, process.env.PUBLICATION_PLAN_PATH || 'data/notion/publication-plan.json');
 const catalogPath = path.join(root, 'data', 'release', 'catalogo.json');
 const TOKEN = process.env.NOTION_TOKEN;
 const RELEASE_SHA = process.env.RELEASE_COMMIT || process.env.GITHUB_SHA || '';
@@ -17,7 +19,26 @@ if (!fs.existsSync(snapshotPath) || !fs.readFileSync(snapshotPath, 'utf8').trim(
 if (!TOKEN) throw new Error('NOTION_TOKEN não está disponível para fechar a rastreabilidade.');
 if (!RELEASE_SHA) throw new Error('Commit da release não informado.');
 
-const snapshot = JSON.parse(fs.readFileSync(snapshotPath, 'utf8'));
+const snapshotContent = fs.readFileSync(snapshotPath);
+const snapshot = JSON.parse(snapshotContent.toString('utf8'));
+const expectedPlan = buildPublicationPlan(snapshotContent);
+if (!fs.existsSync(planPath)) {
+  if (expectedPlan.total_records) {
+    throw new Error(
+      `Há ${expectedPlan.total_records} registro(s) sem rastreabilidade, mas nenhum plano explícito foi autorizado.`,
+    );
+  }
+  console.log('✓ Nenhum lote autorizado aguarda fechamento no Notion.');
+  process.exit(0);
+}
+
+const plan = JSON.parse(fs.readFileSync(planPath, 'utf8'));
+validatePublicationPlan(plan, snapshotContent);
+if (!plan.total_records) {
+  console.log('✓ Plano explícito vazio; nenhuma página do Notion será alterada.');
+  process.exit(0);
+}
+
 const catalog = JSON.parse(fs.readFileSync(catalogPath, 'utf8'));
 const clean = value => String(value ?? '').trim();
 const sleep = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
@@ -87,6 +108,12 @@ function publicationProperties(properties, recordCode) {
   return patch;
 }
 
+const plannedCodes = new Set(plan.lots.flatMap(item => item.codes));
+const selected = (snapshot.records || []).filter(record => plannedCodes.has(clean(record.code)));
+if (selected.length !== plan.total_records) {
+  throw new Error(`Plano autorizou ${plan.total_records} registro(s), mas o snapshot resolveu ${selected.length}.`);
+}
+
 const publicCodes = new Set();
 for (const metadata of catalog.materials || []) {
   const materialPath = path.resolve(root, String(metadata.file).replace(/^\.\//, ''));
@@ -96,55 +123,58 @@ for (const metadata of catalog.materials || []) {
     if (question.codigo_fonte) publicCodes.add(clean(question.codigo_fonte));
   }
 }
-
-const selected = (snapshot.records || []).filter(record => !clean(record.github_id));
-if (!selected.length) {
-  console.log('✓ Todos os registros do snapshot já possuem rastreabilidade no Notion.');
-  process.exit(0);
-}
-
 for (const record of selected) {
   if (!publicCodes.has(clean(record.code))) {
-    throw new Error(`${record.code}: registro do snapshot não foi encontrado no catálogo público nem como codigo_fonte.`);
+    throw new Error(`${record.code}: registro autorizado não foi encontrado no catálogo público.`);
   }
 }
 
-const groups = new Map();
-for (const record of selected.filter(item => clean(item.publication_lot))) {
-  if (!groups.has(record.publication_lot)) groups.set(record.publication_lot, []);
-  groups.get(record.publication_lot).push(record);
-}
-for (const [lot, records] of groups) {
-  const numbers = records.map(record => Number(record.original_number)).filter(Number.isInteger).sort((left, right) => left - right);
-  const consecutive = numbers.length === records.length
-    && new Set(numbers).size === numbers.length
-    && numbers.every((number, index) => index === 0 || number === numbers[index - 1] + 1);
-  console.log(`${consecutive ? 'Lote consecutivo' : 'Lote parcial registrado sem bloquear os demais'}: ${lot} — ${records.length} registro(s).`);
+for (const item of plan.lots) {
+  console.log(`Lote autorizado: ${item.lot} — ${item.expected_count} registro(s), códigos verificados por SHA-256.`);
 }
 
-let updated = 0;
+const pendingUpdates = [];
 let alreadyPublished = 0;
-let skippedChangedGate = 0;
 for (const record of selected) {
   const current = await request(`/pages/${record.notion_id}`);
   const properties = current.properties || {};
-  const currentGithub = plain(properties['Código GitHub']);
+  const currentCode = clean(plain(properties['Código']));
+  const currentLot = clean(plain(properties['Lote de publicação']));
+  const currentGithub = clean(plain(properties['Código GitHub']));
+
+  if (currentCode !== clean(record.code)) {
+    throw new Error(`${record.code}: código atual no Notion divergiu após o snapshot: ${currentCode || 'vazio'}.`);
+  }
+  if (currentLot !== clean(record.publication_lot)) {
+    throw new Error(`${record.code}: lote atual no Notion divergiu após o snapshot: ${currentLot || 'vazio'}.`);
+  }
   if (currentGithub) {
     alreadyPublished += 1;
     continue;
   }
   if (!booleanValue(properties['Pode publicar'])) {
-    skippedChangedGate += 1;
-    console.log(`Gate alterado após o snapshot; registro não marcado: ${record.code}.`);
-    continue;
+    throw new Error(`${record.code}: gate Pode publicar foi retirado após o snapshot.`);
   }
+  if (!booleanValue(properties['Liberada para exportação'])) {
+    throw new Error(`${record.code}: liberação para exportação foi retirada após o snapshot.`);
+  }
+  pendingUpdates.push({record, properties});
+}
 
+let updated = 0;
+for (const {record, properties} of pendingUpdates) {
   await request(`/pages/${record.notion_id}`, {
     method: 'PATCH',
     body: JSON.stringify({properties: publicationProperties(properties, record.code)}),
   });
   updated += 1;
-  if (updated % 25 === 0) console.log(`${updated}/${selected.length} registros fechados no Notion.`);
+  if (updated % 25 === 0) console.log(`${updated}/${pendingUpdates.length} registros autorizados fechados no Notion.`);
 }
 
-console.log(`✓ Rastreabilidade fechada: ${updated} atualizados, ${alreadyPublished} já publicados e ${skippedChangedGate} preservados por alteração posterior do gate; release ${releaseCode}.`);
+if (updated + alreadyPublished !== plan.total_records) {
+  throw new Error('Fechamento da rastreabilidade terminou com contagem divergente do plano autorizado.');
+}
+console.log(
+  `✓ Rastreabilidade limitada ao plano: ${updated} atualizados e ${alreadyPublished} já publicados; `
+  + `${plan.total_records} registro(s) autorizados; release ${releaseCode}.`,
+);

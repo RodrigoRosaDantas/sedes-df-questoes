@@ -46,7 +46,19 @@ for (const discipline of study.disciplines || []) {
 if (indexedIds.size !== questionCount) fail(`Cobertura inteligente divergente: ${indexedIds.size}/${questionCount}.`);
 
 const workflow = read(".github/workflows/pages.yml");
-for (const marker of ["path: dist", "playwright", "verify-deployment.mjs", "playwright.public.config.js", "rollback-deployment.mjs", "export-notion-snapshot.mjs"]) {
+for (const marker of [
+  "path: dist",
+  "playwright",
+  "verify-deployment.mjs",
+  "playwright.public.config.js",
+  "rollback-deployment.mjs",
+  "PUBLICATION_PLAN_PATH",
+  "source_sha:",
+  "steps.traceability.outcome == 'failure'",
+]) {
   if (!workflow.includes(marker)) fail(`Workflow incompleto: ${marker}`);
 }
-console.log(`✓ Plataforma inteligente validada: ${questionCount} questões, ${materialCount} materiais, ${study.summary.disciplines} matérias, ${study.summary.topics} tópicos, PWA e auditoria pública com rollback.`);
+if (workflow.includes("export-notion-snapshot.mjs")) {
+  fail("O workflow de Pages não pode substituir o snapshot versionado por leitura ao vivo do Notion.");
+}
+console.log(`✓ Plataforma inteligente validada: ${questionCount} questões, ${materialCount} materiais, ${study.summary.disciplines} matérias, ${study.summary.topics} tópicos, PWA e auditoria pública com plano restrito e rollback.`);

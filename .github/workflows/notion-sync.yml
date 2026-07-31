@@ -7,15 +7,20 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: sedes-df-notion-sync
   cancel-in-progress: false
 
+env:
+  PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes
+  PUBLICATION_PLAN_PATH: data/notion/publication-plan.json
+
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 120
     steps:
       - name: Baixar repositório
         uses: actions/checkout@v6
@@ -39,17 +44,80 @@ jobs:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         run: node scripts/export-notion-snapshot.mjs
 
-      - name: Construir e validar a plataforma com o snapshot
+      - name: Gerar plano explícito de lotes, contagens e códigos
+        run: node scripts/create-publication-plan.mjs
+
+      - name: Construir e validar a plataforma com o snapshot e o plano
         run: npm run check
 
-      - name: Publicar mudança semântica no branch principal
+      - name: Versionar snapshot e plano no branch principal
+        id: publish_snapshot
         shell: bash
         run: |
           set -euo pipefail
-          git add data/notion/published.json
+          git add data/notion/published.json "${PUBLICATION_PLAN_PATH}"
           if git diff --cached --quiet; then
-            echo 'Nenhuma mudança semântica no Banco Mestre.'
-            exit 0
+            echo 'Nenhuma mudança semântica no Banco Mestre ou no plano de publicação.'
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+          else
+            git commit -m 'Sincronizar questões publicáveis do Banco Mestre'
+            git pull --rebase origin main
+            git push origin HEAD:main
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
           fi
-          git commit -m 'Sincronizar questões publicáveis do Banco Mestre'
-          git push origin HEAD:main
+          echo "source_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Comparar branch principal com a produção
+        id: deployment_needed
+        env:
+          SOURCE_SHA: ${{ steps.publish_snapshot.outputs.source_sha }}
+          SNAPSHOT_CHANGED: ${{ steps.publish_snapshot.outputs.changed }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          PUBLIC_SHA=$(curl -fsS -H 'cache-control: no-cache, no-store' \
+            "${PUBLIC_BASE_URL}/data/release/build-info.json?sync=${GITHUB_RUN_ID}" \
+            | jq -r '.source_sha // empty' || true)
+          echo "Commit do main: ${SOURCE_SHA}; commit público: ${PUBLIC_SHA:-indisponível}."
+          if [ "${SNAPSHOT_CHANGED}" = 'true' ] || [ "${PUBLIC_SHA}" != "${SOURCE_SHA}" ]; then
+            echo 'needed=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'needed=false' >> "$GITHUB_OUTPUT"
+            echo '✓ Produção já corresponde ao branch principal.'
+          fi
+
+      - name: Acionar e acompanhar a publicação do commit sincronizado
+        if: steps.deployment_needed.outputs.needed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_SHA: ${{ steps.publish_snapshot.outputs.source_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          DISPATCHED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          gh workflow run pages.yml --ref main -f source_sha="${SOURCE_SHA}"
+
+          RUN_ID=''
+          for attempt in $(seq 1 60); do
+            gh api "repos/${GITHUB_REPOSITORY}/actions/runs?event=workflow_dispatch&branch=main&per_page=50" > /tmp/pages-runs.json
+            RUN_ID=$(jq -r --arg sha "${SOURCE_SHA}" --arg since "${DISPATCHED_AT}" '
+              .workflow_runs[]
+              | select(.head_sha == $sha)
+              | select(.name == "Validar e publicar GitHub Pages")
+              | select(.event == "workflow_dispatch")
+              | select(.created_at >= $since)
+              | .id
+            ' /tmp/pages-runs.json | head -n1)
+            if [ -n "${RUN_ID}" ]; then break; fi
+            echo "Aguardando criação da execução de Pages para ${SOURCE_SHA} (${attempt}/60)."
+            sleep 5
+          done
+
+          if [ -z "${RUN_ID}" ]; then
+            echo 'A execução de publicação não foi criada dentro da janela de segurança.'
+            exit 1
+          fi
+
+          echo "Execução de Pages criada: ${RUN_ID}."
+          gh run watch "${RUN_ID}" --exit-status --interval 10
+          echo "✓ Sincronização e publicação concluídas para ${SOURCE_SHA}."
