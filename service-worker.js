@@ -1,4 +1,5 @@
-const CACHE_VERSION = "sedes-questoes-v2-12";
+const CACHE_VERSION = "sedes-questoes-v2-12-3";
+const INDEX_URL = new URL("./index.html", self.location.href).toString();
 const SHELL = [
   "./",
   "./index.html",
@@ -23,31 +24,64 @@ const SHELL = [
   "./data/release/build-info.json"
 ];
 
+async function putSuccessful(cacheKey, response) {
+  if (!response?.ok) return response;
+  const cache = await caches.open(CACHE_VERSION);
+  await cache.put(cacheKey, response.clone());
+  return response;
+}
+
+async function networkFirst(request, {cacheKey = request, fallback = cacheKey, noStore = false} = {}) {
+  try {
+    const response = await fetch(request, noStore ? {cache: "no-store"} : undefined);
+    return putSuccessful(cacheKey, response);
+  } catch (error) {
+    const cached = await caches.match(fallback);
+    if (cached) return cached;
+    throw error;
+  }
+}
+
 self.addEventListener("install", event => {
-  event.waitUntil(caches.open(CACHE_VERSION).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()));
+  event.waitUntil(
+    caches.open(CACHE_VERSION)
+      .then(cache => cache.addAll(SHELL))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener("activate", event => {
-  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE_VERSION).map(key => caches.delete(key)))).then(() => self.clients.claim()));
+  event.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(key => key !== CACHE_VERSION).map(key => caches.delete(key))))
+      .then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener("message", event => {
+  if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
 });
 
 self.addEventListener("fetch", event => {
   if (event.request.method !== "GET" || new URL(event.request.url).origin !== self.location.origin) return;
+
   const url = new URL(event.request.url);
-  const networkFirst = /\/data\/(release\/(catalogo|study-index|build-info)|concurso)\.json$/.test(url.pathname);
-  if (networkFirst) {
-    event.respondWith(fetch(event.request).then(response => {
-      const copy = response.clone();
-      caches.open(CACHE_VERSION).then(cache => cache.put(event.request, copy));
-      return response;
-    }).catch(() => caches.match(event.request)));
+  const isNavigation = event.request.mode === "navigate";
+  const isMutableData = /\/data\/(release\/(catalogo|study-index|build-info)|concurso)\.json$/.test(url.pathname);
+  const isVersionedApplicationAsset = /\/assets\//.test(url.pathname);
+  const isMaterial = /\/data\/release\/materials\//.test(url.pathname);
+
+  if (isNavigation) {
+    event.respondWith(networkFirst(event.request, {cacheKey: INDEX_URL, fallback: INDEX_URL, noStore: true}));
     return;
   }
-  event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
-    if (response.ok && (/\/assets\//.test(url.pathname) || /\/data\/release\/materials\//.test(url.pathname))) {
-      const copy = response.clone();
-      caches.open(CACHE_VERSION).then(cache => cache.put(event.request, copy));
-    }
-    return response;
-  })));
+
+  if (isMutableData || isVersionedApplicationAsset || isMaterial) {
+    event.respondWith(networkFirst(event.request));
+    return;
+  }
+
+  event.respondWith(
+    caches.match(event.request).then(cached => cached || fetch(event.request).then(response => putSuccessful(event.request, response)))
+  );
 });
