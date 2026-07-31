@@ -8,9 +8,14 @@ const exists = relative => fs.existsSync(path.join(root, relative));
 const fail = message => { throw new Error(message); };
 
 const packageData = JSON.parse(read("package.json"));
-if (packageData.version !== "2.11.1") fail(`Versão inesperada: ${packageData.version}`);
+if (packageData.version !== "2.12.0") fail(`Versão inesperada: ${packageData.version}`);
 const buildCommand = String(packageData.scripts?.build || "");
-if (!buildCommand.includes("build-public.mjs") || !buildCommand.includes("fixed-build-time.mjs")) fail("Build canônico ou relógio reproduzível não estão ativos.");
+for (const required of ["build-release-v2-4.mjs", "apply-notion-snapshot.mjs", "build-study-index.mjs", "build-public.mjs", "fixed-build-time.mjs"]) {
+  if (!buildCommand.includes(required)) fail(`Etapa obrigatória ausente no build: ${required}`);
+}
+if (buildCommand.indexOf("apply-notion-snapshot.mjs") > buildCommand.indexOf("build-study-index.mjs")) {
+  fail("O índice de matérias está sendo gerado antes da aplicação do snapshot do Notion.");
+}
 for (const legacy of ["patch-runtime-catalog", "patch-study-navigation", "patch-intelligence", "build-dist.mjs"]) {
   if (buildCommand.includes(legacy)) fail(`Build ainda depende de ${legacy}.`);
 }
@@ -29,8 +34,15 @@ for (const forbidden of [".replace(", "staleGuard", "compileApplication", "compi
   if (builder.includes(forbidden)) fail(`Build público ainda transforma fontes: ${forbidden}`);
 }
 
+const exporter = read("scripts/export-notion-snapshot.mjs");
+for (const marker of ["alternativesAreBlank", "alternativas_A_E_vazias", "Pode publicar = true", "released_for_export", "publication_lot"]) {
+  if (!exporter.includes(marker)) fail(`Exportador do Notion sem regra obrigatória: ${marker}`);
+}
+const snapshotApplier = read("scripts/apply-notion-snapshot.mjs");
+if (!snapshotApplier.includes("Snapshot do Notion aplicado")) fail("Aplicação do snapshot não está ativa.");
+
 const buildInfo = JSON.parse(read("dist/data/release/build-info.json"));
-if (buildInfo.version !== packageData.version || buildInfo.builder !== "copy-public-v2-11-1") fail("Proveniência da cópia canônica 2.11.1 ausente.");
+if (buildInfo.version !== packageData.version || buildInfo.builder !== "copy-public-v2-11-1") fail("Proveniência da cópia canônica ausente.");
 if (!buildInfo.source_files_sha256?.index_html || !buildInfo.source_files_sha256?.app_js) fail("Hashes das fontes canônicas ausentes.");
 if ("generated_at" in buildInfo) fail("Build-info ainda contém horário variável.");
 
@@ -47,9 +59,13 @@ for (const marker of ["Catálogo inconsistente.", 'data-study-view="materias"', 
 }
 if (sourceApp.includes("Release incompleta.")) fail("Aplicação canônica ainda contém trava antiga.");
 
-const workflow = read(".github/workflows/pages.yml");
-for (const marker of ["verify-deployment.mjs", "playwright.public.config.js", "rollback-deployment.mjs", "actions: write"]) {
-  if (!workflow.includes(marker)) fail(`Workflow sem proteção de produção: ${marker}`);
+const pagesWorkflow = read(".github/workflows/pages.yml");
+for (const marker of ["verify-deployment.mjs", "playwright.public.config.js", "rollback-deployment.mjs", "mark-notion-published.mjs", "actions: write"]) {
+  if (!pagesWorkflow.includes(marker)) fail(`Workflow sem proteção de produção: ${marker}`);
+}
+const notionWorkflow = read(".github/workflows/notion-sync.yml");
+for (const marker of ["push:", "export-notion-snapshot.mjs", "gh workflow run pages.yml", "actions: write"]) {
+  if (!notionWorkflow.includes(marker)) fail(`Workflow do Notion incompleto: ${marker}`);
 }
 
-console.log("✓ Build 2.11.1 validado: fontes canônicas, cópia sem transformação, reprodutibilidade e rollback configurados.");
+console.log("✓ Build 2.12 validado: fontes canônicas, snapshot do Notion aplicado, C/E inferido por alternativas vazias e publicação encadeada.");
