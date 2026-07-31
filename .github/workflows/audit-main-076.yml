@@ -1,0 +1,105 @@
+name: Auditar produção 076c837
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/audit-main-076.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  audit:
+    if: github.head_ref == 'agent/audit-public-2-12-3'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Aguardar e auditar execução do main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EXPECTED_SHA: 076c8377b1a13a0e42add6b788b8c7f4fbbd9e0c
+        run: |
+          node --input-type=module <<'NODE'
+          const headers = {
+            Accept: 'application/vnd.github+json',
+            Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+            'X-GitHub-Api-Version': '2026-03-10',
+          };
+          const repository = process.env.GITHUB_REPOSITORY;
+          const expectedSha = process.env.EXPECTED_SHA;
+          const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+          const api = async url => {
+            const response = await fetch(url, {headers, cache: 'no-store'});
+            if (!response.ok) throw new Error(`GitHub API ${response.status}: ${await response.text()}`);
+            return response.json();
+          };
+          for (let attempt = 1; attempt <= 60; attempt += 1) {
+            const data = await api(`https://api.github.com/repos/${repository}/actions/runs?event=push&branch=main&per_page=50`);
+            const run = data.workflow_runs.find(item => item.head_sha === expectedSha && item.name === 'Validar e publicar GitHub Pages');
+            if (!run) console.log(`Tentativa ${attempt}: run ainda não localizado.`);
+            else if (run.status !== 'completed') console.log(`Tentativa ${attempt}: run ${run.id} em ${run.status}.`);
+            else {
+              const jobs = await api(run.jobs_url);
+              for (const job of jobs.jobs || []) {
+                console.log(`Job ${job.name}: ${job.conclusion || job.status}`);
+                for (const step of job.steps || []) console.log(`  ${step.number}. ${step.name}: ${step.conclusion || step.status}`);
+              }
+              if (run.conclusion !== 'success') throw new Error(`Produção ${run.id} terminou com ${run.conclusion}.`);
+              console.log(`✓ Produção ${run.id} aprovada para ${expectedSha}.`);
+              process.exit(0);
+            }
+            if (attempt < 60) await sleep(10000);
+          }
+          throw new Error('Produção não concluiu dentro da janela de auditoria.');
+          NODE
+      - name: Conferir versão e lote no endereço público
+        env:
+          PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes
+          EXPECTED_SHA: 076c8377b1a13a0e42add6b788b8c7f4fbbd9e0c
+        run: |
+          node --input-type=module <<'NODE'
+          const base = process.env.PUBLIC_BASE_URL.replace(/\/+$/, '');
+          const expectedSha = process.env.EXPECTED_SHA;
+          const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+          const targets = new Set();
+          const addRange = (prefix, start, end, excluded = new Set()) => {
+            for (let number = start; number <= end; number += 1) if (!excluded.has(number)) targets.add(`${prefix}${String(number).padStart(3, '0')}`);
+          };
+          addRange('PROVA-QDX-CRMVRN-2026-AGENTE-ADMINISTRATIVO-200-', 1, 120, new Set([107]));
+          addRange('PROVA-QDX-CRBM6-2026-AUXILIAR-ADMINISTRATIVO-200-', 29, 55);
+          addRange('PROVA-QDX-CRTR12-2026-AUXILIAR-ADMINISTRATIVO-200-', 17, 18);
+          addRange('PROVA-QDX-CRTR12-2026-AUXILIAR-ADMINISTRATIVO-200-', 21, 22);
+          addRange('PROVA-QDX-CRTR12-2026-AUXILIAR-ADMINISTRATIVO-200-', 25, 34);
+          addRange('PROVA-QDX-CRTR12-2026-AUXILIAR-ADMINISTRATIVO-200-', 36, 120);
+          if (targets.size !== 245) throw new Error(`Seleção inválida: ${targets.size}.`);
+          let last = '';
+          for (let attempt = 1; attempt <= 30; attempt += 1) {
+            try {
+              const stamp = Date.now();
+              const [buildResponse, catalogResponse] = await Promise.all([
+                fetch(`${base}/data/release/build-info.json?audit=${stamp}`, {cache: 'no-store'}),
+                fetch(`${base}/data/release/catalogo.json?audit=${stamp}`, {cache: 'no-store'}),
+              ]);
+              if (!buildResponse.ok || !catalogResponse.ok) throw new Error(`HTTP build=${buildResponse.status}, catálogo=${catalogResponse.status}`);
+              const build = await buildResponse.json();
+              const catalog = await catalogResponse.text();
+              const missing = [...targets].filter(code => !catalog.includes(code));
+              if (build.version !== '2.12.3') throw new Error(`versão ${build.version || 'ausente'}`);
+              if (build.source_sha !== expectedSha) throw new Error(`commit ${build.source_sha || 'ausente'}`);
+              if (missing.length) throw new Error(`${missing.length}/245 ausentes; primeiro ${missing[0]}`);
+              console.log(`✓ Site público: versão ${build.version}, commit ${build.source_sha}, 245/245 códigos.`);
+              process.exit(0);
+            } catch (error) {
+              last = error.message;
+              console.log(`Tentativa pública ${attempt}/30: ${last}`);
+              if (attempt < 30) await sleep(10000);
+            }
+          }
+          throw new Error(`Site público não confirmado: ${last}`);
+          NODE
