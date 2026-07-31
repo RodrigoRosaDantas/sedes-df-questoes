@@ -27,9 +27,9 @@ requireMarkers(pages, [
   "pages: write",
   "id-token: write",
   "actions: write",
-  "build_type",
-  "workflow",
-  "api.github.com/repos/${GITHUB_REPOSITORY}/pages",
+  "actions/configure-pages@v5",
+  "actions/upload-pages-artifact@v3",
+  "actions/deploy-pages@v4",
   "verify-deployment.mjs",
   "playwright.public.config.js",
   "mark-notion-published.mjs",
@@ -40,6 +40,9 @@ forbidMarkers(pages, [
   "deployment-receipt.json",
   "Registrar recibo do deploy aprovado",
   "git push origin HEAD:main",
+  "api.github.com/repos/${GITHUB_REPOSITORY}/pages",
+  "-X PUT",
+  "build_type",
 ], "Workflow de Pages");
 
 const notion = read(".github/workflows/notion-sync.yml");
@@ -89,5 +92,5 @@ if (!builder.includes("builder: expectedBuilder") || !verifier.includes("buildIn
   fail(`Builder dinâmico ${expectedBuilder} não está protegido de ponta a ponta.`);
 }
 
-console.log(`✓ Workflows auditados: versão ${packageData.version}, cache ${expectedCacheVersion}, origem Pages por workflow, deploy único e sincronização sem recursão.`);
+console.log(`✓ Workflows auditados: versão ${packageData.version}, cache ${expectedCacheVersion}, deploy Pages sem mutação administrativa e sincronização sem recursão.`);
 // Este teste existe para impedir que commits automáticos voltem a criar loops de Actions.
