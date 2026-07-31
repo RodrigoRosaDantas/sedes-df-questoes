@@ -14,13 +14,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: integration/notion-bank-master-v2
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
+          package-manager-cache: false
       - name: Gerar release pública atual
         run: npm run build
       - name: Comparar Banco Mestre com a release
@@ -48,7 +49,7 @@ jobs:
           git push origin HEAD:integration/notion-bank-master-v2
       - name: Guardar relatório comparativo
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: notion-release-comparison
           path: /tmp/notion-release-comparison.json

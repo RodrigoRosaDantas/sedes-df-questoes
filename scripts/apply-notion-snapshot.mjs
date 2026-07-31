@@ -28,6 +28,11 @@ const composite = (material, number) => `${key(material)}::${Number(number) || 0
 const sha256 = value => crypto.createHash('sha256').update(value).digest('hex');
 const editorialCode = record => clean(record.code);
 const fingerprint = (prompt, alternatives, answer) => key([prompt, ...Object.values(alternatives || {}), answer].join('\u241f'));
+const releaseReceiptPattern = /^release-\d+\.\d+\.\d+:[0-9a-f]{7,64}$/i;
+const legacyPublicId = value => {
+  const candidate = clean(value);
+  return candidate && !releaseReceiptPattern.test(candidate) ? candidate : '';
+};
 
 const currentMaterials = new Map();
 const currentQuestions = [];
@@ -54,8 +59,9 @@ for (const material of currentMaterials.values()) materialByName.set(key(materia
 function matchRecord(record) {
   const direct = byCode.get(key(editorialCode(record)));
   if (direct) return direct;
-  const github = byId.get(key(record.github_id));
-  if (github) return github;
+  const previousPublicId = legacyPublicId(record.github_id);
+  const legacy = previousPublicId ? byId.get(key(previousPublicId)) : null;
+  if (legacy) return legacy;
   const exact = byFingerprint.get(fingerprint(record.prompt, record.alternatives, record.answer)) || [];
   if (exact.length === 1) return exact[0];
   return byComposite.get(composite(record.material_name, record.original_number)) || null;
@@ -74,7 +80,7 @@ function updatedQuestion(record, current) {
   const use = (source, fallback) => clean(source) || clean(fallback);
   return {
     ...(current || {}),
-    id: current?.id || clean(record.github_id) || slug(record.code),
+    id: current?.id || legacyPublicId(record.github_id) || slug(record.code),
     codigo: current?.codigo || record.code,
     numero: current?.numero || Number(record.original_number) || 0,
     numero_original: Number(record.original_number) || current?.numero_original || current?.numero || 0,
@@ -141,6 +147,9 @@ for (const record of snapshot.records || []) {
   if (!question.id || !question.codigo || !question.enunciado || !question.comentario) {
     throw new Error(`${record.code}: questão incompleta após aplicação do snapshot.`);
   }
+  if (releaseReceiptPattern.test(clean(question.id))) {
+    throw new Error(`${record.code}: recibo de publicação não pode ser usado como ID público: ${question.id}`);
+  }
   if (usedIds.has(key(question.id))) throw new Error(`ID duplicado após sincronização: ${question.id}`);
   if (usedCodes.has(key(question.codigo))) throw new Error(`Código duplicado após sincronização: ${question.codigo}`);
   usedIds.add(key(question.id));
@@ -158,6 +167,9 @@ for (const currentMaterial of currentMaterials.values()) {
   const target = finalMaterials.get(currentMaterial.id);
   for (const currentQuestion of currentMaterial.questoes || []) {
     if (usedIds.has(key(currentQuestion.id)) || usedCodes.has(key(currentQuestion.codigo))) continue;
+    if (releaseReceiptPattern.test(clean(currentQuestion.id))) {
+      throw new Error(`${currentQuestion.codigo || currentQuestion.id}: release existente contém recibo de publicação como ID público.`);
+    }
     target.questoes.push(currentQuestion);
     usedIds.add(key(currentQuestion.id));
     usedCodes.add(key(currentQuestion.codigo));
@@ -226,4 +238,4 @@ const manifest = {
   }),
 };
 fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
-console.log(`✓ Snapshot do Notion aplicado: ${catalog.summary.questoes} questões em ${catalog.summary.materiais} materiais; IDs públicos preservados quando já existentes.`);
+console.log(`✓ Snapshot do Notion aplicado: ${catalog.summary.questoes} questões em ${catalog.summary.materiais} materiais; IDs públicos preservados quando já existentes e recibos de release mantidos apenas como rastreabilidade.`);
