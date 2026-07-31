@@ -1,0 +1,34 @@
+name: Saneamento Administrador CRF-DF
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/saneamento-administrador-crfdf-20260731.mjs'
+      - '.github/workflows/saneamento-administrador-crfdf.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: saneamento-administrador-crfdf-20260731
+  cancel-in-progress: false
+
+jobs:
+  saneamento:
+    if: github.head_ref == 'agent/saneamento-administrador-crfdf-20260731'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Auditar e reconciliar o Banco Mestre
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/saneamento-administrador-crfdf-20260731.mjs
