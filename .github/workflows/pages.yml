@@ -21,6 +21,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Ler snapshot atual do Banco Mestre
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/export-notion-snapshot.mjs
       - name: Gerar e validar aplicação, banco e informações da prova
         run: npm run check
       - name: Instalar navegador de teste
@@ -44,6 +48,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Ler snapshot definitivo do Banco Mestre
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/export-notion-snapshot.mjs
       - name: Gerar pacote final
         run: npm run build
       - uses: actions/configure-pages@v5
