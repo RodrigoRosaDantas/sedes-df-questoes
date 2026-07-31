@@ -1,0 +1,49 @@
+name: Auditar correção pública Certo e Errado v2
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/audit-true-false-public-v2.yml'
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      SOURCE_SHA: 250f9f20a0b971ed35a2b0ff67e555fd36e3e9a1
+    steps:
+      - name: Acionar e acompanhar a publicação corrigida
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          DISPATCHED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          gh workflow run pages.yml --repo "${GITHUB_REPOSITORY}" --ref main -f source_sha="${SOURCE_SHA}"
+
+          RUN_ID=''
+          for attempt in $(seq 1 60); do
+            gh api "repos/${GITHUB_REPOSITORY}/actions/runs?event=workflow_dispatch&branch=main&per_page=50" > /tmp/runs.json
+            RUN_ID=$(jq -r --arg sha "${SOURCE_SHA}" --arg since "${DISPATCHED_AT}" '
+              .workflow_runs[]
+              | select(.head_sha == $sha)
+              | select(.name == "Validar e publicar GitHub Pages")
+              | select(.event == "workflow_dispatch")
+              | select(.created_at >= $since)
+              | .id
+            ' /tmp/runs.json | head -n1)
+            if [ -n "${RUN_ID}" ]; then break; fi
+            sleep 5
+          done
+
+          test -n "${RUN_ID}"
+          echo "Execução de Pages: ${RUN_ID}."
+          gh run watch "${RUN_ID}" --repo "${GITHUB_REPOSITORY}" --exit-status --interval 10
+
+      - name: Registrar aprovação pública
+        run: echo "✓ Commit ${SOURCE_SHA} publicado e aprovado pelo teste público completo, incluindo Certo/Errado sem duplicação."
