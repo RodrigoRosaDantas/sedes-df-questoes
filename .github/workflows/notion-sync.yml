@@ -55,16 +55,35 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          CHANGED=false
           git add data/notion/published.json "${PUBLICATION_PLAN_PATH}"
           if git diff --cached --quiet; then
             echo 'Nenhuma mudança semântica no Banco Mestre ou no plano de publicação.'
-            echo 'changed=false' >> "$GITHUB_OUTPUT"
           else
             git commit -m 'Sincronizar questões publicáveis do Banco Mestre'
-            git pull --rebase origin main
-            git push origin HEAD:main
-            echo 'changed=true' >> "$GITHUB_OUTPUT"
+            CHANGED=true
           fi
+
+          # O build altera arquivos rastreados apenas para validação. Depois de
+          # preservar snapshot e plano no commit, nenhum artefato gerado pode
+          # impedir o rebase ou entrar acidentalmente no branch principal.
+          git reset --hard HEAD
+          git clean -fd
+          if [ -n "$(git status --porcelain)" ]; then
+            echo 'O diretório permaneceu sujo após a limpeza dos artefatos de build.'
+            git status --short
+            exit 1
+          fi
+
+          git fetch origin main
+          if ! git merge-base --is-ancestor origin/main HEAD; then
+            git rebase origin/main
+          fi
+          if [ "${CHANGED}" = 'true' ]; then
+            git push origin HEAD:main
+          fi
+
+          echo "changed=${CHANGED}" >> "$GITHUB_OUTPUT"
           echo "source_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Comparar branch principal com a produção
