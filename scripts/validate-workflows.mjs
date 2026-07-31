@@ -87,3 +87,4 @@ if (!builder.includes("builder: expectedBuilder") || !verifier.includes("buildIn
 }
 
 console.log(`✓ Workflows auditados: versão ${packageData.version}, cache ${expectedCacheVersion}, deploy único e sincronização sem recursão.`);
+// Este teste existe para impedir que commits automáticos voltem a criar loops de Actions.
