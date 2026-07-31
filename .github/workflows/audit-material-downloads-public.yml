@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      SOURCE_SHA: ec86a80fd4087044256c375df9db65c2573a0776
+      SOURCE_SHA: 84fbb3ce4b357e7f0361b89e34875e39bc80d13c
     steps:
       - name: Acionar e acompanhar a publicação
         env:
