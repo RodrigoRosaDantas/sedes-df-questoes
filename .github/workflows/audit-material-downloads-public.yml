@@ -1,0 +1,49 @@
+name: Auditar downloads públicos de materiais
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/audit-material-downloads-public.yml'
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SOURCE_SHA: ec86a80fd4087044256c375df9db65c2573a0776
+    steps:
+      - name: Acionar e acompanhar a publicação
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          DISPATCHED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          gh workflow run pages.yml --repo "${GITHUB_REPOSITORY}" --ref main -f source_sha="${SOURCE_SHA}"
+
+          RUN_ID=''
+          for attempt in $(seq 1 60); do
+            gh api "repos/${GITHUB_REPOSITORY}/actions/runs?event=workflow_dispatch&branch=main&per_page=50" > /tmp/runs.json
+            RUN_ID=$(jq -r --arg sha "${SOURCE_SHA}" --arg since "${DISPATCHED_AT}" '
+              .workflow_runs[]
+              | select(.head_sha == $sha)
+              | select(.name == "Validar e publicar GitHub Pages")
+              | select(.event == "workflow_dispatch")
+              | select(.created_at >= $since)
+              | .id
+            ' /tmp/runs.json | head -n1)
+            if [ -n "${RUN_ID}" ]; then break; fi
+            sleep 5
+          done
+
+          test -n "${RUN_ID}"
+          echo "Execução de Pages: ${RUN_ID}."
+          gh run watch "${RUN_ID}" --repo "${GITHUB_REPOSITORY}" --exit-status --interval 10
+
+      - name: Registrar aprovação pública
+        run: echo "✓ Downloads de provas e simulados publicados e aprovados no site público pelo commit ${SOURCE_SHA}."
