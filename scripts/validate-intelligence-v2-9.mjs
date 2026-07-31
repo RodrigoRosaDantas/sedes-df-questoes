@@ -14,7 +14,7 @@ for (const file of [
 ]) if (!exists(file)) fail(`Arquivo da plataforma inteligente ausente: ${file}`);
 
 const index = read("dist/index.html");
-for (const feature of ["manifest.webmanifest", "intelligence-v2-9.css", "app-v4.js?v=7", "learning-v2-9.js", "pwa-v2-9.js"]) {
+for (const feature of ["manifest.webmanifest", "intelligence-v2-9.css", "app-v4.js?v=8", "learning-v2-9.js", "pwa-v2-9.js"]) {
   if (!index.includes(feature)) fail(`Integração ausente no HTML: ${feature}`);
 }
 const learning = read("dist/assets/learning-v2-9.js");

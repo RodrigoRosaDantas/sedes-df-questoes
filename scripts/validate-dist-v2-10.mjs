@@ -23,7 +23,7 @@ for (const entry of required) {
 }
 
 const index = fs.readFileSync(path.join(dist, "index.html"), "utf8");
-for (const reference of ["reports-v2-10.css?v=2", "reports-v2-10.js?v=2", "app-v4.js?v=7", "pwa-v2-9.js?v=1"]) {
+for (const reference of ["reports-v2-10.css?v=2", "reports-v2-10.js?v=2", "app-v4.js?v=8", "pwa-v2-9.js?v=1"]) {
   if (!index.includes(reference)) throw new Error(`Referência ausente no HTML: ${reference}`);
 }
 
@@ -57,7 +57,7 @@ for (const marker of ["data-progress-reports", "schema_version: \"2.10\"", "Amer
 }
 
 const worker = fs.readFileSync(path.join(dist, "service-worker.js"), "utf8");
-for (const marker of [expectedCacheVersion, "app-v4.js?v=7", "pwa-v2-9.js?v=1", "reports-v2-10.js?v=2", "build-info.json", 'event.request.mode === "navigate"', 'cache: "no-store"']) {
+for (const marker of [expectedCacheVersion, "app-v4.js?v=8", "pwa-v2-9.js?v=1", "reports-v2-10.js?v=2", "build-info.json", 'event.request.mode === "navigate"', 'cache: "no-store"']) {
   if (!worker.includes(marker)) throw new Error(`Service worker sem marcador obrigatório: ${marker}`);
 }
 

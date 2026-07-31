@@ -80,6 +80,26 @@ async function publishedCodesFromMaterials(request, catalog) {
   return codes;
 }
 
+async function findTrueFalseCase(request, catalog) {
+  for (const metadata of catalog.materials || []) {
+    const relative = clean(metadata.file).replace(/^\.\//, "");
+    const material = await fetchEventually(request, relative, "json", value => Array.isArray(value?.questoes));
+    const questionIndex = (material.questoes || []).findIndex(question => {
+      const entries = Object.entries(question.alternativas || {});
+      return entries.length === 2
+        && entries.every(([letter, text]) => ["Certo", "Errado"].includes(clean(letter)) && clean(text) === clean(letter));
+    });
+    if (questionIndex >= 0) {
+      return {
+        material,
+        questionIndex,
+        expectedLabels: Object.keys(material.questoes[questionIndex].alternativas),
+      };
+    }
+  }
+  throw new Error("Nenhuma questão Certo/Errado com rótulos equivalentes foi encontrada no pacote público.");
+}
+
 test("GitHub Pages serve a release completa e executável", async ({page, request}) => {
   const build = await fetchEventually(request, "data/release/build-info.json", "json", value =>
     value?.version === expectedVersion && (!expectedSha || value?.source_sha === expectedSha));
@@ -113,6 +133,8 @@ test("GitHub Pages serve a release completa e executável", async ({page, reques
     missingTargets,
     `Questões do lote ausentes dos materiais publicados: ${missingTargets.slice(0, 20).join(", ")}`,
   ).toEqual([]);
+  const trueFalseCase = await findTrueFalseCase(request, catalog);
+  expect(trueFalseCase.expectedLabels).toEqual(["Certo", "Errado"]);
 
   const homeURL = resourceURL("");
   homeURL.searchParams.set("verify", String(Date.now()));
@@ -153,6 +175,21 @@ test("GitHub Pages serve a release completa e executável", async ({page, reques
   await firstDiscipline.click();
   await expect(page.locator(".topic-builder")).toBeVisible();
   await expect(page.locator("[data-select-weak-topics]")).toBeVisible();
+
+  const trueFalseURL = resourceURL("");
+  trueFalseURL.hash = "/estudar";
+  await page.goto(trueFalseURL.href, {waitUntil: "domcontentloaded"});
+  const trueFalseCard = page.locator(".material-card").filter({hasText: clean(trueFalseCase.material.nome)}).first();
+  await expect(trueFalseCard).toBeVisible({timeout: 30000});
+  await trueFalseCard.locator("[data-open-material]").click();
+  await page.locator('[data-start="treino"]').click();
+  if (trueFalseCase.questionIndex > 0) {
+    await page.locator(`[data-jump="${trueFalseCase.questionIndex}"]`).click();
+  }
+  const trueFalseOptions = page.locator(".options .option");
+  await expect(trueFalseOptions).toHaveCount(2);
+  expect((await trueFalseOptions.allTextContents()).map(clean)).toEqual(trueFalseCase.expectedLabels);
+  await expect(page.locator(".options .option > span:visible")).toHaveCount(2);
 
   const performanceURL = resourceURL("");
   performanceURL.hash = "/desempenho";
