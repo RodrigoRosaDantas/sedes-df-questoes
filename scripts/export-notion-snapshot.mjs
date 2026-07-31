@@ -179,7 +179,7 @@ function validate(records) {
 
 const all = await readAll();
 const records = all
-  .filter(row => row['Pode publicar'] === true)
+  .filter(row => row['Pode publicar'] === true || clean(row['Código GitHub']))
   .map(record)
   .sort((left, right) => left.material_name.localeCompare(right.material_name, 'pt-BR')
     || Number(left.original_number) - Number(right.original_number)
@@ -192,7 +192,7 @@ const semantic = {
     name: 'Banco Mestre — Provas e Simulados SEDES/DF',
     database_url: DATABASE_URL,
     data_source_id: SOURCE,
-    publication_rule: 'Pode publicar = true; alternativas A–E vazias = Certo / Errado',
+    publication_rule: 'Pode publicar = true ou Código GitHub preenchido; alternativas A–E vazias = Certo / Errado',
   },
   totals: {
     all: all.length,

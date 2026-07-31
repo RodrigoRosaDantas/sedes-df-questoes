@@ -61,9 +61,13 @@ function matchRecord(record) {
   return byComposite.get(composite(record.material_name, record.original_number)) || null;
 }
 
+const assignedMaterialIds = new Map();
 function materialIdFor(record, matched) {
-  if (matched) return matched.material_id;
-  return materialByName.get(key(record.material_name)) || `notion-${slug(record.material_name || record.code)}`;
+  const materialKey = key(record.material_name);
+  if (assignedMaterialIds.has(materialKey)) return assignedMaterialIds.get(materialKey);
+  const selected = materialByName.get(materialKey) || matched?.material_id || `notion-${slug(record.material_name || record.code)}`;
+  assignedMaterialIds.set(materialKey, selected);
+  return selected;
 }
 
 function updatedQuestion(record, current) {
