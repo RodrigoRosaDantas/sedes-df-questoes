@@ -1,0 +1,96 @@
+name: Auditar publicação pública 2.12.3
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/audit-public-2-12-3.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: audit-public-2-12-3
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    if: github.head_ref == 'agent/audit-public-2-12-3'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Aguardar versão 2.12.3 e conferir os 245 códigos
+        env:
+          PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes
+          EXPECTED_SHA: 1f4c9fe2cd03bb3ad341e6d431488f2f62894ca7
+        run: |
+          node --input-type=module <<'NODE'
+          const base = process.env.PUBLIC_BASE_URL.replace(/\/+$/, '');
+          const expectedSha = process.env.EXPECTED_SHA;
+          const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+          const targets = new Set();
+          const addRange = (prefix, start, end, excluded = new Set()) => {
+            for (let number = start; number <= end; number += 1) {
+              if (!excluded.has(number)) targets.add(`${prefix}${String(number).padStart(3, '0')}`);
+            }
+          };
+          addRange('PROVA-QDX-CRMVRN-2026-AGENTE-ADMINISTRATIVO-200-', 1, 120, new Set([107]));
+          addRange('PROVA-QDX-CRBM6-2026-AUXILIAR-ADMINISTRATIVO-200-', 29, 55);
+          addRange('PROVA-QDX-CRTR12-2026-AUXILIAR-ADMINISTRATIVO-200-', 17, 18);
+          addRange('PROVA-QDX-CRTR12-2026-AUXILIAR-ADMINISTRATIVO-200-', 21, 22);
+          addRange('PROVA-QDX-CRTR12-2026-AUXILIAR-ADMINISTRATIVO-200-', 25, 34);
+          addRange('PROVA-QDX-CRTR12-2026-AUXILIAR-ADMINISTRATIVO-200-', 36, 120);
+          if (targets.size !== 245) throw new Error(`Seleção interna inválida: ${targets.size}.`);
+
+          let last = 'site ainda não consultado';
+          for (let attempt = 1; attempt <= 36; attempt += 1) {
+            try {
+              const stamp = Date.now();
+              const [buildResponse, catalogResponse, workerResponse] = await Promise.all([
+                fetch(`${base}/data/release/build-info.json?audit=${stamp}`, {cache: 'no-store'}),
+                fetch(`${base}/data/release/catalogo.json?audit=${stamp}`, {cache: 'no-store'}),
+                fetch(`${base}/service-worker.js?audit=${stamp}`, {cache: 'no-store'}),
+              ]);
+              if (!buildResponse.ok || !catalogResponse.ok || !workerResponse.ok) {
+                throw new Error(`HTTP build=${buildResponse.status}, catálogo=${catalogResponse.status}, worker=${workerResponse.status}`);
+              }
+              const build = await buildResponse.json();
+              const catalogText = await catalogResponse.text();
+              const worker = await workerResponse.text();
+              const missing = [...targets].filter(code => !catalogText.includes(code));
+              if (build.version !== '2.12.3') throw new Error(`versão pública ${build.version || 'ausente'}`);
+              if (build.source_sha !== expectedSha) throw new Error(`commit público ${build.source_sha || 'ausente'}`);
+              if (build.cache_version !== 'sedes-questoes-v2-12-3') throw new Error(`cache público ${build.cache_version || 'ausente'}`);
+              if (!worker.includes('sedes-questoes-v2-12-3') || !worker.includes('event.request.mode === "navigate"') || !worker.includes('cache: "no-store"')) {
+                throw new Error('service worker ainda não é o corrigido');
+              }
+              if (missing.length) throw new Error(`${missing.length}/245 códigos ainda ausentes; primeiro: ${missing[0]}`);
+              console.log(`✓ Site público confirmado na tentativa ${attempt}: versão ${build.version}, commit ${build.source_sha}, 245/245 códigos presentes.`);
+              process.exit(0);
+            } catch (error) {
+              last = error.message;
+              console.log(`Tentativa ${attempt}/36: ${last}`);
+              if (attempt < 36) await sleep(10000);
+            }
+          }
+          throw new Error(`Publicação não confirmada: ${last}`);
+          NODE
+
+      - name: Verificar pacote público completo
+        run: node scripts/verify-deployment.mjs "https://rodrigorosadantas.github.io/sedes-df-questoes" "1f4c9fe2cd03bb3ad341e6d431488f2f62894ca7"
+
+      - name: Instalar Chromium
+        run: |
+          npm install --no-save @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Testar o site público como usuário real
+        env:
+          PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes
+          EXPECTED_SHA: 1f4c9fe2cd03bb3ad341e6d431488f2f62894ca7
+        run: npx playwright test --config=playwright.public.config.js
