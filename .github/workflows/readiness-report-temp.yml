@@ -1,0 +1,35 @@
+name: Relatório temporário de prontidão do site
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    if: github.head_ref == 'agent/readiness-report-20260731'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Baixar branch de relatório
+        uses: actions/checkout@v6
+      - name: Preparar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Consultar Banco Mestre e comparar com main e site
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes
+          READINESS_REPORT: artifacts/site-readiness-report.json
+        run: node scripts/report-site-readiness.mjs
+      - name: Publicar relatório técnico
+        uses: actions/upload-artifact@v5
+        with:
+          name: site-readiness-report
+          path: artifacts/site-readiness-report.json
+          if-no-files-found: error
+          retention-days: 7
