@@ -16,14 +16,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
-      EXPECTED_SHA: d9e30f9d6fe1800d043c7d4d1bdc1ebe2b052f4b
+      EXPECTED_SHA: ca8ae0915e0a4ebf027154f4a58b84aab255dee0
       PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes
       GH_TOKEN: ${{ github.token }}
+      PLAYWRIGHT_VERSION: 1.61.1
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
+          package-manager-cache: false
 
       - name: Aguardar e validar a execução de produção
         shell: bash
@@ -60,7 +62,7 @@ jobs:
 
       - name: Instalar Chromium
         run: |
-          npm install --no-save @playwright/test@1.55.0
+          npm install --no-save "@playwright/test@${PLAYWRIGHT_VERSION}"
           npx playwright install --with-deps chromium
 
       - name: Testar site público e as 245 questões
