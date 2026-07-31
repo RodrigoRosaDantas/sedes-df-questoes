@@ -26,15 +26,19 @@ const sourceIndex = read("index.html");
 const sourceApp = read("assets/app-v4.js");
 const sourceWorker = read("service-worker.js");
 const sourcePwa = read("assets/pwa-v2-9.js");
+const sourceMaterialDownloads = read("assets/material-downloads-v1.js");
+const sourceMaterialDownloadsCss = read("assets/material-downloads-v1.css");
 for (const marker of [
   "manifest.webmanifest",
   "study-navigation-v2-6.css?v=1",
   "intelligence-v2-9.css?v=1",
   "reports-v2-10.css?v=2",
+  "material-downloads-v1.css?v=1",
   "app-v4.js?v=8",
   "learning-v2-9.js?v=1",
   "pwa-v2-9.js?v=1",
   "reports-v2-10.js?v=2",
+  "material-downloads-v1.js?v=1",
 ]) requireMarker(sourceIndex, marker, "HTML canônico");
 for (const marker of [
   'const STUDY_INDEX_URL = "./data/release/study-index.json";',
@@ -45,11 +49,17 @@ for (const marker of [
   "function renderDisciplineTopics()",
   "Catálogo inconsistente.",
 ]) requireMarker(sourceApp, marker, "Aplicação canônica");
-for (const marker of [expectedCacheVersion, 'event.request.mode === "navigate"', 'cache: "no-store"', 'type === "SKIP_WAITING"']) {
+for (const marker of [expectedCacheVersion, 'event.request.mode === "navigate"', 'cache: "no-store"', 'type === "SKIP_WAITING"', "material-downloads-v1.js?v=1", "material-downloads-v1.css?v=1"]) {
   requireMarker(sourceWorker, marker, "Service worker canônico");
 }
 for (const marker of ['updateViaCache: "none"', 'controllerchange', 'registration.update()']) {
   requireMarker(sourcePwa, marker, "Registro PWA canônico");
+}
+for (const marker of ["data-material-download-card", "PDF para responder", "PDF comentado", "printableDocument"]) {
+  requireMarker(sourceMaterialDownloads, marker, "Download de materiais canônico");
+}
+for (const marker of ["material-download-card", "material-download-actions"]) {
+  requireMarker(sourceMaterialDownloadsCss, marker, "Estilos de download canônicos");
 }
 if (sourceApp.includes("Release incompleta.")) throw new Error("A fonte canônica ainda contém a trava antiga de totais fixos.");
 
@@ -71,7 +81,16 @@ const distIndex = fs.readFileSync(path.join(dist, "index.html"), "utf8");
 const distApp = fs.readFileSync(path.join(dist, "assets", "app-v4.js"), "utf8");
 const distWorker = fs.readFileSync(path.join(dist, "service-worker.js"), "utf8");
 const distPwa = fs.readFileSync(path.join(dist, "assets", "pwa-v2-9.js"), "utf8");
-if (distIndex !== sourceIndex || distApp !== sourceApp || distWorker !== sourceWorker || distPwa !== sourcePwa) {
+const distMaterialDownloads = fs.readFileSync(path.join(dist, "assets", "material-downloads-v1.js"), "utf8");
+const distMaterialDownloadsCss = fs.readFileSync(path.join(dist, "assets", "material-downloads-v1.css"), "utf8");
+if (
+  distIndex !== sourceIndex
+  || distApp !== sourceApp
+  || distWorker !== sourceWorker
+  || distPwa !== sourcePwa
+  || distMaterialDownloads !== sourceMaterialDownloads
+  || distMaterialDownloadsCss !== sourceMaterialDownloadsCss
+) {
   throw new Error("O pacote público diverge das fontes canônicas.");
 }
 
@@ -98,6 +117,8 @@ const buildInfo = {
     app_js: sha256(sourceApp),
     service_worker_js: sha256(sourceWorker),
     pwa_js: sha256(sourcePwa),
+    material_downloads_js: sha256(sourceMaterialDownloads),
+    material_downloads_css: sha256(sourceMaterialDownloadsCss),
   },
   questions: questionCount,
   materials: materialCount,

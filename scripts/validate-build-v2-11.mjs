@@ -8,7 +8,7 @@ const exists = relative => fs.existsSync(path.join(root, relative));
 const fail = message => { throw new Error(message); };
 
 const packageData = JSON.parse(read("package.json"));
-if (packageData.version !== "2.12.3") fail(`Versão inesperada: ${packageData.version}`);
+if (packageData.version !== "2.12.4") fail(`Versão inesperada: ${packageData.version}`);
 const versionToken = packageData.version.replace(/\./g, "-");
 const expectedBuilder = `copy-public-v${versionToken}`;
 const expectedCacheVersion = `sedes-questoes-v${versionToken}`;
@@ -32,11 +32,18 @@ for (const legacyFile of [
   ".github/workflows/consolidate-source-once.yml",
 ]) if (exists(legacyFile)) fail(`Artefato temporário ou mutável ainda existe: ${legacyFile}`);
 
+const checkCommand = String(packageData.scripts?.check || "");
+const testCommand = String(packageData.scripts?.test || "");
+for (const marker of ["node --check assets/material-downloads-v1.js", "node --check scripts/validate-material-downloads.mjs"]) {
+  if (!checkCommand.includes(marker)) fail(`Comando de auditoria sem cobertura dos downloads: ${marker}`);
+}
+if (!testCommand.includes("validate-material-downloads.mjs")) fail("Validação integral dos materiais não participa do npm test.");
+
 const builder = read("scripts/build-public.mjs");
 for (const forbidden of [".replace(\"Release incompleta", "staleGuard", "compileApplication", "compileIndex", "study-navigation-v2-6.js.txt"]) {
   if (builder.includes(forbidden)) fail(`Build público ainda transforma fontes: ${forbidden}`);
 }
-for (const marker of ["expectedBuilder", "expectedCacheVersion", "service_worker_js", "pwa_js"]) {
+for (const marker of ["expectedBuilder", "expectedCacheVersion", "service_worker_js", "pwa_js", "material_downloads_js", "material_downloads_css"]) {
   if (!builder.includes(marker)) fail(`Build público sem controle dinâmico: ${marker}`);
 }
 
@@ -51,7 +58,14 @@ const buildInfo = JSON.parse(read("dist/data/release/build-info.json"));
 if (buildInfo.version !== packageData.version || buildInfo.builder !== expectedBuilder || buildInfo.cache_version !== expectedCacheVersion) {
   fail("Proveniência da cópia canônica ou versão de cache ausente.");
 }
-if (!buildInfo.source_files_sha256?.index_html || !buildInfo.source_files_sha256?.app_js || !buildInfo.source_files_sha256?.service_worker_js) {
+if (
+  !buildInfo.source_files_sha256?.index_html
+  || !buildInfo.source_files_sha256?.app_js
+  || !buildInfo.source_files_sha256?.service_worker_js
+  || !buildInfo.source_files_sha256?.pwa_js
+  || !buildInfo.source_files_sha256?.material_downloads_js
+  || !buildInfo.source_files_sha256?.material_downloads_css
+) {
   fail("Hashes das fontes canônicas ausentes.");
 }
 if ("generated_at" in buildInfo) fail("Build-info ainda contém horário variável.");
@@ -60,25 +74,61 @@ const sourceIndex = read("index.html");
 const sourceApp = read("assets/app-v4.js");
 const sourceWorker = read("service-worker.js");
 const sourcePwa = read("assets/pwa-v2-9.js");
+const sourceMaterialDownloads = read("assets/material-downloads-v1.js");
+const sourceMaterialDownloadsCss = read("assets/material-downloads-v1.css");
 const distIndex = read("dist/index.html");
 const distApp = read("dist/assets/app-v4.js");
 const distWorker = read("dist/service-worker.js");
 const distPwa = read("dist/assets/pwa-v2-9.js");
-if (sourceIndex !== distIndex || sourceApp !== distApp || sourceWorker !== distWorker || sourcePwa !== distPwa) {
+const distMaterialDownloads = read("dist/assets/material-downloads-v1.js");
+const distMaterialDownloadsCss = read("dist/assets/material-downloads-v1.css");
+if (
+  sourceIndex !== distIndex
+  || sourceApp !== distApp
+  || sourceWorker !== distWorker
+  || sourcePwa !== distPwa
+  || sourceMaterialDownloads !== distMaterialDownloads
+  || sourceMaterialDownloadsCss !== distMaterialDownloadsCss
+) {
   fail("O dist não é cópia exata das fontes canônicas.");
 }
-for (const marker of ["app-v4.js?v=8", "study-navigation-v2-6.css?v=1", "reports-v2-10.js?v=2"]) {
+for (const marker of [
+  "app-v4.js?v=8",
+  "study-navigation-v2-6.css?v=1",
+  "reports-v2-10.js?v=2",
+  "material-downloads-v1.css?v=1",
+  "material-downloads-v1.js?v=1",
+]) {
   if (!sourceIndex.includes(marker)) fail(`HTML canônico sem ${marker}.`);
 }
-for (const marker of ["Catálogo inconsistente.", 'data-study-view="materias"', 'data-study-view="provas"', "function renderDisciplineTopics()"] ) {
+for (const marker of ["Catálogo inconsistente.", 'data-study-view="materias"', 'data-study-view="provas"', "function renderDisciplineTopics()"]) {
   if (!sourceApp.includes(marker)) fail(`Aplicação canônica sem ${marker}.`);
 }
 if (sourceApp.includes("Release incompleta.")) fail("Aplicação canônica ainda contém trava antiga.");
-for (const marker of [expectedCacheVersion, 'event.request.mode === "navigate"', 'cache: "no-store"', 'type === "SKIP_WAITING"']) {
+for (const marker of [
+  expectedCacheVersion,
+  'event.request.mode === "navigate"',
+  'cache: "no-store"',
+  'type === "SKIP_WAITING"',
+  "material-downloads-v1.css?v=1",
+  "material-downloads-v1.js?v=1",
+]) {
   if (!sourceWorker.includes(marker)) fail(`Service worker sem proteção de atualização: ${marker}.`);
 }
-for (const marker of ['updateViaCache: "none"', "controllerchange", "registration.update()"] ) {
+for (const marker of ['updateViaCache: "none"', "controllerchange", "registration.update()"]) {
   if (!sourcePwa.includes(marker)) fail(`Registro PWA sem atualização controlada: ${marker}.`);
+}
+for (const marker of ["data-material-download-card", "PDF para responder", "PDF comentado", "printableDocument"]) {
+  if (!sourceMaterialDownloads.includes(marker)) fail(`Recurso de download sem marcador: ${marker}.`);
+}
+
+const downloadValidator = read("scripts/validate-material-downloads.mjs");
+for (const marker of ["question_index", "tipo de material inválido", "todos indexados e comentados"]) {
+  if (!downloadValidator.includes(marker)) fail(`Validador dos downloads incompleto: ${marker}.`);
+}
+const publicDownloadTest = read("tests-public/material-downloads.spec.js");
+for (const marker of ["provas", "simulados", "PDF para responder", "PDF comentado"]) {
+  if (!publicDownloadTest.includes(marker)) fail(`Teste público dos downloads incompleto: ${marker}.`);
 }
 
 const pagesWorkflow = read(".github/workflows/pages.yml");
@@ -122,4 +172,4 @@ for (const forbidden of ["Preparar branch isolada", "refs/heads/"]) {
 const dispatchCount = (notionWorkflow.match(/gh workflow run pages\.yml/g) || []).length;
 if (dispatchCount !== 1) fail(`Workflow do Notion deve criar uma única publicação explícita; encontrado: ${dispatchCount}.`);
 
-console.log("✓ Build 2.12.3 validado: cache coerente, snapshot versionado, plano restrito e dispatch único acompanhado sem recursão.");
+console.log("✓ Build 2.12.4 validado: cache coerente, downloads auditados, snapshot versionado, plano restrito e dispatch único acompanhado sem recursão.");

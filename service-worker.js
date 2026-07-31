@@ -1,4 +1,4 @@
-const CACHE_VERSION = "sedes-questoes-v2-12-3";
+const CACHE_VERSION = "sedes-questoes-v2-12-4";
 const INDEX_URL = new URL("./index.html", self.location.href).toString();
 const SHELL = [
   "./",
@@ -12,12 +12,14 @@ const SHELL = [
   "./assets/study-navigation-v2-6.css?v=1",
   "./assets/intelligence-v2-9.css?v=1",
   "./assets/reports-v2-10.css?v=2",
+  "./assets/material-downloads-v1.css?v=1",
   "./assets/progress-migration-v2-3.js?v=1",
   "./assets/question-images-v2-5.js?v=1",
   "./assets/app-v4.js?v=8",
   "./assets/learning-v2-9.js?v=1",
   "./assets/pwa-v2-9.js?v=1",
   "./assets/reports-v2-10.js?v=2",
+  "./assets/material-downloads-v1.js?v=1",
   "./data/concurso.json",
   "./data/release/catalogo.json",
   "./data/release/study-index.json",

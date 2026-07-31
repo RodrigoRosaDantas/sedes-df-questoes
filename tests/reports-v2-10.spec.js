@@ -2,6 +2,9 @@ import fs from "node:fs/promises";
 import {test, expect} from "@playwright/test";
 
 const FIXED_NOW = Date.parse("2026-07-30T15:00:00.000Z");
+const packageData = JSON.parse(await fs.readFile(new URL("../package.json", import.meta.url), "utf8"));
+const EXPECTED_VERSION = String(packageData.version || "").trim();
+const EXPECTED_BUILDER = `copy-public-v${EXPECTED_VERSION.replace(/\./g, "-")}`;
 
 async function seedProfile(page) {
   await page.addInitScript(({now}) => { Date.now = () => now; }, {now: FIXED_NOW});
@@ -213,8 +216,8 @@ test("publica build-info consistente com o catálogo e o compilador", async ({re
   expect(buildResponse.ok()).toBeTruthy();
   const catalog = await catalogResponse.json();
   const build = await buildResponse.json();
-  expect(build.version).toBe("2.12.3");
-  expect(build.builder).toBe("copy-public-v2-12-3");
+  expect(build.version).toBe(EXPECTED_VERSION);
+  expect(build.builder).toBe(EXPECTED_BUILDER);
   expect(build.data_release_version).toBe(catalog.release_version);
   expect(build.catalog_schema_version).toBe(catalog.schema_version);
   expect(build.questions).toBe(catalog.summary.questoes);
