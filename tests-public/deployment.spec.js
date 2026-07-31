@@ -176,23 +176,27 @@ test("GitHub Pages serve a release completa e executável", async ({page, reques
   await expect(page.locator(".topic-builder")).toBeVisible();
   await expect(page.locator("[data-select-weak-topics]")).toBeVisible();
 
+  const trueFalsePage = await page.context().newPage();
   const trueFalseURL = resourceURL("");
+  trueFalseURL.searchParams.set("verify", `true-false-${Date.now()}`);
   trueFalseURL.hash = "/estudar";
-  await page.goto(trueFalseURL.href, {waitUntil: "domcontentloaded"});
+  await trueFalsePage.goto(trueFalseURL.href, {waitUntil: "domcontentloaded"});
+  await expect(trueFalsePage.locator('[data-study-view="materias"]')).toBeVisible({timeout: 30000});
   const trueFalseView = clean(trueFalseCase.metadata.tipo_material).toLocaleLowerCase("pt-BR") === "prova" ? "provas" : "simulados";
-  await page.locator(`[data-study-view="${trueFalseView}"]`).click();
-  await page.locator("#study-search").fill(clean(trueFalseCase.metadata.nome));
-  const trueFalseCard = page.locator(".material-card").filter({hasText: clean(trueFalseCase.metadata.nome)}).first();
+  await trueFalsePage.locator(`[data-study-view="${trueFalseView}"]`).click();
+  await trueFalsePage.locator("#study-search").fill(clean(trueFalseCase.metadata.nome));
+  const trueFalseCard = trueFalsePage.locator(".material-card").filter({hasText: clean(trueFalseCase.metadata.nome)}).first();
   await expect(trueFalseCard).toBeVisible({timeout: 30000});
   await trueFalseCard.locator("[data-open-material]").click();
-  await page.locator('[data-start="treino"]').click();
+  await trueFalsePage.locator('[data-start="treino"]').click();
   if (trueFalseCase.questionIndex > 0) {
-    await page.locator(`[data-jump="${trueFalseCase.questionIndex}"]`).click();
+    await trueFalsePage.locator(`[data-jump="${trueFalseCase.questionIndex}"]`).click();
   }
-  const trueFalseOptions = page.locator(".options .option");
+  const trueFalseOptions = trueFalsePage.locator(".options .option");
   await expect(trueFalseOptions).toHaveCount(2);
   expect((await trueFalseOptions.allTextContents()).map(clean)).toEqual(trueFalseCase.expectedLabels);
-  await expect(page.locator(".options .option > span:visible")).toHaveCount(2);
+  await expect(trueFalsePage.locator(".options .option > span:visible")).toHaveCount(2);
+  await trueFalsePage.close();
 
   const performanceURL = resourceURL("");
   performanceURL.hash = "/desempenho";
