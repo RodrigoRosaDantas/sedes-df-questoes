@@ -28,6 +28,7 @@ const deprecatedWorkflowMarkers = [
   "actions/configure-pages@v5",
   "actions/upload-pages-artifact@v3",
   "actions/deploy-pages@v4",
+  "actions/upload-artifact@v4",
   "@playwright/test@1.55.0",
   "ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION",
 ];
