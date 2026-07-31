@@ -4,6 +4,7 @@ import {fileURLToPath} from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const snapshotPath = path.join(root, 'data', 'notion', 'published.json');
+const planPath = path.join(root, 'data', 'notion', 'publication-plan.json');
 const reportPath = path.join(root, 'artifacts', 'sync-crf-assistente-i-corrections.json');
 const TOKEN = process.env.NOTION_TOKEN;
 const SOURCE = '784234ae-deca-4514-b60d-19524e122a89';
@@ -13,9 +14,9 @@ if (!TOKEN) throw new Error('NOTION_TOKEN ausente.');
 
 const promptItems = new Set([37, 39, 52, 57, 61, 64, 67, 70, 94, 101, 109]);
 const foundationItems = new Set([71, 72, 73]);
-const numbers = [...promptItems, ...foundationItems].sort((a, b) => a - b);
+const editorialNumbers = [...promptItems, ...foundationItems].sort((a, b) => a - b);
 const codeFor = number => `PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-${String(number).padStart(3, '0')}`;
-const expectedCodes = new Set(numbers.map(codeFor));
+const editorialCodes = new Set(editorialNumbers.map(codeFor));
 const clean = value => String(value ?? '').replace(/\r/g, '').replace(/[ \t]+/g, ' ').replace(/ *\n */g, '\n').trim();
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -62,42 +63,14 @@ function value(property) {
   return null;
 }
 
-async function readTargets() {
-  const found = new Map();
-  let cursor;
-  do {
-    const body = {page_size: 100};
-    if (cursor) body.start_cursor = cursor;
-    const page = await request(`/data_sources/${SOURCE}/query`, {method: 'POST', body: JSON.stringify(body)});
-    for (const item of page.results || []) {
-      const properties = Object.fromEntries(Object.entries(item.properties || {}).map(([name, property]) => [name, value(property)]));
-      const code = clean(properties['Código']);
-      if (!expectedCodes.has(code)) continue;
-      if (found.has(code)) throw new Error(`Código duplicado no Notion: ${code}.`);
-      found.set(code, {
-        notion_id: item.id,
-        notion_url: item.url,
-        notion_last_edited_time: item.last_edited_time,
-        ...properties,
-      });
-    }
-    cursor = page.has_more ? page.next_cursor : null;
-  } while (cursor && found.size < expectedCodes.size);
-  if (found.size !== expectedCodes.size) {
-    const missing = [...expectedCodes].filter(code => !found.has(code));
-    throw new Error(`Registros ausentes no Notion: ${missing.join(', ')}`);
-  }
-  return found;
-}
-
-function record(row) {
+function liveRecord(row) {
   const declaredFormat = clean(row['Formato da questão']);
   const answer = clean(row['Gabarito']);
-  const multipleChoiceAlternatives = {
+  const alternatives = {
     A: clean(row['Alternativa A']), B: clean(row['Alternativa B']), C: clean(row['Alternativa C']),
     D: clean(row['Alternativa D']), E: clean(row['Alternativa E']),
   };
-  const alternativesAreBlank = Object.values(multipleChoiceAlternatives).every(alternative => !alternative);
+  const alternativesAreBlank = Object.values(alternatives).every(alternative => !alternative);
   const trueFalse = alternativesAreBlank || /certo\s*\/\s*errado/i.test(declaredFormat) || ['Certo', 'Errado'].includes(answer);
   return {
     notion_id: row.notion_id,
@@ -123,7 +96,7 @@ function record(row) {
     original_number: Number(row['Número original']) || null,
     text_base: clean(row['Texto-base']),
     prompt: clean(row['Enunciado']),
-    alternatives: trueFalse ? {Certo: 'Certo', Errado: 'Errado'} : multipleChoiceAlternatives,
+    alternatives: trueFalse ? {Certo: 'Certo', Errado: 'Errado'} : alternatives,
     answer,
     comment: clean(row['Comentário geral']),
     alternative_comments: {
@@ -150,48 +123,79 @@ function changedFields(before, after) {
   return fields.sort();
 }
 
-const targets = await readTargets();
 const snapshot = JSON.parse(await fs.readFile(snapshotPath, 'utf8'));
+const currentPlan = JSON.parse(await fs.readFile(planPath, 'utf8'));
 if (!Array.isArray(snapshot.records)) throw new Error('Snapshot sem records.');
-const indexes = new Map();
-snapshot.records.forEach((item, index) => {
-  if (expectedCodes.has(clean(item.code))) {
-    if (indexes.has(item.code)) throw new Error(`Código duplicado no snapshot: ${item.code}.`);
-    indexes.set(item.code, index);
+const plannedCodes = new Set((currentPlan.lots || []).flatMap(lot => lot.codes || []).map(clean));
+if (plannedCodes.size !== 98) throw new Error(`Plano esperado com 98 registros; encontrado ${plannedCodes.size}.`);
+for (const code of editorialCodes) if (!plannedCodes.has(code)) throw new Error(`${code}: não pertence ao lote reconciliado.`);
+
+const targets = new Map();
+let cursor;
+do {
+  const body = {page_size: 100};
+  if (cursor) body.start_cursor = cursor;
+  const page = await request(`/data_sources/${SOURCE}/query`, {method: 'POST', body: JSON.stringify(body)});
+  for (const item of page.results || []) {
+    const properties = Object.fromEntries(Object.entries(item.properties || {}).map(([name, property]) => [name, value(property)]));
+    const code = clean(properties['Código']);
+    if (!plannedCodes.has(code)) continue;
+    if (targets.has(code)) throw new Error(`Código duplicado no Notion: ${code}.`);
+    targets.set(code, {
+      notion_id: item.id,
+      notion_url: item.url,
+      notion_last_edited_time: item.last_edited_time,
+      ...properties,
+    });
   }
-});
-if (indexes.size !== expectedCodes.size) {
-  const missing = [...expectedCodes].filter(code => !indexes.has(code));
-  throw new Error(`Registros ausentes no snapshot: ${missing.join(', ')}`);
+  cursor = page.has_more ? page.next_cursor : null;
+} while (cursor && targets.size < plannedCodes.size);
+if (targets.size !== plannedCodes.size) {
+  const missing = [...plannedCodes].filter(code => !targets.has(code));
+  throw new Error(`Registros ausentes no Notion: ${missing.join(', ')}`);
 }
 
-const report = [];
-for (const number of numbers) {
-  const code = codeFor(number);
-  const index = indexes.get(code);
+const snapshotIndex = new Map(snapshot.records.map((record, index) => [clean(record.code), index]));
+const receiptPattern = /^release-[^:]+:[0-9a-f]{40}$/i;
+const editorialReport = [];
+const receiptReport = [];
+
+for (const code of [...plannedCodes].sort()) {
+  const index = snapshotIndex.get(code);
+  if (index === undefined) throw new Error(`${code}: ausente no snapshot.`);
   const before = snapshot.records[index];
-  const after = record(targets.get(code));
+  const live = liveRecord(targets.get(code));
+  const receipt = clean(live.github_id);
+  if (!receiptPattern.test(receipt)) throw new Error(`${code}: recibo GitHub inválido ou ausente no Notion: ${receipt || '(vazio)'}.`);
 
-  // Esta sincronização é exclusivamente editorial. Metadados de publicação
-  // permanecem exatamente como estavam no snapshot aprovado.
-  after.github_id = before.github_id;
-  after.publication_lot = before.publication_lot;
-  after.released_for_export = before.released_for_export;
-
-  const fields = changedFields(before, after);
-  const allowed = new Set(promptItems.has(number)
-    ? ['notion_last_edited_time', 'prompt']
-    : ['foundation', 'notion_last_edited_time']);
-  const unexpected = fields.filter(field => !allowed.has(field));
-  if (unexpected.length) throw new Error(`${code}: campos inesperados alterados: ${unexpected.join(', ')}`);
-  const required = promptItems.has(number) ? 'prompt' : 'foundation';
-  if (!fields.includes(required)) throw new Error(`${code}: a correção esperada em ${required} não aparece no diff.`);
-  snapshot.records[index] = after;
-  report.push({number, code, changed_fields: fields, notion_url: after.notion_url});
+  if (editorialCodes.has(code)) {
+    const after = {...live};
+    after.publication_lot = before.publication_lot;
+    after.released_for_export = before.released_for_export;
+    after.github_id = receipt;
+    const fields = changedFields(before, after);
+    const number = Number(after.original_number);
+    const allowed = new Set(promptItems.has(number)
+      ? ['github_id', 'notion_last_edited_time', 'prompt']
+      : ['foundation', 'github_id', 'notion_last_edited_time']);
+    const unexpected = fields.filter(field => !allowed.has(field));
+    if (unexpected.length) throw new Error(`${code}: campos inesperados alterados: ${unexpected.join(', ')}`);
+    snapshot.records[index] = after;
+    editorialReport.push({number, code, changed_fields: fields, notion_url: after.notion_url});
+  } else {
+    const beforeReceipt = clean(before.github_id);
+    snapshot.records[index] = {...before, github_id: receipt};
+    receiptReport.push({code, previous_receipt: beforeReceipt, receipt, notion_url: live.notion_url});
+  }
 }
 
 snapshot.generated_at = new Date().toISOString();
 await fs.writeFile(snapshotPath, `${JSON.stringify(snapshot, null, 2)}\n`, 'utf8');
 await fs.mkdir(path.dirname(reportPath), {recursive: true});
-await fs.writeFile(reportPath, `${JSON.stringify({count: report.length, records: report}, null, 2)}\n`, 'utf8');
-console.log(`✓ ${report.length} correções sincronizadas no snapshot; metadados de publicação preservados.`);
+await fs.writeFile(reportPath, `${JSON.stringify({
+  editorial_corrections: editorialReport.length,
+  receipts_reconciled: receiptReport.length + editorialReport.length,
+  editorial_records: editorialReport,
+  receipt_records: receiptReport,
+}, null, 2)}\n`, 'utf8');
+console.log(`✓ ${editorialReport.length} correções editoriais e ${receiptReport.length + editorialReport.length} recibos reconciliados.`);
