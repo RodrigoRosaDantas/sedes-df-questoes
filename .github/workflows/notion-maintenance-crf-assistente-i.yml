@@ -1,0 +1,50 @@
+name: Manutenção isolada do Notion — CRF-DF Assistente I
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/notion-maintenance-crf-assistente-i.yml'
+      - 'scripts/apply-notion-maintenance-crf-assistente-i.mjs'
+      - 'data/notion/maintenance/crf-df-assistente-i-2026-07-31.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: notion-maintenance-crf-assistente-i
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.head_ref == 'agent/notion-maintenance-crf-assistente-i-20260731'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Baixar branch de manutenção
+        uses: actions/checkout@v6
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Aplicar 14 correções editoriais e diagnosticar o item 41
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          MAINTENANCE_CONFIRMATION: CRF-DF-ASSISTENTE-I-EDITORIAL-14
+          NOTION_MAINTENANCE_PATCH: data/notion/maintenance/crf-df-assistente-i-2026-07-31.json
+          NOTION_MAINTENANCE_REPORT: artifacts/notion-maintenance-crf-assistente-i-report.json
+        run: node scripts/apply-notion-maintenance-crf-assistente-i.mjs
+
+      - name: Publicar relatório técnico da manutenção
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: notion-maintenance-crf-assistente-i-report
+          path: artifacts/notion-maintenance-crf-assistente-i-report.json
+          if-no-files-found: error
+          retention-days: 7
