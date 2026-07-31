@@ -72,13 +72,70 @@ async function readAll() {
     const page = await request(`/data_sources/${SOURCE}/query`, {method: 'POST', body: JSON.stringify(body)});
     for (const item of page.results || []) {
       const properties = Object.fromEntries(Object.entries(item.properties || {}).map(([name, property]) => [name, value(property)]));
-      rows.push({notion_id: item.id, notion_url: item.url, ...properties});
+      rows.push({
+        notion_id: item.id,
+        notion_url: item.url,
+        notion_created_time: item.created_time || properties['Criado em'] || null,
+        notion_last_edited_time: item.last_edited_time || properties['Última edição'] || null,
+        ...properties,
+      });
     }
     batches += 1;
     cursor = page.has_more ? page.next_cursor : null;
   } while (cursor);
   console.log(`Banco Mestre: ${rows.length} registros lidos em ${batches} lotes.`);
   return rows;
+}
+
+function completenessScore(row) {
+  const textFields = [
+    'Texto-base', 'Enunciado', 'Comentário geral', 'Fundamento legal', 'Pegadinha',
+    'Observações', 'Assunto', 'Subassunto', 'Disciplina', 'URL da fonte',
+  ];
+  const textScore = textFields.reduce((score, field) => score + Math.min(clean(row[field]).length, 1000), 0);
+  const checks = ['Transcrição conferida', 'Gabarito conferido - registro manual anterior']
+    .reduce((score, field) => score + (row[field] === true ? 5000 : 0), 0);
+  return textScore + checks;
+}
+
+function canonicalPreference(row) {
+  return {
+    explicitlyDuplicate: row['Duplicada'] === true ? 1 : 0,
+    editedAt: Date.parse(row.notion_last_edited_time || row['Última edição'] || row.notion_created_time || 0) || 0,
+    completeness: completenessScore(row),
+    id: clean(row.notion_id),
+  };
+}
+
+function preferCanonical(left, right) {
+  const a = canonicalPreference(left);
+  const b = canonicalPreference(right);
+  if (a.explicitlyDuplicate !== b.explicitlyDuplicate) return a.explicitlyDuplicate < b.explicitlyDuplicate ? left : right;
+  if (a.editedAt !== b.editedAt) return a.editedAt > b.editedAt ? left : right;
+  if (a.completeness !== b.completeness) return a.completeness > b.completeness ? left : right;
+  return a.id.localeCompare(b.id) >= 0 ? left : right;
+}
+
+function deduplicatePublicableRows(rows) {
+  const canonical = new Map();
+  const duplicates = [];
+  for (const row of rows) {
+    const codeKey = key(row['Código']) || `sem-codigo:${row.notion_id}`;
+    const current = canonical.get(codeKey);
+    if (!current) {
+      canonical.set(codeKey, row);
+      continue;
+    }
+    const selected = preferCanonical(current, row);
+    const ignored = selected === current ? row : current;
+    canonical.set(codeKey, selected);
+    duplicates.push({code: clean(row['Código']), selected: selected.notion_url, ignored: ignored.notion_url});
+  }
+  if (duplicates.length) {
+    console.log(`Duplicidades publicáveis saneadas: ${duplicates.length} linha(s) ignorada(s); nenhuma página foi apagada do Notion.`);
+    duplicates.slice(0, 10).forEach(item => console.log(`  ${item.code}: canônica ${item.selected}; ignorada ${item.ignored}`));
+  }
+  return {rows: [...canonical.values()], duplicates};
 }
 
 function record(row) {
@@ -99,6 +156,7 @@ function record(row) {
   return {
     notion_id: row.notion_id,
     notion_url: row.notion_url,
+    notion_last_edited_time: row.notion_last_edited_time,
     code: clean(row['Código']),
     github_id: clean(row['Código GitHub']),
     title: clean(row['Questão']),
@@ -154,7 +212,7 @@ function validate(records) {
     ]) {
       if (!propertyValue) throw new Error(`${label} ausente em ${item.code || item.notion_url}.`);
     }
-    if (codes.has(key(item.code))) throw new Error(`Código publicável duplicado: ${item.code}`);
+    if (codes.has(key(item.code))) throw new Error(`Código canônico duplicado após saneamento: ${item.code}`);
     codes.add(key(item.code));
     if (item.format === 'Certo / Errado') {
       if (!['Certo', 'Errado', 'Anulada'].includes(item.answer)) {
@@ -173,8 +231,9 @@ function validate(records) {
 }
 
 const all = await readAll();
-const records = all
-  .filter(row => row['Pode publicar'] === true)
+const publicable = all.filter(row => row['Pode publicar'] === true);
+const canonical = deduplicatePublicableRows(publicable);
+const records = canonical.rows
   .map(record)
   .sort((left, right) => left.material_name.localeCompare(right.material_name, 'pt-BR')
     || Number(left.original_number) - Number(right.original_number)
@@ -182,15 +241,17 @@ const records = all
 validate(records);
 
 const semantic = {
-  schema_version: '1.1',
+  schema_version: '1.2',
   source: {
     name: 'Banco Mestre — Provas e Simulados SEDES/DF',
     database_url: DATABASE_URL,
     data_source_id: SOURCE,
-    publication_rule: 'Pode publicar = true; alternativas A–E vazias = Certo / Errado',
+    publication_rule: 'Pode publicar = true; alternativas A–E vazias = Certo / Errado; códigos repetidos usam a linha não duplicada, mais recente e mais completa',
   },
   totals: {
     all: all.length,
+    publicable_rows_before_deduplication: publicable.length,
+    duplicate_publicable_rows_ignored: canonical.duplicates.length,
     published: records.length,
     pending: all.length - records.length,
     materials: new Set(records.map(item => key(item.material_name))).size,
@@ -206,4 +267,4 @@ try {
 } catch {}
 await fs.mkdir(path.dirname(output), {recursive: true});
 await fs.writeFile(output, `${JSON.stringify({...semantic, generated_at: generatedAt}, null, 2)}\n`);
-console.log(`✓ Snapshot autorizado: ${records.length} questões publicáveis, ${semantic.totals.materials} materiais e ${semantic.totals.pending} registros mantidos fora do site.`);
+console.log(`✓ Snapshot autorizado: ${records.length} questões canônicas, ${semantic.totals.materials} materiais, ${canonical.duplicates.length} duplicidade(s) ignorada(s) e ${semantic.totals.pending} registros mantidos fora do site.`);
