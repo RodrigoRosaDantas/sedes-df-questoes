@@ -63,6 +63,30 @@ function booleanValue(property) {
   return false;
 }
 
+function publicationProperties(properties, recordCode) {
+  const githubProperty = properties['Código GitHub'];
+  const publicationDateProperty = properties['Data da publicação'];
+  const manualStatusProperty = properties['Status editorial — registro manual anterior'];
+
+  if (githubProperty?.type !== 'rich_text') {
+    throw new Error(`${recordCode}: propriedade Código GitHub ausente ou incompatível.`);
+  }
+  if (publicationDateProperty?.type !== 'date') {
+    throw new Error(`${recordCode}: propriedade Data da publicação ausente ou incompatível.`);
+  }
+
+  const patch = {
+    'Código GitHub': rich(releaseCode),
+    'Data da publicação': {date: {start: publicationDate}},
+  };
+
+  if (manualStatusProperty?.type === 'select') {
+    patch['Status editorial — registro manual anterior'] = {select: {name: 'Publicada'}};
+  }
+
+  return patch;
+}
+
 const publicCodes = new Set();
 for (const metadata of catalog.materials || []) {
   const materialPath = path.resolve(root, String(metadata.file).replace(/^\.\//, ''));
@@ -114,15 +138,10 @@ for (const record of selected) {
     console.log(`Gate alterado após o snapshot; registro não marcado: ${record.code}.`);
     continue;
   }
+
   await request(`/pages/${record.notion_id}`, {
     method: 'PATCH',
-    body: JSON.stringify({
-      properties: {
-        'Código GitHub': rich(releaseCode),
-        'Data da publicação': {date: {start: publicationDate}},
-        'Status editorial - registro manual anterior': {select: {name: 'Publicada'}},
-      },
-    }),
+    body: JSON.stringify({properties: publicationProperties(properties, record.code)}),
   });
   updated += 1;
   if (updated % 25 === 0) console.log(`${updated}/${selected.length} registros fechados no Notion.`);
