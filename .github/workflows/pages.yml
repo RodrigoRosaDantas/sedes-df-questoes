@@ -38,8 +38,11 @@ jobs:
         run: npm run check
       - name: Instalar navegador de teste e auditar dependências
         run: |
+          AUDIT_DIR=$(mktemp -d)
+          printf '{"name":"sedes-ci-audit","private":true}\n' > "$AUDIT_DIR/package.json"
+          npm install --prefix "$AUDIT_DIR" --package-lock-only --ignore-scripts --save-dev "@playwright/test@${PLAYWRIGHT_VERSION}"
+          npm audit --prefix "$AUDIT_DIR" --audit-level=high
           npm install --no-save "@playwright/test@${PLAYWRIGHT_VERSION}"
-          npm audit --audit-level=high
           npx playwright install --with-deps chromium
       - name: Testar a plataforma como usuário real
         run: |
@@ -83,8 +86,11 @@ jobs:
       - name: Instalar Chromium para auditoria pública
         if: steps.static_verify.outcome == 'success'
         run: |
+          AUDIT_DIR=$(mktemp -d)
+          printf '{"name":"sedes-ci-audit","private":true}\n' > "$AUDIT_DIR/package.json"
+          npm install --prefix "$AUDIT_DIR" --package-lock-only --ignore-scripts --save-dev "@playwright/test@${PLAYWRIGHT_VERSION}"
+          npm audit --prefix "$AUDIT_DIR" --audit-level=high
           npm install --no-save "@playwright/test@${PLAYWRIGHT_VERSION}"
-          npm audit --audit-level=high
           npx playwright install --with-deps chromium
       - name: Abrir e testar o endereço público
         id: browser_verify
