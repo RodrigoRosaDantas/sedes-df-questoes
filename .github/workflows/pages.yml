@@ -61,6 +61,24 @@ jobs:
         run: node scripts/export-notion-snapshot.mjs
       - name: Gerar pacote final
         run: npm run build
+      - name: Garantir GitHub Actions como origem do Pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          status=$(curl -sS -o /tmp/pages-update.json -w '%{http_code}' \
+            -X PUT \
+            -H 'Accept: application/vnd.github+json' \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+            -H 'X-GitHub-Api-Version: 2026-03-10' \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/pages" \
+            -d '{"build_type":"workflow"}')
+          if [ "$status" != '204' ]; then
+            echo "Falha ao configurar o Pages para GitHub Actions: HTTP ${status}"
+            cat /tmp/pages-update.json
+            exit 1
+          fi
+          echo '✓ Origem do GitHub Pages configurada como workflow.'
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
