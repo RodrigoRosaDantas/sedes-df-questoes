@@ -1,12 +1,14 @@
 import {defineConfig} from "@playwright/test";
 
-const baseURL = String(process.env.PUBLIC_BASE_URL || "").replace(/\/+$/, "");
-if (!baseURL.startsWith("http")) throw new Error("PUBLIC_BASE_URL não informada para o teste público.");
+const configuredURL = String(process.env.PUBLIC_BASE_URL || "").trim();
+if (!configuredURL.startsWith("http")) throw new Error("PUBLIC_BASE_URL não informada para o teste público.");
+const baseURL = `${configuredURL.replace(/\/+$/, "")}/`;
 
 export default defineConfig({
   testDir: "./tests-public",
-  timeout: 90000,
-  retries: 2,
+  timeout: 180000,
+  retries: 1,
+  workers: 1,
   use: {
     baseURL,
     headless: true,
