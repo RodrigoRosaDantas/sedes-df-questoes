@@ -105,19 +105,19 @@ addRange(
   29,
   55,
 );
-for (const number of [17, 18]) {
-  targetCodes.add(
-    `PROVA-QDX-CRTR12-2026-AUXILIAR-ADMINISTRATIVO-200-${String(number).padStart(3, '0')}`,
-  );
-}
 addRange(
   'PROVA-QDX-CRTR12-2026-AUXILIAR-ADMINISTRATIVO-200-',
-  21,
-  29,
+  17,
+  18,
 );
 addRange(
   'PROVA-QDX-CRTR12-2026-AUXILIAR-ADMINISTRATIVO-200-',
-  32,
+  21,
+  22,
+);
+addRange(
+  'PROVA-QDX-CRTR12-2026-AUXILIAR-ADMINISTRATIVO-200-',
+  25,
   34,
 );
 addRange(
@@ -163,7 +163,7 @@ for (const code of targetCodes) {
 
   const checks = [
     [row['Transcrição conferida'] === true, 'transcrição não conferida'],
-    [row['Gabarito conferido - registro manual anterior'] === true, 'gabarito não conferido'],
+    [row['Gabarito conferido — registro manual anterior'] === true, 'gabarito não conferido'],
     [['Aprovada', 'Ajustada'].includes(clean(row['Auditoria de conteúdo'])), 'auditoria não aprovada/ajustada'],
     [row['Duplicada'] !== true, 'duplicada'],
     [row['Anulada'] !== true, 'anulada'],
