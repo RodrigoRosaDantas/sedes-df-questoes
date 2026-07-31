@@ -4,6 +4,7 @@ on:
   pull_request:
     branches: [main]
     paths:
+      - 'scripts/auditar-faixa-81-120-crfdf.mjs'
       - 'scripts/saneamento-administrador-crfdf-20260731.mjs'
       - '.github/workflows/saneamento-administrador-crfdf.yml'
 
@@ -27,6 +28,11 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '24'
+
+      - name: Mapear faixa 81 a 120
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/auditar-faixa-81-120-crfdf.mjs
 
       - name: Auditar e reconciliar o Banco Mestre
         env:
