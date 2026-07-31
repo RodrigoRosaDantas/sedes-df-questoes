@@ -53,3 +53,5 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Rótulo único protegido por teste público em navegador. */
