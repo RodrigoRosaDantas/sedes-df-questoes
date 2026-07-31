@@ -19,12 +19,12 @@ const activeQuestions = activeEntries.reduce((sum, item) => sum + Number(item.ex
 const snapshotPath = resolve("data/notion/published.json");
 const snapshotInstalled = fs.existsSync(snapshotPath) && read("data/notion/published.json").trim();
 const snapshot = snapshotInstalled ? readJSON("data/notion/published.json") : null;
-const expectedQuestions = snapshot ? Number(snapshot.totals.published) : Number(config.expected_questions) + activeQuestions;
-const expectedMaterials = snapshot ? Number(snapshot.totals.materials) : Number(config.expected_materials) + activeEntries.length;
+const expectedQuestions = snapshot ? Number(catalog.summary.questoes) : Number(config.expected_questions) + activeQuestions;
+const expectedMaterials = snapshot ? Number(catalog.summary.materiais) : Number(config.expected_materials) + activeEntries.length;
 const expectedBank = snapshot ? Number(snapshot.totals.all) : Number(config.banco_mestre);
-const expectedPending = snapshot ? Number(snapshot.totals.pending) : Number(config.aguardando_auditoria) - activeQuestions;
+const expectedPending = snapshot ? Math.max(0, Number(snapshot.totals.all) - expectedQuestions) : Number(config.aguardando_auditoria) - activeQuestions;
 const expectedTrueFalse = snapshot
-  ? snapshot.records.filter(record => record.format === "Certo / Errado").length
+  ? null
   : activeQuestions;
 const app = read("assets/app-v4.js");
 const migration = read("assets/progress-migration-v2-3.js");
@@ -87,8 +87,13 @@ for (const meta of catalog.materials) {
   }
 }
 if (questions !== expectedQuestions || ids.size !== expectedQuestions || codes.size !== expectedQuestions) fail("Fechamento global da release inválido.");
-if (trueFalseQuestions !== expectedTrueFalse) fail(`Total C/E ativo divergente: esperado ${expectedTrueFalse}, encontrado ${trueFalseQuestions}.`);
+if (snapshot ? trueFalseQuestions < activeQuestions : trueFalseQuestions !== expectedTrueFalse) fail(`Total C/E ativo divergente: mínimo/esperado ${snapshot ? activeQuestions : expectedTrueFalse}, encontrado ${trueFalseQuestions}.`);
 
+if (snapshot) {
+  for (const record of snapshot.records) {
+    if (!codes.has(record.code)) fail(`${record.code}: registro publicável do Notion não entrou na release.`);
+  }
+}
 for (const entry of activeEntries) {
   const source = readJSON(entry.file);
   if (source.questoes.length !== Number(entry.expected_questions)) fail(`${source.id}: lote ativo incompleto.`);

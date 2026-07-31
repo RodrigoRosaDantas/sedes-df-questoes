@@ -148,6 +148,22 @@ for (const record of snapshot.records || []) {
   finalMaterials.get(materialId).questoes.push(question);
 }
 
+// Preservar questões atuais ausentes do snapshot: o Notion acrescenta e atualiza,
+// mas não remove automaticamente conteúdo já publicado.
+for (const currentMaterial of currentMaterials.values()) {
+  if (!finalMaterials.has(currentMaterial.id)) {
+    const {questoes, ...metadata} = currentMaterial;
+    finalMaterials.set(currentMaterial.id, {...metadata, questoes: []});
+  }
+  const target = finalMaterials.get(currentMaterial.id);
+  for (const currentQuestion of currentMaterial.questoes || []) {
+    if (usedIds.has(key(currentQuestion.id)) || usedCodes.has(key(currentQuestion.codigo))) continue;
+    target.questoes.push(currentQuestion);
+    usedIds.add(key(currentQuestion.id));
+    usedCodes.add(key(currentQuestion.codigo));
+  }
+}
+
 for (const material of finalMaterials.values()) {
   material.questoes.sort((left, right) => Number(left.numero) - Number(right.numero) || left.codigo.localeCompare(right.codigo));
   material.quantidade_questoes = material.questoes.length;
@@ -177,13 +193,13 @@ catalog.exported_at = new Date().toISOString();
 catalog.source = {
   name: snapshot.source.name,
   notion_url: snapshot.source.database_url,
-  criteria: `${snapshot.totals.published} questões liberadas por “Pode publicar = true”; alternativas A–E vazias são tratadas como Certo/Errado; ${snapshot.totals.pending} registros permanecem em revisão editorial.`,
+  criteria: `${snapshot.totals.published} registros atualmente liberados pelo Notion foram mesclados à release existente; alternativas A–E vazias são tratadas como Certo/Errado.`,
 };
 catalog.summary = {
   banco_mestre: snapshot.totals.all,
   materiais: catalogMaterials.length,
-  questoes: snapshot.totals.published,
-  aguardando_auditoria: snapshot.totals.pending,
+  questoes: [...finalMaterials.values()].reduce((sum, material) => sum + material.questoes.length, 0),
+  aguardando_auditoria: Math.max(0, snapshot.totals.all - [...finalMaterials.values()].reduce((sum, material) => sum + material.questoes.length, 0)),
   provas: catalogMaterials.filter(material => material.tipo_material === 'prova').length,
   simulados: catalogMaterials.filter(material => material.tipo_material === 'simulado').length,
 };
