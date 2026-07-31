@@ -1,15 +1,12 @@
 name: Sincronizar Banco Mestre do Notion
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
   schedule:
     - cron: '20 3,9,15,21 * * *'
 
 permissions:
   contents: write
-  actions: write
 
 concurrency:
   group: sedes-df-notion-sync
@@ -24,22 +21,17 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: main
 
       - name: Preparar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: Preparar branch isolada
-        id: branch
-        shell: bash
+      - name: Preparar autoria da sincronização
         run: |
-          set -euo pipefail
           git config user.name 'sedes-df-notion-sync[bot]'
           git config user.email 'sedes-df-notion-sync[bot]@users.noreply.github.com'
-          target="notion-sync/run-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          git switch -c "$target"
-          echo "target=$target" >> "$GITHUB_OUTPUT"
 
       - name: Consultar o Banco Mestre
         env:
@@ -49,24 +41,14 @@ jobs:
       - name: Construir e validar a plataforma com o snapshot
         run: npm run check
 
-      - name: Publicar mudança semântica
-        id: publish
+      - name: Publicar mudança semântica no branch principal
         shell: bash
         run: |
           set -euo pipefail
           git add data/notion/published.json
           if git diff --cached --quiet; then
             echo 'Nenhuma mudança semântica no Banco Mestre.'
-            echo 'changed=false' >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git commit -m 'Sincronizar questões publicáveis do Banco Mestre'
-          git push origin "HEAD:refs/heads/${{ steps.branch.outputs.target }}"
           git push origin HEAD:main
-          echo 'changed=true' >> "$GITHUB_OUTPUT"
-
-      - name: Disparar publicação do snapshot atualizado
-        if: steps.publish.outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh workflow run pages.yml --ref main
