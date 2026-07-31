@@ -42,7 +42,7 @@ async function request(endpoint, options = {}, attempt = 1) {
   });
   if (response.ok) return response.status === 204 ? {} : response.json();
   const body = await response.text();
-  if ((response.status === 429 || response.status >= 500) && attempt < 8) {
+  if ((response.status === 429 || response.status >= 500) && attempt < 9) {
     await sleep(Math.max(Number(response.headers.get('retry-after') || 0) * 1000, 400 * 2 ** (attempt - 1)));
     return request(endpoint, options, attempt + 1);
   }
@@ -56,43 +56,51 @@ function plain(property) {
   return '';
 }
 
+function booleanValue(property) {
+  if (!property) return false;
+  if (property.type === 'checkbox') return property.checkbox === true;
+  if (property.type === 'formula' && property.formula?.type === 'boolean') return property.formula.boolean === true;
+  return false;
+}
+
 const publicCodes = new Set();
 for (const metadata of catalog.materials || []) {
   const materialPath = path.resolve(root, String(metadata.file).replace(/^\.\//, ''));
   const material = JSON.parse(fs.readFileSync(materialPath, 'utf8'));
-  for (const question of material.questoes || []) publicCodes.add(clean(question.codigo));
+  for (const question of material.questoes || []) {
+    publicCodes.add(clean(question.codigo));
+    if (question.codigo_fonte) publicCodes.add(clean(question.codigo_fonte));
+  }
 }
 
-const selected = (snapshot.records || []).filter(record =>
-  record.released_for_export
-  && clean(record.publication_lot)
-  && !clean(record.github_id)
-);
+const selected = (snapshot.records || []).filter(record => !clean(record.github_id));
 if (!selected.length) {
-  console.log('✓ Nenhum registro novo precisa ser marcado como publicado no Notion.');
+  console.log('✓ Todos os registros do snapshot já possuem rastreabilidade no Notion.');
   process.exit(0);
 }
 
-const groups = new Map();
 for (const record of selected) {
-  if (!publicCodes.has(clean(record.code))) throw new Error(`${record.code}: registro novo não foi encontrado no catálogo público.`);
+  if (!publicCodes.has(clean(record.code))) {
+    throw new Error(`${record.code}: registro do snapshot não foi encontrado no catálogo público nem como codigo_fonte.`);
+  }
+}
+
+const groups = new Map();
+for (const record of selected.filter(item => clean(item.publication_lot))) {
   if (!groups.has(record.publication_lot)) groups.set(record.publication_lot, []);
   groups.get(record.publication_lot).push(record);
 }
 for (const [lot, records] of groups) {
-  const numbers = records.map(record => Number(record.original_number)).sort((left, right) => left - right);
-  const unique = new Set(numbers);
-  if (unique.size !== numbers.length || numbers.some(number => !Number.isInteger(number) || number <= 0)) {
-    throw new Error(`${lot}: numeração inválida ou duplicada.`);
-  }
-  for (let index = 1; index < numbers.length; index += 1) {
-    if (numbers[index] !== numbers[index - 1] + 1) throw new Error(`${lot}: sequência incompleta entre ${numbers[index - 1]} e ${numbers[index]}.`);
-  }
-  console.log(`Lote pronto para fechamento: ${lot} — ${records.length} registros (${numbers[0]}–${numbers.at(-1)}).`);
+  const numbers = records.map(record => Number(record.original_number)).filter(Number.isInteger).sort((left, right) => left - right);
+  const consecutive = numbers.length === records.length
+    && new Set(numbers).size === numbers.length
+    && numbers.every((number, index) => index === 0 || number === numbers[index - 1] + 1);
+  console.log(`${consecutive ? 'Lote consecutivo' : 'Lote parcial registrado sem bloquear os demais'}: ${lot} — ${records.length} registro(s).`);
 }
 
 let updated = 0;
 let alreadyPublished = 0;
+let skippedChangedGate = 0;
 for (const record of selected) {
   const current = await request(`/pages/${record.notion_id}`);
   const properties = current.properties || {};
@@ -101,10 +109,10 @@ for (const record of selected) {
     alreadyPublished += 1;
     continue;
   }
-  const currentLot = plain(properties['Lote de publicação']);
-  const released = properties['Liberada para exportação']?.checkbox === true;
-  if (currentLot !== record.publication_lot || !released) {
-    throw new Error(`${record.code}: o gate editorial mudou antes do fechamento; atualização interrompida.`);
+  if (!booleanValue(properties['Pode publicar'])) {
+    skippedChangedGate += 1;
+    console.log(`Gate alterado após o snapshot; registro não marcado: ${record.code}.`);
+    continue;
   }
   await request(`/pages/${record.notion_id}`, {
     method: 'PATCH',
@@ -117,6 +125,7 @@ for (const record of selected) {
     }),
   });
   updated += 1;
-  if (updated % 20 === 0) console.log(`${updated}/${selected.length} registros fechados no Notion.`);
+  if (updated % 25 === 0) console.log(`${updated}/${selected.length} registros fechados no Notion.`);
 }
-console.log(`✓ Rastreabilidade fechada: ${updated} registros atualizados, ${alreadyPublished} já estavam publicados; release ${releaseCode}.`);
+
+console.log(`✓ Rastreabilidade fechada: ${updated} atualizados, ${alreadyPublished} já publicados e ${skippedChangedGate} preservados por alteração posterior do gate; release ${releaseCode}.`);

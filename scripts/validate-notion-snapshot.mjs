@@ -12,10 +12,16 @@ if (!fs.existsSync(file) || !fs.readFileSync(file, 'utf8').trim()) {
 const data = JSON.parse(fs.readFileSync(file, 'utf8'));
 const fail = message => { throw new Error(message); };
 const key = value => String(value ?? '').trim().toLowerCase();
-if (!['1.0', '1.1'].includes(data.schema_version)) fail('Versão do snapshot do Notion inválida.');
+if (!['1.0', '1.1', '1.2'].includes(data.schema_version)) fail('Versão do snapshot do Notion inválida.');
 if (!Array.isArray(data.records)) fail('Registros do snapshot ausentes.');
 if (data.records.length !== Number(data.totals?.published)) fail('Total publicável divergente no snapshot.');
 if (Number(data.totals?.all) !== Number(data.totals?.published) + Number(data.totals?.pending)) fail('Fechamento do Banco Mestre divergente.');
+if (data.schema_version === '1.2') {
+  const rawPublicable = Number(data.totals?.publicable_rows_before_deduplication);
+  const ignored = Number(data.totals?.duplicate_publicable_rows_ignored);
+  if (!Number.isInteger(rawPublicable) || !Number.isInteger(ignored) || ignored < 0) fail('Totais de saneamento de duplicidades inválidos.');
+  if (rawPublicable !== data.records.length + ignored) fail('Saneamento de duplicidades não fecha com o total publicável bruto.');
+}
 
 const codes = new Set();
 const urls = new Set();
@@ -30,9 +36,9 @@ for (const record of data.records) {
     [record.comment, 'Comentário'],
   ]) if (!String(value || '').trim()) fail(`${label} ausente no snapshot.`);
 
-  if (codes.has(key(record.code))) fail(`Código duplicado: ${record.code}`);
+  if (codes.has(key(record.code))) fail(`Código canônico duplicado: ${record.code}`);
   codes.add(key(record.code));
-  if (urls.has(record.notion_url)) fail(`URL duplicada: ${record.notion_url}`);
+  if (urls.has(record.notion_url)) fail(`URL canônica duplicada: ${record.notion_url}`);
   urls.add(record.notion_url);
   materials.add(key(record.material_name));
 
@@ -52,4 +58,4 @@ if (materials.size !== Number(data.totals?.materials)) fail('Total de materiais 
 for (const forbidden of ['Pode publicar', 'Status editorial', 'Auditoria efetiva', 'formulaResult', 'ID interno']) {
   if (JSON.stringify(data).includes(`"${forbidden}"`)) fail(`Campo técnico indevido no snapshot: ${forbidden}`);
 }
-console.log(`✓ Snapshot do Notion validado: ${data.records.length} questões, ${materials.size} materiais e ${data.totals.pending} registros excluídos da publicação.`);
+console.log(`✓ Snapshot do Notion validado: ${data.records.length} questões canônicas, ${materials.size} materiais, ${data.totals.duplicate_publicable_rows_ignored || 0} duplicidade(s) ignorada(s) e ${data.totals.pending} registros fora da publicação.`);
