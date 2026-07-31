@@ -1,0 +1,68 @@
+name: Auditar sincronismo corrigido do Notion
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v6
+      - name: Acionar e acompanhar o sincronismo real
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          DISPATCHED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          gh workflow run notion-sync.yml --ref main
+
+          RUN_ID=''
+          for attempt in $(seq 1 60); do
+            gh api "repos/${GITHUB_REPOSITORY}/actions/runs?event=workflow_dispatch&branch=main&per_page=50" > /tmp/sync-runs.json
+            RUN_ID=$(jq -r --arg since "${DISPATCHED_AT}" '
+              .workflow_runs[]
+              | select(.name == "Sincronizar Banco Mestre do Notion")
+              | select(.event == "workflow_dispatch")
+              | select(.created_at >= $since)
+              | .id
+            ' /tmp/sync-runs.json | head -n1)
+            if [ -n "${RUN_ID}" ]; then break; fi
+            echo "Aguardando criação do sincronismo (${attempt}/60)."
+            sleep 5
+          done
+          test -n "${RUN_ID}"
+          echo "Sincronismo criado: ${RUN_ID}."
+          gh run watch "${RUN_ID}" --exit-status --interval 10
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/jobs?per_page=100" \
+            | jq -r '.jobs[] | "JOB \(.name): \(.conclusion // .status)\n" + ((.steps // []) | map("  \(.number). \(.name): \(.conclusion // .status)") | join("\n"))'
+
+      - name: Confirmar produção alinhada e íntegra
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes
+        shell: bash
+        run: |
+          set -euo pipefail
+          MAIN_SHA=$(gh api "repos/${GITHUB_REPOSITORY}/commits/main" --jq '.sha')
+          for attempt in $(seq 1 60); do
+            curl -fsS -H 'cache-control: no-cache, no-store' \
+              "${PUBLIC_BASE_URL}/data/release/build-info.json?audit=${GITHUB_RUN_ID}-${attempt}" > /tmp/build-info.json || true
+            PUBLIC_SHA=$(jq -r '.source_sha // empty' /tmp/build-info.json 2>/dev/null || true)
+            QUESTIONS=$(jq -r '.questions // empty' /tmp/build-info.json 2>/dev/null || true)
+            MATERIALS=$(jq -r '.materials // empty' /tmp/build-info.json 2>/dev/null || true)
+            if [ "${PUBLIC_SHA}" = "${MAIN_SHA}" ] && [ "${QUESTIONS}" = '1498' ] && [ "${MATERIALS}" = '47' ]; then
+              echo "✓ Produção e main alinhados em ${MAIN_SHA}; 1498 questões e 47 materiais."
+              exit 0
+            fi
+            echo "Aguardando produção: main ${MAIN_SHA}; público ${PUBLIC_SHA:-indisponível}; ${QUESTIONS:-?}/${MATERIALS:-?} (${attempt}/60)."
+            sleep 5
+          done
+          echo 'Produção não terminou alinhada e íntegra.'
+          exit 1
