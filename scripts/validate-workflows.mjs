@@ -27,9 +27,9 @@ requireMarkers(pages, [
   "pages: write",
   "id-token: write",
   "actions: write",
-  "build_type",
-  "workflow",
+  "Confirmar GitHub Actions como origem do Pages",
   "api.github.com/repos/${GITHUB_REPOSITORY}/pages",
+  "pages.build_type !== 'workflow'",
   "verify-deployment.mjs",
   "playwright.public.config.js",
   "mark-notion-published.mjs",
@@ -40,6 +40,9 @@ forbidMarkers(pages, [
   "deployment-receipt.json",
   "Registrar recibo do deploy aprovado",
   "git push origin HEAD:main",
+  "-X PUT",
+  "pages-update.json",
+  "{\"build_type\":\"workflow\"}",
 ], "Workflow de Pages");
 
 const notion = read(".github/workflows/notion-sync.yml");
@@ -89,5 +92,5 @@ if (!builder.includes("builder: expectedBuilder") || !verifier.includes("buildIn
   fail(`Builder dinâmico ${expectedBuilder} não está protegido de ponta a ponta.`);
 }
 
-console.log(`✓ Workflows auditados: versão ${packageData.version}, cache ${expectedCacheVersion}, origem Pages por workflow, deploy único e sincronização sem recursão.`);
-// Este teste existe para impedir que commits automáticos voltem a criar loops de Actions.
+console.log(`✓ Workflows auditados: versão ${packageData.version}, cache ${expectedCacheVersion}, origem Pages validada em modo somente leitura, deploy único e sincronização sem recursão.`);
+// Este teste existe para impedir que commits automáticos ou tentativas de configuração administrativa voltem a bloquear o deploy.
