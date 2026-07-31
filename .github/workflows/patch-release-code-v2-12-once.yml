@@ -1,0 +1,50 @@
+name: Corrigir semântica do Código GitHub uma vez
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.head_ref == 'feature/notion-sync-ce-v2-12'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - name: Permitir código de release compartilhado pelo lote
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          exporter_path = Path('scripts/export-notion-snapshot.mjs')
+          exporter = exporter_path.read_text()
+          exporter = exporter.replace("  const ids = new Set();\n", "")
+          exporter = exporter.replace("    if (item.github_id) {\n      if (ids.has(key(item.github_id))) throw new Error(`Código GitHub duplicado: ${item.github_id}`);\n      ids.add(key(item.github_id));\n    }\n", "")
+          if 'Código GitHub duplicado' in exporter:
+              raise SystemExit('Validação duplicada permaneceu no exportador')
+          exporter_path.write_text(exporter)
+
+          validator_path = Path('scripts/validate-notion-snapshot.mjs')
+          validator = validator_path.read_text()
+          validator = validator.replace("const githubIds = new Set();\n", "")
+          validator = validator.replace("  if (record.github_id) {\n    if (githubIds.has(key(record.github_id))) fail(`Código GitHub duplicado: ${record.github_id}`);\n    githubIds.add(key(record.github_id));\n  }\n", "")
+          if 'Código GitHub duplicado' in validator:
+              raise SystemExit('Validação duplicada permaneceu no validador')
+          validator_path.write_text(validator)
+          PY
+      - name: Registrar correção
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add scripts/export-notion-snapshot.mjs scripts/validate-notion-snapshot.mjs
+          if git diff --cached --quiet; then
+            echo 'Semântica já corrigida.'
+          else
+            git commit -m 'Trata Código GitHub como identificador compartilhado da release'
+            git push origin HEAD:${{ github.head_ref }}
+          fi
