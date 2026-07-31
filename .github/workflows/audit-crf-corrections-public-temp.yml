@@ -1,0 +1,31 @@
+name: Auditar correções públicas do CRF-DF
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    if: github.head_ref == 'agent/audit-crf-corrections-public'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Baixar branch de auditoria
+        uses: actions/checkout@v6
+      - name: Preparar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Confirmar commit e conteúdo no endereço público
+        run: node scripts/audit-crf-corrections-public.mjs
+      - name: Publicar relatório técnico
+        uses: actions/upload-artifact@v5
+        with:
+          name: audit-crf-corrections-public-report
+          path: artifacts/audit-crf-corrections-public.json
+          if-no-files-found: error
+          retention-days: 7
