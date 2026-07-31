@@ -32,8 +32,15 @@ const deprecatedWorkflowMarkers = [
   "@playwright/test@1.55.0",
   "ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION",
 ];
+const workflowViolations = [];
 for (const file of workflowFiles) {
-  forbidMarkers(read(path.join(".github", "workflows", file)), deprecatedWorkflowMarkers, `Workflow ${file}`);
+  const content = read(path.join(".github", "workflows", file));
+  for (const marker of deprecatedWorkflowMarkers) {
+    if (content.includes(marker)) workflowViolations.push(`${file}: ${marker}`);
+  }
+}
+if (workflowViolations.length) {
+  fail(`Workflows com dependências obsoletas:\n- ${workflowViolations.join("\n- ")}`);
 }
 
 const pages = read(".github/workflows/pages.yml");
