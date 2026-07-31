@@ -21,6 +21,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Liberar lote editorial de 245 questões
+        if: github.event_name == 'pull_request' && github.head_ref == 'agent/release-245-site'
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/release-notion-batch-245.mjs
       - name: Ler snapshot atual do Banco Mestre
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
