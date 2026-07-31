@@ -171,6 +171,13 @@ for (const number of numbers) {
   const index = indexes.get(code);
   const before = snapshot.records[index];
   const after = record(targets.get(code));
+
+  // Esta sincronização é exclusivamente editorial. Metadados de publicação
+  // permanecem exatamente como estavam no snapshot aprovado.
+  after.github_id = before.github_id;
+  after.publication_lot = before.publication_lot;
+  after.released_for_export = before.released_for_export;
+
   const fields = changedFields(before, after);
   const allowed = new Set(promptItems.has(number)
     ? ['notion_last_edited_time', 'prompt']
@@ -187,4 +194,4 @@ snapshot.generated_at = new Date().toISOString();
 await fs.writeFile(snapshotPath, `${JSON.stringify(snapshot, null, 2)}\n`, 'utf8');
 await fs.mkdir(path.dirname(reportPath), {recursive: true});
 await fs.writeFile(reportPath, `${JSON.stringify({count: report.length, records: report}, null, 2)}\n`, 'utf8');
-console.log(`✓ ${report.length} correções sincronizadas no snapshot; nenhum campo inesperado.`);
+console.log(`✓ ${report.length} correções sincronizadas no snapshot; metadados de publicação preservados.`);
