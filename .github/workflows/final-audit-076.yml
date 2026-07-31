@@ -1,0 +1,67 @@
+name: Auditoria final da publicação 2.12.3
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/final-audit-076.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  audit:
+    if: github.head_ref == 'agent/final-audit-076'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      EXPECTED_SHA: 076c8377b1a13a0e42add6b788b8c7f4fbbd9e0c
+      PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Aguardar e validar a execução de produção
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 90); do
+            gh api "repos/${GITHUB_REPOSITORY}/actions/runs?event=push&branch=main&per_page=50" > /tmp/runs.json
+            run_id=$(jq -r --arg sha "$EXPECTED_SHA" '.workflow_runs[] | select(.head_sha == $sha and .name == "Validar e publicar GitHub Pages") | .id' /tmp/runs.json | head -n1)
+            if [ -z "$run_id" ]; then
+              echo "Tentativa ${attempt}/90: execução de produção ainda não encontrada."
+              sleep 10
+              continue
+            fi
+            status=$(jq -r --argjson id "$run_id" '.workflow_runs[] | select(.id == $id) | .status' /tmp/runs.json)
+            conclusion=$(jq -r --argjson id "$run_id" '.workflow_runs[] | select(.id == $id) | (.conclusion // "")' /tmp/runs.json)
+            if [ "$status" != "completed" ]; then
+              echo "Tentativa ${attempt}/90: execução ${run_id} em ${status}."
+              sleep 10
+              continue
+            fi
+            if [ "$conclusion" != "success" ]; then
+              echo "Execução ${run_id} terminou com ${conclusion}."
+              gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/jobs?per_page=100" | jq -r '.jobs[] | "JOB \(.name): \(.conclusion // .status)\n" + ((.steps // []) | map("  \(.number). \(.name): \(.conclusion // .status)") | join("\n"))'
+              exit 1
+            fi
+            echo "✓ Execução de produção ${run_id} concluída com sucesso."
+            exit 0
+          done
+          echo "A execução de produção não concluiu dentro da janela de auditoria."
+          exit 1
+
+      - name: Confirmar pacote público, versão e commit
+        run: node scripts/verify-deployment.mjs "$PUBLIC_BASE_URL" "$EXPECTED_SHA"
+
+      - name: Instalar Chromium
+        run: |
+          npm install --no-save @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Testar site público e as 245 questões
+        run: npx playwright test --config=playwright.public.config.js
