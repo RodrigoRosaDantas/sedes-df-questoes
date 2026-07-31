@@ -16,8 +16,16 @@ const requireMarker = (content, marker, context) => {
   if (!content.includes(marker)) throw new Error(`${context}: marcador obrigatório ausente: ${marker}`);
 };
 
+const packageData = JSON.parse(read("package.json"));
+const versionToken = String(packageData.version || "").replace(/\./g, "-");
+if (!/^\d+-\d+-\d+$/.test(versionToken)) throw new Error(`Versão inválida no package.json: ${packageData.version || "ausente"}.`);
+const expectedCacheVersion = `sedes-questoes-v${versionToken}`;
+const expectedBuilder = `copy-public-v${versionToken}`;
+
 const sourceIndex = read("index.html");
 const sourceApp = read("assets/app-v4.js");
+const sourceWorker = read("service-worker.js");
+const sourcePwa = read("assets/pwa-v2-9.js");
 for (const marker of [
   "manifest.webmanifest",
   "study-navigation-v2-6.css?v=1",
@@ -37,6 +45,12 @@ for (const marker of [
   "function renderDisciplineTopics()",
   "Catálogo inconsistente.",
 ]) requireMarker(sourceApp, marker, "Aplicação canônica");
+for (const marker of [expectedCacheVersion, 'event.request.mode === "navigate"', 'cache: "no-store"', 'type === "SKIP_WAITING"']) {
+  requireMarker(sourceWorker, marker, "Service worker canônico");
+}
+for (const marker of ['updateViaCache: "none"', 'controllerchange', 'registration.update()']) {
+  requireMarker(sourcePwa, marker, "Registro PWA canônico");
+}
 if (sourceApp.includes("Release incompleta.")) throw new Error("A fonte canônica ainda contém a trava antiga de totais fixos.");
 
 fs.rmSync(dist, {recursive: true, force: true});
@@ -55,10 +69,13 @@ for (const forbidden of ["scripts", ".github", "data/consolidated", "data/true-f
 
 const distIndex = fs.readFileSync(path.join(dist, "index.html"), "utf8");
 const distApp = fs.readFileSync(path.join(dist, "assets", "app-v4.js"), "utf8");
-if (distIndex !== sourceIndex || distApp !== sourceApp) throw new Error("O pacote público diverge das fontes canônicas.");
+const distWorker = fs.readFileSync(path.join(dist, "service-worker.js"), "utf8");
+const distPwa = fs.readFileSync(path.join(dist, "assets", "pwa-v2-9.js"), "utf8");
+if (distIndex !== sourceIndex || distApp !== sourceApp || distWorker !== sourceWorker || distPwa !== sourcePwa) {
+  throw new Error("O pacote público diverge das fontes canônicas.");
+}
 
 const catalog = JSON.parse(fs.readFileSync(path.join(dist, "data/release/catalogo.json"), "utf8"));
-const packageData = JSON.parse(read("package.json"));
 const materialCount = Array.isArray(catalog.materials) ? catalog.materials.length : 0;
 const questionCount = Object.keys(catalog.question_index || {}).length;
 const materialDir = path.join(dist, "data/release/materials");
@@ -74,10 +91,13 @@ const buildInfo = {
   data_release_version: catalog.release_version || null,
   catalog_schema_version: catalog.schema_version || null,
   source_sha: process.env.GITHUB_SHA || "local",
-  builder: "copy-public-v2-11-1",
+  builder: expectedBuilder,
+  cache_version: expectedCacheVersion,
   source_files_sha256: {
     index_html: sha256(sourceIndex),
     app_js: sha256(sourceApp),
+    service_worker_js: sha256(sourceWorker),
+    pwa_js: sha256(sourcePwa),
   },
   questions: questionCount,
   materials: materialCount,
@@ -85,4 +105,4 @@ const buildInfo = {
 };
 fs.writeFileSync(path.join(dist, "data/release/build-info.json"), `${JSON.stringify(buildInfo, null, 2)}\n`);
 
-console.log(`✓ Build público canônico ${packageData.version}: ${questionCount} questões, ${materialCount} materiais e fontes copiadas sem transformação.`);
+console.log(`✓ Build público canônico ${packageData.version}: cache ${expectedCacheVersion}, ${questionCount} questões, ${materialCount} materiais e fontes copiadas sem transformação.`);

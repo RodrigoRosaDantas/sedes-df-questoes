@@ -6,8 +6,12 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const packageData = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
 const base = String(process.argv[2] || "").replace(/\/+$/, "");
 const expectedSha = String(process.argv[3] || process.env.GITHUB_SHA || "").trim();
+const versionToken = String(packageData.version || "").replace(/\./g, "-");
+const expectedCacheVersion = `sedes-questoes-v${versionToken}`;
+const expectedBuilder = `copy-public-v${versionToken}`;
 
 if (!base.startsWith("http")) throw new Error("URL pública do GitHub Pages não informada.");
+if (!/^\d+-\d+-\d+$/.test(versionToken)) throw new Error(`Versão da aplicação inválida: ${packageData.version || "ausente"}.`);
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const fetchJSON = async relative => {
@@ -24,33 +28,46 @@ const fetchText = async relative => {
 let lastError;
 for (let attempt = 1; attempt <= 30; attempt += 1) {
   try {
-    const [buildInfo, catalog, index, app, worker, reports] = await Promise.all([
+    const [buildInfo, catalog, index, app, worker, pwa, reports] = await Promise.all([
       fetchJSON("data/release/build-info.json"),
       fetchJSON("data/release/catalogo.json"),
       fetchText("index.html"),
       fetchText("assets/app-v4.js"),
       fetchText("service-worker.js"),
+      fetchText("assets/pwa-v2-9.js"),
       fetchText("assets/reports-v2-10.js"),
     ]);
 
     const questions = Object.keys(catalog.question_index || {}).length;
     const materials = Array.isArray(catalog.materials) ? catalog.materials.length : 0;
+    const appReference = index.match(/assets\/app-v4\.js\?v=\d+/)?.[0] || "";
+    const pwaReference = index.match(/assets\/pwa-v2-9\.js\?v=\d+/)?.[0] || "";
+
     if (buildInfo.version !== packageData.version) throw new Error(`Versão pública ${buildInfo.version}; esperada ${packageData.version}.`);
     if (expectedSha && buildInfo.source_sha !== expectedSha) throw new Error(`Commit público ${buildInfo.source_sha}; esperado ${expectedSha}.`);
-    if (buildInfo.builder !== "copy-public-v2-11-1") throw new Error("Pacote público não foi copiado das fontes canônicas 2.11.1.");
-    if (!buildInfo.source_files_sha256?.index_html || !buildInfo.source_files_sha256?.app_js) throw new Error("Hashes das fontes canônicas ausentes.");
+    if (buildInfo.builder !== expectedBuilder) throw new Error(`Builder público ${buildInfo.builder}; esperado ${expectedBuilder}.`);
+    if (buildInfo.cache_version !== expectedCacheVersion) throw new Error(`Cache público ${buildInfo.cache_version}; esperado ${expectedCacheVersion}.`);
+    if (!buildInfo.source_files_sha256?.index_html || !buildInfo.source_files_sha256?.app_js || !buildInfo.source_files_sha256?.service_worker_js) {
+      throw new Error("Hashes das fontes canônicas ausentes.");
+    }
     if (buildInfo.questions !== questions || buildInfo.materials !== materials) throw new Error("Totais públicos divergem do catálogo entregue.");
     if (questions !== Number(catalog.summary?.questoes) || materials !== Number(catalog.summary?.materiais)) throw new Error("Resumo público diverge dos dados reais.");
-    for (const marker of ["app-v4.js?v=7", "reports-v2-10.js?v=2", "manifest.webmanifest"]) {
+    if (!appReference || !pwaReference) throw new Error("HTML público sem referências versionadas ao aplicativo e ao PWA.");
+    for (const marker of [appReference, pwaReference, "reports-v2-10.js?v=2", "manifest.webmanifest"]) {
       if (!index.includes(marker)) throw new Error(`HTML público sem ${marker}.`);
     }
     for (const marker of ["Catálogo inconsistente.", 'data-study-view="provas"', "function renderDisciplineTopics()"] ) {
       if (!app.includes(marker)) throw new Error(`Aplicação pública sem ${marker}.`);
     }
-    if (!worker.includes('sedes-questoes-v2-11-1') || !worker.includes("app-v4.js?v=7")) throw new Error("Service worker público desatualizado.");
+    for (const marker of [expectedCacheVersion, appReference, pwaReference, 'event.request.mode === "navigate"', 'cache: "no-store"', 'type === "SKIP_WAITING"']) {
+      if (!worker.includes(marker)) throw new Error(`Service worker público sem ${marker}.`);
+    }
+    for (const marker of ['updateViaCache: "none"', "controllerchange", "registration.update()"] ) {
+      if (!pwa.includes(marker)) throw new Error(`Registro PWA público sem ${marker}.`);
+    }
     if (!reports.includes("restoreBackupTransaction")) throw new Error("Relatórios e backup não foram publicados.");
 
-    console.log(`✓ Deploy estático confirmado em ${base}: versão ${buildInfo.version}, commit ${buildInfo.source_sha}, ${questions} questões e ${materials} materiais.`);
+    console.log(`✓ Deploy estático confirmado em ${base}: versão ${buildInfo.version}, commit ${buildInfo.source_sha}, cache ${expectedCacheVersion}, ${questions} questões e ${materials} materiais.`);
     process.exit(0);
   } catch (error) {
     lastError = error;
