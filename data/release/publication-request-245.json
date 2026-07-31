@@ -2,6 +2,7 @@
   "lot": "REL-2026-07-QDX-2026-LOTE-245-001",
   "questions": 245,
   "requested_at": "2026-07-31T03:16:00Z",
+  "verification_requested_at": "2026-07-31T03:38:00Z",
   "source_snapshot_commit": "271ea95a2d10fcfb6421936ac0583218b61fea42",
-  "status": "deployment_requested"
+  "status": "public_deployment_verification_requested"
 }
