@@ -25,11 +25,11 @@ jobs:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes
           READINESS_REPORT: artifacts/site-readiness-report.json
-        run: node scripts/report-site-readiness.mjs
+        run: node scripts/report-site-readiness-v2.mjs
       - name: Publicar relatório técnico
         uses: actions/upload-artifact@v5
         with:
-          name: site-readiness-report
+          name: site-readiness-report-v2
           path: artifacts/site-readiness-report.json
           if-no-files-found: error
           retention-days: 7
