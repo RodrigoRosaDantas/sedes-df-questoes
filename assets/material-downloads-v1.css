@@ -1,0 +1,19 @@
+.material-download-card {
+  align-content: start;
+}
+
+.material-download-actions {
+  display: grid;
+  gap: .75rem;
+  margin-top: auto;
+}
+
+.material-download-actions .btn {
+  width: 100%;
+}
+
+@media (min-width: 760px) {
+  .material-download-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
