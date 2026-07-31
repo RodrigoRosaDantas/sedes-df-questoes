@@ -1,0 +1,117 @@
+name: Ajustar mesclagem incremental do Notion uma vez
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.head_ref == 'feature/notion-sync-ce-v2-12'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - name: Aplicar mesclagem incremental segura
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          exporter_path = Path('scripts/export-notion-snapshot.mjs')
+          exporter = exporter_path.read_text()
+          exporter = exporter.replace(
+              ".filter(row => row['Pode publicar'] === true || clean(row['Código GitHub']))",
+              ".filter(row => row['Pode publicar'] === true)",
+          ).replace(
+              "publication_rule: 'Pode publicar = true ou Código GitHub preenchido; alternativas A–E vazias = Certo / Errado',",
+              "publication_rule: 'Pode publicar = true; alternativas A–E vazias = Certo / Errado',",
+          )
+          exporter_path.write_text(exporter)
+
+          applier_path = Path('scripts/apply-notion-snapshot.mjs')
+          applier = applier_path.read_text()
+          marker = '''for (const record of snapshot.records || []) {
+            const current = matchRecord(record);'''.replace('            ', '')
+          if marker not in applier and 'Preservar questões atuais ausentes do snapshot' not in applier:
+              raise SystemExit('Loop de aplicação do snapshot não localizado')
+          append_before = '''
+          for (const material of finalMaterials.values()) {
+            material.questoes.sort'''.replace('          ', '')
+          retained_block = '''
+          // Preservar questões atuais ausentes do snapshot: o Notion acrescenta e atualiza,
+          // mas não remove automaticamente conteúdo já publicado.
+          for (const currentMaterial of currentMaterials.values()) {
+            if (!finalMaterials.has(currentMaterial.id)) {
+              const {questoes, ...metadata} = currentMaterial;
+              finalMaterials.set(currentMaterial.id, {...metadata, questoes: []});
+            }
+            const target = finalMaterials.get(currentMaterial.id);
+            for (const currentQuestion of currentMaterial.questoes || []) {
+              if (usedIds.has(key(currentQuestion.id)) || usedCodes.has(key(currentQuestion.codigo))) continue;
+              target.questoes.push(currentQuestion);
+              usedIds.add(key(currentQuestion.id));
+              usedCodes.add(key(currentQuestion.codigo));
+            }
+          }
+
+          for (const material of finalMaterials.values()) {
+            material.questoes.sort'''.replace('          ', '')
+          if append_before in applier:
+              applier = applier.replace(append_before, retained_block)
+          elif 'Preservar questões atuais ausentes do snapshot' not in applier:
+              raise SystemExit('Ponto de preservação não localizado')
+          applier = applier.replace(
+              "questoes: snapshot.totals.published,",
+              "questoes: [...finalMaterials.values()].reduce((sum, material) => sum + material.questoes.length, 0),",
+          ).replace(
+              "aguardando_auditoria: snapshot.totals.pending,",
+              "aguardando_auditoria: Math.max(0, snapshot.totals.all - [...finalMaterials.values()].reduce((sum, material) => sum + material.questoes.length, 0)),",
+          ).replace(
+              "criteria: `${snapshot.totals.published} questões liberadas por “Pode publicar = true”; alternativas A–E vazias são tratadas como Certo/Errado; ${snapshot.totals.pending} registros permanecem em revisão editorial.`,",
+              "criteria: `${snapshot.totals.published} registros atualmente liberados pelo Notion foram mesclados à release existente; alternativas A–E vazias são tratadas como Certo/Errado.`,",
+          )
+          applier_path.write_text(applier)
+
+          validator_path = Path('scripts/validate-release-v2-4.mjs')
+          validator = validator_path.read_text()
+          validator = validator.replace(
+              'const expectedQuestions = snapshot ? Number(snapshot.totals.published) : Number(config.expected_questions) + activeQuestions;',
+              'const expectedQuestions = snapshot ? Number(catalog.summary.questoes) : Number(config.expected_questions) + activeQuestions;',
+          ).replace(
+              'const expectedMaterials = snapshot ? Number(snapshot.totals.materials) : Number(config.expected_materials) + activeEntries.length;',
+              'const expectedMaterials = snapshot ? Number(catalog.summary.materiais) : Number(config.expected_materials) + activeEntries.length;',
+          ).replace(
+              'const expectedPending = snapshot ? Number(snapshot.totals.pending) : Number(config.aguardando_auditoria) - activeQuestions;',
+              'const expectedPending = snapshot ? Math.max(0, Number(snapshot.totals.all) - expectedQuestions) : Number(config.aguardando_auditoria) - activeQuestions;',
+          ).replace(
+              '''const expectedTrueFalse = snapshot
+            ? snapshot.records.filter(record => record.format === "Certo / Errado").length
+            : activeQuestions;'''.replace('            ', ''),
+              '''const expectedTrueFalse = snapshot
+            ? null
+            : activeQuestions;'''.replace('            ', ''),
+          ).replace(
+              'if (trueFalseQuestions !== expectedTrueFalse) fail(`Total C/E ativo divergente: esperado ${expectedTrueFalse}, encontrado ${trueFalseQuestions}.`);',
+              'if (snapshot ? trueFalseQuestions < activeQuestions : trueFalseQuestions !== expectedTrueFalse) fail(`Total C/E ativo divergente: mínimo/esperado ${snapshot ? activeQuestions : expectedTrueFalse}, encontrado ${trueFalseQuestions}.`);',
+          )
+          insertion = 'if (snapshot) {\n  for (const record of snapshot.records) {\n    if (!codes.has(record.code)) fail(`${record.code}: registro publicável do Notion não entrou na release.`);\n  }\n}\n'
+          anchor = 'for (const entry of activeEntries) {'
+          if insertion not in validator:
+              validator = validator.replace(anchor, insertion + anchor)
+          validator_path.write_text(validator)
+          PY
+      - name: Registrar ajuste
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add scripts/export-notion-snapshot.mjs scripts/apply-notion-snapshot.mjs scripts/validate-release-v2-4.mjs
+          if git diff --cached --quiet; then
+            echo 'Mesclagem incremental já aplicada.'
+          else
+            git commit -m 'Mescla o Notion sem remover questões já publicadas'
+            git push origin HEAD:${{ github.head_ref }}
+          fi
