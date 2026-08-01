@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
-      SOURCE_SHA: b3c49b912471b667c6d520ae007f34c4c0fac76b
+      SOURCE_SHA: 68980eba79d1afd34c6cf2b69722549105f1a596
     steps:
       - name: Acionar e acompanhar publicação auditada
         env:
@@ -46,4 +46,4 @@ jobs:
           gh run watch "${RUN_ID}" --repo "${GITHUB_REPOSITORY}" --exit-status --interval 10
 
       - name: Registrar aprovação pública
-        run: echo "✓ Plataforma 2.13.0 e novos recursos aprovados no site público pelo commit ${SOURCE_SHA}."
+        run: echo "✓ Plataforma 2.13.0 e novos recursos aprovados no site público pelo commit final ${SOURCE_SHA}."
