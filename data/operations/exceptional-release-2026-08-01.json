@@ -1,11 +1,11 @@
 {
   "operation_id": "EXC-2026-08-01-PROVAS-PENDENTES",
   "revision": 2,
-  "retry": 4,
+  "retry": 5,
   "authorized": true,
   "authorized_at": "2026-08-01T02:37:00-03:00",
   "corrected_at": "2026-08-01T03:06:00-03:00",
-  "retried_at": "2026-08-01T04:05:00-03:00",
+  "retried_at": "2026-08-01T10:26:00-03:00",
   "scope": "provas_pendentes",
   "ordinary_review_gates_waived": true,
   "preserve_existing_publication": true,
@@ -16,5 +16,5 @@
     "duplicada"
   ],
   "technical_policy": "corrigir somente o indispensavel para publicar",
-  "technical_fix": "PROVA-QDX-CRTR12-2026-AUXILIAR-ADMINISTRATIVO-200-035"
+  "technical_fix_resolution": "A questão CRTR12 Auxiliar Administrativo 200-035 foi excluída corretamente como duplicada de conteúdo; o pós-processador que exigia sua presença foi removido."
 }
