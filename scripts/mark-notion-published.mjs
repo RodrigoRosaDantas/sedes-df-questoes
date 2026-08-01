@@ -114,6 +114,14 @@ function publicationProperties(properties, recordCode) {
   return patch;
 }
 
+function exceptionalPublicationProperties() {
+  return {
+    'Código GitHub': rich(releaseCode),
+    'Data da publicação': {date: {start: publicationDate}},
+    'Status editorial — registro manual anterior': {select: {name: 'Publicada'}},
+  };
+}
+
 const plannedCodes = new Set(plan.lots.flatMap(item => item.codes));
 const selected = (snapshot.records || []).filter(record => (
   plannedCodes.has(clean(record.code)) || exceptionalCodes.has(clean(record.code))
@@ -147,6 +155,15 @@ for (const item of plan.lots) {
 const pendingUpdates = [];
 let alreadyPublished = 0;
 for (const record of selected) {
+  if (record.publication_exception) {
+    if (clean(record.github_id)) {
+      alreadyPublished += 1;
+      continue;
+    }
+    pendingUpdates.push({record, properties: null});
+    continue;
+  }
+
   const current = await request(`/pages/${record.notion_id}`);
   const properties = current.properties || {};
   const currentCode = clean(plain(properties['Código']));
@@ -160,17 +177,14 @@ for (const record of selected) {
     alreadyPublished += 1;
     continue;
   }
-
-  if (!record.publication_exception) {
-    if (currentLot !== clean(record.publication_lot)) {
-      throw new Error(`${record.code}: lote atual no Notion divergiu após o snapshot: ${currentLot || 'vazio'}.`);
-    }
-    if (!booleanValue(properties['Pode publicar'])) {
-      throw new Error(`${record.code}: gate Pode publicar foi retirado após o snapshot.`);
-    }
-    if (!booleanValue(properties['Liberada para exportação'])) {
-      throw new Error(`${record.code}: liberação para exportação foi retirada após o snapshot.`);
-    }
+  if (currentLot !== clean(record.publication_lot)) {
+    throw new Error(`${record.code}: lote atual no Notion divergiu após o snapshot: ${currentLot || 'vazio'}.`);
+  }
+  if (!booleanValue(properties['Pode publicar'])) {
+    throw new Error(`${record.code}: gate Pode publicar foi retirado após o snapshot.`);
+  }
+  if (!booleanValue(properties['Liberada para exportação'])) {
+    throw new Error(`${record.code}: liberação para exportação foi retirada após o snapshot.`);
   }
 
   pendingUpdates.push({record, properties});
@@ -178,9 +192,12 @@ for (const record of selected) {
 
 let updated = 0;
 for (const {record, properties} of pendingUpdates) {
+  const patch = record.publication_exception
+    ? exceptionalPublicationProperties()
+    : publicationProperties(properties, record.code);
   await request(`/pages/${record.notion_id}`, {
     method: 'PATCH',
-    body: JSON.stringify({properties: publicationProperties(properties, record.code)}),
+    body: JSON.stringify({properties: patch}),
   });
   updated += 1;
   if (updated % 25 === 0) console.log(`${updated}/${pendingUpdates.length} registros autorizados fechados no Notion.`);
