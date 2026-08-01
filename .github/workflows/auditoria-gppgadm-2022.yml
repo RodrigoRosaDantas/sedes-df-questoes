@@ -1,0 +1,73 @@
+name: Auditoria GPPGADM 2022
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/auditar-gppgadm-2022.mjs'
+      - '.github/workflows/auditoria-gppgadm-2022.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: auditoria-gppgadm-2022-20260731
+  cancel-in-progress: false
+
+jobs:
+  auditar:
+    if: github.head_ref == 'agent/auditoria-gppgadm-2022-20260731'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Preparar ferramentas de leitura oficial
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils unzip
+
+      - name: Baixar prova e gabarito oficiais
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/auditoria-gppgadm-2022/oficial/provas
+          curl -fL --retry 3 --retry-delay 2 -A 'Mozilla/5.0' \
+            'https://quadrix.org.br/uploads/861/concursos/1180/anexos/d901d108bc8976c4fa40c7b7554385ea.pdf?v205742=' \
+            -o artifacts/auditoria-gppgadm-2022/oficial/gabarito-definitivo.pdf
+          curl -fL --retry 3 --retry-delay 2 -A 'Mozilla/5.0' \
+            'https://anexos.cdn.selecao.net.br/uploads/861/concursos/1180/anexos/663a2282-84f2-4991-8f93-720a3a58f659.zip' \
+            -o artifacts/auditoria-gppgadm-2022/oficial/provas-tipo-a-gestor.zip
+          unzip -q artifacts/auditoria-gppgadm-2022/oficial/provas-tipo-a-gestor.zip \
+            -d artifacts/auditoria-gppgadm-2022/oficial/provas
+          pdftotext -layout artifacts/auditoria-gppgadm-2022/oficial/gabarito-definitivo.pdf \
+            artifacts/auditoria-gppgadm-2022/oficial/gabarito-definitivo.txt
+          find artifacts/auditoria-gppgadm-2022/oficial/provas -type f -iname '*.pdf' -print0 |
+            while IFS= read -r -d '' pdf; do
+              pdftotext -layout "$pdf" "$pdf.txt"
+            done
+          find artifacts/auditoria-gppgadm-2022/oficial -maxdepth 3 -type f -printf '%P\n' | sort \
+            > artifacts/auditoria-gppgadm-2022/oficial/arquivos.txt
+          echo 'OFFICIAL_FILES_BEGIN'
+          cat artifacts/auditoria-gppgadm-2022/oficial/arquivos.txt
+          echo 'OFFICIAL_FILES_END'
+
+      - name: Comparar Notion, main e site público
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/auditar-gppgadm-2022.mjs
+
+      - name: Preservar relatório e fontes extraídas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: auditoria-gppgadm-2022-20260731
+          path: artifacts/auditoria-gppgadm-2022
+          if-no-files-found: error
+          retention-days: 90
