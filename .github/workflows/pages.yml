@@ -136,7 +136,7 @@ jobs:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           RELEASE_COMMIT: ${{ github.sha }}
           PUBLICATION_PLAN_PATH: ${{ env.PUBLICATION_PLAN_PATH }}
-        run: node scripts/mark-notion-published.mjs
+        run: node scripts/dist-mark-notion-published.mjs
       - name: Acionar rollback para a última release aprovada
         if: steps.static_verify.outcome == 'failure' || steps.browser_verify.outcome == 'failure'
         env:
