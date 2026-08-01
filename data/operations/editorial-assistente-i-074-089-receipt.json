@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "EDT-2026-08-01-CRFDF-ASSISTENTE-I-074-089",
+  "material": "Assistente I — CRF-DF — Quadrix 2026",
+  "source_release_sha": "8a528d925807db558967a3ff0a956006e87356a5",
+  "status": "success",
+  "expected_records": 16,
+  "updated_records": 16,
+  "field_updated": "Fundamento legal",
+  "editorial_basis": "Fundamento teórico — elaboração editorial com base no enunciado e no comentário validado",
+  "updated_codes": [
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-074",
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-075",
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-076",
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-077",
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-078",
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-079",
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-080",
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-081",
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-082",
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-083",
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-084",
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-085",
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-086",
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-087",
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-088",
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-089"
+  ],
+  "preserved_fields": [
+    "Código",
+    "Enunciado",
+    "Texto-base",
+    "Gabarito",
+    "Comentário geral",
+    "Subassunto",
+    "Pegadinha",
+    "Código GitHub",
+    "Data da publicação",
+    "Status editorial — registro manual anterior"
+  ],
+  "verification": {
+    "method": "Leitura prévia individual e releitura posterior do início, meio e fim do lote",
+    "verified_codes": [
+      "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-074",
+      "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-081",
+      "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-089"
+    ]
+  },
+  "site_deployed": false,
+  "publication_queue_reopened": false,
+  "recorded_date": "2026-08-01"
+}
