@@ -1,11 +1,11 @@
 {
   "operation_id": "EXC-2026-08-01-PROVAS-PENDENTES",
   "revision": 2,
-  "retry": 10,
+  "retry": 11,
   "authorized": true,
   "authorized_at": "2026-08-01T02:37:00-03:00",
   "corrected_at": "2026-08-01T03:06:00-03:00",
-  "retried_at": "2026-08-01T11:41:00-03:00",
+  "retried_at": "2026-08-01T11:47:00-03:00",
   "scope": "provas_pendentes",
   "ordinary_review_gates_waived": true,
   "preserve_existing_publication": true,
@@ -23,6 +23,9 @@
     "Corrigida no Banco Mestre a marcação indevida de recurso visual da questão PROVA-QDX-SEEDF-2025-ART-A-077, que é integralmente textual.",
     "Corrigida no Banco Mestre a marcação indevida de recurso visual da questão PROVA-QDX-SEEDF-2025-ART-A-097, que é integralmente textual.",
     "Corrigida no Banco Mestre a marcação indevida de recurso visual da questão PROVA-QDX-SEEDF-2025-ART-A-102, que é integralmente textual.",
-    "Adicionada auditoria persistente para listar todos os recursos visuais incompletos do candidato em uma única execução."
+    "Adicionada auditoria persistente para listar todos os recursos visuais incompletos do candidato em uma única execução.",
+    "Corrigida no Banco Mestre a marcação indevida de imagem dos itens PROVA-QDX-SEEDF-2025-QUI-A-085, 086, 087, 089, 090, 091 e 092, cujas fórmulas e equações já estão transcritas em texto.",
+    "Adicionada reconstrução vetorial acessível da célula animal numerada usada pelos itens PROVA-QDX-SEEDF-2025-BIO-A-071 a 076.",
+    "Adicionada reconstrução vetorial acessível do microscópio óptico numerado usado pelos itens PROVA-QDX-SEEDF-2025-BIO-A-086 a 090."
   ]
 }
