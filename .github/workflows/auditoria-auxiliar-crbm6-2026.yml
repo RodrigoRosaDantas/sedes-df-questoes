@@ -68,9 +68,9 @@ jobs:
           jq -r '.[] | select(.body | startswith("SANITIZER_CHUNK_2:")) | .body | sub("^SANITIZER_CHUNK_2:"; "")' "$COMMENTS" | tail -n 1 > "$RUNNER_TEMP/chunk2"
           test -s "$RUNNER_TEMP/chunk1"
           test -s "$RUNNER_TEMP/chunk2"
-          cat "$RUNNER_TEMP/chunk1" "$RUNNER_TEMP/chunk2" | base64 -d | gzip -d > "$RUNNER_TEMP/sanear-auxiliar-crbm6-2026.mjs"
-          node --check "$RUNNER_TEMP/sanear-auxiliar-crbm6-2026.mjs"
-          echo "SANITIZER_SHA256=$(sha256sum "$RUNNER_TEMP/sanear-auxiliar-crbm6-2026.mjs" | cut -d' ' -f1)"
+          cat "$RUNNER_TEMP/chunk1" "$RUNNER_TEMP/chunk2" | base64 -d | gzip -d > scripts/sanear-auxiliar-crbm6-2026.runtime.mjs
+          node --check scripts/sanear-auxiliar-crbm6-2026.runtime.mjs
+          echo "SANITIZER_SHA256=$(sha256sum scripts/sanear-auxiliar-crbm6-2026.runtime.mjs | cut -d' ' -f1)"
 
       - name: Registrar diagnóstico inicial
         env:
@@ -80,7 +80,7 @@ jobs:
       - name: Executar reconstrução e saneamento integral
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        run: node "$RUNNER_TEMP/sanear-auxiliar-crbm6-2026.mjs"
+        run: node scripts/sanear-auxiliar-crbm6-2026.runtime.mjs
 
       - name: Preservar relatório e fonte oficial
         if: always()
