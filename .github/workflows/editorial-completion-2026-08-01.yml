@@ -6,6 +6,10 @@ on:
       - agent/editorial-completion-2026-08-01
     paths:
       - data/editorial/editorial-completion-2026-08-01.json
+  pull_request:
+    branches: [main]
+    paths:
+      - data/editorial/editorial-completion-2026-08-01.json
 
 permissions:
   contents: write
