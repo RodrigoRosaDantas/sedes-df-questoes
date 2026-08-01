@@ -17,6 +17,7 @@ concurrency:
 env:
   PUBLICATION_PLAN_PATH: data/notion/publication-plan.json
   EXCEPTION_REPORT_PATH: data/notion/exceptional-release-report.json
+  CANDIDATE_BRANCH: ops/exceptional-candidate-2026-08-01
 
 jobs:
   release:
@@ -48,11 +49,8 @@ jobs:
       - name: Fixar lote, contagem e códigos da publicação
         run: node scripts/create-publication-plan.mjs
 
-      - name: Construir e validar integralmente a plataforma
-        run: npm run check
-
-      - name: Versionar somente snapshot, plano e relatório da operação
-        id: publish_snapshot
+      - name: Registrar candidato em branch isolado de auditoria
+        id: candidate
         shell: bash
         run: |
           set -euo pipefail
@@ -60,10 +58,22 @@ jobs:
           if git diff --cached --quiet; then
             echo 'A operação não produziu mudança semântica.'
           else
-            git commit -m 'Publicar provas pendentes em caráter excepcional'
+            git commit -m 'Preparar candidato da publicação excepcional'
           fi
+          CANDIDATE_SHA=$(git rev-parse HEAD)
+          git push --force origin "HEAD:refs/heads/${CANDIDATE_BRANCH}"
+          echo "candidate_sha=${CANDIDATE_SHA}" >> "$GITHUB_OUTPUT"
+          echo "✓ Candidato auditável registrado em ${CANDIDATE_BRANCH}: ${CANDIDATE_SHA}."
 
-          git reset --hard HEAD
+      - name: Construir e validar integralmente a plataforma
+        run: npm run check
+
+      - name: Limpar artefatos e promover somente o candidato validado
+        id: publish_snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          git reset --hard "${{ steps.candidate.outputs.candidate_sha }}"
           git clean -fd
           if [ -n "$(git status --porcelain)" ]; then
             echo 'O diretório permaneceu sujo após a limpeza dos artefatos de build.'
@@ -74,6 +84,9 @@ jobs:
           git fetch origin main
           if ! git merge-base --is-ancestor origin/main HEAD; then
             git rebase origin/main
+            npm run check
+            git reset --hard HEAD
+            git clean -fd
           fi
           git push origin HEAD:main
           echo "source_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
