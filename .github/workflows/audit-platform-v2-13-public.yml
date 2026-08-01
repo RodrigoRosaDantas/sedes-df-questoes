@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
-      SOURCE_SHA: 2e83ad1a313a2378e180c16057be5afacb376f80
+      SOURCE_SHA: be95181afea79e4c2327ca81beea79f5667969b6
     steps:
       - name: Acionar e acompanhar publicação auditada
         env:
@@ -24,7 +24,7 @@ jobs:
         run: |
           set -euo pipefail
           DISPATCHED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-          gh workflow run pages.yml --repo "${GITHUB_REPOSITORY}" --ref main -f source_sha="${SOURCE_SHA}"
+          gh workflow run pages.yml --repo "${GITHUB_REPOSITORY}" --ref main -f source_sha="${SOURCE_SHA}" -f close_notion=false
 
           RUN_ID=''
           for attempt in $(seq 1 60); do
@@ -46,4 +46,4 @@ jobs:
           gh run watch "${RUN_ID}" --repo "${GITHUB_REPOSITORY}" --exit-status --interval 10
 
       - name: Registrar aprovação pública
-        run: echo "✓ Plataforma 2.13.0, acervo integral e novos recursos aprovados no site público pelo commit final ${SOURCE_SHA}."
+        run: echo "✓ Plataforma 2.13.0, acervo integral e novos recursos aprovados no site público pelo commit final ${SOURCE_SHA}, sem escrita editorial na auditoria."
