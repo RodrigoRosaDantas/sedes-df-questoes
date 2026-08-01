@@ -5,12 +5,11 @@ on:
     branches: [main]
     paths:
       - 'scripts/auditar-agente-fiscal-crefito17-2026.mjs'
+      - 'scripts/sanear-agente-fiscal-crefito17-2026.mjs'
       - '.github/workflows/auditoria-agente-fiscal-crefito17-2026.yml'
 
 permissions:
   contents: read
-  issues: read
-  pull-requests: read
 
 concurrency:
   group: saneamento-agente-fiscal-crefito17-20260801
@@ -33,7 +32,7 @@ jobs:
       - name: Preparar ferramentas
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq poppler-utils unzip jq
+          sudo apt-get install -y -qq poppler-utils unzip
 
       - name: Baixar e extrair caderno, gabarito e recursos oficiais
         shell: bash
@@ -57,103 +56,11 @@ jobs:
           pdftotext -layout "$BASE/analise-recursos.pdf" "$BASE/analise-recursos.txt"
           sha256sum "$BASE/provas-aplicadas.zip" "$BASE/401_Agente-Fiscal_CREFITO-17_2026.pdf" "$BASE/gabarito-definitivo.pdf" "$BASE/analise-recursos.pdf" > "$BASE/sha256.txt"
 
-      - name: Reconstruir rotina temporária de saneamento
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
+      - name: Validar rotinas
         run: |
-          set -euo pipefail
-          COMMENTS="$RUNNER_TEMP/comments.json"
-          curl -fsSL \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H 'Accept: application/vnd.github+json' \
-            -H 'X-GitHub-Api-Version: 2022-11-28' \
-            'https://api.github.com/repos/${{ github.repository }}/issues/61/comments?per_page=100' \
-            -o "$COMMENTS"
-          python3 - "$COMMENTS" scripts/sanear-agente-fiscal-crefito17-2026.runtime.mjs <<'PY'
-          import base64
-          import gzip
-          import hashlib
-          import json
-          import re
-          import sys
-          from pathlib import Path
-
-          comments_path = Path(sys.argv[1])
-          output_path = Path(sys.argv[2])
-          comments = json.loads(comments_path.read_text(encoding='utf-8'))
-
-          prefixes = {
-              'integral': 'SANITIZER_AGENTEFISCAL:',
-              'fragmento_1': 'SANITIZER_AGENTEFISCAL_1:',
-              'fragmento_2': 'SANITIZER_AGENTEFISCAL_2:',
-          }
-          payloads = {}
-          for name, prefix in prefixes.items():
-              matches = [item.get('body', '')[len(prefix):] for item in comments if item.get('body', '').startswith(prefix)]
-              if matches:
-                  payloads[name] = ''.join(matches[-1].split())
-
-          if not payloads:
-              raise SystemExit('Nenhum pacote temporário foi encontrado nos comentários do PR.')
-
-          alphabet = re.compile(r'^[A-Za-z0-9+/=]*$')
-          for name, payload in payloads.items():
-              print(f'PAYLOAD_{name.upper()}_LENGTH={len(payload)}')
-              print(f'PAYLOAD_{name.upper()}_VALID_ALPHABET={bool(alphabet.fullmatch(payload))}')
-              print(f'PAYLOAD_{name.upper()}_MOD4={len(payload) % 4}')
-              print(f'PAYLOAD_{name.upper()}_SHA256={hashlib.sha256(payload.encode()).hexdigest()}')
-
-          def decode_raw(name, payload):
-              candidate = payload + ('=' * (-len(payload) % 4))
-              try:
-                  raw = base64.b64decode(candidate, validate=True)
-                  print(f'RAW_{name.upper()}_BYTES={len(raw)}')
-                  print(f'RAW_{name.upper()}_SHA256={hashlib.sha256(raw).hexdigest()}')
-                  return raw
-              except Exception as exc:
-                  print(f'RAW_{name.upper()}_ERROR={type(exc).__name__}:{exc}')
-                  return None
-
-          def decompress(name, raw):
-              if not raw:
-                  return None
-              try:
-                  data = gzip.decompress(raw)
-                  print(f'DECOMPRESS_{name.upper()}_BYTES={len(data)}')
-                  print(f'DECOMPRESS_{name.upper()}_SHA256={hashlib.sha256(data).hexdigest()}')
-                  return data
-              except Exception as exc:
-                  print(f'DECOMPRESS_{name.upper()}_ERROR={type(exc).__name__}:{exc}')
-                  return None
-
-          raw = {name: decode_raw(name, payload) for name, payload in payloads.items()}
-          result = decompress('integral', raw.get('integral'))
-          route = 'integral' if result else None
-
-          if not result and raw.get('fragmento_1') and raw.get('fragmento_2'):
-              result = decompress('bytes_fragmentados', raw['fragmento_1'] + raw['fragmento_2'])
-              route = 'bytes_fragmentados' if result else None
-
-          if not result and raw.get('integral') and raw.get('fragmento_2'):
-              result = decompress('integral_mais_fragmento_2', raw['integral'] + raw['fragmento_2'])
-              route = 'integral_mais_fragmento_2' if result else None
-
-          if not result and payloads.get('fragmento_1') and payloads.get('fragmento_2'):
-              combined_payload = payloads['fragmento_1'].rstrip('=') + payloads['fragmento_2']
-              result = decompress('base64_recomposto', decode_raw('base64_recomposto', combined_payload))
-              route = 'base64_recomposto' if result else None
-
-          if not result:
-              raise SystemExit('Nenhuma rota de reconstrução produziu um gzip íntegro.')
-
-          output_path.write_bytes(result)
-          print(f'SANITIZER_ROUTE={route}')
-          print(f'SANITIZER_BYTES={len(result)}')
-          print(f'SANITIZER_SHA256={hashlib.sha256(result).hexdigest()}')
-          PY
           node --check scripts/auditar-agente-fiscal-crefito17-2026.mjs
-          node --check scripts/sanear-agente-fiscal-crefito17-2026.runtime.mjs
+          node --check scripts/sanear-agente-fiscal-crefito17-2026.mjs
+          sha256sum scripts/sanear-agente-fiscal-crefito17-2026.mjs
 
       - name: Registrar diagnóstico inicial
         env:
@@ -163,7 +70,7 @@ jobs:
       - name: Reconstruir e sanear os 120 itens
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        run: node scripts/sanear-agente-fiscal-crefito17-2026.runtime.mjs
+        run: node scripts/sanear-agente-fiscal-crefito17-2026.mjs
 
       - name: Auditar estado final
         env:
