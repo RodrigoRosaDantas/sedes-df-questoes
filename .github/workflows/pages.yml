@@ -62,6 +62,10 @@ jobs:
             exit 1
           fi
           echo "✓ Build vinculado ao commit ${GITHUB_SHA} e ao snapshot versionado."
+      - name: Exportar somente o saneamento editorial autorizado
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/export-editorial-platform-sync.mjs
       - name: Gerar e validar aplicação, banco, plano e informações da prova
         run: npm run check
       - name: Instalar navegador de teste e auditar dependências
