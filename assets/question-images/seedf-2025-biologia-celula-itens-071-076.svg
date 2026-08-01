@@ -27,7 +27,7 @@
   <g transform="translate(309 474)"><rect x="0" y="0" width="70" height="26" rx="10" fill="#ddd" stroke="#222" stroke-width="4" transform="rotate(28 35 13)"/><rect x="35" y="18" width="70" height="26" rx="10" fill="#fff" stroke="#222" stroke-width="4" transform="rotate(92 70 31)"/></g>
   <circle cx="675" cy="348" r="30" fill="#eee" stroke="#222" stroke-width="4"/><circle cx="218" cy="377" r="19" fill="#fff" stroke="#222" stroke-width="4"/><circle cx="594" cy="530" r="25" fill="#fff" stroke="#222" stroke-width="4"/><path d="M192 244 C224 223 250 226 273 247 C246 270 218 270 192 244 Z" fill="#ddd" stroke="#222" stroke-width="4"/>
   <g fill="none" stroke="#222" stroke-width="2" marker-end="url(#arrow)">
-    <path d="M880 122 L736 218"/><path d="M916 216 L728 330"/><path d="M908 316 L606 323"/><path d="M900 400 L806 432"/><path d="M875 526 L760 480"/><path d="M135 120 L207 226"/><path d="M70 220 L133 279"/><path d="M60 350 L198 374"/><path d="M80 532 L315 496"/><path d="M430 671 L583 548"/>
+    <path d="M880 122 L736 218"/><path d="M916 216 L728 330"/><path d="M908 316 L606 323"/><path d="M900 400 L806 432"/><path d="M875 526 L760 480"/><path d="M135 120 L300 245"/><path d="M70 220 L133 279"/><path d="M60 350 L198 374"/><path d="M80 532 L315 496"/><path d="M430 671 L410 432"/>
   </g>
   <g font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#111" text-anchor="middle">
     <circle cx="900" cy="110" r="23" fill="#fff" stroke="#222" stroke-width="4"/><text x="900" y="119">1</text>
