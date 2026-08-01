@@ -38,10 +38,7 @@ jobs:
       - name: Montar e validar as partes do lote
         id: assemble
         continue-on-error: true
-        shell: bash
-        run: |
-          set -o pipefail
-          node scripts/assemble-editorial-operation.mjs 2>&1 | tee /tmp/editorial-assemble.log
+        run: node scripts/assemble-editorial-operation.mjs
 
       - name: Aplicar correções com preflight e verificação integral
         id: editorial
@@ -62,28 +59,24 @@ jobs:
           set -euo pipefail
           if [ ! -f "${EDITORIAL_RECEIPT_PATH}" ]; then
             mkdir -p "$(dirname "${EDITORIAL_RECEIPT_PATH}")"
-            ASSEMBLY_LOG=$(tail -n 80 /tmp/editorial-assemble.log 2>/dev/null || echo 'Recibo editorial não foi produzido.')
             jq -n \
-              --arg operation_id 'EDT-2026-08-01-CREFITO17-AUXILIAR-120' \
+              --arg operation_id 'EDT-2026-08-01-CREFITO17-AGENTE-FISCAL-57' \
               --arg status 'failure' \
               --arg stage 'assembly' \
               --arg assemble_outcome "${ASSEMBLE_OUTCOME:-unknown}" \
               --arg editorial_outcome "${EDITORIAL_OUTCOME:-skipped}" \
-              --arg error "${ASSEMBLY_LOG}" \
               --arg finished_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-              '{schema_version:"1.0",operation_id:$operation_id,status:$status,stage:$stage,assemble_outcome:$assemble_outcome,editorial_outcome:$editorial_outcome,expected_records:120,updated_records:0,error:$error,finished_at:$finished_at}' \
+              '{schema_version:"1.1",operation_id:$operation_id,status:$status,stage:$stage,assemble_outcome:$assemble_outcome,editorial_outcome:$editorial_outcome,expected_records:57,updated_records:0,site_deployed:false,publication_queue_reopened:false,finished_at:$finished_at}' \
               > "${EDITORIAL_RECEIPT_PATH}"
           fi
           git config user.name 'sedes-df-editorial-sanitizer[bot]'
           git config user.email 'sedes-df-editorial-sanitizer[bot]@users.noreply.github.com'
           git add "${EDITORIAL_RECEIPT_PATH}"
           if ! git diff --cached --quiet; then
-            git commit -m 'Registrar saneamento editorial do CREFITO-17'
+            git commit -m 'Registrar saneamento editorial do Agente Fiscal'
             git push origin HEAD:agent/editorial-completion-2026-08-01
           fi
 
       - name: Reprovar lote não concluído
         if: steps.assemble.outcome != 'success' || steps.editorial.outcome != 'success'
-        run: |
-          echo 'O saneamento foi interrompido; consulte o recibo persistido no branch.'
-          exit 1
+        run: exit 1
