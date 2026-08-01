@@ -21,22 +21,28 @@ if (!RELEASE_SHA) throw new Error('Commit da release não informado.');
 
 const snapshotContent = fs.readFileSync(snapshotPath);
 const snapshot = JSON.parse(snapshotContent.toString('utf8'));
+const exceptionalRecords = (snapshot.records || []).filter(record => record.publication_exception);
+const exceptionalCodes = new Set(exceptionalRecords.map(record => String(record.code ?? '').trim()));
 const expectedPlan = buildPublicationPlan(snapshotContent);
-if (!fs.existsSync(planPath)) {
-  if (expectedPlan.total_records) {
-    throw new Error(
-      `Há ${expectedPlan.total_records} registro(s) sem rastreabilidade, mas nenhum plano explícito foi autorizado.`,
-    );
-  }
+let plan = {schema_version: '1.0', total_records: 0, lots: []};
+
+if (fs.existsSync(planPath)) {
+  plan = JSON.parse(fs.readFileSync(planPath, 'utf8'));
+  validatePublicationPlan(plan, snapshotContent);
+} else if (expectedPlan.total_records) {
+  throw new Error(
+    `Há ${expectedPlan.total_records} registro(s) sem rastreabilidade, mas nenhum plano explícito foi autorizado.`,
+  );
+}
+
+if (!plan.total_records && !exceptionalRecords.length) {
   console.log('✓ Nenhum lote autorizado aguarda fechamento no Notion.');
   process.exit(0);
 }
-
-const plan = JSON.parse(fs.readFileSync(planPath, 'utf8'));
-validatePublicationPlan(plan, snapshotContent);
-if (!plan.total_records) {
-  console.log('✓ Plano explícito vazio; nenhuma página do Notion será alterada.');
-  process.exit(0);
+if (exceptionalRecords.length) {
+  console.log(
+    `Exceção operacional ativa: ${exceptionalRecords.length} registro(s) serão fechados no Notion sem gates editoriais.`,
+  );
 }
 
 const catalog = JSON.parse(fs.readFileSync(catalogPath, 'utf8'));
@@ -109,9 +115,14 @@ function publicationProperties(properties, recordCode) {
 }
 
 const plannedCodes = new Set(plan.lots.flatMap(item => item.codes));
-const selected = (snapshot.records || []).filter(record => plannedCodes.has(clean(record.code)));
-if (selected.length !== plan.total_records) {
-  throw new Error(`Plano autorizou ${plan.total_records} registro(s), mas o snapshot resolveu ${selected.length}.`);
+const selected = (snapshot.records || []).filter(record => (
+  plannedCodes.has(clean(record.code)) || exceptionalCodes.has(clean(record.code))
+));
+const expectedSelected = new Set([...plannedCodes, ...exceptionalCodes]);
+if (selected.length !== expectedSelected.size) {
+  throw new Error(
+    `Escopo autorizou ${expectedSelected.size} registro(s), mas o snapshot resolveu ${selected.length}.`,
+  );
 }
 
 const publicCodes = new Set();
@@ -145,19 +156,23 @@ for (const record of selected) {
   if (currentCode !== clean(record.code)) {
     throw new Error(`${record.code}: código atual no Notion divergiu após o snapshot: ${currentCode || 'vazio'}.`);
   }
-  if (currentLot !== clean(record.publication_lot)) {
-    throw new Error(`${record.code}: lote atual no Notion divergiu após o snapshot: ${currentLot || 'vazio'}.`);
-  }
   if (currentGithub) {
     alreadyPublished += 1;
     continue;
   }
-  if (!booleanValue(properties['Pode publicar'])) {
-    throw new Error(`${record.code}: gate Pode publicar foi retirado após o snapshot.`);
+
+  if (!record.publication_exception) {
+    if (currentLot !== clean(record.publication_lot)) {
+      throw new Error(`${record.code}: lote atual no Notion divergiu após o snapshot: ${currentLot || 'vazio'}.`);
+    }
+    if (!booleanValue(properties['Pode publicar'])) {
+      throw new Error(`${record.code}: gate Pode publicar foi retirado após o snapshot.`);
+    }
+    if (!booleanValue(properties['Liberada para exportação'])) {
+      throw new Error(`${record.code}: liberação para exportação foi retirada após o snapshot.`);
+    }
   }
-  if (!booleanValue(properties['Liberada para exportação'])) {
-    throw new Error(`${record.code}: liberação para exportação foi retirada após o snapshot.`);
-  }
+
   pendingUpdates.push({record, properties});
 }
 
@@ -171,10 +186,10 @@ for (const {record, properties} of pendingUpdates) {
   if (updated % 25 === 0) console.log(`${updated}/${pendingUpdates.length} registros autorizados fechados no Notion.`);
 }
 
-if (updated + alreadyPublished !== plan.total_records) {
-  throw new Error('Fechamento da rastreabilidade terminou com contagem divergente do plano autorizado.');
+if (updated + alreadyPublished !== selected.length) {
+  throw new Error('Fechamento da rastreabilidade terminou com contagem divergente do escopo autorizado.');
 }
 console.log(
-  `✓ Rastreabilidade limitada ao plano: ${updated} atualizados e ${alreadyPublished} já publicados; `
-  + `${plan.total_records} registro(s) autorizados; release ${releaseCode}.`,
+  `✓ Rastreabilidade concluída: ${updated} atualizados e ${alreadyPublished} já publicados; `
+  + `${selected.length} registro(s) autorizados; release ${releaseCode}.`,
 );
