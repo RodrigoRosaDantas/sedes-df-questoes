@@ -6,6 +6,12 @@
       "image": "./assets/question-images/iades-seecdf-2023-ppggadm-a-054.svg",
       "description": "Fluxograma cíclico do processo orçamentário com quatro etapas: elaboração da proposta orçamentária; discussão, votação e aprovação da lei orçamentária; execução orçamentária; e controle e avaliação da execução orçamentária. As setas indicam a sequência e o retorno do controle à elaboração.",
       "provenance": "Reconstrução vetorial acessível baseada na descrição consolidada do Banco Mestre e na página 14 do caderno oficial informado no registro."
+    },
+    {
+      "code": "PROVA-QDX-SEEDF-2025-ART-A-072",
+      "image": "./assets/question-images/seedf-2025-art-a-072.svg",
+      "description": "Forma circular incompleta: contorno circular escuro com uma abertura no quadrante superior direito, percebido como círculo pela tendência de fechamento na relação entre figura e fundo.",
+      "provenance": "Reconstrução vetorial acessível baseada no enunciado e na indicação da página 2 do caderno oficial registrada no Banco Mestre."
     }
   ]
 }
