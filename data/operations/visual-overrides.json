@@ -78,6 +78,41 @@
       "image": "./assets/question-images/seedf-2025-biologia-microscopio-itens-086-090.svg",
       "description": "Figura de microscópio óptico com componentes numerados, usada como referência para os itens 86 a 90.",
       "provenance": "Reconstrução vetorial acessível baseada na descrição do Banco Mestre, nos enunciados dos itens 86 a 90 e na página 10 do caderno oficial informado nos registros."
+    },
+    {
+      "code": "PROVA-QDX-SEEDF-2025-QUI-A-085",
+      "remove_image": true,
+      "provenance": "Correção técnica: o texto-base, as equações e o enunciado já estão integralmente transcritos em texto; não há recurso visual necessário."
+    },
+    {
+      "code": "PROVA-QDX-SEEDF-2025-QUI-A-086",
+      "remove_image": true,
+      "provenance": "Correção técnica: o texto-base, as equações e o enunciado já estão integralmente transcritos em texto; não há recurso visual necessário."
+    },
+    {
+      "code": "PROVA-QDX-SEEDF-2025-QUI-A-087",
+      "remove_image": true,
+      "provenance": "Correção técnica: o texto-base, as equações e o enunciado já estão integralmente transcritos em texto; não há recurso visual necessário."
+    },
+    {
+      "code": "PROVA-QDX-SEEDF-2025-QUI-A-089",
+      "remove_image": true,
+      "provenance": "Correção técnica: o texto-base, as equações e o enunciado já estão integralmente transcritos em texto; não há recurso visual necessário."
+    },
+    {
+      "code": "PROVA-QDX-SEEDF-2025-QUI-A-090",
+      "remove_image": true,
+      "provenance": "Correção técnica: o texto-base, as equações e o enunciado já estão integralmente transcritos em texto; não há recurso visual necessário."
+    },
+    {
+      "code": "PROVA-QDX-SEEDF-2025-QUI-A-091",
+      "remove_image": true,
+      "provenance": "Correção técnica: o texto-base, as equações e o enunciado já estão integralmente transcritos em texto; não há recurso visual necessário."
+    },
+    {
+      "code": "PROVA-QDX-SEEDF-2025-QUI-A-092",
+      "remove_image": true,
+      "provenance": "Correção técnica: o texto-base, as equações e o enunciado já estão integralmente transcritos em texto; não há recurso visual necessário."
     }
   ]
 }
