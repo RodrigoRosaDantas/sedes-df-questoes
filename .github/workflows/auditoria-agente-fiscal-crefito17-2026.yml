@@ -104,36 +104,44 @@ jobs:
               print(f'PAYLOAD_{name.upper()}_MOD4={len(payload) % 4}')
               print(f'PAYLOAD_{name.upper()}_SHA256={hashlib.sha256(payload.encode()).hexdigest()}')
 
-          def decode_gzip(name, payload):
-              candidates = [payload, payload + ('=' * (-len(payload) % 4))]
-              seen = set()
-              for index, candidate in enumerate(candidates, start=1):
-                  if candidate in seen:
-                      continue
-                  seen.add(candidate)
-                  try:
-                      raw = base64.b64decode(candidate, validate=True)
-                      data = gzip.decompress(raw)
-                      print(f'DECODE_{name.upper()}_SUCCESS={index}')
-                      print(f'DECODE_{name.upper()}_BYTES={len(data)}')
-                      print(f'DECODE_{name.upper()}_SHA256={hashlib.sha256(data).hexdigest()}')
-                      return data
-                  except Exception as exc:
-                      print(f'DECODE_{name.upper()}_ATTEMPT_{index}_ERROR={type(exc).__name__}:{exc}')
-              return None
+          def decode_raw(name, payload):
+              candidate = payload + ('=' * (-len(payload) % 4))
+              try:
+                  raw = base64.b64decode(candidate, validate=True)
+                  print(f'RAW_{name.upper()}_BYTES={len(raw)}')
+                  print(f'RAW_{name.upper()}_SHA256={hashlib.sha256(raw).hexdigest()}')
+                  return raw
+              except Exception as exc:
+                  print(f'RAW_{name.upper()}_ERROR={type(exc).__name__}:{exc}')
+                  return None
 
-          decoded = {name: decode_gzip(name, payload) for name, payload in payloads.items()}
-          result = None
-          route = None
-          if decoded.get('integral'):
-              result = decoded['integral']
-              route = 'integral'
-          elif decoded.get('fragmento_1') and decoded.get('fragmento_2'):
-              result = decoded['fragmento_1'] + decoded['fragmento_2']
-              route = 'dois_gzip'
-          elif payloads.get('fragmento_1') and payloads.get('fragmento_2'):
-              combined = payloads['fragmento_1'].rstrip('=') + payloads['fragmento_2']
-              result = decode_gzip('base64_recomposto', combined)
+          def decompress(name, raw):
+              if not raw:
+                  return None
+              try:
+                  data = gzip.decompress(raw)
+                  print(f'DECOMPRESS_{name.upper()}_BYTES={len(data)}')
+                  print(f'DECOMPRESS_{name.upper()}_SHA256={hashlib.sha256(data).hexdigest()}')
+                  return data
+              except Exception as exc:
+                  print(f'DECOMPRESS_{name.upper()}_ERROR={type(exc).__name__}:{exc}')
+                  return None
+
+          raw = {name: decode_raw(name, payload) for name, payload in payloads.items()}
+          result = decompress('integral', raw.get('integral'))
+          route = 'integral' if result else None
+
+          if not result and raw.get('fragmento_1') and raw.get('fragmento_2'):
+              result = decompress('bytes_fragmentados', raw['fragmento_1'] + raw['fragmento_2'])
+              route = 'bytes_fragmentados' if result else None
+
+          if not result and raw.get('integral') and raw.get('fragmento_2'):
+              result = decompress('integral_mais_fragmento_2', raw['integral'] + raw['fragmento_2'])
+              route = 'integral_mais_fragmento_2' if result else None
+
+          if not result and payloads.get('fragmento_1') and payloads.get('fragmento_2'):
+              combined_payload = payloads['fragmento_1'].rstrip('=') + payloads['fragmento_2']
+              result = decompress('base64_recomposto', decode_raw('base64_recomposto', combined_payload))
               route = 'base64_recomposto' if result else None
 
           if not result:
