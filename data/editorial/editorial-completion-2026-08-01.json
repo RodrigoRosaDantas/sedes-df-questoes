@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "operation_id": "EDT-2026-08-01-CREFITO17-AUXILIAR-120",
-  "trigger_nonce": "2026-08-01T17:09:00Z",
+  "trigger_nonce": "2026-08-01T17:16:00Z",
   "source_release_sha": "8a528d925807db558967a3ff0a956006e87356a5",
   "expected_github_code": "release-2.13.0:8a528d925807db558967a3ff0a956006e87356a5",
   "official_source_url": "https://quadrix.org.br/informacoes/3041/",
