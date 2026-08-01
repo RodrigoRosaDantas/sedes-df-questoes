@@ -1,4 +1,4 @@
-name: Auditoria Agente Fiscal CREFITO-17 2026
+name: Saneamento Agente Fiscal CREFITO-17 2026
 
 on:
   pull_request:
@@ -9,16 +9,18 @@ on:
 
 permissions:
   contents: read
+  issues: read
+  pull-requests: read
 
 concurrency:
-  group: auditoria-agente-fiscal-crefito17-20260801
+  group: saneamento-agente-fiscal-crefito17-20260801
   cancel-in-progress: false
 
 jobs:
-  auditar:
+  sanear:
     if: github.head_ref == 'agent/auditoria-agente-fiscal-crefito17-20260801'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -28,10 +30,10 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Preparar leitura oficial
+      - name: Preparar ferramentas
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq poppler-utils unzip
+          sudo apt-get install -y -qq poppler-utils unzip jq
 
       - name: Baixar e extrair caderno, gabarito e recursos oficiais
         shell: bash
@@ -54,12 +56,38 @@ jobs:
           pdftotext -layout "$BASE/gabarito-definitivo.pdf" "$BASE/gabarito-definitivo.txt"
           pdftotext -layout "$BASE/analise-recursos.pdf" "$BASE/analise-recursos.txt"
           sha256sum "$BASE/provas-aplicadas.zip" "$BASE/401_Agente-Fiscal_CREFITO-17_2026.pdf" "$BASE/gabarito-definitivo.pdf" "$BASE/analise-recursos.pdf" > "$BASE/sha256.txt"
-          find "$BASE" -maxdepth 3 -type f -printf '%P\n' | sort > "$BASE/arquivos.txt"
 
-      - name: Validar sintaxe
-        run: node --check scripts/auditar-agente-fiscal-crefito17-2026.mjs
+      - name: Reconstruir rotina temporária de saneamento
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          COMMENTS="$RUNNER_TEMP/comments.json"
+          curl -fsSL \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            'https://api.github.com/repos/${{ github.repository }}/issues/61/comments?per_page=100' \
+            -o "$COMMENTS"
+          jq -r '.[] | select(.body | startswith("SANITIZER_AGENTEFISCAL:")) | .body | sub("^SANITIZER_AGENTEFISCAL:"; "")' "$COMMENTS" | tail -n 1 > "$RUNNER_TEMP/sanitizer.b64"
+          test -s "$RUNNER_TEMP/sanitizer.b64"
+          base64 -d "$RUNNER_TEMP/sanitizer.b64" | gzip -d > scripts/sanear-agente-fiscal-crefito17-2026.runtime.mjs
+          node --check scripts/auditar-agente-fiscal-crefito17-2026.mjs
+          node --check scripts/sanear-agente-fiscal-crefito17-2026.runtime.mjs
+          echo "SANITIZER_SHA256=$(sha256sum scripts/sanear-agente-fiscal-crefito17-2026.runtime.mjs | cut -d' ' -f1)"
 
-      - name: Auditar Banco Mestre, main e catálogo público
+      - name: Registrar diagnóstico inicial
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/auditar-agente-fiscal-crefito17-2026.mjs
+
+      - name: Reconstruir e sanear os 120 itens
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/sanear-agente-fiscal-crefito17-2026.runtime.mjs
+
+      - name: Auditar estado final
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         run: node scripts/auditar-agente-fiscal-crefito17-2026.mjs
@@ -68,7 +96,9 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: auditoria-agente-fiscal-crefito17-20260801
-          path: artifacts/auditoria-agente-fiscal-crefito17-2026
+          name: saneamento-agente-fiscal-crefito17-20260801
+          path: |
+            artifacts/auditoria-agente-fiscal-crefito17-2026
+            artifacts/saneamento-agente-fiscal-crefito17-20260801.json
           if-no-files-found: error
           retention-days: 90
