@@ -12,6 +12,72 @@
       "image": "./assets/question-images/seedf-2025-art-a-072.svg",
       "description": "Forma circular incompleta: contorno circular escuro com uma abertura no quadrante superior direito, percebido como círculo pela tendência de fechamento na relação entre figura e fundo.",
       "provenance": "Reconstrução vetorial acessível baseada no enunciado e na indicação da página 2 do caderno oficial registrada no Banco Mestre."
+    },
+    {
+      "code": "PROVA-QDX-SEEDF-2025-BIO-A-071",
+      "image": "./assets/question-images/seedf-2025-biologia-celula-itens-071-076.svg",
+      "description": "Figura esquemática de célula animal com organelas numeradas de 1 a 10, usada como referência para os itens 71 a 76.",
+      "provenance": "Reconstrução vetorial acessível baseada na descrição do Banco Mestre, nos enunciados dos itens 71 a 76 e na página 9 do caderno oficial informado nos registros."
+    },
+    {
+      "code": "PROVA-QDX-SEEDF-2025-BIO-A-072",
+      "image": "./assets/question-images/seedf-2025-biologia-celula-itens-071-076.svg",
+      "description": "Figura esquemática de célula animal com organelas numeradas de 1 a 10, usada como referência para os itens 71 a 76.",
+      "provenance": "Reconstrução vetorial acessível baseada na descrição do Banco Mestre, nos enunciados dos itens 71 a 76 e na página 9 do caderno oficial informado nos registros."
+    },
+    {
+      "code": "PROVA-QDX-SEEDF-2025-BIO-A-073",
+      "image": "./assets/question-images/seedf-2025-biologia-celula-itens-071-076.svg",
+      "description": "Figura esquemática de célula animal com organelas numeradas de 1 a 10, usada como referência para os itens 71 a 76.",
+      "provenance": "Reconstrução vetorial acessível baseada na descrição do Banco Mestre, nos enunciados dos itens 71 a 76 e na página 9 do caderno oficial informado nos registros."
+    },
+    {
+      "code": "PROVA-QDX-SEEDF-2025-BIO-A-074",
+      "image": "./assets/question-images/seedf-2025-biologia-celula-itens-071-076.svg",
+      "description": "Figura esquemática de célula animal com organelas numeradas de 1 a 10, usada como referência para os itens 71 a 76.",
+      "provenance": "Reconstrução vetorial acessível baseada na descrição do Banco Mestre, nos enunciados dos itens 71 a 76 e na página 9 do caderno oficial informado nos registros."
+    },
+    {
+      "code": "PROVA-QDX-SEEDF-2025-BIO-A-075",
+      "image": "./assets/question-images/seedf-2025-biologia-celula-itens-071-076.svg",
+      "description": "Figura esquemática de célula animal com organelas numeradas de 1 a 10, usada como referência para os itens 71 a 76.",
+      "provenance": "Reconstrução vetorial acessível baseada na descrição do Banco Mestre, nos enunciados dos itens 71 a 76 e na página 9 do caderno oficial informado nos registros."
+    },
+    {
+      "code": "PROVA-QDX-SEEDF-2025-BIO-A-076",
+      "image": "./assets/question-images/seedf-2025-biologia-celula-itens-071-076.svg",
+      "description": "Figura esquemática de célula animal com organelas numeradas de 1 a 10, usada como referência para os itens 71 a 76.",
+      "provenance": "Reconstrução vetorial acessível baseada na descrição do Banco Mestre, nos enunciados dos itens 71 a 76 e na página 9 do caderno oficial informado nos registros."
+    },
+    {
+      "code": "PROVA-QDX-SEEDF-2025-BIO-A-086",
+      "image": "./assets/question-images/seedf-2025-biologia-microscopio-itens-086-090.svg",
+      "description": "Figura de microscópio óptico com componentes numerados, usada como referência para os itens 86 a 90.",
+      "provenance": "Reconstrução vetorial acessível baseada na descrição do Banco Mestre, nos enunciados dos itens 86 a 90 e na página 10 do caderno oficial informado nos registros."
+    },
+    {
+      "code": "PROVA-QDX-SEEDF-2025-BIO-A-087",
+      "image": "./assets/question-images/seedf-2025-biologia-microscopio-itens-086-090.svg",
+      "description": "Figura de microscópio óptico com componentes numerados, usada como referência para os itens 86 a 90.",
+      "provenance": "Reconstrução vetorial acessível baseada na descrição do Banco Mestre, nos enunciados dos itens 86 a 90 e na página 10 do caderno oficial informado nos registros."
+    },
+    {
+      "code": "PROVA-QDX-SEEDF-2025-BIO-A-088",
+      "image": "./assets/question-images/seedf-2025-biologia-microscopio-itens-086-090.svg",
+      "description": "Figura de microscópio óptico com componentes numerados, usada como referência para os itens 86 a 90.",
+      "provenance": "Reconstrução vetorial acessível baseada na descrição do Banco Mestre, nos enunciados dos itens 86 a 90 e na página 10 do caderno oficial informado nos registros."
+    },
+    {
+      "code": "PROVA-QDX-SEEDF-2025-BIO-A-089",
+      "image": "./assets/question-images/seedf-2025-biologia-microscopio-itens-086-090.svg",
+      "description": "Figura de microscópio óptico com componentes numerados, usada como referência para os itens 86 a 90.",
+      "provenance": "Reconstrução vetorial acessível baseada na descrição do Banco Mestre, nos enunciados dos itens 86 a 90 e na página 10 do caderno oficial informado nos registros."
+    },
+    {
+      "code": "PROVA-QDX-SEEDF-2025-BIO-A-090",
+      "image": "./assets/question-images/seedf-2025-biologia-microscopio-itens-086-090.svg",
+      "description": "Figura de microscópio óptico com componentes numerados, usada como referência para os itens 86 a 90.",
+      "provenance": "Reconstrução vetorial acessível baseada na descrição do Banco Mestre, nos enunciados dos itens 86 a 90 e na página 10 do caderno oficial informado nos registros."
     }
   ]
 }
