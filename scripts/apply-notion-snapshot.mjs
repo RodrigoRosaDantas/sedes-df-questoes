@@ -59,6 +59,7 @@ for (const material of currentMaterials.values()) materialByName.set(key(materia
 function matchRecord(record) {
   const direct = byCode.get(key(editorialCode(record)));
   if (direct) return direct;
+  if (record.publication_exception) return null;
   const previousPublicId = legacyPublicId(record.github_id);
   const legacy = previousPublicId ? byId.get(key(previousPublicId)) : null;
   if (legacy) return legacy;
@@ -105,7 +106,7 @@ function updatedQuestion(record, current) {
     notion_url: record.notion_url,
     codigo_fonte: record.code,
     anulada: Boolean(record.annulled),
-    possui_imagem: Boolean(record.has_image),
+    possui_imagem: Boolean(record.has_image) || Boolean(current?.imagem),
     descricao_imagem: use(record.image_description, current?.descricao_imagem),
     imagem: current?.imagem || '',
   };

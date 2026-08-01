@@ -19,7 +19,8 @@ const clean = value => String(value ?? '')
   .trim();
 const key = value => clean(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 const sleep = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
-const shortId = value => clean(value).replace(/-/g, '').slice(0, 12) || Math.random().toString(16).slice(2, 14);
+const stableId = value => clean(value).replace(/-/g, '') || Math.random().toString(16).slice(2);
+const shortId = value => stableId(value).slice(-16);
 
 async function request(endpoint, options = {}, attempt = 1) {
   const response = await fetch(`${API}${endpoint}`, {
@@ -135,6 +136,7 @@ function record(row) {
   if (!validAnswer) notices.push('Gabarito ausente ou incompatível; a questão foi publicada como anulada para não inventar resposta correta.');
   if (!trueFalse && Object.values(sourceAlternatives).some(alternative => !alternative)) notices.push('Uma ou mais alternativas não estavam cadastradas e foram sinalizadas literalmente.');
   if (!clean(row['Comentário geral'])) notices.push('Comentário editorial não cadastrado.');
+  if (Boolean(row['Possui imagem'])) notices.push('Imagem indicada no Banco Mestre sem arquivo público disponível; questão publicada sem recurso visual.');
 
   const prompt = clean(row['Enunciado'])
     || clean(row['Texto-base'])
@@ -148,7 +150,7 @@ function record(row) {
     notion_last_edited_time: row.notion_last_edited_time,
     code,
     original_code: clean(row['Código']),
-    github_id: clean(row['Código GitHub']) || `notion-${shortId(row.notion_id)}`,
+    github_id: `notion-${stableId(row.notion_id)}`,
     title: clean(row['Questão']) || code,
     material_name: clean(row['Nome do material']) || 'Banco Mestre — material não identificado',
     material_type: clean(row['Tipo de material']) || 'Simulado',
@@ -181,7 +183,7 @@ function record(row) {
     trap: clean(row['Pegadinha']),
     observations,
     annulled: Boolean(row['Anulada']) || !validAnswer,
-    has_image: Boolean(row['Possui imagem']),
+    has_image: false,
     image_description: clean(row['Descrição da imagem']),
     pdf_page: clean(row['Página do PDF']),
     publication_lot: clean(row['Lote de publicação']) || EXCEPTION_LOT,
