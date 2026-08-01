@@ -1,11 +1,11 @@
 {
   "operation_id": "EXC-2026-08-01-PROVAS-PENDENTES",
   "revision": 2,
-  "retry": 8,
+  "retry": 9,
   "authorized": true,
   "authorized_at": "2026-08-01T02:37:00-03:00",
   "corrected_at": "2026-08-01T03:06:00-03:00",
-  "retried_at": "2026-08-01T11:15:00-03:00",
+  "retried_at": "2026-08-01T11:30:00-03:00",
   "scope": "provas_pendentes",
   "ordinary_review_gates_waived": true,
   "preserve_existing_publication": true,
@@ -20,6 +20,8 @@
     "Removida a exigência contraditória da questão CRTR12 Auxiliar Administrativo 200-035, já excluída como duplicada de conteúdo.",
     "Adicionada reconstrução vetorial acessível do fluxograma da questão PROVA-IADES-SEECDF-2023-PPGGADM-A-054.",
     "Adicionada reconstrução vetorial acessível da forma circular incompleta da questão PROVA-QDX-SEEDF-2025-ART-A-072.",
-    "Corrigida no Banco Mestre a marcação indevida de recurso visual da questão PROVA-QDX-SEEDF-2025-ART-A-077, que é integralmente textual."
+    "Corrigida no Banco Mestre a marcação indevida de recurso visual da questão PROVA-QDX-SEEDF-2025-ART-A-077, que é integralmente textual.",
+    "Corrigida no Banco Mestre a marcação indevida de recurso visual da questão PROVA-QDX-SEEDF-2025-ART-A-097, que é integralmente textual.",
+    "Adicionada auditoria persistente para listar todos os recursos visuais incompletos do candidato em uma única execução."
   ]
 }
