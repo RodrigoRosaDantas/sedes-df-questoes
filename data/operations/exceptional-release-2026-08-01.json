@@ -1,11 +1,11 @@
 {
   "operation_id": "EXC-2026-08-01-PROVAS-PENDENTES",
   "revision": 2,
-  "retry": 6,
+  "retry": 7,
   "authorized": true,
   "authorized_at": "2026-08-01T02:37:00-03:00",
   "corrected_at": "2026-08-01T03:06:00-03:00",
-  "retried_at": "2026-08-01T10:40:00-03:00",
+  "retried_at": "2026-08-01T11:00:00-03:00",
   "scope": "provas_pendentes",
   "ordinary_review_gates_waived": true,
   "preserve_existing_publication": true,
@@ -18,6 +18,7 @@
   "technical_policy": "corrigir somente o indispensavel para publicar",
   "technical_fixes": [
     "Removida a exigência contraditória da questão CRTR12 Auxiliar Administrativo 200-035, já excluída como duplicada de conteúdo.",
-    "Adicionada reconstrução vetorial acessível do fluxograma da questão PROVA-IADES-SEECDF-2023-PPGGADM-A-054."
+    "Adicionada reconstrução vetorial acessível do fluxograma da questão PROVA-IADES-SEECDF-2023-PPGGADM-A-054.",
+    "Adicionada reconstrução vetorial acessível da forma circular incompleta da questão PROVA-QDX-SEEDF-2025-ART-A-072."
   ]
 }
