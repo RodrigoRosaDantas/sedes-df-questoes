@@ -69,7 +69,7 @@ export const createCompatibleSession = ({id, name, questionIds, questions = null
   if (existing && !confirm("Existe uma tentativa salva. Deseja substituí-la por esta sessão?")) return false;
   const payload = {
     version: 4,
-    material: {id, nome: name, disciplina, fonte: source, tipo_material: "simulado", ano: 2026, codigo_cargo: cargo, tempo_sugerido_minutos: minutes},
+    material: {id, nome: name, disciplina: discipline, fonte: source, tipo_material: "simulado", ano: 2026, codigo_cargo: cargo, tempo_sugerido_minutos: minutes},
     questionIds: [...new Set(questionIds)], mode, current: 0, answers: {}, confirmed: {}, flagged: {}, elapsedBase: 0, questionTimes: {}, savedAt: new Date().toISOString(),
   };
   if (Array.isArray(questions) && questions.length === payload.questionIds.length) payload.questions = questions;
