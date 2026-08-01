@@ -1,0 +1,110 @@
+[
+  {
+    "number": 1,
+    "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-001",
+    "notion_id": "3adcf5a2-6731-81dd-b55e-fb5673cfda8a",
+    "patch": {"Fundamento legal": "Interpretação direta do texto-base: primeiro, segundo e terceiro parágrafos."}
+  },
+  {
+    "number": 2,
+    "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-002",
+    "notion_id": "3adcf5a2-6731-8111-8b68-f13d293df3fd",
+    "patch": {"Fundamento legal": "Tipologia textual: predomínio expositivo-argumentativo no texto-base."}
+  },
+  {
+    "number": 3,
+    "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-003",
+    "notion_id": "3adcf5a2-6731-815c-be20-fb538b8429a9",
+    "patch": {"Fundamento legal": "Semântica e pressuposição no primeiro período do texto-base; gabarito definitivo alterado para Errado."}
+  },
+  {
+    "number": 4,
+    "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-004",
+    "notion_id": "3adcf5a2-6731-812f-b282-ed4d68994a5c",
+    "patch": {"Fundamento legal": "Interpretação direta do segundo parágrafo do texto-base."}
+  },
+  {
+    "number": 5,
+    "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-005",
+    "notion_id": "3adcf5a2-6731-81ba-9a71-fc0556a3c45f",
+    "patch": {"Fundamento legal": "Semântica contextual do primeiro e do terceiro parágrafos do texto-base."}
+  },
+  {
+    "number": 6,
+    "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-006",
+    "notion_id": "3adcf5a2-6731-8108-a366-c2885fbbb23b",
+    "patch": {"Fundamento legal": "Semântica verbal e interpretação do segundo parágrafo do texto-base."}
+  },
+  {
+    "number": 7,
+    "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-007",
+    "notion_id": "3adcf5a2-6731-8171-91f4-ff688ce2ab89",
+    "patch": {"Fundamento legal": "Relação semântica entre “sutilezas linguísticas” e a sequência “interpretar implícitos discursivos e avaliar criticamente os efeitos de sentido”."}
+  },
+  {
+    "number": 8,
+    "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-008",
+    "notion_id": "3adcf5a2-6731-8163-b04f-c50ba2f072a8",
+    "patch": {"Fundamento legal": "Coesão referencial: anáfora resumitiva entre o início do segundo parágrafo e o conteúdo precedente."}
+  },
+  {
+    "number": 9,
+    "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-009",
+    "notion_id": "3adcf5a2-6731-818c-a862-fc74a5efe927",
+    "patch": {"Fundamento legal": "Coesão sequencial: valor conclusivo dos conectivos “assim” e “portanto”."}
+  },
+  {
+    "number": 10,
+    "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-010",
+    "notion_id": "3adcf5a2-6731-8154-9bc9-c88fbda92eee",
+    "patch": {"Fundamento legal": "Organização textual e progressão temática entre os três parágrafos do texto-base."}
+  },
+  {
+    "number": 11,
+    "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-011",
+    "notion_id": "3adcf5a2-6731-81ec-a2a1-c6a27ab983e3",
+    "patch": {"Fundamento legal": "Concordância verbal com sujeito simples cujo núcleo é “competência”."}
+  },
+  {
+    "number": 12,
+    "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-012",
+    "notion_id": "3adcf5a2-6731-815f-ad2f-f60fa77ab45b",
+    "patch": {"Fundamento legal": "Regência nominal do substantivo “compromisso” e função de complemento nominal."}
+  },
+  {
+    "number": 13,
+    "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-013",
+    "notion_id": "3adcf5a2-6731-8106-983d-cd00007a0cfe",
+    "patch": {"Fundamento legal": "Transformação de voz ativa em passiva e manutenção dos participantes semânticos; gabarito definitivo alterado para Errado."}
+  },
+  {
+    "number": 14,
+    "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-014",
+    "notion_id": "3adcf5a2-6731-8105-8721-db0c302e4e22",
+    "patch": {"Fundamento legal": "Regência nominal de “indispensável” e emprego obrigatório da crase diante de substantivo feminino determinado."}
+  },
+  {
+    "number": 15,
+    "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-015",
+    "notion_id": "3adcf5a2-6731-81fa-935c-f44bac98602a",
+    "patch": {"Fundamento legal": "Teoria dos conjuntos: |F ∪ V| = |F| + |V| − |F ∩ V|."}
+  },
+  {
+    "number": 16,
+    "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-016",
+    "notion_id": "3adcf5a2-6731-8158-8569-ea4863117a5d",
+    "patch": {"Fundamento legal": "Razões e proporções aplicadas a conjuntos: somente vôlei = 100/300 do total."}
+  },
+  {
+    "number": 17,
+    "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-017",
+    "notion_id": "3adcf5a2-6731-818a-a863-cd8bed4c404b",
+    "patch": {"Fundamento legal": "Proporcionalidade direta entre quantidade de máquinas e produção, mantidas as demais condições."}
+  },
+  {
+    "number": 18,
+    "code": "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-018",
+    "notion_id": "3adcf5a2-6731-81f2-988f-d19d42ed8d5b",
+    "patch": {"Fundamento legal": "Proporcionalidade direta: 120 × 3/4 = 90."}
+  }
+]
