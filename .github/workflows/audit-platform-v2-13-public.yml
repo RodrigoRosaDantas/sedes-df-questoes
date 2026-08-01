@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
-      SOURCE_SHA: 68980eba79d1afd34c6cf2b69722549105f1a596
+      SOURCE_SHA: da1999816515dd513a8764788bfda35115e0c8ee
     steps:
       - name: Acionar e acompanhar publicação auditada
         env:
