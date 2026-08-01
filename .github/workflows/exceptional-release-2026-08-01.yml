@@ -12,7 +12,7 @@ permissions:
 
 concurrency:
   group: sedes-df-notion-sync
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 env:
   PUBLICATION_PLAN_PATH: data/notion/publication-plan.json

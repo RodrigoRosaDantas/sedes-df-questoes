@@ -1,9 +1,11 @@
 {
   "operation_id": "EXC-2026-08-01-PROVAS-PENDENTES",
   "revision": 2,
+  "retry": 1,
   "authorized": true,
   "authorized_at": "2026-08-01T02:37:00-03:00",
   "corrected_at": "2026-08-01T03:06:00-03:00",
+  "retried_at": "2026-08-01T03:20:00-03:00",
   "scope": "provas_pendentes",
   "ordinary_review_gates_waived": true,
   "preserve_existing_publication": true,
