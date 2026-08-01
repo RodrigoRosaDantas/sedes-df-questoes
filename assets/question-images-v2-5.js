@@ -1,6 +1,14 @@
 (() => {
   const visuals = new Map([
     [
+      "A imagem a seguir pode ser percebida como um círculo, embora seja uma forma circular incompleta. Essa percepção só é possível pela predominância da métrica na relação entre forma e fundo.",
+      {
+        src: "./assets/question-images/seedf-2025-art-a-072.svg",
+        alt: "Forma circular incompleta com uma abertura no quadrante superior direito.",
+        caption: "Reconstrução vetorial acessível da forma circular incompleta apresentada na questão 72.",
+      },
+    ],
+    [
       "A figura apresentada retrata o processo orçamentário, considerando a etapa de elaboração da Proposta de Lei Orçamentária Anual (PLOA) no Brasil. De acordo com a Lei nº 4.320/1964, a competência dessa elaboração é do",
       {
         src: "./assets/question-images/iades-seecdf-2023-ppggadm-a-054.svg",
