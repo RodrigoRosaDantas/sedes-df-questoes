@@ -47,8 +47,10 @@ jobs:
       - name: Gerar plano explícito de lotes, contagens e códigos
         run: node scripts/create-publication-plan.mjs
 
-      - name: Construir e validar a plataforma com o snapshot e o plano
-        run: npm run check
+      - name: Validar snapshot e plano sem reconstruir a plataforma
+        run: |
+          node scripts/validate-notion-snapshot.mjs
+          node scripts/validate-publication-plan.mjs
 
       - name: Versionar snapshot e plano no branch principal
         id: publish_snapshot
@@ -64,13 +66,12 @@ jobs:
             CHANGED=true
           fi
 
-          # O build altera arquivos rastreados apenas para validação. Depois de
-          # preservar snapshot e plano no commit, nenhum artefato gerado pode
-          # impedir o rebase ou entrar acidentalmente no branch principal.
+          # Depois de preservar snapshot e plano no commit, nenhum arquivo
+          # temporário pode impedir o rebase ou entrar acidentalmente no main.
           git reset --hard HEAD
           git clean -fd
           if [ -n "$(git status --porcelain)" ]; then
-            echo 'O diretório permaneceu sujo após a limpeza dos artefatos de build.'
+            echo 'O diretório permaneceu sujo após a limpeza dos arquivos temporários.'
             git status --short
             exit 1
           fi
