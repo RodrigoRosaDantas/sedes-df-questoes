@@ -46,6 +46,9 @@ if (workflowViolations.length) {
 const pages = read(".github/workflows/pages.yml");
 requireMarkers(pages, [
   "push:",
+  "paths-ignore:",
+  "data/notion/published.json",
+  "data/notion/publication-plan.json",
   "pull_request:",
   "workflow_dispatch:",
   "source_sha:",
@@ -57,10 +60,16 @@ requireMarkers(pages, [
   "actions: write",
   "PLAYWRIGHT_VERSION: 1.61.1",
   "PUBLICATION_PLAN_PATH",
+  "VALIDATED_DIST_ARTIFACT",
+  "validated-dist-${{ github.sha }}",
   "actions/checkout@v6",
   "actions/setup-node@v6",
   "package-manager-cache: false",
   "Build vinculado ao commit",
+  "actions/upload-artifact@v7",
+  "if-no-files-found: error",
+  "retention-days: 1",
+  "actions/download-artifact@v8",
   "actions/configure-pages@v6",
   "actions/upload-pages-artifact@v5",
   "actions/deploy-pages@v5",
@@ -84,7 +93,15 @@ forbidMarkers(pages, [
   "api.github.com/repos/${GITHUB_REPOSITORY}/pages",
   "-X PUT",
   "build_type",
+  "run: npm run build",
 ], "Workflow de Pages");
+const fullCheckIndex = pages.indexOf("run: npm run check");
+const artifactUploadIndex = pages.indexOf("actions/upload-artifact@v7");
+const artifactDownloadIndex = pages.indexOf("actions/download-artifact@v8");
+const pagesUploadIndex = pages.indexOf("actions/upload-pages-artifact@v5");
+if (!(fullCheckIndex >= 0 && fullCheckIndex < artifactUploadIndex && artifactUploadIndex < artifactDownloadIndex && artifactDownloadIndex < pagesUploadIndex)) {
+  fail("Workflow de Pages deve validar uma vez, preservar o dist aprovado e publicar exatamente esse artefato.");
+}
 
 const notion = read(".github/workflows/notion-sync.yml");
 requireMarkers(notion, [
@@ -99,7 +116,9 @@ requireMarkers(notion, [
   "export-notion-snapshot.mjs",
   "create-publication-plan.mjs",
   "data/notion/publication-plan.json",
-  "npm run check",
+  "validate-notion-snapshot.mjs",
+  "validate-publication-plan.mjs",
+  "sem reconstruir a plataforma",
   "git reset --hard HEAD",
   "git clean -fd",
   "git status --porcelain",
@@ -117,6 +136,7 @@ requireMarkers(notion, [
 ], "Workflow do Notion");
 if (/^  push:/m.test(notion)) fail("Workflow do Notion não pode reagir ao próprio push no branch main.");
 forbidMarkers(notion, [
+  "npm run check",
   "git pull --rebase origin main",
   "Preparar branch isolada",
   "notion-sync/run-",
@@ -130,6 +150,19 @@ const pushIndex = notion.indexOf("git push origin HEAD:main");
 if (!(commitIndex >= 0 && commitIndex < resetIndex && resetIndex < fetchIndex && fetchIndex < rebaseIndex && rebaseIndex < pushIndex)) {
   fail("Workflow do Notion deve preservar o commit semântico, limpar artefatos e somente depois rebasear e enviar.");
 }
+
+const notionExporter = read("scripts/export-notion-snapshot.mjs");
+requireMarkers(notionExporter, [
+  "EXPORT_PROPERTIES",
+  "filter_properties[]",
+  "QUERY_ENDPOINT",
+  "result_type: 'page'",
+  "request(QUERY_ENDPOINT",
+  "propriedades selecionadas",
+], "Exportador do Notion");
+forbidMarkers(notionExporter, [
+  "request(`/data_sources/${SOURCE}/query`",
+], "Exportador do Notion");
 
 const planLibrary = read("scripts/publication-plan.mjs");
 requireMarkers(planLibrary, [
@@ -198,6 +231,6 @@ if (!builder.includes("builder: expectedBuilder") || !verifier.includes("buildIn
 }
 
 console.log(
-  `✓ ${workflowFiles.length} workflows auditados: snapshot versionado, plano explícito, deploy sem escrita editorial, `
-  + 'fechamento do Notion somente pela sincronização autorizada, Actions em Node 24 e auditoria npm de severidade alta.',
+  `✓ ${workflowFiles.length} workflows auditados: consulta enxuta do Notion, snapshot e plano versionados, `
+  + 'um único build validado e reutilizado no deploy, fechamento editorial controlado e auditoria npm de severidade alta.',
 );
