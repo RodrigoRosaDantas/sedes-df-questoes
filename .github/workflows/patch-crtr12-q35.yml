@@ -1,0 +1,102 @@
+name: Integrar recurso visual CRTR-12 questão 35
+
+on:
+  push:
+    branches:
+      - fix/recurso-visual-crtr12-q35
+    paths:
+      - .github/workflows/patch-crtr12-q35.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: fix/recurso-visual-crtr12-q35
+          fetch-depth: 0
+
+      - name: Aplicar correção técnica mínima
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+
+          code = 'PROVA-QDX-CRTR12-2026-AUXILIAR-ADMINISTRATIVO-200-035'
+          image = './assets/question-images/crtr12-2026-q35-original.jpg'
+
+          apply_path = Path('scripts/apply-notion-snapshot.mjs')
+          apply_text = apply_path.read_text()
+          old = "    imagem: current?.imagem || '',"
+          new = "    imagem: current?.imagem || clean(record.image) || '',"
+          assert apply_text.count(old) == 1, 'Ponto de integração da imagem não encontrado.'
+          apply_path.write_text(apply_text.replace(old, new))
+
+          export_path = Path('scripts/export-exceptional-proofs.mjs')
+          export_text = export_path.read_text()
+          old = "  if (answer !== rawAnswer) corrections.push('gabarito_normalizado');"
+          new = old + f"\n  if (code === '{code}') corrections.push('recurso_visual_restaurado');"
+          assert export_text.count(old) == 1, 'Ponto do relatório técnico não encontrado.'
+          export_text = export_text.replace(old, new)
+          old = "    image_description: clean(row['Descrição da imagem']),\n    pdf_page: clean(row['Página do PDF']),"
+          new = (
+              "    image_description: clean(row['Descrição da imagem']),\n"
+              f"    image: code === '{code}'\n"
+              f"      ? '{image}'\n"
+              "      : '',\n"
+              "    pdf_page: clean(row['Página do PDF']),"
+          )
+          assert export_text.count(old) == 1, 'Ponto do ativo visual não encontrado.'
+          export_text = export_text.replace(old, new)
+          old = "  if (!record.answer) problems.push('gabarito_ausente');"
+          new = old + "\n  if (record.has_image && (!record.image || !record.image_description)) problems.push('recurso_visual_incompleto');"
+          assert export_text.count(old) == 1, 'Ponto da validação visual não encontrado.'
+          export_path.write_text(export_text.replace(old, new))
+
+          visual_path = Path('assets/question-images-v2-5.js')
+          visual_text = visual_path.read_text()
+          anchor = '  const visuals = new Map([\n'
+          entry = '''    [
+      "No Windows 10 e 11, ao excluir um arquivo utilizando a tecla Del, o arquivo é removido permanentemente do sistema, não podendo ser recuperado pela Lixeira.",
+      {
+        src: "./assets/question-images/crtr12-2026-q35-original.jpg",
+        alt: "Representação da tecla Del, usada para excluir um arquivo no Windows.",
+        caption: "Tecla Del reproduzida no caderno da prova CRTR-12/Quadrix 2026.",
+      },
+    ],
+'''
+          assert visual_text.count(anchor) == 1, 'Mapa de recursos visuais não encontrado.'
+          visual_path.write_text(visual_text.replace(anchor, anchor + entry))
+
+          source_path = Path('data/operations/crtr12-q35-visual-source.md')
+          source_text = source_path.read_text().rstrip()
+          source_path.write_text(source_text + '''
+
+## Identificação confirmada
+
+A imagem original possui 25 × 19 pixels e representa a tecla **Del**. O ativo foi conferido visualmente, preservado no repositório e ligado à questão por caminho local. O OCR automático não foi usado como fonte decisória devido à dimensão reduzida da imagem.
+''')
+
+          marker_path = Path('data/operations/exceptional-release-2026-08-01.json')
+          marker = json.loads(marker_path.read_text())
+          marker['retry'] = 4
+          marker['retried_at'] = '2026-08-01T04:05:00-03:00'
+          marker['technical_fix'] = code
+          marker_path.write_text(json.dumps(marker, ensure_ascii=False, indent=2) + '\n')
+
+          Path('data/operations/crtr12-q35-ocr.txt').unlink(missing_ok=True)
+          Path('.github/workflows/patch-crtr12-q35.yml').unlink()
+          PY
+
+      - name: Versionar integração e reacionar a publicação
+        run: |
+          set -euo pipefail
+          git config user.name 'sedes-df-visual-fix[bot]'
+          git config user.email 'sedes-df-visual-fix[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Integrar recurso visual da questão CRTR-12 35'
+          git push origin HEAD:fix/recurso-visual-crtr12-q35
