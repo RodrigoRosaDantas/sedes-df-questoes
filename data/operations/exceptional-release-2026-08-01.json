@@ -1,11 +1,11 @@
 {
   "operation_id": "EXC-2026-08-01-PROVAS-PENDENTES",
   "revision": 2,
-  "retry": 12,
+  "retry": 13,
   "authorized": true,
   "authorized_at": "2026-08-01T02:37:00-03:00",
   "corrected_at": "2026-08-01T03:06:00-03:00",
-  "retried_at": "2026-08-01T12:07:50-03:00",
+  "retried_at": "2026-08-01T12:35:00-03:00",
   "scope": "provas_pendentes",
   "ordinary_review_gates_waived": true,
   "preserve_existing_publication": true,
@@ -27,6 +27,7 @@
     "Corrigida no Banco Mestre a marcação indevida de imagem dos itens PROVA-QDX-SEEDF-2025-QUI-A-085, 086, 087, 089, 090, 091 e 092, cujas fórmulas e equações já estão transcritas em texto.",
     "Adicionada reconstrução vetorial acessível da célula animal numerada usada pelos itens PROVA-QDX-SEEDF-2025-BIO-A-071 a 076.",
     "Adicionada reconstrução vetorial acessível do microscópio óptico numerado usado pelos itens PROVA-QDX-SEEDF-2025-BIO-A-086 a 090.",
-    "Adicionado override técnico negativo para remover marcações visuais residuais das ocorrências duplicadas dos sete itens textuais de Química durante o build."
+    "Adicionado override técnico negativo para remover marcações visuais residuais das ocorrências duplicadas dos sete itens textuais de Química durante o build.",
+    "Adicionado recibo persistente do workflow de Pages, com ID, conclusão, jobs e logs de falha, para eliminar repetição sem diagnóstico."
   ]
 }
