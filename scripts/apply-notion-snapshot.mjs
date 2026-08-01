@@ -59,7 +59,6 @@ for (const material of currentMaterials.values()) materialByName.set(key(materia
 function matchRecord(record) {
   const direct = byCode.get(key(editorialCode(record)));
   if (direct) return direct;
-  if (record.publication_exception) return null;
   const previousPublicId = legacyPublicId(record.github_id);
   const legacy = previousPublicId ? byId.get(key(previousPublicId)) : null;
   if (legacy) return legacy;
@@ -102,7 +101,9 @@ function updatedQuestion(record, current) {
     pagina_pdf: use(record.pdf_page, current?.pagina_pdf),
     fonte_oficial: record.source_url || record.notion_url,
     fonte_consolidada: record.source_url || record.notion_url,
-    auditoria: 'Banco Mestre — Pode publicar = true',
+    auditoria: record.publication_exception
+      ? 'Publicação excepcional autorizada em 01/08/2026'
+      : 'Banco Mestre — Pode publicar = true',
     notion_url: record.notion_url,
     codigo_fonte: record.code,
     anulada: Boolean(record.annulled),
@@ -113,6 +114,10 @@ function updatedQuestion(record, current) {
 }
 
 function baseMaterial(id, record, current) {
+  if (record.publication_exception && current) {
+    const {questoes, ...metadata} = current;
+    return {...metadata, questoes: []};
+  }
   const type = key(record.material_type).includes('prova') ? 'prova' : 'simulado';
   return {
     ...(current ? Object.fromEntries(Object.entries(current).filter(([property]) => property !== 'questoes')) : {}),
@@ -140,6 +145,10 @@ const usedIds = new Set();
 const usedCodes = new Set();
 for (const record of snapshot.records || []) {
   const current = matchRecord(record);
+  // No modo excepcional, registros já existentes são deixados integralmente
+  // para o laço de preservação abaixo; somente itens realmente ausentes entram.
+  if (record.publication_exception && current) continue;
+
   const materialId = materialIdFor(record, current);
   if (!finalMaterials.has(materialId)) {
     finalMaterials.set(materialId, baseMaterial(materialId, record, currentMaterials.get(materialId)));
