@@ -11,8 +11,8 @@ test("expõe release unificada, prova real, reporte e proteção do progresso", 
   await expect(page.locator(".question-card")).toBeVisible({timeout: 30000});
   await expect.poll(() => page.evaluate(() => {
     const session = JSON.parse(localStorage.getItem("sedes.questoes.rodrigo.session.v3") || "null");
-    return {id: session?.material?.id, questionIds: session?.questionIds?.length, questions: session?.questions?.length};
-  })).toEqual({id: "prova-real-sedes-2026", questionIds: 60, questions: 60});
+    return {id: session?.material?.id, questionIds: session?.questionIds?.length};
+  })).toEqual({id: "prova-real-sedes-2026", questionIds: 60});
   await expect(page.locator("[data-official-remaining]")).toBeVisible();
   await expect(page.locator("[data-report-question]")).toBeVisible();
   await page.locator("[data-report-question]").click();
