@@ -1,6 +1,14 @@
 (() => {
   const visuals = new Map([
     [
+      "A figura apresentada retrata o processo orçamentário, considerando a etapa de elaboração da Proposta de Lei Orçamentária Anual (PLOA) no Brasil. De acordo com a Lei nº 4.320/1964, a competência dessa elaboração é do",
+      {
+        src: "./assets/question-images/iades-seecdf-2023-ppggadm-a-054.svg",
+        alt: "Fluxograma cíclico do processo orçamentário com elaboração da proposta, discussão e aprovação, execução, controle e avaliação.",
+        caption: "Reconstrução vetorial acessível do ciclo do processo orçamentário apresentado na questão 54.",
+      },
+    ],
+    [
       "No Windows 10 e 11, ao excluir um arquivo utilizando a tecla Del, o arquivo é removido permanentemente do sistema, não podendo ser recuperado pela Lixeira.",
       {
         src: "./assets/question-images/crtr12-2026-q35-original.jpg",
