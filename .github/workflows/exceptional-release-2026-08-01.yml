@@ -21,6 +21,9 @@ env:
   VALIDATION_STATUS_PATH: data/operations/exceptional-validation-status.json
   VALIDATION_LOG_PATH: data/operations/exceptional-validation.log
   VISUAL_AUDIT_PATH: data/operations/exceptional-visual-audit.json
+  PAGES_STATUS_PATH: data/operations/exceptional-pages-status.json
+  PAGES_LOG_PATH: data/operations/exceptional-pages-failed.log
+  PAGES_JOBS_PATH: data/operations/exceptional-pages-jobs.json
 
 jobs:
   release:
@@ -151,14 +154,23 @@ jobs:
           echo "source_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Publicar e fechar a rastreabilidade no Notion
+        id: pages
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
           SOURCE_SHA: ${{ steps.publish_snapshot.outputs.source_sha }}
         shell: bash
         run: |
-          set -euo pipefail
+          set -uo pipefail
           DISPATCHED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-          gh workflow run pages.yml --ref main -f source_sha="${SOURCE_SHA}" -f close_notion=true
+          echo "dispatched_at=${DISPATCHED_AT}" >> "$GITHUB_OUTPUT"
+
+          if ! gh workflow run pages.yml --ref main -f source_sha="${SOURCE_SHA}" -f close_notion=true; then
+            echo 'Falha ao solicitar a execução do workflow de Pages.' | tee /tmp/exceptional-pages-failed.log
+            echo 'run_id=' >> "$GITHUB_OUTPUT"
+            echo 'conclusion=dispatch_failure' >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
 
           RUN_ID=''
           for attempt in $(seq 1 60); do
@@ -175,10 +187,75 @@ jobs:
             sleep 5
           done
 
+          echo "run_id=${RUN_ID}" >> "$GITHUB_OUTPUT"
           if [ -z "${RUN_ID}" ]; then
-            echo 'A execução de publicação não foi criada dentro da janela de segurança.'
+            echo 'A execução de publicação não foi criada dentro da janela de segurança.' | tee /tmp/exceptional-pages-failed.log
+            echo 'conclusion=run_not_found' >> "$GITHUB_OUTPUT"
             exit 1
           fi
 
+          set +e
           gh run watch "${RUN_ID}" --exit-status --interval 10
-          echo "✓ Operação excepcional publicada e rastreada no commit ${SOURCE_SHA}."
+          PAGES_EXIT=$?
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}" > /tmp/exceptional-pages-run.json || true
+          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/jobs?per_page=100" > /tmp/exceptional-pages-jobs.json || true
+          gh run view "${RUN_ID}" --log-failed > /tmp/exceptional-pages-failed.log 2>&1 || true
+          CONCLUSION=$(jq -r '.conclusion // .status // "unknown"' /tmp/exceptional-pages-run.json 2>/dev/null || echo unknown)
+          echo "conclusion=${CONCLUSION}" >> "$GITHUB_OUTPUT"
+          echo "pages_exit=${PAGES_EXIT}" >> "$GITHUB_OUTPUT"
+          if [ "${PAGES_EXIT}" -eq 0 ]; then
+            echo "✓ Operação excepcional publicada e rastreada no commit ${SOURCE_SHA}."
+          fi
+          exit "${PAGES_EXIT}"
+
+      - name: Registrar resultado do Pages no branch candidato
+        if: always() && steps.candidate.outcome == 'success'
+        shell: bash
+        env:
+          SOURCE_SHA: ${{ steps.publish_snapshot.outputs.source_sha }}
+          RUN_ID: ${{ steps.pages.outputs.run_id }}
+          PAGES_OUTCOME: ${{ steps.pages.outcome }}
+          PAGES_CONCLUSION: ${{ steps.pages.outputs.conclusion }}
+          PAGES_EXIT: ${{ steps.pages.outputs.pages_exit }}
+          DISPATCHED_AT: ${{ steps.pages.outputs.dispatched_at }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/exceptional-pages-audit
+          if [ -f /tmp/exceptional-pages-failed.log ]; then
+            cp /tmp/exceptional-pages-failed.log /tmp/exceptional-pages-audit/failed.log
+          else
+            : > /tmp/exceptional-pages-audit/failed.log
+          fi
+          if [ -f /tmp/exceptional-pages-jobs.json ]; then
+            cp /tmp/exceptional-pages-jobs.json /tmp/exceptional-pages-audit/jobs.json
+          else
+            printf '{"jobs":[]}\n' > /tmp/exceptional-pages-audit/jobs.json
+          fi
+
+          git fetch origin "${CANDIDATE_BRANCH}"
+          git switch -C "${CANDIDATE_BRANCH}" "origin/${CANDIDATE_BRANCH}"
+          mkdir -p "$(dirname "${PAGES_STATUS_PATH}")"
+          cp /tmp/exceptional-pages-audit/failed.log "${PAGES_LOG_PATH}"
+          cp /tmp/exceptional-pages-audit/jobs.json "${PAGES_JOBS_PATH}"
+          jq -n \
+            --arg operation_id 'EXC-2026-08-01-PROVAS-PENDENTES' \
+            --arg source_sha "${SOURCE_SHA:-}" \
+            --arg run_id "${RUN_ID:-}" \
+            --arg outcome "${PAGES_OUTCOME:-unknown}" \
+            --arg conclusion "${PAGES_CONCLUSION:-unknown}" \
+            --arg pages_exit "${PAGES_EXIT:-}" \
+            --arg dispatched_at "${DISPATCHED_AT:-}" \
+            --arg recorded_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            '{schema_version:"1.0", operation_id:$operation_id, source_sha:$source_sha, run_id:$run_id, outcome:$outcome, conclusion:$conclusion, pages_exit:$pages_exit, dispatched_at:$dispatched_at, recorded_at:$recorded_at}' \
+            > "${PAGES_STATUS_PATH}"
+          git add "${PAGES_STATUS_PATH}" "${PAGES_LOG_PATH}" "${PAGES_JOBS_PATH}"
+          if ! git diff --cached --quiet; then
+            git commit -m 'Registrar resultado do Pages da operação excepcional'
+            git push origin "HEAD:refs/heads/${CANDIDATE_BRANCH}"
+          fi
+
+      - name: Interromper publicação não concluída
+        if: steps.pages.outcome != 'success'
+        run: |
+          echo 'A validação do candidato passou, mas o Pages não concluiu. Consulte o recibo persistido no branch candidato.'
+          exit 1
