@@ -11,6 +11,11 @@ on:
         description: Commit exato do snapshot autorizado que deve ser publicado
         required: false
         type: string
+      close_notion:
+        description: Fechar a rastreabilidade editorial no Notion após o deploy aprovado
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -111,7 +116,7 @@ jobs:
         run: npx playwright test --config=playwright.public.config.js
       - name: Fechar somente os lotes do plano explícito no Notion
         id: traceability
-        if: steps.static_verify.outcome == 'success' && steps.browser_verify.outcome == 'success'
+        if: steps.static_verify.outcome == 'success' && steps.browser_verify.outcome == 'success' && inputs.close_notion == true
         continue-on-error: true
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
