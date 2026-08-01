@@ -153,7 +153,7 @@ test("interface pública abre a mesma release e seus recursos essenciais", async
   const {build} = await loadRelease(request);
   await page.context().setExtraHTTPHeaders({"cache-control": "no-cache, no-store", pragma: "no-cache"});
   await openFresh(page, "inicio");
-  await expect(page.locator("[data-release-health]")).toContainText(String(build.questions), {timeout: 30000});
+  await expect(page.locator("[data-release-health]")).toContainText(Number(build.questions).toLocaleString("pt-BR"), {timeout: 30000});
   await expect(page.locator("[data-official-exam-card]")).toContainText("60 questões");
   await expect(page.locator("[data-adaptive-review]")).toBeVisible();
   await page.locator("[data-start-official-exam]").click();
