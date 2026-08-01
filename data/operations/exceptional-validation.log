@@ -1,0 +1,43 @@
+
+> sedes-df-questoes@2.13.0 check
+> npm run build && node --check assets/progress-migration-v2-3.js && node --check assets/question-images-v2-5.js && node --check assets/learning-v2-9.js && node --check assets/pwa-v2-9.js && node --check assets/reports-v2-10.js && node --check assets/material-downloads-v1.js && node --check assets/shared-v2-13.js && node --check assets/release-v2-13.js && node --check assets/vault-v2-13.js && node --check assets/report-v2-13.js && node --check assets/official-exam-v2-13.js && node --check assets/adaptive-review-v2-13.js && node --check service-worker.js && node --check scripts/build-release.mjs && node --check scripts/build-release-v2-4.mjs && node --check scripts/export-notion-snapshot.mjs && node --check scripts/export-exceptional-proofs.mjs && node --check scripts/publication-plan.mjs && node --check scripts/create-publication-plan.mjs && node --check scripts/validate-publication-plan.mjs && node --check scripts/apply-notion-snapshot.mjs && node --check scripts/apply-visual-overrides.mjs && node --check scripts/audit-release-visuals.mjs && node --check scripts/validate-notion-snapshot.mjs && node --check scripts/build-study-index.mjs && node --check scripts/build-public.mjs && node --check scripts/fixed-build-time.mjs && node --check scripts/verify-deployment.mjs && node --check scripts/rollback-deployment.mjs && node --check scripts/mark-notion-published.mjs && node --check scripts/validate-runtime-catalog.mjs && node --check scripts/validate-study-navigation-v2-6.mjs && node --check scripts/validate-intelligence-v2-9.mjs && node --check scripts/validate-material-downloads.mjs && node --check scripts/validate-platform-v2-13.mjs && node --check scripts/validate-dist-v2-10.mjs && node --check scripts/validate-build-v2-11.mjs && node --check scripts/validate-workflows.mjs && node --check scripts/validate-reproducible-build.mjs && node scripts/validate-runtime-catalog.mjs && npm test && node scripts/validate-reproducible-build.mjs
+
+
+> sedes-df-questoes@2.13.0 build
+> node --import=./scripts/fixed-build-time.mjs scripts/build-release-v2-4.mjs && node --import=./scripts/fixed-build-time.mjs scripts/apply-notion-snapshot.mjs && node --import=./scripts/fixed-build-time.mjs scripts/apply-visual-overrides.mjs && node --import=./scripts/fixed-build-time.mjs scripts/build-study-index.mjs && node scripts/build-public.mjs
+
+✓ Release 2.9.0 gerada: 35 materiais, 570 questões e 1869 em auditoria.
+✓ Release híbrida gerada: 36 materiais e 690 questões (1 material e 120 questões adicionadas).
+✓ Snapshot do Notion aplicado: 2536 questões em 63 materiais; IDs públicos preservados quando já existentes e recibos de release mantidos apenas como rastreabilidade.
+✓ Substituições visuais aplicadas em 4 material(is).
+✓ Índice de estudos gerado: 136 matérias, 1119 tópicos e 2536 questões.
+✓ Build público canônico 2.13.0: cache sedes-questoes-v2-13-0, 2536 questões, 63 materiais e release-meta unificado.
+✓ Runtime canônico validado: catálogo dinâmico, fontes idênticas ao dist e cache v8.
+
+> sedes-df-questoes@2.13.0 test
+> node scripts/validate-data.mjs && node scripts/validate-true-false-plan.mjs && node scripts/validate-notion-snapshot.mjs && node scripts/validate-publication-plan.mjs && node scripts/validate-release-v2-4.mjs && node scripts/validate-exam-v4.mjs && node scripts/validate-study-navigation-v2-6.mjs && node scripts/validate-intelligence-v2-9.mjs && node scripts/validate-material-downloads.mjs && node scripts/validate-platform-v2-13.mjs && node scripts/validate-dist-v2-10.mjs && node scripts/validate-build-v2-11.mjs && node scripts/validate-workflows.mjs
+
+✓ Base válida e preservada: 9 materiais e 180 questões.
+✓ Planejamento C/E validado: 2 provas e 240 itens em auditoria.
+✓ Snapshot do Notion validado: 1846 questões canônicas, 27 materiais, 329 duplicidade(s) ignorada(s) e 3148 registros fora da publicação.
+✓ Plano real validado: 1846 registro(s) em 1 lote(s), com códigos e contagens exatos.
+✓ Release 2.9.0 validada: 2536 questões, 63 materiais, 1813 C/E ativas e 2458 registros em auditoria.
+✓ Concurso validado em 2026-09-06: 5 cargos, níveis Médio e Superior e contador no horário de Brasília.
+✓ Navegação pública validada: 136 matérias, 1119 tópicos, 35 simulados e 28 prova(s).
+✓ Plataforma inteligente validada: 2536 questões, 63 materiais, 136 matérias, 1119 tópicos, cache sedes-questoes-v2-13-0, PWA e auditoria pública com plano restrito e rollback.
+✓ Downloads compatíveis: 2536 questões em 63 materiais (28 provas e 35 simulados), todos indexados e comentados.
+✓ Plataforma 2.13 validada: 2536 questões, 63 materiais, release unificada, cofre local, reporte, prova real e revisão adaptativa.
+✓ Dist 2.13.0 validado: cache sedes-questoes-v2-13-0, 2536 questões, 63 materiais, downloads, snapshot do Notion e proveniência reproduzível.
+✓ Build 2.13.0 validado: release-meta, vault, reporte, prova real, revisão adaptativa e publicação protegida.
+✓ 6 workflows auditados: consulta enxuta do Notion, snapshot e plano versionados, um único build validado e reutilizado no deploy, fechamento editorial controlado e auditoria npm de severidade alta.
+
+> sedes-df-questoes@2.13.0 build
+> node --import=./scripts/fixed-build-time.mjs scripts/build-release-v2-4.mjs && node --import=./scripts/fixed-build-time.mjs scripts/apply-notion-snapshot.mjs && node --import=./scripts/fixed-build-time.mjs scripts/apply-visual-overrides.mjs && node --import=./scripts/fixed-build-time.mjs scripts/build-study-index.mjs && node scripts/build-public.mjs
+
+✓ Release 2.9.0 gerada: 35 materiais, 570 questões e 1869 em auditoria.
+✓ Release híbrida gerada: 36 materiais e 690 questões (1 material e 120 questões adicionadas).
+✓ Snapshot do Notion aplicado: 2536 questões em 63 materiais; IDs públicos preservados quando já existentes e recibos de release mantidos apenas como rastreabilidade.
+✓ Substituições visuais aplicadas em 4 material(is).
+✓ Índice de estudos gerado: 136 matérias, 1119 tópicos e 2536 questões.
+✓ Build público canônico 2.13.0: cache sedes-questoes-v2-13-0, 2536 questões, 63 materiais e release-meta unificado.
+✓ Build reproduzível confirmado: ca6cf65ab0dcab9fd086e9e5f24f4b51a5905d4bc71a99f4cb8c70fa9d08861d
