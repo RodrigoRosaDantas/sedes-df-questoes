@@ -1,0 +1,77 @@
+name: Auditoria CRBM-6 Agente 2026
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/auditar-crbm6-agente-2026.mjs'
+      - '.github/workflows/auditoria-crbm6-agente-2026.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: auditoria-crbm6-agente-20260801
+  cancel-in-progress: false
+
+jobs:
+  auditar:
+    if: github.head_ref == 'agent/auditoria-crbm6-agente-20260801'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Preparar ferramentas
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils unzip
+
+      - name: Baixar fontes oficiais
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='artifacts/auditoria-crbm6-agente-2026/oficial'
+          PAGE='https://quadrix.org.br/informacoes/3042/'
+          mkdir -p "$BASE/provas"
+          curl -fL --retry 3 --retry-delay 2 -A 'Mozilla/5.0' -e "$PAGE" \
+            'https://anexos.cdn.selecao.net.br/uploads/861/concursos/3042/anexos/ece0a8fe-6502-49eb-aff0-69f0fad207e3.zip' \
+            -o "$BASE/provas-aplicadas.zip"
+          curl -fL --retry 3 --retry-delay 2 -A 'Mozilla/5.0' -e "$PAGE" \
+            'https://anexos.cdn.selecao.net.br/uploads/861/concursos/3042/anexos/9c5a54b4-2f16-4706-8873-f40801845825.pdf' \
+            -o "$BASE/gabarito-definitivo.pdf"
+          curl -fL --retry 3 --retry-delay 2 -A 'Mozilla/5.0' -e "$PAGE" \
+            'https://anexos.cdn.selecao.net.br/uploads/861/concursos/3042/anexos/6e1e2bfe-06bd-41de-a786-af913192efba.pdf' \
+            -o "$BASE/analise-recursos.pdf"
+          unzip -q "$BASE/provas-aplicadas.zip" -d "$BASE/provas"
+          pdftotext -layout "$BASE/gabarito-definitivo.pdf" "$BASE/gabarito-definitivo.txt"
+          pdftotext -layout "$BASE/analise-recursos.pdf" "$BASE/analise-recursos.txt"
+          find "$BASE/provas" -type f -iname '*.pdf' -print0 |
+            while IFS= read -r -d '' pdf; do
+              pdftotext -layout "$pdf" "$pdf.txt"
+            done
+          find "$BASE" -type f -printf '%P\n' | sort > "$BASE/arquivos.txt"
+          sha256sum "$BASE/provas-aplicadas.zip" "$BASE/gabarito-definitivo.pdf" "$BASE/analise-recursos.pdf" > "$BASE/fontes.sha256"
+          echo 'OFFICIAL_FILES_BEGIN'
+          cat "$BASE/arquivos.txt"
+          echo 'OFFICIAL_FILES_END'
+
+      - name: Exportar e auditar Banco Mestre
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/auditar-crbm6-agente-2026.mjs
+
+      - name: Preservar diagnóstico
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: auditoria-crbm6-agente-20260801
+          path: artifacts/auditoria-crbm6-agente-2026
+          if-no-files-found: error
+          retention-days: 90
