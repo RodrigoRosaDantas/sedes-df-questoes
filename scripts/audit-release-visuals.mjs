@@ -62,6 +62,9 @@ if (report.catalog_available) {
   }
 }
 
+report.issues.sort((left, right) =>
+  String(left.code || left.material_id || '').localeCompare(String(right.code || right.material_id || ''), 'pt-BR'),
+);
 report.incomplete_visuals = report.issues.length;
 fs.mkdirSync(path.dirname(outputPath), {recursive: true});
 fs.writeFileSync(outputPath, `${JSON.stringify(report, null, 2)}\n`);
