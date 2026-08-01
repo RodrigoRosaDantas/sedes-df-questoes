@@ -34,6 +34,42 @@ jobs:
           git config user.name 'sedes-df-publish-all[bot]'
           git config user.email 'sedes-df-publish-all[bot]@users.noreply.github.com'
 
+      - name: Ajustar IDs técnicos e preservar duplicatas da exceção
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          export_file = Path('scripts/export-all-notion-snapshot-temp.mjs')
+          export_text = export_file.read_text()
+          export_text = export_text.replace(
+              "const shortId = value => clean(value).replace(/-/g, '').slice(0, 12) || Math.random().toString(16).slice(2, 14);",
+              "const stableId = value => clean(value).replace(/-/g, '') || Math.random().toString(16).slice(2);\nconst shortId = value => stableId(value).slice(-16);",
+          )
+          export_text = export_text.replace(
+              "github_id: clean(row['Código GitHub']) || `notion-${shortId(row.notion_id)}` ,",
+              "github_id: `notion-${stableId(row.notion_id)}` ,",
+          )
+          export_text = export_text.replace(
+              "github_id: clean(row['Código GitHub']) || `notion-${shortId(row.notion_id)}` ,".replace(' }', '}'),
+              "github_id: `notion-${stableId(row.notion_id)}` ,".replace(' }', '}'),
+          )
+          export_text = export_text.replace(
+              "github_id: clean(row['Código GitHub']) || `notion-${shortId(row.notion_id)}` ,".replace('` ,', '`,'),
+              "github_id: `notion-${stableId(row.notion_id)}` ,".replace('` ,', '`,'),
+          )
+          if "const stableId" not in export_text or "github_id: `notion-${stableId(row.notion_id)}`" not in export_text:
+              raise SystemExit('Não foi possível aplicar a correção de IDs técnicos únicos.')
+          export_file.write_text(export_text)
+
+          apply_file = Path('scripts/apply-notion-snapshot.mjs')
+          apply_text = apply_file.read_text()
+          old = "function matchRecord(record) {\n  const direct = byCode.get(key(editorialCode(record)));\n  if (direct) return direct;\n"
+          new = old + "  if (record.publication_exception) return null;\n"
+          if old not in apply_text:
+              raise SystemExit('Não foi possível localizar o ponto de compatibilidade do snapshot.')
+          apply_file.write_text(apply_text.replace(old, new, 1))
+          PY
+
       - name: Exportar integralmente o Banco Mestre
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
@@ -49,7 +85,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git add data/notion/published.json data/notion/publication-plan.json
+          git add data/notion/published.json data/notion/publication-plan.json scripts/export-all-notion-snapshot-temp.mjs scripts/apply-notion-snapshot.mjs
           if git diff --cached --quiet; then
             echo 'Snapshot integral já está atualizado.'
           else
