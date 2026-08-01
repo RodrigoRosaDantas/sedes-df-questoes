@@ -9,6 +9,20 @@ const SOURCE = '784234ae-deca-4514-b60d-19524e122a89';
 const DATABASE_URL = 'https://app.notion.com/p/a1d5fc8f8e434105861faba90dc156d9?v=85b47b4a2e17461e9d3482724b13fab8';
 const API = 'https://api.notion.com/v1';
 const VERSION = '2026-03-11';
+const EXPORT_PROPERTIES = [
+  'Alternativa A', 'Alternativa B', 'Alternativa C', 'Alternativa D', 'Alternativa E',
+  'Ano', 'Anulada', 'Assunto', 'Bloco', 'Cargo',
+  'Comentário A', 'Comentário B', 'Comentário C', 'Comentário D', 'Comentário E',
+  'Comentário geral', 'Código', 'Código GitHub', 'Código do cargo', 'Descrição da imagem',
+  'Disciplina', 'Duplicada', 'Enunciado', 'Fonte / Banca', 'Formato da questão',
+  'Fundamento legal', 'Gabarito', 'Liberada para exportação', 'Lote de publicação',
+  'Nome do material', 'Número original', 'Observações', 'Órgão', 'Página do PDF',
+  'Pegadinha', 'Pode publicar', 'Possui imagem', 'Questão', 'Subassunto',
+  'Texto-base', 'Tipo de material', 'Transcrição conferida', 'URL da fonte',
+];
+const queryParameters = new URLSearchParams();
+for (const property of EXPORT_PROPERTIES) queryParameters.append('filter_properties[]', property);
+const QUERY_ENDPOINT = `/data_sources/${SOURCE}/query?${queryParameters.toString()}`;
 if (!TOKEN) throw new Error('NOTION_TOKEN não está disponível neste repositório.');
 
 const clean = value => String(value ?? '')
@@ -67,9 +81,9 @@ async function readAll() {
   let cursor;
   let batches = 0;
   do {
-    const body = {page_size: 100};
+    const body = {page_size: 100, result_type: 'page'};
     if (cursor) body.start_cursor = cursor;
-    const page = await request(`/data_sources/${SOURCE}/query`, {method: 'POST', body: JSON.stringify(body)});
+    const page = await request(QUERY_ENDPOINT, {method: 'POST', body: JSON.stringify(body)});
     for (const item of page.results || []) {
       const properties = Object.fromEntries(Object.entries(item.properties || {}).map(([name, property]) => [name, value(property)]));
       rows.push({
@@ -83,7 +97,7 @@ async function readAll() {
     batches += 1;
     cursor = page.has_more ? page.next_cursor : null;
   } while (cursor);
-  console.log(`Banco Mestre: ${rows.length} registros lidos em ${batches} lotes.`);
+  console.log(`Banco Mestre: ${rows.length} registros lidos em ${batches} lotes com ${EXPORT_PROPERTIES.length} propriedades selecionadas.`);
   return rows;
 }
 
