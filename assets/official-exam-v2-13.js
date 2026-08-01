@@ -1,4 +1,4 @@
-import {ensureData, state, allQuestionIds, currentRoute, activeSession, activeHistory, profileKey, readJSON, saveJSON, shuffle, createCompatibleSession, OFFICIAL_MATERIAL_ID, esc, observeApp, toast} from "./shared-v2-13.js?v=1";
+import {ensureData, state, allQuestionIds, materialIdFromIndex, currentRoute, activeSession, activeHistory, profileKey, readJSON, saveJSON, shuffle, createCompatibleSession, OFFICIAL_MATERIAL_ID, esc, observeApp, toast} from "./shared-v2-13.js?v=1";
 
 const BLUEPRINT_KEY = () => profileKey("officialBlueprint.v1");
 const GENERAL_PATTERN = /(portugu|língua|ride|distrito federal|maria da penha|mulher|primeiros socorros)/i;
@@ -32,16 +32,50 @@ function fillBlock(preferred, total, excluded, fallback) {
   }
   return selected;
 }
-function startOfficialExam() {
+async function loadSelectedQuestions(ids) {
+  const grouped = new Map();
+  for (const id of ids) {
+    const materialId = materialIdFromIndex(state.catalog?.question_index?.[id]);
+    if (!materialId) continue;
+    if (!grouped.has(materialId)) grouped.set(materialId, []);
+    grouped.get(materialId).push(id);
+  }
+  const questionMap = new Map();
+  await Promise.all([...grouped.entries()].map(async ([materialId, questionIds]) => {
+    const meta = state.catalog.materials.find(item => item.id === materialId);
+    if (!meta?.file) return;
+    const response = await fetch(meta.file, {cache: "force-cache"});
+    if (!response.ok) throw new Error(`Falha ao carregar ${materialId}: HTTP ${response.status}`);
+    const material = await response.json();
+    const wanted = new Set(questionIds);
+    for (const question of material.questoes || []) {
+      if (!wanted.has(question.id)) continue;
+      questionMap.set(question.id, {...question, _materialId: material.id, _materialName: material.nome, _discipline: question.disciplina || material.disciplina, _cargo: String(material.codigo_cargo)});
+    }
+  }));
+  return ids.map(id => questionMap.get(id)).filter(Boolean);
+}
+async function startOfficialExam() {
   const {general, specific} = classifiedIds();
   const all = allQuestionIds();
   const generalIds = fillBlock(general, 20, [], all);
   const specificIds = fillBlock(specific, 40, generalIds, all);
-  if (generalIds.length !== 20 || specificIds.length !== 40 || new Set([...generalIds, ...specificIds]).size !== 60) {
+  const questionIds = [...generalIds, ...specificIds];
+  if (generalIds.length !== 20 || specificIds.length !== 40 || new Set(questionIds).size !== 60) {
     return toast("O acervo publicado ainda não permite montar 60 questões únicas.", "error");
   }
-  saveJSON(BLUEPRINT_KEY(), {createdAt: new Date().toISOString(), generalIds, specificIds, generalWeight: 1, specificWeight: 2, durationMinutes: 240});
-  createCompatibleSession({id: OFFICIAL_MATERIAL_ID, name: "Prova Real SEDES/DF 2026", questionIds: [...generalIds, ...specificIds], mode: "prova", minutes: 240, discipline: "Conhecimentos gerais e específicos", source: "Edital nº 1/2026 — simulação com o acervo publicado"});
+  const button = document.querySelector("[data-start-official-exam]");
+  if (button) { button.disabled = true; button.textContent = "Preparando prova…"; }
+  try {
+    const questions = await loadSelectedQuestions(questionIds);
+    if (questions.length !== 60) throw new Error(`Questões carregadas: ${questions.length}/60.`);
+    saveJSON(BLUEPRINT_KEY(), {createdAt: new Date().toISOString(), generalIds, specificIds, generalWeight: 1, specificWeight: 2, durationMinutes: 240});
+    createCompatibleSession({id: OFFICIAL_MATERIAL_ID, name: "Prova Real SEDES/DF 2026", questionIds, questions, mode: "prova", minutes: 240, discipline: "Conhecimentos gerais e específicos", source: "Edital nº 1/2026 — simulação com o acervo publicado"});
+  } catch (error) {
+    console.error(error);
+    toast("Não foi possível preparar a prova real. O acervo foi preservado.", "error");
+    if (button) { button.disabled = false; button.textContent = "Iniciar prova real"; }
+  }
 }
 function injectCard() {
   if (currentRoute() !== "inicio" || document.querySelector("[data-official-exam-card]")) return;
