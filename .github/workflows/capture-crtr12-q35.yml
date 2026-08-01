@@ -3,7 +3,7 @@ name: Capturar recurso visual CRTR-12 questão 35
 on:
   push:
     branches:
-      - fix/recurso-visual-crtr12-q35
+      - main
     paths:
       - .github/workflows/capture-crtr12-q35.yml
       - data/operations/crtr12-q35-visual-source.md
@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: fix/recurso-visual-crtr12-q35
+          ref: main
 
       - name: Baixar imagem vinculada à questão pública
         run: |
@@ -55,5 +55,5 @@ jobs:
             echo 'Imagem já capturada.'
           else
             git commit -m 'Restaurar imagem original da questão CRTR-12 35'
-            git push origin HEAD:fix/recurso-visual-crtr12-q35
+            git push origin HEAD:main
           fi
