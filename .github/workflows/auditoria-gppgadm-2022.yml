@@ -33,30 +33,65 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq poppler-utils unzip
 
-      - name: Baixar prova e gabarito oficiais
+      - name: Coletar prova e gabarito oficiais sem bloquear auditoria
         shell: bash
         run: |
-          set -euo pipefail
-          mkdir -p artifacts/auditoria-gppgadm-2022/oficial/provas
-          curl -fL --retry 3 --retry-delay 2 -A 'Mozilla/5.0' \
-            'https://quadrix.org.br/uploads/861/concursos/1180/anexos/d901d108bc8976c4fa40c7b7554385ea.pdf?v205742=' \
-            -o artifacts/auditoria-gppgadm-2022/oficial/gabarito-definitivo.pdf
-          curl -fL --retry 3 --retry-delay 2 -A 'Mozilla/5.0' \
-            'https://anexos.cdn.selecao.net.br/uploads/861/concursos/1180/anexos/663a2282-84f2-4991-8f93-720a3a58f659.zip' \
-            -o artifacts/auditoria-gppgadm-2022/oficial/provas-tipo-a-gestor.zip
-          unzip -q artifacts/auditoria-gppgadm-2022/oficial/provas-tipo-a-gestor.zip \
-            -d artifacts/auditoria-gppgadm-2022/oficial/provas
-          pdftotext -layout artifacts/auditoria-gppgadm-2022/oficial/gabarito-definitivo.pdf \
-            artifacts/auditoria-gppgadm-2022/oficial/gabarito-definitivo.txt
-          find artifacts/auditoria-gppgadm-2022/oficial/provas -type f -iname '*.pdf' -print0 |
-            while IFS= read -r -d '' pdf; do
-              pdftotext -layout "$pdf" "$pdf.txt"
+          set -u -o pipefail
+          BASE='artifacts/auditoria-gppgadm-2022/oficial'
+          mkdir -p "$BASE/provas"
+          : > "$BASE/download-status.txt"
+          COOKIE="$RUNNER_TEMP/quadrix.cookies"
+          PAGE='https://quadrix.org.br/informacoes/1180/'
+          curl -sSL --retry 2 -A 'Mozilla/5.0' -c "$COOKIE" "$PAGE" -o "$BASE/pagina-oficial.html" || true
+
+          try_download() {
+            local label="$1"
+            local output="$2"
+            shift 2
+            for url in "$@"; do
+              echo "Tentando $label: $url" | tee -a "$BASE/download-status.txt"
+              if curl -fL --retry 2 --retry-delay 2 -A 'Mozilla/5.0' \
+                -e "$PAGE" -b "$COOKIE" -c "$COOKIE" "$url" -o "$output"; then
+                echo "OK $label: $url" | tee -a "$BASE/download-status.txt"
+                return 0
+              fi
             done
-          find artifacts/auditoria-gppgadm-2022/oficial -maxdepth 3 -type f -printf '%P\n' | sort \
-            > artifacts/auditoria-gppgadm-2022/oficial/arquivos.txt
+            rm -f "$output"
+            echo "FALHA $label" | tee -a "$BASE/download-status.txt"
+            return 1
+          }
+
+          try_download 'gabarito definitivo' "$BASE/gabarito-definitivo.pdf" \
+            'https://quadrix.org.br/uploads/861/concursos/1180/anexos/d901d108bc8976c4fa40c7b7554385ea.pdf?v205742=' \
+            'https://quadrix.org.br/uploads/861/concursos/1180/anexos/d901d108bc8976c4fa40c7b7554385ea.pdf' \
+            'https://anexos.cdn.selecao.net.br/uploads/861/concursos/1180/anexos/d901d108bc8976c4fa40c7b7554385ea.pdf' \
+            'https://anexos-r2.selecao.net.br/uploads/861/concursos/1180/anexos/d901d108bc8976c4fa40c7b7554385ea.pdf' || true
+
+          try_download 'provas aplicadas Tipo A Gestor' "$BASE/provas-tipo-a-gestor.zip" \
+            'https://anexos.cdn.selecao.net.br/uploads/861/concursos/1180/anexos/663a2282-84f2-4991-8f93-720a3a58f659.zip' \
+            'https://anexos-r2.selecao.net.br/uploads/861/concursos/1180/anexos/663a2282-84f2-4991-8f93-720a3a58f659.zip' || true
+
+          if [ -s "$BASE/gabarito-definitivo.pdf" ]; then
+            file "$BASE/gabarito-definitivo.pdf" | tee -a "$BASE/download-status.txt"
+            pdftotext -layout "$BASE/gabarito-definitivo.pdf" "$BASE/gabarito-definitivo.txt" || true
+          fi
+
+          if [ -s "$BASE/provas-tipo-a-gestor.zip" ]; then
+            file "$BASE/provas-tipo-a-gestor.zip" | tee -a "$BASE/download-status.txt"
+            unzip -q "$BASE/provas-tipo-a-gestor.zip" -d "$BASE/provas" || true
+            find "$BASE/provas" -type f -iname '*.pdf' -print0 |
+              while IFS= read -r -d '' pdf; do
+                pdftotext -layout "$pdf" "$pdf.txt" || true
+              done
+          fi
+
+          find "$BASE" -maxdepth 4 -type f -printf '%P\n' | sort > "$BASE/arquivos.txt"
           echo 'OFFICIAL_FILES_BEGIN'
-          cat artifacts/auditoria-gppgadm-2022/oficial/arquivos.txt
+          cat "$BASE/arquivos.txt"
           echo 'OFFICIAL_FILES_END'
+          echo 'OFFICIAL_DOWNLOAD_STATUS_BEGIN'
+          cat "$BASE/download-status.txt"
+          echo 'OFFICIAL_DOWNLOAD_STATUS_END'
 
       - name: Comparar Notion, main e site público
         env:
