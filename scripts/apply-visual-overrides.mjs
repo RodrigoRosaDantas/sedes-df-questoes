@@ -23,14 +23,20 @@ const byCode = new Map();
 
 for (const override of overrides) {
   const code = String(override.code || '').trim();
+  const removeImage = override.remove_image === true;
   const image = String(override.image || '').trim();
   const description = String(override.description || '').trim();
-  if (!code || !image || !description) {
-    throw new Error('Substituição visual incompleta: código, imagem e descrição são obrigatórios.');
+  if (!code) throw new Error('Substituição visual incompleta: código é obrigatório.');
+  if (removeImage) {
+    if (image || description) throw new Error(`${code}: remoção de imagem não pode declarar arquivo ou descrição visual.`);
+  } else {
+    if (!image || !description) {
+      throw new Error(`${code}: código, imagem e descrição são obrigatórios para adicionar recurso visual.`);
+    }
+    if (!fs.existsSync(resolve(image))) throw new Error(`${code}: arquivo visual não encontrado em ${image}.`);
   }
   if (byCode.has(code)) throw new Error(`Substituição visual duplicada: ${code}.`);
-  if (!fs.existsSync(resolve(image))) throw new Error(`${code}: arquivo visual não encontrado em ${image}.`);
-  byCode.set(code, {...override, code, image, description, matches: 0});
+  byCode.set(code, {...override, code, remove_image: removeImage, image, description, matches: 0});
 }
 
 let changedMaterials = 0;
@@ -42,9 +48,15 @@ for (const metadata of catalog.materials || []) {
   for (const question of material.questoes || []) {
     const override = byCode.get(question.codigo) || byCode.get(question.codigo_fonte);
     if (!override) continue;
-    question.possui_imagem = true;
-    question.descricao_imagem = override.description;
-    question.imagem = override.image;
+    if (override.remove_image) {
+      question.possui_imagem = false;
+      question.descricao_imagem = '';
+      delete question.imagem;
+    } else {
+      question.possui_imagem = true;
+      question.descricao_imagem = override.description;
+      question.imagem = override.image;
+    }
     override.matches += 1;
     changed = true;
   }
