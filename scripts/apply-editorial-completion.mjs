@@ -9,26 +9,27 @@ const receiptPath = path.resolve(root, process.env.EDITORIAL_RECEIPT_PATH || 'da
 const TOKEN = process.env.NOTION_TOKEN;
 const API = 'https://api.notion.com/v1';
 const VERSION = '2026-03-11';
-const sleep = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
 const clean = value => String(value ?? '').trim();
+const sleep = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
 
 if (!TOKEN) throw new Error('NOTION_TOKEN não está disponível.');
-if (!fs.existsSync(operationPath)) throw new Error(`Operação editorial não encontrada: ${operationPath}`);
-
 const raw = fs.readFileSync(operationPath);
 const operation = JSON.parse(raw.toString('utf8'));
 const operationHash = crypto.createHash('sha256').update(raw).digest('hex');
+const records = operation.records || [];
 const startedAt = new Date().toISOString();
 const updatedCodes = [];
 const alreadyAppliedCodes = [];
 
+const richFields = new Set(['Comentário geral', 'Fundamento legal', 'Subassunto', 'Pegadinha', 'Observações']);
+const urlFields = new Set(['URL da fonte']);
+const selectFields = new Set(['Auditoria de conteúdo']);
+const dateFields = new Set(['Data da revisão']);
+
 function textArray(value) {
   const text = clean(value);
-  if (!text) return [];
   const chunks = [];
-  for (let offset = 0; offset < text.length; offset += 1900) {
-    chunks.push({type: 'text', text: {content: text.slice(offset, offset + 1900)}});
-  }
+  for (let offset = 0; offset < text.length; offset += 1900) chunks.push({type: 'text', text: {content: text.slice(offset, offset + 1900)}});
   return chunks;
 }
 const rich = value => ({rich_text: textArray(value)});
@@ -46,113 +47,79 @@ const checkboxValue = property => property?.type === 'checkbox' && property.chec
 async function request(endpoint, options = {}, attempt = 1) {
   const response = await fetch(`${API}${endpoint}`, {
     ...options,
-    headers: {
-      Authorization: `Bearer ${TOKEN}`,
-      'Notion-Version': VERSION,
-      'Content-Type': 'application/json',
-      ...(options.headers || {}),
-    },
+    headers: {Authorization: `Bearer ${TOKEN}`, 'Notion-Version': VERSION, 'Content-Type': 'application/json', ...(options.headers || {})},
   });
   if (response.ok) return response.status === 204 ? {} : response.json();
   const body = await response.text();
   if ((response.status === 429 || response.status >= 500) && attempt < 9) {
-    const retryAfter = Number(response.headers.get('retry-after') || 0) * 1000;
-    await sleep(Math.max(retryAfter, 500 * 2 ** (attempt - 1)));
+    await sleep(Math.max(Number(response.headers.get('retry-after') || 0) * 1000, 500 * 2 ** (attempt - 1)));
     return request(endpoint, options, attempt + 1);
   }
   throw new Error(`Notion API ${response.status}: ${body.slice(0, 800)}`);
 }
 
-function normalizeRecord(record) {
-  return {
-    ...record,
-    patch: {
-      'Comentário geral': clean(record.comment),
-      'Fundamento legal': clean(record.foundation),
-      'Subassunto': clean(record.subtopic),
-      'Pegadinha': clean(record.trap),
-      'URL da fonte': clean(operation.official_source_url),
-      'Auditoria de conteúdo': 'Ajustada',
-      'Data da revisão': clean(operation.review_date),
-    },
-  };
-}
-const records = (operation.records || []).map(normalizeRecord);
-
 function assertOperation() {
   const expected = Number(operation.expected_records || 0);
-  if (!['1.0', '1.1'].includes(operation.schema_version)) throw new Error('Versão da operação editorial incompatível.');
+  if (!['1.1', '1.2'].includes(operation.schema_version)) throw new Error('Versão da operação editorial incompatível.');
   if (!Number.isInteger(expected) || records.length !== expected) throw new Error(`A operação deve conter ${expected} registros; recebeu ${records.length}.`);
-  if (!clean(operation.expected_github_code) || !clean(operation.official_source_url) || !clean(operation.review_date)) throw new Error('Metadados operacionais obrigatórios ausentes.');
+  if (!clean(operation.expected_github_code)) throw new Error('Código GitHub esperado ausente.');
   const codes = new Set();
   const ids = new Set();
   for (const record of records) {
     if (!clean(record.code) || !clean(record.notion_id) || !Number(record.number)) throw new Error('Registro sem identificação suficiente.');
-    if (codes.has(record.code)) throw new Error(`Código duplicado na operação: ${record.code}`);
-    if (ids.has(record.notion_id)) throw new Error(`Página duplicada na operação: ${record.notion_id}`);
+    if (!record.patch || !Object.keys(record.patch).length) throw new Error(`${record.code}: patch vazio.`);
+    if (codes.has(record.code) || ids.has(record.notion_id)) throw new Error(`${record.code}: registro duplicado.`);
     codes.add(record.code);
     ids.add(record.notion_id);
     for (const [field, value] of Object.entries(record.patch)) {
-      if (!clean(value)) throw new Error(`${record.code}: patch sem ${field}.`);
+      if (!clean(value)) throw new Error(`${record.code}: valor vazio em ${field}.`);
+      if (![...richFields, ...urlFields, ...selectFields, ...dateFields].includes(field)) throw new Error(`${record.code}: campo não autorizado (${field}).`);
     }
   }
 }
 
 function currentValue(properties, field) {
-  if (['Comentário geral', 'Fundamento legal', 'Subassunto', 'Pegadinha'].includes(field)) return clean(plain(properties[field]));
-  if (field === 'URL da fonte') return urlValue(properties[field]);
-  if (field === 'Auditoria de conteúdo') return selectValue(properties[field]);
-  if (field === 'Data da revisão') return dateValue(properties[field]);
+  if (richFields.has(field)) return clean(plain(properties[field]));
+  if (urlFields.has(field)) return urlValue(properties[field]);
+  if (selectFields.has(field)) return selectValue(properties[field]);
+  if (dateFields.has(field)) return dateValue(properties[field]);
   throw new Error(`Campo não reconhecido: ${field}`);
 }
-
+function encodedValue(field, value) {
+  if (richFields.has(field)) return rich(value);
+  if (urlFields.has(field)) return {url: value};
+  if (selectFields.has(field)) return {select: {name: value}};
+  if (dateFields.has(field)) return {date: {start: value}};
+  throw new Error(`Campo não reconhecido: ${field}`);
+}
 function desiredPatch(record, properties) {
   const patch = {};
-  for (const [field, expected] of Object.entries(record.patch)) {
+  for (const [field, expectedRaw] of Object.entries(record.patch)) {
+    const expected = clean(expectedRaw);
     const current = currentValue(properties, field);
-    if (field === 'Auditoria de conteúdo') {
-      if (current === 'Ajustada' || current === 'Aprovada') continue;
-      if (!current || current === 'Pendente') patch[field] = {select: {name: expected}};
-      else throw new Error(`${record.code}: auditoria atual divergente (${current}).`);
-      continue;
-    }
-    if (!current) {
-      if (field === 'URL da fonte') patch[field] = {url: expected};
-      else if (field === 'Data da revisão') patch[field] = {date: {start: expected}};
-      else patch[field] = rich(expected);
-    } else if (current !== expected) {
-      throw new Error(`${record.code}: ${field} já contém valor editorial divergente; nada será sobrescrito.`);
-    }
+    if (!current) patch[field] = encodedValue(field, expected);
+    else if (current !== expected) throw new Error(`${record.code}: ${field} já contém valor divergente; nada será sobrescrito.`);
   }
   return patch;
 }
-
 function verifyIdentity(record, properties) {
   const actualCode = clean(plain(properties.Código));
   const actualGithub = clean(plain(properties['Código GitHub']));
-  const actualStatus = selectValue(properties['Status editorial — registro manual anterior']);
-  if (actualCode !== clean(record.code)) throw new Error(`${record.code}: Código atual diverge (${actualCode || 'vazio'}).`);
-  if (actualGithub !== clean(operation.expected_github_code)) throw new Error(`${record.code}: Código GitHub diverge (${actualGithub || 'vazio'}).`);
-  if (actualStatus !== 'Publicada') throw new Error(`${record.code}: status publicado diverge (${actualStatus || 'vazio'}).`);
-  if (checkboxValue(properties.Anulada)) throw new Error(`${record.code}: questão está anulada.`);
-  if (checkboxValue(properties.Duplicada)) throw new Error(`${record.code}: questão está marcada como duplicada.`);
-  if (!dateValue(properties['Data da publicação'])) throw new Error(`${record.code}: Data da publicação está vazia.`);
+  const status = selectValue(properties['Status editorial — registro manual anterior']);
+  if (actualCode !== clean(record.code)) throw new Error(`${record.code}: Código atual diverge.`);
+  if (actualGithub !== clean(operation.expected_github_code)) throw new Error(`${record.code}: Código GitHub diverge.`);
+  if (status !== 'Publicada') throw new Error(`${record.code}: status não é Publicada.`);
+  if (checkboxValue(properties.Anulada) || checkboxValue(properties.Duplicada)) throw new Error(`${record.code}: registro anulado ou duplicado.`);
+  if (!dateValue(properties['Data da publicação'])) throw new Error(`${record.code}: Data da publicação vazia.`);
 }
-
 function verifyApplied(record, properties) {
   for (const [field, expected] of Object.entries(record.patch)) {
-    const current = currentValue(properties, field);
-    if (field === 'Auditoria de conteúdo') {
-      if (!['Ajustada', 'Aprovada'].includes(current)) throw new Error(`${record.code}: auditoria final inválida (${current || 'vazio'}).`);
-    } else if (current !== expected) {
-      throw new Error(`${record.code}: verificação final encontrou ${field} divergente.`);
-    }
+    if (currentValue(properties, field) !== clean(expected)) throw new Error(`${record.code}: verificação final encontrou ${field} divergente.`);
   }
 }
-
 async function writeReceipt(status, error = null) {
   const receipt = {
-    schema_version: '1.1',
+    schema_version: '1.2',
     operation_id: operation.operation_id,
     material: operation.material,
     operation_sha256: operationHash,
@@ -184,18 +151,15 @@ async function main() {
     const patch = desiredPatch(record, properties);
     if (Object.keys(patch).length) pending.push({record, patch});
     else alreadyAppliedCodes.push(record.code);
-    if ((index + 1) % 20 === 0) console.log(`Preflight: ${index + 1}/${records.length}.`);
+    if ((index + 1) % 18 === 0) console.log(`Preflight: ${index + 1}/${records.length}.`);
     await sleep(230);
   }
-  console.log(`✓ Preflight concluído: ${pending.length} pendentes; ${alreadyAppliedCodes.length} já idempotentes.`);
+  console.log(`✓ Preflight concluído: ${pending.length} pendentes; ${alreadyAppliedCodes.length} já aplicados.`);
   for (let index = 0; index < pending.length; index += 1) {
     const {record, patch} = pending[index];
-    await request(`/pages/${record.notion_id}`, {
-      method: 'PATCH',
-      body: JSON.stringify({properties: patch}),
-    });
+    await request(`/pages/${record.notion_id}`, {method: 'PATCH', body: JSON.stringify({properties: patch})});
     updatedCodes.push(record.code);
-    if ((index + 1) % 20 === 0) console.log(`Atualização: ${index + 1}/${pending.length}.`);
+    if ((index + 1) % 18 === 0) console.log(`Atualização: ${index + 1}/${pending.length}.`);
     await sleep(280);
   }
   for (let index = 0; index < records.length; index += 1) {
@@ -204,7 +168,7 @@ async function main() {
     const properties = page.properties || {};
     verifyIdentity(record, properties);
     verifyApplied(record, properties);
-    if ((index + 1) % 20 === 0) console.log(`Verificação: ${index + 1}/${records.length}.`);
+    if ((index + 1) % 18 === 0) console.log(`Verificação: ${index + 1}/${records.length}.`);
     await sleep(230);
   }
   await writeReceipt('success');
