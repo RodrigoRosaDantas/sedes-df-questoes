@@ -1,16 +1,14 @@
 {
-  "schema_version": "1.1",
-  "operation_id": "EDT-2026-08-01-CREFITO17-AGENTE-FISCAL-57",
-  "trigger_nonce": "2026-08-01T18:20:00Z",
+  "schema_version": "1.2",
+  "operation_id": "EDT-2026-08-01-CRFDF-ASSISTENTE-I-FUNDAMENTOS-54",
+  "trigger_nonce": "2026-08-01T18:32:00Z",
   "source_release_sha": "8a528d925807db558967a3ff0a956006e87356a5",
   "expected_github_code": "release-2.13.0:8a528d925807db558967a3ff0a956006e87356a5",
-  "official_source_url": "https://quadrix.org.br/informacoes/3041/",
-  "review_date": "2026-08-01",
-  "material": "Agente Fiscal — CREFITO-17 — Quadrix 2026",
-  "expected_records": 57,
+  "material": "Assistente I — CRF-DF — Quadrix 2026",
+  "expected_records": 54,
   "parts": [
-    "data/editorial/parts/editorial-agent-fiscal-01.json",
-    "data/editorial/parts/editorial-agent-fiscal-02.json",
-    "data/editorial/parts/editorial-agent-fiscal-03.json"
+    "data/editorial/parts/editorial-assistente-fundamentos-01.json",
+    "data/editorial/parts/editorial-assistente-fundamentos-02.json",
+    "data/editorial/parts/editorial-assistente-fundamentos-03.json"
   ]
 }
