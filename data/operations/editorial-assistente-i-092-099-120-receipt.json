@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "EDT-2026-08-01-CRFDF-ASSISTENTE-I-092-099-120",
+  "material": "Assistente I — CRF-DF — Quadrix 2026",
+  "source_release_sha": "8a528d925807db558967a3ff0a956006e87356a5",
+  "status": "success",
+  "expected_records": 9,
+  "updated_records": 9,
+  "field_updated": "Fundamento legal",
+  "editorial_basis": "Fundamento teórico — elaboração editorial com base no enunciado e no comentário validado",
+  "updated_codes": [
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-092",
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-093",
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-094",
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-095",
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-096",
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-097",
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-098",
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-099",
+    "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-120"
+  ],
+  "preserved_fields": [
+    "Código",
+    "Enunciado",
+    "Texto-base",
+    "Gabarito",
+    "Comentário geral",
+    "Subassunto",
+    "Pegadinha",
+    "Código GitHub",
+    "Data da publicação",
+    "Status editorial — registro manual anterior"
+  ],
+  "verification": {
+    "method": "Leitura prévia individual e releitura posterior das fronteiras do lote",
+    "verified_codes": [
+      "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-092",
+      "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-096",
+      "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-099",
+      "PROVA-QDX-CRFDF-2026-ASSISTENTE-I-200-120"
+    ]
+  },
+  "site_deployed": false,
+  "publication_queue_reopened": false,
+  "recorded_date": "2026-08-01"
+}
