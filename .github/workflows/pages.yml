@@ -3,6 +3,9 @@ name: Validar e publicar GitHub Pages
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'data/notion/published.json'
+      - 'data/notion/publication-plan.json'
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -30,6 +33,7 @@ concurrency:
 env:
   PLAYWRIGHT_VERSION: 1.61.1
   PUBLICATION_PLAN_PATH: data/notion/publication-plan.json
+  VALIDATED_DIST_ARTIFACT: validated-dist-${{ github.sha }}
 
 jobs:
   validate:
@@ -67,6 +71,13 @@ jobs:
           python3 -m http.server 4173 --directory dist >/tmp/sedes-http.log 2>&1 &
           for i in {1..30}; do curl -fsS http://127.0.0.1:4173/ >/dev/null && break; sleep 1; done
           npx playwright test
+      - name: Preservar exatamente o pacote aprovado
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ env.VALIDATED_DIST_ARTIFACT }}
+          path: dist
+          if-no-files-found: error
+          retention-days: 1
 
   deploy:
     if: github.event_name != 'pull_request'
@@ -82,8 +93,11 @@ jobs:
         with:
           node-version: 22
           package-manager-cache: false
-      - name: Gerar pacote final a partir do snapshot versionado
-        run: npm run build
+      - name: Recuperar o pacote já validado
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ env.VALIDATED_DIST_ARTIFACT }}
+          path: dist
       - name: Preparar GitHub Pages
         uses: actions/configure-pages@v6
       - name: Empacotar site
