@@ -20,6 +20,7 @@ env:
   CANDIDATE_BRANCH: ops/exceptional-candidate-2026-08-01
   VALIDATION_STATUS_PATH: data/operations/exceptional-validation-status.json
   VALIDATION_LOG_PATH: data/operations/exceptional-validation.log
+  VISUAL_AUDIT_PATH: data/operations/exceptional-visual-audit.json
 
 jobs:
   release:
@@ -80,6 +81,11 @@ jobs:
           echo "exit_code=${EXIT_CODE}" >> "$GITHUB_OUTPUT"
           exit "${EXIT_CODE}"
 
+      - name: Auditar todos os recursos visuais do candidato
+        if: always() && steps.candidate.outcome == 'success'
+        shell: bash
+        run: node scripts/audit-release-visuals.mjs
+
       - name: Registrar resultado da validação no branch candidato
         if: always() && steps.candidate.outcome == 'success'
         shell: bash
@@ -90,10 +96,16 @@ jobs:
         run: |
           set -euo pipefail
           cp /tmp/exceptional-validation.log /tmp/exceptional-validation-preserved.log
+          if [ -f "${VISUAL_AUDIT_PATH}" ]; then
+            cp "${VISUAL_AUDIT_PATH}" /tmp/exceptional-visual-audit-preserved.json
+          fi
           git reset --hard "${CANDIDATE_SHA}"
           git clean -fd
           mkdir -p "$(dirname "${VALIDATION_STATUS_PATH}")"
           cp /tmp/exceptional-validation-preserved.log "${VALIDATION_LOG_PATH}"
+          if [ -f /tmp/exceptional-visual-audit-preserved.json ]; then
+            cp /tmp/exceptional-visual-audit-preserved.json "${VISUAL_AUDIT_PATH}"
+          fi
           jq -n \
             --arg operation_id 'EXC-2026-08-01-PROVAS-PENDENTES' \
             --arg candidate_sha "${CANDIDATE_SHA}" \
@@ -103,6 +115,9 @@ jobs:
             '{schema_version:"1.0", operation_id:$operation_id, candidate_sha:$candidate_sha, outcome:$outcome, exit_code:$exit_code, validated_at:$validated_at}' \
             > "${VALIDATION_STATUS_PATH}"
           git add "${VALIDATION_STATUS_PATH}" "${VALIDATION_LOG_PATH}"
+          if [ -f "${VISUAL_AUDIT_PATH}" ]; then
+            git add "${VISUAL_AUDIT_PATH}"
+          fi
           git commit -m 'Registrar validação do candidato excepcional'
           git push --force origin "HEAD:refs/heads/${CANDIDATE_BRANCH}"
 
