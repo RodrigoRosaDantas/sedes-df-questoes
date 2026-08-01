@@ -1,11 +1,11 @@
 {
   "operation_id": "EXC-2026-08-01-PROVAS-PENDENTES",
   "revision": 2,
-  "retry": 15,
+  "retry": 16,
   "authorized": true,
   "authorized_at": "2026-08-01T02:37:00-03:00",
   "corrected_at": "2026-08-01T03:06:00-03:00",
-  "retried_at": "2026-08-01T12:55:00-03:00",
+  "retried_at": "2026-08-01T13:03:00-03:00",
   "scope": "provas_pendentes",
   "ordinary_review_gates_waived": true,
   "preserve_existing_publication": true,
@@ -31,6 +31,7 @@
     "Adicionado recibo persistente do workflow de Pages, com ID, conclusão, jobs e logs de falha, para eliminar repetição sem diagnóstico.",
     "Substituído o teste público rígido de 245 códigos por um contrato que exige todos os 1.846 códigos do plano autorizado e rejeita códigos duplicados ou anulados.",
     "Adicionada verificação pública vinculada ao SHA para evitar mistura transitória de arquivos durante a propagação do GitHub Pages.",
-    "Alinhada a auditoria dos cadernos em PDF à numeração efetivamente exibida pelo gerador, mantendo o número original apenas como metadado da questão."
+    "Alinhada a auditoria dos cadernos em PDF à numeração efetivamente exibida pelo gerador, mantendo o número original apenas como metadado da questão.",
+    "Corrigido o fechamento da rastreabilidade para usar o catálogo e os materiais do mesmo artefato dist que foi testado e publicado."
   ]
 }
