@@ -1,0 +1,58 @@
+name: Publicar integralmente o Banco Mestre — exceção
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-all-questions-exception
+  cancel-in-progress: false
+
+jobs:
+  export:
+    if: github.head_ref == 'agent/publish-all-questions-exception'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Baixar branch excepcional
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Configurar autoria
+        run: |
+          git config user.name 'sedes-df-publish-all[bot]'
+          git config user.email 'sedes-df-publish-all[bot]@users.noreply.github.com'
+
+      - name: Exportar integralmente o Banco Mestre
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/export-all-notion-snapshot-temp.mjs
+
+      - name: Gerar plano técnico
+        run: node scripts/create-publication-plan.mjs
+
+      - name: Validar pacote integral
+        run: npm run check
+
+      - name: Versionar snapshot integral
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add data/notion/published.json data/notion/publication-plan.json
+          if git diff --cached --quiet; then
+            echo 'Snapshot integral já está atualizado.'
+          else
+            git commit -m 'Publicar integralmente todas as questões do Banco Mestre'
+            git push origin HEAD:${{ github.event.pull_request.head.ref }}
+          fi
