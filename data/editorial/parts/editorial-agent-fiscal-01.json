@@ -1,0 +1,182 @@
+[
+  {
+    "number": 28,
+    "code": "PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-028",
+    "notion_id": "3afcf5a2-6731-8107-888e-ff5641a403a6",
+    "comment": "Errado. As soluções não negativas de x+y+z=3 são 10; logo, a probabilidade é 10/216 ≈ 4,63%, inferior a 5%.",
+    "foundation": "Contagem por combinações com repetição e probabilidade clássica.",
+    "subtopic": "Combinações com repetição e probabilidade clássica",
+    "trap": "Arredondar 4,63% para valor superior a 5%."
+  },
+  {
+    "number": 40,
+    "code": "PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-040",
+    "notion_id": "3afcf5a2-6731-8165-8cd8-fc83d0c18441",
+    "comment": "Errado. A comunicação em rede depende de protocolos previamente definidos para endereçamento, roteamento, transporte e interpretação dos dados.",
+    "foundation": "Arquitetura em camadas e protocolos de redes de computadores.",
+    "subtopic": "Arquitetura em camadas e protocolos de rede",
+    "trap": "Supor que a infraestrutura física substitui as regras lógicas de comunicação."
+  },
+  {
+    "number": 45,
+    "code": "PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-045",
+    "notion_id": "3afcf5a2-6731-8114-acbf-dd6b8032bc1e",
+    "comment": "Certo. A legalidade formal não neutraliza a censura ética quando o agente disfarça interesse pessoal como interesse público.",
+    "foundation": "Constituição Federal, art. 37, caput; princípios da moralidade, impessoalidade e finalidade.",
+    "subtopic": "Moralidade administrativa e desvio de finalidade",
+    "trap": "Confundir validade formal com legitimidade ética."
+  },
+  {
+    "number": 50,
+    "code": "PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-050",
+    "notion_id": "3afcf5a2-6731-8135-a4e7-ce5104ca2704",
+    "comment": "Errado. A improbidade exige dolo, mas a afirmação mistura essa exigência com o ressarcimento civil e usa “dolo específico” como requisito geral em formulação excessiva.",
+    "foundation": "Lei nº 8.429/1992, arts. 1º, §§ 1º a 3º, e 10; Constituição Federal, art. 37, § 5º.",
+    "subtopic": "Elemento subjetivo da improbidade e ressarcimento",
+    "trap": "Confundir ação de improbidade com responsabilidade civil de ressarcimento."
+  },
+  {
+    "number": 55,
+    "code": "PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-055",
+    "notion_id": "3afcf5a2-6731-81f2-a758-cd4166a04e73",
+    "comment": "Errado. A Lei nº 9.784/1999 prevê prazos contínuos e alegações finais em até dez dias; não existe prazo mínimo de cinco dias úteis.",
+    "foundation": "Lei nº 9.784/1999, arts. 44 e 66, § 2º; análise oficial dos recursos da Quadrix.",
+    "subtopic": "Alegações finais e contagem de prazos",
+    "trap": "Aplicar literalmente o gabarito preliminar, sem considerar a decisão definitiva dos recursos."
+  },
+  {
+    "number": 65,
+    "code": "PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-065",
+    "notion_id": "3afcf5a2-6731-81b6-8266-efcdff850bff",
+    "comment": "Errado. A LGPD não estabelece dispensa geral de encarregado para órgão público de pequeno porte; eventual flexibilização depende de regulamentação aplicável.",
+    "foundation": "Lei nº 13.709/2018, arts. 23, III, e 41.",
+    "subtopic": "Encarregado de dados no Poder Público",
+    "trap": "Importar automaticamente regras de agentes privados de pequeno porte para órgãos públicos."
+  },
+  {
+    "number": 70,
+    "code": "PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-070",
+    "notion_id": "3afcf5a2-6731-8153-80e4-dbef22ebfa0f",
+    "comment": "Certo. A legalidade meramente formal não legitima atuação orientada por finalidade estranha ao interesse público; desvio de finalidade e abuso de poder também submetem o ato ao controle ético e jurídico.",
+    "foundation": "Constituição Federal, art. 37, caput; Lei nº 4.717/1965, art. 2º, parágrafo único, e; Lei nº 9.784/1999, art. 2º.",
+    "subtopic": "Desvio de finalidade e abuso de poder",
+    "trap": "Tratar conformidade literal com a norma como salvo-conduto ético."
+  },
+  {
+    "number": 71,
+    "code": "PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-071",
+    "notion_id": "3adcf5a2-6731-811c-98ed-cac94d40d92f",
+    "comment": "Certo. A assertiva está de acordo com a disciplina oficial de direitos e garantias fundamentais e organização do estado.",
+    "foundation": "Constituição Federal de 1988",
+    "subtopic": "Liberdade de expressão e vedação à censura",
+    "trap": "Desconsiderar a literalidade e o alcance da norma aplicável a direitos e garantias fundamentais e organização do estado."
+  },
+  {
+    "number": 72,
+    "code": "PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-072",
+    "notion_id": "3adcf5a2-6731-81cf-9c75-d2487cbc7ef9",
+    "comment": "Certo. A assertiva está de acordo com a disciplina oficial de direitos e garantias fundamentais e organização do estado.",
+    "foundation": "Constituição Federal de 1988",
+    "subtopic": "Piso salarial proporcional à extensão e complexidade do trabalho",
+    "trap": "Desconsiderar a literalidade e o alcance da norma aplicável a direitos e garantias fundamentais e organização do estado."
+  },
+  {
+    "number": 73,
+    "code": "PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-073",
+    "notion_id": "3adcf5a2-6731-8135-b9da-f82ad2e1717f",
+    "comment": "Errado. A intervenção federal pode ser utilizada para assegurar a prestação de contas da administração direta e indireta.",
+    "foundation": "Constituição Federal de 1988",
+    "subtopic": "Intervenção federal para assegurar prestação de contas",
+    "trap": "A intervenção federal pode ser utilizada para assegurar a prestação de contas da administração direta e indireta."
+  },
+  {
+    "number": 74,
+    "code": "PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-074",
+    "notion_id": "3adcf5a2-6731-811e-aad8-c9786c4b58c9",
+    "comment": "Errado. No mandato eletivo federal, o servidor deve afastar-se do cargo, emprego ou função.",
+    "foundation": "Constituição Federal de 1988",
+    "subtopic": "Afastamento do servidor investido em mandato federal",
+    "trap": "No mandato eletivo federal, o servidor deve afastar-se do cargo, emprego ou função."
+  },
+  {
+    "number": 75,
+    "code": "PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-075",
+    "notion_id": "3adcf5a2-6731-81da-92c3-efaf0374c476",
+    "comment": "Errado. A composição do Fundo Social de Emergência não corresponde à enumeração apresentada.",
+    "foundation": "Constituição Federal de 1988 e ADCT",
+    "subtopic": "Composição do Fundo Social de Emergência",
+    "trap": "A composição do Fundo Social de Emergência não corresponde à enumeração apresentada."
+  },
+  {
+    "number": 76,
+    "code": "PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-076",
+    "notion_id": "3adcf5a2-6731-81aa-b0ab-da27f1787971",
+    "comment": "Errado. A Constituição não contém a vedação absoluta descrita no item.",
+    "foundation": "Constituição Federal de 1988 e ADCT",
+    "subtopic": "Contribuição sobre movimentação financeira",
+    "trap": "A Constituição não contém a vedação absoluta descrita no item."
+  },
+  {
+    "number": 77,
+    "code": "PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-077",
+    "notion_id": "3adcf5a2-6731-81b0-b76a-ead22c8140d5",
+    "comment": "Certo. A assertiva está de acordo com a disciplina oficial de organização dos poderes e ordem social.",
+    "foundation": "Constituição Federal de 1988 e ADCT",
+    "subtopic": "Objetivos constitucionais da seguridade social",
+    "trap": "Desconsiderar a literalidade e o alcance da norma aplicável a organização dos poderes e ordem social."
+  },
+  {
+    "number": 78,
+    "code": "PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-078",
+    "notion_id": "3adcf5a2-6731-8136-b7c9-ee8683e93285",
+    "comment": "Certo. A assertiva está de acordo com a disciplina oficial de organização dos poderes e ordem social.",
+    "foundation": "Constituição Federal de 1988 e ADCT",
+    "subtopic": "Competências constitucionais do SUS",
+    "trap": "Desconsiderar a literalidade e o alcance da norma aplicável a organização dos poderes e ordem social."
+  },
+  {
+    "number": 79,
+    "code": "PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-079",
+    "notion_id": "3adcf5a2-6731-810a-abe9-fe2b43f71f0a",
+    "comment": "Certo. A assertiva está de acordo com a disciplina oficial de princípios e poder de polícia.",
+    "foundation": "Lei nº 9.784/1999 e regime jurídico do poder de polícia",
+    "subtopic": "Autotutela administrativa: anulação e revogação",
+    "trap": "Desconsiderar a literalidade e o alcance da norma aplicável a princípios e poder de polícia."
+  },
+  {
+    "number": 80,
+    "code": "PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-080",
+    "notion_id": "3adcf5a2-6731-81d1-8684-ed69f4f659af",
+    "comment": "Certo. A assertiva está de acordo com a disciplina oficial de princípios e poder de polícia.",
+    "foundation": "Lei nº 9.784/1999 e regime jurídico do poder de polícia",
+    "subtopic": "Proporcionalidade das sanções administrativas",
+    "trap": "Desconsiderar a literalidade e o alcance da norma aplicável a princípios e poder de polícia."
+  },
+  {
+    "number": 81,
+    "code": "PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-081",
+    "notion_id": "3adcf5a2-6731-816a-a582-db85a49f8378",
+    "comment": "Errado. A atividade nuclear de fiscalização profissional não pode ser livremente delegada a associação privada.",
+    "foundation": "Lei nº 9.784/1999 e regime jurídico do poder de polícia",
+    "subtopic": "Indelegabilidade da fiscalização profissional",
+    "trap": "A atividade nuclear de fiscalização profissional não pode ser livremente delegada a associação privada."
+  },
+  {
+    "number": 82,
+    "code": "PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-082",
+    "notion_id": "3adcf5a2-6731-8196-83ca-e79908131a6b",
+    "comment": "Errado. A multa exige processo administrativo com contraditório e ampla defesa.",
+    "foundation": "Lei nº 9.784/1999 e regime jurídico do poder de polícia",
+    "subtopic": "Autoexecutoriedade, contraditório e aplicação de multa",
+    "trap": "A multa exige processo administrativo com contraditório e ampla defesa."
+  },
+  {
+    "number": 83,
+    "code": "PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-083",
+    "notion_id": "3adcf5a2-6731-811d-ba45-c070c7ae281b",
+    "comment": "Errado. Atuação fora da competência caracteriza excesso de poder, não desvio de finalidade.",
+    "foundation": "Lei nº 9.784/1999 e teoria dos atos administrativos",
+    "subtopic": "Excesso de poder e desvio de finalidade",
+    "trap": "Atuação fora da competência caracteriza excesso de poder, não desvio de finalidade."
+  }
+]
