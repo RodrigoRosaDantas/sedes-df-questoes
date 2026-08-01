@@ -1,89 +1,14 @@
-name: Saneamento Agente Fiscal CREFITO-17 2026
+name: Saneamento Agente Fiscal CREFITO-17 2026 — arquivado
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'scripts/auditar-agente-fiscal-crefito17-2026.mjs'
-      - 'scripts/sanear-agente-fiscal-crefito17-2026.mjs'
-      - '.github/workflows/auditoria-agente-fiscal-crefito17-2026.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
 
-concurrency:
-  group: saneamento-agente-fiscal-crefito17-20260801
-  cancel-in-progress: false
-
 jobs:
-  sanear:
-    if: github.head_ref == 'agent/auditoria-agente-fiscal-crefito17-20260801'
+  arquivado:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: '24'
-
-      - name: Preparar ferramentas
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq poppler-utils unzip
-
-      - name: Baixar e extrair caderno, gabarito e recursos oficiais
-        shell: bash
-        run: |
-          set -euo pipefail
-          BASE='artifacts/auditoria-agente-fiscal-crefito17-2026/oficial'
-          mkdir -p "$BASE/extraido"
-          ZIP='https://anexos.cdn.selecao.net.br/uploads/861/concursos/3041/anexos/fc75420c-9413-4962-94be-4d800eac2df8.zip'
-          KEY='https://anexos.cdn.selecao.net.br/uploads/861/concursos/3041/anexos/56b57efd-7a95-4e53-aac2-c47d87fbb19a.pdf'
-          APPEALS='https://anexos.cdn.selecao.net.br/uploads/861/concursos/3041/anexos/5d2448af-596f-4902-960a-548bdd19fadb.pdf'
-          curl -fL --retry 3 --retry-delay 2 -A 'Mozilla/5.0' "$ZIP" -o "$BASE/provas-aplicadas.zip"
-          curl -fL --retry 3 --retry-delay 2 -A 'Mozilla/5.0' "$KEY" -o "$BASE/gabarito-definitivo.pdf"
-          curl -fL --retry 3 --retry-delay 2 -A 'Mozilla/5.0' "$APPEALS" -o "$BASE/analise-recursos.pdf"
-          unzip -q "$BASE/provas-aplicadas.zip" -d "$BASE/extraido"
-          PDF="$(find "$BASE/extraido" -type f -iname '*Agente*Fiscal*.pdf' | head -n 1)"
-          test -n "$PDF"
-          cp "$PDF" "$BASE/401_Agente-Fiscal_CREFITO-17_2026.pdf"
-          pdftotext -layout "$PDF" "$BASE/401_Agente-Fiscal_CREFITO-17_2026.txt"
-          pdftotext -raw "$PDF" "$BASE/401_Agente-Fiscal_CREFITO-17_2026.raw.txt"
-          pdftotext -layout "$BASE/gabarito-definitivo.pdf" "$BASE/gabarito-definitivo.txt"
-          pdftotext -layout "$BASE/analise-recursos.pdf" "$BASE/analise-recursos.txt"
-          sha256sum "$BASE/provas-aplicadas.zip" "$BASE/401_Agente-Fiscal_CREFITO-17_2026.pdf" "$BASE/gabarito-definitivo.pdf" "$BASE/analise-recursos.pdf" > "$BASE/sha256.txt"
-
-      - name: Validar rotinas
-        run: |
-          node --check scripts/auditar-agente-fiscal-crefito17-2026.mjs
-          node --check scripts/sanear-agente-fiscal-crefito17-2026.mjs
-          sha256sum scripts/sanear-agente-fiscal-crefito17-2026.mjs
-
-      - name: Registrar diagnóstico inicial
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        run: node scripts/auditar-agente-fiscal-crefito17-2026.mjs
-
-      - name: Reconstruir e sanear os 120 itens
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        run: node scripts/sanear-agente-fiscal-crefito17-2026.mjs
-
-      - name: Auditar estado final
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        run: node scripts/auditar-agente-fiscal-crefito17-2026.mjs
-
-      - name: Preservar relatório e fontes oficiais
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: saneamento-agente-fiscal-crefito17-20260801
-          path: |
-            artifacts/auditoria-agente-fiscal-crefito17-2026
-            artifacts/saneamento-agente-fiscal-crefito17-20260801.json
-          if-no-files-found: error
-          retention-days: 90
+      - name: Informar encerramento
+        run: echo 'Reconstrução concluída. Workflow arquivado para impedir nova escrita sobre o material saneado.'
