@@ -1,11 +1,11 @@
 {
   "operation_id": "EXC-2026-08-01-PROVAS-PENDENTES",
   "revision": 2,
-  "retry": 13,
+  "retry": 14,
   "authorized": true,
   "authorized_at": "2026-08-01T02:37:00-03:00",
   "corrected_at": "2026-08-01T03:06:00-03:00",
-  "retried_at": "2026-08-01T12:35:00-03:00",
+  "retried_at": "2026-08-01T12:48:00-03:00",
   "scope": "provas_pendentes",
   "ordinary_review_gates_waived": true,
   "preserve_existing_publication": true,
@@ -28,6 +28,9 @@
     "Adicionada reconstrução vetorial acessível da célula animal numerada usada pelos itens PROVA-QDX-SEEDF-2025-BIO-A-071 a 076.",
     "Adicionada reconstrução vetorial acessível do microscópio óptico numerado usado pelos itens PROVA-QDX-SEEDF-2025-BIO-A-086 a 090.",
     "Adicionado override técnico negativo para remover marcações visuais residuais das ocorrências duplicadas dos sete itens textuais de Química durante o build.",
-    "Adicionado recibo persistente do workflow de Pages, com ID, conclusão, jobs e logs de falha, para eliminar repetição sem diagnóstico."
+    "Adicionado recibo persistente do workflow de Pages, com ID, conclusão, jobs e logs de falha, para eliminar repetição sem diagnóstico.",
+    "Substituído o teste público rígido de 245 códigos por um contrato que exige todos os 1.846 códigos do plano autorizado e rejeita códigos duplicados ou anulados.",
+    "Adicionada verificação pública vinculada ao SHA para evitar mistura transitória de arquivos durante a propagação do GitHub Pages.",
+    "Corrigida a validação do PDF para usar a numeração efetivamente exibida no caderno, preservando o número original como metadado."
   ]
 }
