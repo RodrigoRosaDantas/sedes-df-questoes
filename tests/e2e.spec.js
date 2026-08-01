@@ -12,9 +12,11 @@ test("fluxo principal, prova completa, matérias e recursos inteligentes", async
   await expect(page.locator('[data-study-view="provas"]')).toBeVisible();
 
   await page.locator('[data-study-view="provas"]').click();
-  const examCard = page.locator(".material-card").filter({hasText: "Gestor em Políticas Públicas"});
-  await expect(examCard).toBeVisible();
-  await examCard.locator("[data-open-material]").click();
+  const examButton = page.locator('[data-open-material="prova-qdx-seedf-2022-gppgadm-a"]');
+  const examCard = examButton.locator("xpath=ancestor::article[contains(@class, 'material-card')]");
+  await expect(examButton).toBeVisible();
+  await expect(examCard).toContainText("120 questões");
+  await examButton.click();
   await expect(page.locator(".detail-summary")).toContainText("120");
 
   await page.goto("/#/estudar");
