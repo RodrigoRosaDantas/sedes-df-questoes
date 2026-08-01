@@ -33,7 +33,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq poppler-utils unzip
 
-      - name: Coletar prova e gabarito oficiais sem bloquear auditoria
+      - name: Coletar prova e gabarito sem bloquear auditoria
         shell: bash
         run: |
           set -u -o pipefail
@@ -52,8 +52,10 @@ jobs:
               echo "Tentando $label: $url" | tee -a "$BASE/download-status.txt"
               if curl -fL --retry 2 --retry-delay 2 -A 'Mozilla/5.0' \
                 -e "$PAGE" -b "$COOKIE" -c "$COOKIE" "$url" -o "$output"; then
-                echo "OK $label: $url" | tee -a "$BASE/download-status.txt"
-                return 0
+                if [ -s "$output" ]; then
+                  echo "OK $label: $url" | tee -a "$BASE/download-status.txt"
+                  return 0
+                fi
               fi
             done
             rm -f "$output"
@@ -62,10 +64,11 @@ jobs:
           }
 
           try_download 'gabarito definitivo' "$BASE/gabarito-definitivo.pdf" \
+            'https://quadrix.org.br/uploads/861/concursos/1180/anexos/d901d108bc8976c4fa40c7b7554385ea.pdf?v113722=' \
             'https://quadrix.org.br/uploads/861/concursos/1180/anexos/d901d108bc8976c4fa40c7b7554385ea.pdf?v205742=' \
             'https://quadrix.org.br/uploads/861/concursos/1180/anexos/d901d108bc8976c4fa40c7b7554385ea.pdf' \
-            'https://anexos.cdn.selecao.net.br/uploads/861/concursos/1180/anexos/d901d108bc8976c4fa40c7b7554385ea.pdf' \
-            'https://anexos-r2.selecao.net.br/uploads/861/concursos/1180/anexos/d901d108bc8976c4fa40c7b7554385ea.pdf' || true
+            'https://anexos.cdn.selecao.net.br/uploads/861/concursos/1180/anexos/d901d108bc8976c4fa40c7b7554385ea.pdf?v113722=' \
+            'https://www.pciconcursos.com.br/provas/29778806/f4a841b38737/gabarito_oficial.pdf' || true
 
           try_download 'provas aplicadas Tipo A Gestor' "$BASE/provas-tipo-a-gestor.zip" \
             'https://anexos.cdn.selecao.net.br/uploads/861/concursos/1180/anexos/663a2282-84f2-4991-8f93-720a3a58f659.zip' \
@@ -74,6 +77,7 @@ jobs:
           if [ -s "$BASE/gabarito-definitivo.pdf" ]; then
             file "$BASE/gabarito-definitivo.pdf" | tee -a "$BASE/download-status.txt"
             pdftotext -layout "$BASE/gabarito-definitivo.pdf" "$BASE/gabarito-definitivo.txt" || true
+            sha256sum "$BASE/gabarito-definitivo.pdf" | tee "$BASE/gabarito-definitivo.sha256"
           fi
 
           if [ -s "$BASE/provas-tipo-a-gestor.zip" ]; then
