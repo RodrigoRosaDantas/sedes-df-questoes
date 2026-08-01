@@ -59,6 +59,7 @@ for (const material of currentMaterials.values()) materialByName.set(key(materia
 function matchRecord(record) {
   const direct = byCode.get(key(editorialCode(record)));
   if (direct) return direct;
+  if (record.publication_exception) return null;
   const previousPublicId = legacyPublicId(record.github_id);
   const legacy = previousPublicId ? byId.get(key(previousPublicId)) : null;
   if (legacy) return legacy;
