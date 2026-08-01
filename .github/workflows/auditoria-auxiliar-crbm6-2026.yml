@@ -1,0 +1,46 @@
+name: Auditoria Auxiliar CRBM-6 2026
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/auditar-auxiliar-crbm6-2026.mjs'
+      - '.github/workflows/auditoria-auxiliar-crbm6-2026.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: auditoria-auxiliar-crbm6-20260801
+  cancel-in-progress: false
+
+jobs:
+  auditar:
+    if: github.head_ref == 'agent/auditoria-auxiliar-crbm6-20260801'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Validar sintaxe
+        run: node --check scripts/auditar-auxiliar-crbm6-2026.mjs
+
+      - name: Auditar Banco Mestre, main e catálogo público
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/auditar-auxiliar-crbm6-2026.mjs
+
+      - name: Preservar relatório
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: auditoria-auxiliar-crbm6-20260801
+          path: artifacts/auditoria-auxiliar-crbm6-2026
+          if-no-files-found: error
+          retention-days: 90
