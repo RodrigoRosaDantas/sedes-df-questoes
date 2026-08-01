@@ -36,10 +36,16 @@ jobs:
           package-manager-cache: false
 
       - name: Montar e validar as partes do lote
-        run: node scripts/assemble-editorial-operation.mjs
+        id: assemble
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/assemble-editorial-operation.mjs 2>&1 | tee /tmp/editorial-assemble.log
 
       - name: Aplicar correções com preflight e verificação integral
         id: editorial
+        if: steps.assemble.outcome == 'success'
         continue-on-error: true
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
@@ -49,9 +55,25 @@ jobs:
       - name: Registrar recibo auditável no branch de saneamento
         if: always()
         shell: bash
+        env:
+          ASSEMBLE_OUTCOME: ${{ steps.assemble.outcome }}
+          EDITORIAL_OUTCOME: ${{ steps.editorial.outcome }}
         run: |
           set -euo pipefail
-          test -f "${EDITORIAL_RECEIPT_PATH}"
+          if [ ! -f "${EDITORIAL_RECEIPT_PATH}" ]; then
+            mkdir -p "$(dirname "${EDITORIAL_RECEIPT_PATH}")"
+            ASSEMBLY_LOG=$(tail -n 80 /tmp/editorial-assemble.log 2>/dev/null || echo 'Recibo editorial não foi produzido.')
+            jq -n \
+              --arg operation_id 'EDT-2026-08-01-CREFITO17-AUXILIAR-120' \
+              --arg status 'failure' \
+              --arg stage 'assembly' \
+              --arg assemble_outcome "${ASSEMBLE_OUTCOME:-unknown}" \
+              --arg editorial_outcome "${EDITORIAL_OUTCOME:-skipped}" \
+              --arg error "${ASSEMBLY_LOG}" \
+              --arg finished_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+              '{schema_version:"1.0",operation_id:$operation_id,status:$status,stage:$stage,assemble_outcome:$assemble_outcome,editorial_outcome:$editorial_outcome,expected_records:120,updated_records:0,error:$error,finished_at:$finished_at}' \
+              > "${EDITORIAL_RECEIPT_PATH}"
+          fi
           git config user.name 'sedes-df-editorial-sanitizer[bot]'
           git config user.email 'sedes-df-editorial-sanitizer[bot]@users.noreply.github.com'
           git add "${EDITORIAL_RECEIPT_PATH}"
@@ -61,7 +83,7 @@ jobs:
           fi
 
       - name: Reprovar lote não concluído
-        if: steps.editorial.outcome != 'success'
+        if: steps.assemble.outcome != 'success' || steps.editorial.outcome != 'success'
         run: |
           echo 'O saneamento foi interrompido; consulte o recibo persistido no branch.'
           exit 1
