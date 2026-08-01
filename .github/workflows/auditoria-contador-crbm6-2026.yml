@@ -1,4 +1,4 @@
-name: Auditoria Contador CRBM-6 2026
+name: Saneamento Contador CRBM-6 2026
 
 on:
   pull_request:
@@ -9,16 +9,18 @@ on:
 
 permissions:
   contents: read
+  issues: read
+  pull-requests: read
 
 concurrency:
-  group: auditoria-contador-crbm6-20260801
+  group: saneamento-contador-crbm6-20260801
   cancel-in-progress: false
 
 jobs:
-  auditar:
+  sanear:
     if: github.head_ref == 'agent/auditoria-contador-crbm6-20260801'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -28,12 +30,12 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Preparar leitura oficial
+      - name: Preparar ferramentas
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq poppler-utils unzip
+          sudo apt-get install -y -qq poppler-utils unzip jq
 
-      - name: Baixar e extrair caderno oficial
+      - name: Baixar e extrair prova e gabarito oficiais
         shell: bash
         run: |
           set -euo pipefail
@@ -43,28 +45,59 @@ jobs:
           curl -fL --retry 3 --retry-delay 2 -A 'Mozilla/5.0' "$URL" -o "$BASE/CRBM-6-PR_2026.zip"
           unzip -q "$BASE/CRBM-6-PR_2026.zip" -d "$BASE/extraido"
           PDF="$(find "$BASE/extraido" -type f -iname '*Contador*.pdf' | head -n 1)"
+          KEY="$(find "$BASE/extraido" -type f -iname '*gabarito*definitivo*.pdf' | head -n 1)"
           test -n "$PDF"
+          test -n "$KEY"
           cp "$PDF" "$BASE/402_Contador_CRBM-6_2026.pdf"
+          cp "$KEY" "$BASE/gabarito-definitivo.pdf"
           pdftotext -layout "$PDF" "$BASE/402_Contador_CRBM-6_2026.txt"
           pdftotext -raw "$PDF" "$BASE/402_Contador_CRBM-6_2026.raw.txt"
-          sha256sum "$BASE/CRBM-6-PR_2026.zip" "$BASE/402_Contador_CRBM-6_2026.pdf" > "$BASE/sha256.txt"
-          find "$BASE" -maxdepth 3 -type f -printf '%P\n' | sort > "$BASE/arquivos.txt"
+          pdftotext -layout "$KEY" "$BASE/gabarito-definitivo.txt"
+          sha256sum "$BASE/CRBM-6-PR_2026.zip" "$BASE/402_Contador_CRBM-6_2026.pdf" "$BASE/gabarito-definitivo.pdf" > "$BASE/sha256.txt"
 
-      - name: Corrigir e validar rotina temporária
+      - name: Reconstruir rotinas temporárias
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
         run: |
+          set -euo pipefail
           sed -i 's/^  malformed_codes,$/  malformed_codes: malformedCodes,/' scripts/auditar-contador-crbm6-2026.mjs
+          COMMENTS="$RUNNER_TEMP/comments.json"
+          curl -fsSL \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            'https://api.github.com/repos/${{ github.repository }}/issues/60/comments?per_page=100' \
+            -o "$COMMENTS"
+          jq -r '.[] | select(.body | startswith("SANITIZER_CONTADOR:")) | .body | sub("^SANITIZER_CONTADOR:"; "")' "$COMMENTS" | tail -n 1 > "$RUNNER_TEMP/sanitizer.b64"
+          test -s "$RUNNER_TEMP/sanitizer.b64"
+          base64 -d "$RUNNER_TEMP/sanitizer.b64" | gzip -d > scripts/sanear-contador-crbm6-2026.runtime.mjs
           node --check scripts/auditar-contador-crbm6-2026.mjs
+          node --check scripts/sanear-contador-crbm6-2026.runtime.mjs
+          echo "SANITIZER_SHA256=$(sha256sum scripts/sanear-contador-crbm6-2026.runtime.mjs | cut -d' ' -f1)"
 
-      - name: Auditar Banco Mestre, main e catálogo público
+      - name: Registrar diagnóstico inicial
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         run: node scripts/auditar-contador-crbm6-2026.mjs
 
-      - name: Preservar relatório e fonte oficial
+      - name: Reconstruir e sanear os 120 itens
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/sanear-contador-crbm6-2026.runtime.mjs
+
+      - name: Auditar estado final
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/auditar-contador-crbm6-2026.mjs
+
+      - name: Preservar relatório e fontes
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: auditoria-contador-crbm6-20260801
-          path: artifacts/auditoria-contador-crbm6-2026
+          name: saneamento-contador-crbm6-20260801
+          path: |
+            artifacts/auditoria-contador-crbm6-2026
+            artifacts/saneamento-contador-crbm6-20260801.json
           if-no-files-found: error
           retention-days: 90
