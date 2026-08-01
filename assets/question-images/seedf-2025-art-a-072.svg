@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 520" role="img" aria-labelledby="title desc">
+  <title id="title">Forma circular incompleta</title>
+  <desc id="desc">Contorno circular escuro interrompido por uma abertura no quadrante superior direito. Apesar da lacuna, o conjunto tende a ser percebido como um círculo.</desc>
+  <rect width="700" height="520" fill="#ffffff"/>
+  <path
+    d="M 455 105
+       A 180 180 0 1 0 535 205"
+    fill="none"
+    stroke="#181818"
+    stroke-width="28"
+    stroke-linecap="round"
+  />
+</svg>
