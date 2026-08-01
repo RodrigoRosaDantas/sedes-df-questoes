@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 760" role="img" aria-labelledby="title desc">
+  <title id="title">Microscópio óptico com componentes numerados</title>
+  <desc id="desc">Esquema acessível de microscópio óptico. Os números relevantes aos itens identificam: 1 lentes oculares, 3 lentes objetivas, 4 tubo, 5 diafragma e 7 parafuso micrométrico. Outros números representam componentes complementares.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#222"/>
+    </marker>
+  </defs>
+  <rect width="1000" height="760" fill="#fff"/>
+  <text x="500" y="48" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" text-anchor="middle" fill="#111">Microscópio óptico — esquema numerado</text>
+
+  <!-- Base e braço -->
+  <path d="M318 655 C390 625 555 625 652 660 L682 707 H270 Z" fill="#eee" stroke="#222" stroke-width="6"/>
+  <path d="M610 625 C704 555 735 430 689 305 C656 218 595 167 522 148" fill="none" stroke="#222" stroke-width="34" stroke-linecap="round"/>
+  <path d="M602 625 C680 551 700 447 662 337" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round"/>
+
+  <!-- Ocular e tubo -->
+  <g transform="rotate(-22 480 156)">
+    <rect x="428" y="83" width="106" height="48" rx="14" fill="#ddd" stroke="#222" stroke-width="5"/>
+    <rect x="448" y="126" width="72" height="220" rx="18" fill="#f7f7f7" stroke="#222" stroke-width="6"/>
+    <rect x="462" y="91" width="44" height="24" rx="9" fill="#fff" stroke="#222" stroke-width="4"/>
+  </g>
+
+  <!-- Revólver e objetivas -->
+  <ellipse cx="536" cy="354" rx="79" ry="31" fill="#ddd" stroke="#222" stroke-width="5" transform="rotate(-10 536 354)"/>
+  <g fill="#f7f7f7" stroke="#222" stroke-width="5">
+    <path d="M489 370 L472 472 L515 478 L526 377 Z"/>
+    <path d="M530 376 L532 487 L577 487 L570 372 Z"/>
+    <path d="M568 369 L600 463 L643 448 L606 356 Z"/>
+  </g>
+
+  <!-- Platina, lâmina e condensador/diafragma -->
+  <rect x="374" y="482" width="310" height="31" rx="8" fill="#ddd" stroke="#222" stroke-width="5"/>
+  <rect x="464" y="474" width="125" height="12" rx="4" fill="#fff" stroke="#222" stroke-width="3"/>
+  <circle cx="530" cy="542" r="44" fill="#f7f7f7" stroke="#222" stroke-width="5"/>
+  <circle cx="530" cy="542" r="17" fill="#fff" stroke="#222" stroke-width="4"/>
+  <path d="M494 570 L462 625 H598 L565 570 Z" fill="#ddd" stroke="#222" stroke-width="5"/>
+
+  <!-- Parafusos de foco -->
+  <circle cx="685" cy="375" r="48" fill="#ddd" stroke="#222" stroke-width="6"/>
+  <circle cx="685" cy="375" r="24" fill="#fff" stroke="#222" stroke-width="5"/>
+  <circle cx="654" cy="423" r="27" fill="#f7f7f7" stroke="#222" stroke-width="5"/>
+
+  <!-- Iluminador -->
+  <ellipse cx="436" cy="612" rx="45" ry="25" fill="#fff" stroke="#222" stroke-width="5"/>
+  <path d="M436 586 L450 536" stroke="#222" stroke-width="6"/>
+
+  <!-- Linhas indicativas -->
+  <g fill="none" stroke="#222" stroke-width="2" marker-end="url(#arrow)">
+    <path d="M160 118 L447 108"/>
+    <path d="M162 222 L432 245"/>
+    <path d="M164 347 L486 397"/>
+    <path d="M850 152 L524 220"/>
+    <path d="M870 286 L557 542"/>
+    <path d="M868 466 L679 468"/>
+    <path d="M830 590 L668 423"/>
+  </g>
+
+  <!-- Números -->
+  <g font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700" fill="#111" text-anchor="middle">
+    <circle cx="130" cy="116" r="24" fill="#fff" stroke="#222" stroke-width="4"/><text x="130" y="125">1</text>
+    <circle cx="132" cy="220" r="24" fill="#fff" stroke="#222" stroke-width="4"/><text x="132" y="229">2</text>
+    <circle cx="134" cy="343" r="24" fill="#fff" stroke="#222" stroke-width="4"/><text x="134" y="352">3</text>
+    <circle cx="880" cy="145" r="24" fill="#fff" stroke="#222" stroke-width="4"/><text x="880" y="154">4</text>
+    <circle cx="900" cy="279" r="24" fill="#fff" stroke="#222" stroke-width="4"/><text x="900" y="288">5</text>
+    <circle cx="898" cy="468" r="24" fill="#fff" stroke="#222" stroke-width="4"/><text x="898" y="477">6</text>
+    <circle cx="856" cy="610" r="24" fill="#fff" stroke="#222" stroke-width="4"/><text x="856" y="619">7</text>
+  </g>
+
+  <text x="955" y="730" font-family="Arial, Helvetica, sans-serif" font-size="17" text-anchor="end" fill="#222">Reconstrução esquemática acessível; não está em escala.</text>
+</svg>
