@@ -15,16 +15,31 @@ function classifiedIds() {
   all.forEach(id => { if (!generalSet.has(id) && !specificSet.has(id)) specific.push(id); });
   return {general: [...new Set(general)], specific: [...new Set(specific)]};
 }
+function fillBlock(preferred, total, excluded, fallback) {
+  const selected = [];
+  const used = new Set(excluded);
+  for (const id of shuffle(preferred)) {
+    if (!id || used.has(id)) continue;
+    selected.push(id);
+    used.add(id);
+    if (selected.length === total) return selected;
+  }
+  for (const id of shuffle(fallback)) {
+    if (!id || used.has(id)) continue;
+    selected.push(id);
+    used.add(id);
+    if (selected.length === total) return selected;
+  }
+  return selected;
+}
 function startOfficialExam() {
   const {general, specific} = classifiedIds();
-  const generalIds = shuffle(general).slice(0, 20);
-  const specificIds = shuffle(specific.filter(id => !generalIds.includes(id))).slice(0, 40);
-  const missing = 60 - generalIds.length - specificIds.length;
-  if (missing > 0) {
-    const used = new Set([...generalIds, ...specificIds]);
-    specificIds.push(...shuffle(allQuestionIds().filter(id => !used.has(id))).slice(0, missing));
+  const all = allQuestionIds();
+  const generalIds = fillBlock(general, 20, [], all);
+  const specificIds = fillBlock(specific, 40, generalIds, all);
+  if (generalIds.length !== 20 || specificIds.length !== 40 || new Set([...generalIds, ...specificIds]).size !== 60) {
+    return toast("O acervo publicado ainda não permite montar 60 questões únicas.", "error");
   }
-  if (generalIds.length < 20 || specificIds.length < 40) return toast("O acervo publicado ainda não permite montar os blocos 20+40.", "error");
   saveJSON(BLUEPRINT_KEY(), {createdAt: new Date().toISOString(), generalIds, specificIds, generalWeight: 1, specificWeight: 2, durationMinutes: 240});
   createCompatibleSession({id: OFFICIAL_MATERIAL_ID, name: "Prova Real SEDES/DF 2026", questionIds: [...generalIds, ...specificIds], mode: "prova", minutes: 240, discipline: "Conhecimentos gerais e específicos", source: "Edital nº 1/2026 — simulação com o acervo publicado"});
 }
