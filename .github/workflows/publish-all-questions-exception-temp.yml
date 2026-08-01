@@ -34,7 +34,7 @@ jobs:
           git config user.name 'sedes-df-publish-all[bot]'
           git config user.email 'sedes-df-publish-all[bot]@users.noreply.github.com'
 
-      - name: Ajustar IDs técnicos e preservar duplicatas da exceção
+      - name: Compatibilizar publicação integral
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -46,28 +46,42 @@ jobs:
               "const stableId = value => clean(value).replace(/-/g, '') || Math.random().toString(16).slice(2);\nconst shortId = value => stableId(value).slice(-16);",
           )
           export_text = export_text.replace(
-              "github_id: clean(row['Código GitHub']) || `notion-${shortId(row.notion_id)}` ,",
-              "github_id: `notion-${stableId(row.notion_id)}` ,",
-          )
-          export_text = export_text.replace(
-              "github_id: clean(row['Código GitHub']) || `notion-${shortId(row.notion_id)}` ,".replace(' }', '}'),
-              "github_id: `notion-${stableId(row.notion_id)}` ,".replace(' }', '}'),
-          )
-          export_text = export_text.replace(
               "github_id: clean(row['Código GitHub']) || `notion-${shortId(row.notion_id)}` ,".replace('` ,', '`,'),
               "github_id: `notion-${stableId(row.notion_id)}` ,".replace('` ,', '`,'),
           )
-          if "const stableId" not in export_text or "github_id: `notion-${stableId(row.notion_id)}`" not in export_text:
-              raise SystemExit('Não foi possível aplicar a correção de IDs técnicos únicos.')
+          export_text = export_text.replace(
+              "  if (!clean(row['Comentário geral'])) notices.push('Comentário editorial não cadastrado.');",
+              "  if (!clean(row['Comentário geral'])) notices.push('Comentário editorial não cadastrado.');\n  if (Boolean(row['Possui imagem'])) notices.push('Imagem indicada no Banco Mestre sem arquivo público disponível; questão publicada sem recurso visual.');",
+          )
+          export_text = export_text.replace(
+              "    has_image: Boolean(row['Possui imagem']),",
+              "    has_image: false,",
+          )
+          required_export = [
+              "const stableId",
+              "github_id: `notion-${stableId(row.notion_id)}`",
+              "has_image: false",
+              "questão publicada sem recurso visual",
+          ]
+          if any(marker not in export_text for marker in required_export):
+              raise SystemExit('Não foi possível compatibilizar IDs ou imagens da exportação integral.')
           export_file.write_text(export_text)
 
           apply_file = Path('scripts/apply-notion-snapshot.mjs')
           apply_text = apply_file.read_text()
-          old = "function matchRecord(record) {\n  const direct = byCode.get(key(editorialCode(record)));\n  if (direct) return direct;\n"
-          new = old + "  if (record.publication_exception) return null;\n"
-          if old not in apply_text:
-              raise SystemExit('Não foi possível localizar o ponto de compatibilidade do snapshot.')
-          apply_file.write_text(apply_text.replace(old, new, 1))
+          direct = "function matchRecord(record) {\n  const direct = byCode.get(key(editorialCode(record)));\n  if (direct) return direct;\n"
+          exception_gate = "  if (record.publication_exception) return null;\n"
+          if exception_gate not in apply_text:
+              if direct not in apply_text:
+                  raise SystemExit('Não foi possível localizar o ponto de compatibilidade do snapshot.')
+              apply_text = apply_text.replace(direct, direct + exception_gate, 1)
+          apply_text = apply_text.replace(
+              "    possui_imagem: Boolean(record.has_image),",
+              "    possui_imagem: Boolean(record.has_image) || Boolean(current?.imagem),",
+          )
+          if "Boolean(record.has_image) || Boolean(current?.imagem)" not in apply_text:
+              raise SystemExit('Não foi possível preservar imagens já existentes.')
+          apply_file.write_text(apply_text)
           PY
 
       - name: Exportar integralmente o Banco Mestre
