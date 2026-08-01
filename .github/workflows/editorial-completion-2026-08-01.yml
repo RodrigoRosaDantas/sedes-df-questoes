@@ -1,0 +1,67 @@
+name: Saneamento editorial das questões publicadas
+
+on:
+  push:
+    branches:
+      - agent/editorial-completion-2026-08-01
+    paths:
+      - data/editorial/editorial-completion-2026-08-01.json
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sedes-df-editorial-completion
+  cancel-in-progress: false
+
+env:
+  EDITORIAL_MANIFEST_PATH: data/editorial/editorial-completion-2026-08-01.json
+  EDITORIAL_ASSEMBLED_PATH: data/editorial/editorial-completion-assembled.json
+  EDITORIAL_RECEIPT_PATH: data/operations/editorial-completion-receipt.json
+
+jobs:
+  sanitize-notion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Baixar o lote editorial isolado
+        uses: actions/checkout@v6
+        with:
+          ref: agent/editorial-completion-2026-08-01
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Montar e validar as partes do lote
+        run: node scripts/assemble-editorial-operation.mjs
+
+      - name: Aplicar correções com preflight e verificação integral
+        id: editorial
+        continue-on-error: true
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          EDITORIAL_OPERATION_PATH: data/editorial/editorial-completion-assembled.json
+        run: node scripts/apply-editorial-completion.mjs
+
+      - name: Registrar recibo auditável no branch de saneamento
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "${EDITORIAL_RECEIPT_PATH}"
+          git config user.name 'sedes-df-editorial-sanitizer[bot]'
+          git config user.email 'sedes-df-editorial-sanitizer[bot]@users.noreply.github.com'
+          git add "${EDITORIAL_RECEIPT_PATH}"
+          if ! git diff --cached --quiet; then
+            git commit -m 'Registrar saneamento editorial do CREFITO-17'
+            git push origin HEAD:agent/editorial-completion-2026-08-01
+          fi
+
+      - name: Reprovar lote não concluído
+        if: steps.editorial.outcome != 'success'
+        run: |
+          echo 'O saneamento foi interrompido; consulte o recibo persistido no branch.'
+          exit 1
