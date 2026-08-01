@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'scripts/corrigir-faixa-83-120-crfdf.mjs'
+      - 'scripts/inspecionar-publicacao-administrador-crfdf.mjs'
       - '.github/workflows/saneamento-administrador-crfdf.yml'
 
 permissions:
@@ -18,7 +18,7 @@ jobs:
   saneamento:
     if: github.head_ref == 'agent/saneamento-administrador-crfdf-20260731'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -28,19 +28,5 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Validar sintaxe
-        run: node --check scripts/corrigir-faixa-83-120-crfdf.mjs
-
-      - name: Corrigir e bloquear o Banco Mestre
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        run: node scripts/corrigir-faixa-83-120-crfdf.mjs
-
-      - name: Preservar relatório antes e depois
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: saneamento-administrador-crfdf-20260731
-          path: artifacts/saneamento-administrador-crfdf-20260731.json
-          if-no-files-found: error
-          retention-days: 90
+      - name: Inspecionar catálogo público
+        run: node scripts/inspecionar-publicacao-administrador-crfdf.mjs
