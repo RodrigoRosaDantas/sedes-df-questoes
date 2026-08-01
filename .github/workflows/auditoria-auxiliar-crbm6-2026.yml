@@ -28,6 +28,30 @@ jobs:
         with:
           node-version: '24'
 
+      - name: Preparar leitura do caderno oficial
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils unzip
+
+      - name: Baixar e extrair prova oficial
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='artifacts/auditoria-auxiliar-crbm6-2026/oficial'
+          mkdir -p "$BASE/extraido"
+          URL='https://quadrixa.intercom-attachments-7.com/i/o/g60nuz1n/2478105154/b7139f08ad60cb69a63e808399b4/CRBM-6-PR_2026.zip?expires=1785553200&req=diQgHsh%2BmIBaXfMW1HO4zfmIqvzGJl8dW9KX79sVWPx63hy5CL3jf5f1V0p8%0A1JmVdiD%2FKXc%3D%0A&signature=9998450c177cbc81e7ad10e37199867b27f0d0db46185bcca66167e4cb3755f5'
+          curl -fL --retry 3 --retry-delay 2 -A 'Mozilla/5.0' "$URL" -o "$BASE/CRBM-6-PR_2026.zip"
+          unzip -q "$BASE/CRBM-6-PR_2026.zip" -d "$BASE/extraido"
+          PDF="$(find "$BASE/extraido" -type f -iname '*Auxiliar*Administrativo*.pdf' | head -n 1)"
+          test -n "$PDF"
+          cp "$PDF" "$BASE/200_Auxiliar-Administrativo_CRBM-6_2026.pdf"
+          pdftotext -layout "$PDF" "$BASE/200_Auxiliar-Administrativo_CRBM-6_2026.txt"
+          sha256sum "$BASE/CRBM-6-PR_2026.zip" "$BASE/200_Auxiliar-Administrativo_CRBM-6_2026.pdf" > "$BASE/sha256.txt"
+          find "$BASE" -maxdepth 3 -type f -printf '%P\n' | sort > "$BASE/arquivos.txt"
+          echo 'OFFICIAL_TEXT_BEGIN'
+          sed -n '1,900p' "$BASE/200_Auxiliar-Administrativo_CRBM-6_2026.txt"
+          echo 'OFFICIAL_TEXT_END'
+
       - name: Validar sintaxe
         run: node --check scripts/auditar-auxiliar-crbm6-2026.mjs
 
@@ -36,7 +60,7 @@ jobs:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         run: node scripts/auditar-auxiliar-crbm6-2026.mjs
 
-      - name: Preservar relatório
+      - name: Preservar relatório e fonte oficial
         if: always()
         uses: actions/upload-artifact@v4
         with:
