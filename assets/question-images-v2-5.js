@@ -1,6 +1,14 @@
 (() => {
   const visuals = new Map([
     [
+      "No Windows 10 e 11, ao excluir um arquivo utilizando a tecla Del, o arquivo é removido permanentemente do sistema, não podendo ser recuperado pela Lixeira.",
+      {
+        src: "./assets/question-images/crtr12-2026-q35-original.jpg",
+        alt: "Representação da tecla Del, usada para excluir um arquivo no Windows.",
+        caption: "Tecla Del reproduzida no caderno da prova CRTR-12/Quadrix 2026.",
+      },
+    ],
+    [
       "No Excel 2016, caso se selecione um intervalo de células com números, será exibida a ferramenta Análise Rápida (ícone reproduzido abaixo).",
       {
         src: "./assets/images/excel-analise-rapida-q23.svg",
