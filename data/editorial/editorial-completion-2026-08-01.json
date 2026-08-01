@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "EDT-2026-08-01-CREFITO17-AUXILIAR-120",
+  "source_release_sha": "8a528d925807db558967a3ff0a956006e87356a5",
+  "expected_github_code": "release-2.13.0:8a528d925807db558967a3ff0a956006e87356a5",
+  "official_source_url": "https://quadrix.org.br/informacoes/3041/",
+  "review_date": "2026-08-01",
+  "material": "Auxiliar Administrativo — CREFITO-17 — Quadrix 2026",
+  "parts": [
+    "data/editorial/parts/editorial-completion-01.json",
+    "data/editorial/parts/editorial-completion-02.json",
+    "data/editorial/parts/editorial-completion-03.json",
+    "data/editorial/parts/editorial-completion-04.json",
+    "data/editorial/parts/editorial-completion-05.json",
+    "data/editorial/parts/editorial-completion-06.json"
+  ]
+}
