@@ -3,7 +3,7 @@ const EXPECTED_COMMIT = '946a2914979a91f6d57f5044e35cdb25cf5fde7b';
 const sleep = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
 
 async function json(relative) {
-  const response = await fetch(new URL(relative, BASE), {cache: 'no-store'});
+  const response = await fetch(new URL(`${relative}?verify=${Date.now()}`, BASE), {cache: 'no-store'});
   if (!response.ok) throw new Error(`${relative}: HTTP ${response.status}`);
   return response.json();
 }
@@ -13,11 +13,11 @@ let lastError;
 for (let attempt = 1; attempt <= 30; attempt += 1) {
   try {
     const [buildInfo, receipt, catalog] = await Promise.all([
-      json('build-info.json'),
+      json('data/release/build-info.json'),
       json('data/release/editorial-sync-receipt.json'),
       json('data/release/catalogo.json'),
     ]);
-    if (!JSON.stringify(buildInfo).includes(EXPECTED_COMMIT)) {
+    if (buildInfo.source_sha !== EXPECTED_COMMIT) {
       throw new Error(`build público ainda não corresponde ao commit ${EXPECTED_COMMIT.slice(0, 7)}.`);
     }
     if (receipt.operation_id !== 'PLATFORM-EDITORIAL-SYNC-2026-08-01'
