@@ -1,21 +1,22 @@
-name: Auditoria GPPGADM 2022
+name: Saneamento GPPGADM 2022
 
 on:
   pull_request:
     branches: [main]
     paths:
       - 'scripts/auditar-gppgadm-2022.mjs'
+      - 'scripts/sanear-gppgadm-2022.mjs'
       - '.github/workflows/auditoria-gppgadm-2022.yml'
 
 permissions:
   contents: read
 
 concurrency:
-  group: auditoria-gppgadm-2022-20260731
+  group: saneamento-gppgadm-2022-20260731
   cancel-in-progress: false
 
 jobs:
-  auditar:
+  sanear:
     if: github.head_ref == 'agent/auditoria-gppgadm-2022-20260731'
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -28,85 +29,21 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Preparar ferramentas de leitura oficial
+      - name: Validar sintaxe
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq poppler-utils unzip
+          node --check scripts/auditar-gppgadm-2022.mjs
+          node --check scripts/sanear-gppgadm-2022.mjs
 
-      - name: Coletar prova e gabarito sem bloquear auditoria
-        shell: bash
-        run: |
-          set -u -o pipefail
-          BASE='artifacts/auditoria-gppgadm-2022/oficial'
-          mkdir -p "$BASE/provas"
-          : > "$BASE/download-status.txt"
-          COOKIE="$RUNNER_TEMP/quadrix.cookies"
-          PAGE='https://quadrix.org.br/informacoes/1180/'
-          curl -sSL --retry 2 -A 'Mozilla/5.0' -c "$COOKIE" "$PAGE" -o "$BASE/pagina-oficial.html" || true
-
-          try_download() {
-            local label="$1"
-            local output="$2"
-            shift 2
-            for url in "$@"; do
-              echo "Tentando $label: $url" | tee -a "$BASE/download-status.txt"
-              if curl -fL --retry 2 --retry-delay 2 -A 'Mozilla/5.0' \
-                -e "$PAGE" -b "$COOKIE" -c "$COOKIE" "$url" -o "$output"; then
-                if [ -s "$output" ]; then
-                  echo "OK $label: $url" | tee -a "$BASE/download-status.txt"
-                  return 0
-                fi
-              fi
-            done
-            rm -f "$output"
-            echo "FALHA $label" | tee -a "$BASE/download-status.txt"
-            return 1
-          }
-
-          try_download 'gabarito definitivo' "$BASE/gabarito-definitivo.pdf" \
-            'https://quadrix.org.br/uploads/861/concursos/1180/anexos/d901d108bc8976c4fa40c7b7554385ea.pdf?v113722=' \
-            'https://quadrix.org.br/uploads/861/concursos/1180/anexos/d901d108bc8976c4fa40c7b7554385ea.pdf?v205742=' \
-            'https://quadrix.org.br/uploads/861/concursos/1180/anexos/d901d108bc8976c4fa40c7b7554385ea.pdf' \
-            'https://anexos.cdn.selecao.net.br/uploads/861/concursos/1180/anexos/d901d108bc8976c4fa40c7b7554385ea.pdf?v113722=' \
-            'https://www.pciconcursos.com.br/provas/29778806/f4a841b38737/gabarito_oficial.pdf' || true
-
-          try_download 'provas aplicadas Tipo A Gestor' "$BASE/provas-tipo-a-gestor.zip" \
-            'https://anexos.cdn.selecao.net.br/uploads/861/concursos/1180/anexos/663a2282-84f2-4991-8f93-720a3a58f659.zip' \
-            'https://anexos-r2.selecao.net.br/uploads/861/concursos/1180/anexos/663a2282-84f2-4991-8f93-720a3a58f659.zip' || true
-
-          if [ -s "$BASE/gabarito-definitivo.pdf" ]; then
-            file "$BASE/gabarito-definitivo.pdf" | tee -a "$BASE/download-status.txt"
-            pdftotext -layout "$BASE/gabarito-definitivo.pdf" "$BASE/gabarito-definitivo.txt" || true
-            sha256sum "$BASE/gabarito-definitivo.pdf" | tee "$BASE/gabarito-definitivo.sha256"
-          fi
-
-          if [ -s "$BASE/provas-tipo-a-gestor.zip" ]; then
-            file "$BASE/provas-tipo-a-gestor.zip" | tee -a "$BASE/download-status.txt"
-            unzip -q "$BASE/provas-tipo-a-gestor.zip" -d "$BASE/provas" || true
-            find "$BASE/provas" -type f -iname '*.pdf' -print0 |
-              while IFS= read -r -d '' pdf; do
-                pdftotext -layout "$pdf" "$pdf.txt" || true
-              done
-          fi
-
-          find "$BASE" -maxdepth 4 -type f -printf '%P\n' | sort > "$BASE/arquivos.txt"
-          echo 'OFFICIAL_FILES_BEGIN'
-          cat "$BASE/arquivos.txt"
-          echo 'OFFICIAL_FILES_END'
-          echo 'OFFICIAL_DOWNLOAD_STATUS_BEGIN'
-          cat "$BASE/download-status.txt"
-          echo 'OFFICIAL_DOWNLOAD_STATUS_END'
-
-      - name: Comparar Notion, main e site público
+      - name: Executar saneamento no Banco Mestre
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        run: node scripts/auditar-gppgadm-2022.mjs
+        run: node scripts/sanear-gppgadm-2022.mjs
 
-      - name: Preservar relatório e fontes extraídas
+      - name: Preservar relatório antes e depois
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: auditoria-gppgadm-2022-20260731
-          path: artifacts/auditoria-gppgadm-2022
+          name: saneamento-gppgadm-2022-20260731
+          path: artifacts/saneamento-gppgadm-2022-20260731.json
           if-no-files-found: error
           retention-days: 90
