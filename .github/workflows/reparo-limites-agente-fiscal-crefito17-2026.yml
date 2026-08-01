@@ -1,0 +1,39 @@
+name: Reparo de limites Agente Fiscal CREFITO-17 2026
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/reparar-limites-agente-fiscal-crefito17-2026.mjs'
+      - '.github/workflows/reparo-limites-agente-fiscal-crefito17-2026.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: reparo-limites-agente-fiscal-crefito17-20260801
+  cancel-in-progress: false
+
+jobs:
+  reparar:
+    if: github.head_ref == 'agent/auditoria-agente-fiscal-crefito17-20260801'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Validar rotina
+        run: |
+          node --check scripts/reparar-limites-agente-fiscal-crefito17-2026.mjs
+          sha256sum scripts/reparar-limites-agente-fiscal-crefito17-2026.mjs
+
+      - name: Reparar limites e executar gate literal
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/reparar-limites-agente-fiscal-crefito17-2026.mjs
