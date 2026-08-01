@@ -1,26 +1,24 @@
-name: Saneamento Auxiliar CRBM-6 2026
+name: Reconciliar órfãos Auxiliar CRBM-6 2026
 
 on:
   pull_request:
     branches: [main]
     paths:
-      - 'scripts/auditar-auxiliar-crbm6-2026.mjs'
+      - 'scripts/reconciliar-orfaos-auxiliar-crbm6-2026.mjs'
       - '.github/workflows/auditoria-auxiliar-crbm6-2026.yml'
 
 permissions:
   contents: read
-  issues: read
-  pull-requests: read
 
 concurrency:
-  group: saneamento-auxiliar-crbm6-20260801
+  group: reconciliar-orfaos-auxiliar-crbm6-20260801
   cancel-in-progress: false
 
 jobs:
-  sanear:
+  reconciliar:
     if: github.head_ref == 'agent/auditoria-auxiliar-crbm6-20260801'
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -30,65 +28,19 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Preparar ferramentas
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq poppler-utils unzip jq
+      - name: Validar sintaxe
+        run: node --check scripts/reconciliar-orfaos-auxiliar-crbm6-2026.mjs
 
-      - name: Baixar e extrair prova oficial
-        shell: bash
-        run: |
-          set -euo pipefail
-          BASE='artifacts/auditoria-auxiliar-crbm6-2026/oficial'
-          mkdir -p "$BASE/extraido"
-          URL='https://quadrixa.intercom-attachments-7.com/i/o/g60nuz1n/2478105154/b7139f08ad60cb69a63e808399b4/CRBM-6-PR_2026.zip?expires=1785553200&req=diQgHsh%2BmIBaXfMW1HO4zfmIqvzGJl8dW9KX79sVWPx63hy5CL3jf5f1V0p8%0A1JmVdiD%2FKXc%3D%0A&signature=9998450c177cbc81e7ad10e37199867b27f0d0db46185bcca66167e4cb3755f5'
-          curl -fL --retry 3 --retry-delay 2 -A 'Mozilla/5.0' "$URL" -o "$BASE/CRBM-6-PR_2026.zip"
-          unzip -q "$BASE/CRBM-6-PR_2026.zip" -d "$BASE/extraido"
-          PDF="$(find "$BASE/extraido" -type f -iname '*Auxiliar*Administrativo*.pdf' | head -n 1)"
-          test -n "$PDF"
-          cp "$PDF" "$BASE/200_Auxiliar-Administrativo_CRBM-6_2026.pdf"
-          pdftotext -layout "$PDF" "$BASE/200_Auxiliar-Administrativo_CRBM-6_2026.txt"
-          pdftotext -raw "$PDF" "$BASE/200_Auxiliar-Administrativo_CRBM-6_2026.raw.txt"
-          sha256sum "$BASE/CRBM-6-PR_2026.zip" "$BASE/200_Auxiliar-Administrativo_CRBM-6_2026.pdf" > "$BASE/sha256.txt"
-
-      - name: Reconstruir rotina temporária de saneamento
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          COMMENTS="$RUNNER_TEMP/comments.json"
-          curl -fsSL \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H 'Accept: application/vnd.github+json' \
-            -H 'X-GitHub-Api-Version: 2022-11-28' \
-            'https://api.github.com/repos/${{ github.repository }}/issues/59/comments?per_page=100' \
-            -o "$COMMENTS"
-          jq -r '.[] | select(.body | startswith("SANITIZER_CHUNK_1:")) | .body | sub("^SANITIZER_CHUNK_1:"; "")' "$COMMENTS" | tail -n 1 > "$RUNNER_TEMP/chunk1"
-          jq -r '.[] | select(.body | startswith("SANITIZER_CHUNK_2:")) | .body | sub("^SANITIZER_CHUNK_2:"; "")' "$COMMENTS" | tail -n 1 > "$RUNNER_TEMP/chunk2"
-          test -s "$RUNNER_TEMP/chunk1"
-          test -s "$RUNNER_TEMP/chunk2"
-          cat "$RUNNER_TEMP/chunk1" "$RUNNER_TEMP/chunk2" | base64 -d | gzip -d > scripts/sanear-auxiliar-crbm6-2026.runtime.mjs
-          node --check scripts/sanear-auxiliar-crbm6-2026.runtime.mjs
-          echo "SANITIZER_SHA256=$(sha256sum scripts/sanear-auxiliar-crbm6-2026.runtime.mjs | cut -d' ' -f1)"
-
-      - name: Registrar diagnóstico inicial
+      - name: Reconciliar códigos globais e linhas órfãs
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        run: node scripts/auditar-auxiliar-crbm6-2026.mjs
+        run: node scripts/reconciliar-orfaos-auxiliar-crbm6-2026.mjs
 
-      - name: Executar reconstrução e saneamento integral
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        run: node scripts/sanear-auxiliar-crbm6-2026.runtime.mjs
-
-      - name: Preservar relatório e fonte oficial
+      - name: Preservar relatório antes e depois
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: saneamento-auxiliar-crbm6-20260801
-          path: |
-            artifacts/auditoria-auxiliar-crbm6-2026
-            artifacts/saneamento-auxiliar-crbm6-20260801.json
+          name: reconciliacao-orfaos-auxiliar-crbm6-20260801
+          path: artifacts/reconciliacao-orfaos-auxiliar-crbm6-20260801.json
           if-no-files-found: error
           retention-days: 90
