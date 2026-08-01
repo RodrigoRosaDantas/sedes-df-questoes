@@ -18,6 +18,8 @@ env:
   PUBLICATION_PLAN_PATH: data/notion/publication-plan.json
   EXCEPTION_REPORT_PATH: data/notion/exceptional-release-report.json
   CANDIDATE_BRANCH: ops/exceptional-candidate-2026-08-01
+  VALIDATION_STATUS_PATH: data/operations/exceptional-validation-status.json
+  VALIDATION_LOG_PATH: data/operations/exceptional-validation.log
 
 jobs:
   release:
@@ -66,7 +68,49 @@ jobs:
           echo "✓ Candidato auditável registrado em ${CANDIDATE_BRANCH}: ${CANDIDATE_SHA}."
 
       - name: Construir e validar integralmente a plataforma
-        run: npm run check
+        id: validation
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          npm run check > /tmp/exceptional-validation-full.log 2>&1
+          EXIT_CODE=$?
+          tail -n 600 /tmp/exceptional-validation-full.log > /tmp/exceptional-validation.log
+          cat /tmp/exceptional-validation-full.log
+          echo "exit_code=${EXIT_CODE}" >> "$GITHUB_OUTPUT"
+          exit "${EXIT_CODE}"
+
+      - name: Registrar resultado da validação no branch candidato
+        if: always() && steps.candidate.outcome == 'success'
+        shell: bash
+        env:
+          VALIDATION_OUTCOME: ${{ steps.validation.outcome }}
+          VALIDATION_EXIT_CODE: ${{ steps.validation.outputs.exit_code }}
+          CANDIDATE_SHA: ${{ steps.candidate.outputs.candidate_sha }}
+        run: |
+          set -euo pipefail
+          cp /tmp/exceptional-validation.log /tmp/exceptional-validation-preserved.log
+          git reset --hard "${CANDIDATE_SHA}"
+          git clean -fd
+          mkdir -p "$(dirname "${VALIDATION_STATUS_PATH}")"
+          cp /tmp/exceptional-validation-preserved.log "${VALIDATION_LOG_PATH}"
+          jq -n \
+            --arg operation_id 'EXC-2026-08-01-PROVAS-PENDENTES' \
+            --arg candidate_sha "${CANDIDATE_SHA}" \
+            --arg outcome "${VALIDATION_OUTCOME}" \
+            --argjson exit_code "${VALIDATION_EXIT_CODE:-1}" \
+            --arg validated_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            '{schema_version:"1.0", operation_id:$operation_id, candidate_sha:$candidate_sha, outcome:$outcome, exit_code:$exit_code, validated_at:$validated_at}' \
+            > "${VALIDATION_STATUS_PATH}"
+          git add "${VALIDATION_STATUS_PATH}" "${VALIDATION_LOG_PATH}"
+          git commit -m 'Registrar validação do candidato excepcional'
+          git push --force origin "HEAD:refs/heads/${CANDIDATE_BRANCH}"
+
+      - name: Interromper candidato reprovado
+        if: steps.validation.outcome != 'success'
+        run: |
+          echo 'O candidato excepcional foi preservado para auditoria e não será promovido.'
+          exit 1
 
       - name: Limpar artefatos e promover somente o candidato validado
         id: publish_snapshot
