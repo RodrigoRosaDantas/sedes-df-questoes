@@ -190,6 +190,6 @@ if (updated + alreadyPublished !== selected.length) {
   throw new Error('Fechamento da rastreabilidade terminou com contagem divergente do escopo autorizado.');
 }
 console.log(
-  `✓ Rastreabilidade concluída: ${updated} atualizados e ${alreadyPublished} já publicados; `
+  `✓ Rastreabilidade limitada ao plano e à exceção operacional: ${updated} atualizados e ${alreadyPublished} já publicados; `
   + `${selected.length} registro(s) autorizados; release ${releaseCode}.`,
 );
