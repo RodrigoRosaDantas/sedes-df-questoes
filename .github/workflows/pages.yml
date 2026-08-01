@@ -6,6 +6,12 @@ on:
     paths-ignore:
       - 'data/notion/published.json'
       - 'data/notion/publication-plan.json'
+      - '.github/workflows/pages.yml'
+      - '.github/workflows/editorial-completion-2026-08-01.yml'
+      - 'scripts/apply-editorial-completion.mjs'
+      - 'scripts/assemble-editorial-operation.mjs'
+      - 'data/editorial/**'
+      - 'data/operations/editorial-completion-receipt.json'
   pull_request:
     branches: [main]
   workflow_dispatch:
