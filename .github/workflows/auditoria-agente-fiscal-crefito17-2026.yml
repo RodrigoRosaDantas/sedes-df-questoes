@@ -70,18 +70,82 @@ jobs:
             -H 'X-GitHub-Api-Version: 2022-11-28' \
             'https://api.github.com/repos/${{ github.repository }}/issues/61/comments?per_page=100' \
             -o "$COMMENTS"
-          jq -r '.[] | select(.body | startswith("SANITIZER_AGENTEFISCAL_1:")) | .body | sub("^SANITIZER_AGENTEFISCAL_1:"; "")' "$COMMENTS" | tail -n 1 > "$RUNNER_TEMP/chunk1.b64"
-          jq -r '.[] | select(.body | startswith("SANITIZER_AGENTEFISCAL_2:")) | .body | sub("^SANITIZER_AGENTEFISCAL_2:"; "")' "$COMMENTS" | tail -n 1 > "$RUNNER_TEMP/chunk2.b64"
-          test -s "$RUNNER_TEMP/chunk1.b64"
-          test -s "$RUNNER_TEMP/chunk2.b64"
-          base64 -d "$RUNNER_TEMP/chunk1.b64" | gzip -d > "$RUNNER_TEMP/part1.mjs"
-          base64 -d "$RUNNER_TEMP/chunk2.b64" | gzip -d > "$RUNNER_TEMP/part2.mjs"
-          cat "$RUNNER_TEMP/part1.mjs" "$RUNNER_TEMP/part2.mjs" > scripts/sanear-agente-fiscal-crefito17-2026.runtime.mjs
+          python3 - "$COMMENTS" scripts/sanear-agente-fiscal-crefito17-2026.runtime.mjs <<'PY'
+          import base64
+          import gzip
+          import hashlib
+          import json
+          import re
+          import sys
+          from pathlib import Path
+
+          comments_path = Path(sys.argv[1])
+          output_path = Path(sys.argv[2])
+          comments = json.loads(comments_path.read_text(encoding='utf-8'))
+
+          prefixes = {
+              'integral': 'SANITIZER_AGENTEFISCAL:',
+              'fragmento_1': 'SANITIZER_AGENTEFISCAL_1:',
+              'fragmento_2': 'SANITIZER_AGENTEFISCAL_2:',
+          }
+          payloads = {}
+          for name, prefix in prefixes.items():
+              matches = [item.get('body', '')[len(prefix):] for item in comments if item.get('body', '').startswith(prefix)]
+              if matches:
+                  payloads[name] = ''.join(matches[-1].split())
+
+          if not payloads:
+              raise SystemExit('Nenhum pacote temporário foi encontrado nos comentários do PR.')
+
+          alphabet = re.compile(r'^[A-Za-z0-9+/=]*$')
+          for name, payload in payloads.items():
+              print(f'PAYLOAD_{name.upper()}_LENGTH={len(payload)}')
+              print(f'PAYLOAD_{name.upper()}_VALID_ALPHABET={bool(alphabet.fullmatch(payload))}')
+              print(f'PAYLOAD_{name.upper()}_MOD4={len(payload) % 4}')
+              print(f'PAYLOAD_{name.upper()}_SHA256={hashlib.sha256(payload.encode()).hexdigest()}')
+
+          def decode_gzip(name, payload):
+              candidates = [payload, payload + ('=' * (-len(payload) % 4))]
+              seen = set()
+              for index, candidate in enumerate(candidates, start=1):
+                  if candidate in seen:
+                      continue
+                  seen.add(candidate)
+                  try:
+                      raw = base64.b64decode(candidate, validate=True)
+                      data = gzip.decompress(raw)
+                      print(f'DECODE_{name.upper()}_SUCCESS={index}')
+                      print(f'DECODE_{name.upper()}_BYTES={len(data)}')
+                      print(f'DECODE_{name.upper()}_SHA256={hashlib.sha256(data).hexdigest()}')
+                      return data
+                  except Exception as exc:
+                      print(f'DECODE_{name.upper()}_ATTEMPT_{index}_ERROR={type(exc).__name__}:{exc}')
+              return None
+
+          decoded = {name: decode_gzip(name, payload) for name, payload in payloads.items()}
+          result = None
+          route = None
+          if decoded.get('integral'):
+              result = decoded['integral']
+              route = 'integral'
+          elif decoded.get('fragmento_1') and decoded.get('fragmento_2'):
+              result = decoded['fragmento_1'] + decoded['fragmento_2']
+              route = 'dois_gzip'
+          elif payloads.get('fragmento_1') and payloads.get('fragmento_2'):
+              combined = payloads['fragmento_1'].rstrip('=') + payloads['fragmento_2']
+              result = decode_gzip('base64_recomposto', combined)
+              route = 'base64_recomposto' if result else None
+
+          if not result:
+              raise SystemExit('Nenhuma rota de reconstrução produziu um gzip íntegro.')
+
+          output_path.write_bytes(result)
+          print(f'SANITIZER_ROUTE={route}')
+          print(f'SANITIZER_BYTES={len(result)}')
+          print(f'SANITIZER_SHA256={hashlib.sha256(result).hexdigest()}')
+          PY
           node --check scripts/auditar-agente-fiscal-crefito17-2026.mjs
           node --check scripts/sanear-agente-fiscal-crefito17-2026.runtime.mjs
-          echo "PART1_SHA256=$(sha256sum "$RUNNER_TEMP/part1.mjs" | cut -d' ' -f1)"
-          echo "PART2_SHA256=$(sha256sum "$RUNNER_TEMP/part2.mjs" | cut -d' ' -f1)"
-          echo "SANITIZER_SHA256=$(sha256sum scripts/sanear-agente-fiscal-crefito17-2026.runtime.mjs | cut -d' ' -f1)"
 
       - name: Registrar diagnóstico inicial
         env:
