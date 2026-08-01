@@ -3,21 +3,27 @@ name: Integrar recurso visual CRTR-12 questão 35
 on:
   push:
     branches:
-      - fix/recurso-visual-crtr12-q35
+      - main
     paths:
       - .github/workflows/patch-crtr12-q35.yml
+      - assets/question-images/crtr12-2026-q35-original.jpg
+      - data/operations/crtr12-q35-visual-source.md
 
 permissions:
   contents: write
 
+concurrency:
+  group: patch-crtr12-q35
+  cancel-in-progress: true
+
 jobs:
   patch:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: fix/recurso-visual-crtr12-q35
+          ref: main
           fetch-depth: 0
 
       - name: Aplicar correção técnica mínima
@@ -92,6 +98,14 @@ A imagem original possui 25 × 19 pixels e representa a tecla **Del**. O ativo f
           Path('.github/workflows/patch-crtr12-q35.yml').unlink()
           PY
 
+      - name: Validar correção antes do commit
+        run: |
+          set -euo pipefail
+          node --check scripts/apply-notion-snapshot.mjs
+          node --check scripts/export-exceptional-proofs.mjs
+          node --check assets/question-images-v2-5.js
+          npm run check
+
       - name: Versionar integração e reacionar a publicação
         run: |
           set -euo pipefail
@@ -99,4 +113,6 @@ A imagem original possui 25 × 19 pixels e representa a tecla **Del**. O ativo f
           git config user.email 'sedes-df-visual-fix[bot]@users.noreply.github.com'
           git add -A
           git commit -m 'Integrar recurso visual da questão CRTR-12 35'
-          git push origin HEAD:fix/recurso-visual-crtr12-q35
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
