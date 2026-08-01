@@ -59,6 +59,10 @@ for (const material of currentMaterials.values()) materialByName.set(key(materia
 function matchRecord(record) {
   const direct = byCode.get(key(editorialCode(record)));
   if (direct) return direct;
+  // Na publicação excepcional, o snapshot é a fonte canônica. IDs históricos
+  // ainda podem ser reutilizados por updatedQuestion, mas não podem fazer o
+  // registro do Notion desaparecer da release.
+  if (record.publication_exception) return null;
   const previousPublicId = legacyPublicId(record.github_id);
   const legacy = previousPublicId ? byId.get(key(previousPublicId)) : null;
   if (legacy) return legacy;
@@ -145,10 +149,6 @@ const usedIds = new Set();
 const usedCodes = new Set();
 for (const record of snapshot.records || []) {
   const current = matchRecord(record);
-  // No modo excepcional, registros já existentes são deixados integralmente
-  // para o laço de preservação abaixo; somente itens realmente ausentes entram.
-  if (record.publication_exception && current) continue;
-
   const materialId = materialIdFor(record, current);
   if (!finalMaterials.has(materialId)) {
     finalMaterials.set(materialId, baseMaterial(materialId, record, currentMaterials.get(materialId)));
