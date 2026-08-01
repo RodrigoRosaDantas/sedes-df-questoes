@@ -1,52 +1,18 @@
 {
-  "schema_version": "1.0",
-  "operation_id": "EDT-2026-08-01-CREFITO17-AUXILIAR-120",
-  "material": "Auxiliar Administrativo — CREFITO-17 — Quadrix 2026",
+  "schema_version": "1.1",
+  "operation_id": "EDT-2026-08-01-CREFITO17-AGENTE-FISCAL-57",
+  "material": "Agente Fiscal — CREFITO-17 — Quadrix 2026",
+  "operation_sha256": "178962c1c578eae2169b60eea260f6942d235e8dfabe3d32d15ffc76e28208f3",
   "source_release_sha": "8a528d925807db558967a3ff0a956006e87356a5",
-  "status": "success_manual_closure",
-  "expected_records": 120,
-  "applied_records": 120,
-  "fields_applied": [
-    "Comentário geral",
-    "Fundamento legal",
-    "Subassunto",
-    "Pegadinha",
-    "URL da fonte",
-    "Auditoria de conteúdo",
-    "Data da revisão"
-  ],
-  "preserved_fields": [
-    "Código",
-    "Enunciado",
-    "Texto-base",
-    "Alternativas",
-    "Gabarito",
-    "Código GitHub",
-    "Data da publicação",
-    "Status editorial — registro manual anterior"
-  ],
-  "official_source_url": "https://quadrix.org.br/informacoes/3041/",
-  "verification_method": "A aplicação sequencial alcançou o registro 120. Foram relidas no Notion as fronteiras dos seis fragmentos: 001/020, 021/040, 041/060, 061/080, 081/100 e 101/120. Em todas as amostras, os sete campos estavam presentes e os campos preservados permaneciam inalterados.",
-  "verified_boundary_codes": [
-    "PROVA-QDX-CREFITO17-2026-AUXILIAR-ADMINISTRATIVO-200-001",
-    "PROVA-QDX-CREFITO17-2026-AUXILIAR-ADMINISTRATIVO-200-020",
-    "PROVA-QDX-CREFITO17-2026-AUXILIAR-ADMINISTRATIVO-200-021",
-    "PROVA-QDX-CREFITO17-2026-AUXILIAR-ADMINISTRATIVO-200-040",
-    "PROVA-QDX-CREFITO17-2026-AUXILIAR-ADMINISTRATIVO-200-041",
-    "PROVA-QDX-CREFITO17-2026-AUXILIAR-ADMINISTRATIVO-200-060",
-    "PROVA-QDX-CREFITO17-2026-AUXILIAR-ADMINISTRATIVO-200-061",
-    "PROVA-QDX-CREFITO17-2026-AUXILIAR-ADMINISTRATIVO-200-080",
-    "PROVA-QDX-CREFITO17-2026-AUXILIAR-ADMINISTRATIVO-200-081",
-    "PROVA-QDX-CREFITO17-2026-AUXILIAR-ADMINISTRATIVO-200-100",
-    "PROVA-QDX-CREFITO17-2026-AUXILIAR-ADMINISTRATIVO-200-101",
-    "PROVA-QDX-CREFITO17-2026-AUXILIAR-ADMINISTRATIVO-200-120"
-  ],
-  "notion_update_window": {
-    "first_verified_edit": "2026-08-01T17:14:01.886Z",
-    "last_verified_edit": "2026-08-01T17:15:50.146Z"
-  },
+  "status": "failure",
+  "expected_records": 57,
+  "updated_records": 0,
+  "already_applied_records": 0,
+  "updated_codes": [],
+  "already_applied_codes": [],
+  "started_at": "2026-08-01T18:25:17.650Z",
+  "finished_at": "2026-08-01T18:25:17.997Z",
   "site_deployed": false,
   "publication_queue_reopened": false,
-  "receipt_note": "O recibo automático não foi enviado ao branch por concorrência de commits durante o disparo. Este fechamento registra o estado efetivamente relido no Banco Mestre; não representa merge nem nova publicação.",
-  "recorded_at": "2026-08-01T17:31:00Z"
+  "error": "Error: PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-028: Data da revisão já contém valor editorial divergente; nada será sobrescrito.\n    at desiredPatch (file:///home/runner/work/sedes-df-questoes/sedes-df-questoes/scripts/apply-editorial-completion.mjs:124:13)\n    at main (file:///home/runner/work/sedes-df-questoes/sedes-df-questoes/scripts/apply-editorial-completion.mjs:184:19)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"
 }
