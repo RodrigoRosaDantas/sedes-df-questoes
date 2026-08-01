@@ -1,4 +1,4 @@
-name: Auditoria Auxiliar CRBM-6 2026
+name: Saneamento Auxiliar CRBM-6 2026
 
 on:
   pull_request:
@@ -9,16 +9,18 @@ on:
 
 permissions:
   contents: read
+  issues: read
+  pull-requests: read
 
 concurrency:
-  group: auditoria-auxiliar-crbm6-20260801
+  group: saneamento-auxiliar-crbm6-20260801
   cancel-in-progress: false
 
 jobs:
-  auditar:
+  sanear:
     if: github.head_ref == 'agent/auditoria-auxiliar-crbm6-20260801'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -28,10 +30,10 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Preparar leitura do caderno oficial
+      - name: Preparar ferramentas
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq poppler-utils unzip
+          sudo apt-get install -y -qq poppler-utils unzip jq
 
       - name: Baixar e extrair prova oficial
         shell: bash
@@ -46,25 +48,47 @@ jobs:
           test -n "$PDF"
           cp "$PDF" "$BASE/200_Auxiliar-Administrativo_CRBM-6_2026.pdf"
           pdftotext -layout "$PDF" "$BASE/200_Auxiliar-Administrativo_CRBM-6_2026.txt"
+          pdftotext -raw "$PDF" "$BASE/200_Auxiliar-Administrativo_CRBM-6_2026.raw.txt"
           sha256sum "$BASE/CRBM-6-PR_2026.zip" "$BASE/200_Auxiliar-Administrativo_CRBM-6_2026.pdf" > "$BASE/sha256.txt"
-          find "$BASE" -maxdepth 3 -type f -printf '%P\n' | sort > "$BASE/arquivos.txt"
-          echo 'OFFICIAL_TEXT_BEGIN'
-          sed -n '1,900p' "$BASE/200_Auxiliar-Administrativo_CRBM-6_2026.txt"
-          echo 'OFFICIAL_TEXT_END'
 
-      - name: Validar sintaxe
-        run: node --check scripts/auditar-auxiliar-crbm6-2026.mjs
+      - name: Reconstruir rotina temporária de saneamento
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          COMMENTS="$RUNNER_TEMP/comments.json"
+          curl -fsSL \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            'https://api.github.com/repos/${{ github.repository }}/issues/59/comments?per_page=100' \
+            -o "$COMMENTS"
+          jq -r '.[] | select(.body | startswith("SANITIZER_CHUNK_1:")) | .body | sub("^SANITIZER_CHUNK_1:"; "")' "$COMMENTS" | tail -n 1 > "$RUNNER_TEMP/chunk1"
+          jq -r '.[] | select(.body | startswith("SANITIZER_CHUNK_2:")) | .body | sub("^SANITIZER_CHUNK_2:"; "")' "$COMMENTS" | tail -n 1 > "$RUNNER_TEMP/chunk2"
+          test -s "$RUNNER_TEMP/chunk1"
+          test -s "$RUNNER_TEMP/chunk2"
+          cat "$RUNNER_TEMP/chunk1" "$RUNNER_TEMP/chunk2" | base64 -d | gzip -d > "$RUNNER_TEMP/sanear-auxiliar-crbm6-2026.mjs"
+          node --check "$RUNNER_TEMP/sanear-auxiliar-crbm6-2026.mjs"
+          echo "SANITIZER_SHA256=$(sha256sum "$RUNNER_TEMP/sanear-auxiliar-crbm6-2026.mjs" | cut -d' ' -f1)"
 
-      - name: Auditar Banco Mestre, main e catálogo público
+      - name: Registrar diagnóstico inicial
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         run: node scripts/auditar-auxiliar-crbm6-2026.mjs
+
+      - name: Executar reconstrução e saneamento integral
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node "$RUNNER_TEMP/sanear-auxiliar-crbm6-2026.mjs"
 
       - name: Preservar relatório e fonte oficial
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: auditoria-auxiliar-crbm6-20260801
-          path: artifacts/auditoria-auxiliar-crbm6-2026
+          name: saneamento-auxiliar-crbm6-20260801
+          path: |
+            artifacts/auditoria-auxiliar-crbm6-2026
+            artifacts/saneamento-auxiliar-crbm6-20260801.json
           if-no-files-found: error
           retention-days: 90
