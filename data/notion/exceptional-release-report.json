@@ -2,7 +2,7 @@
   "schema_version": "1.1",
   "operation_id": "EXC-2026-08-01-PROVAS-PENDENTES",
   "revision": 2,
-  "generated_at": "2026-08-01T15:36:19.175Z",
+  "generated_at": "2026-08-01T15:49:57.195Z",
   "policy": {
     "ordinary_editorial_gates_waived": true,
     "existing_source_of_truth": "catalogo_publico_versionado",
