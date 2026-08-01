@@ -22,108 +22,61 @@ if (!/^\d+-\d+-\d+$/.test(versionToken)) throw new Error(`Versão inválida no p
 const expectedCacheVersion = `sedes-questoes-v${versionToken}`;
 const expectedBuilder = `copy-public-v${versionToken}`;
 
-const sourceIndex = read("index.html");
-const sourceApp = read("assets/app-v4.js");
-const sourceWorker = read("service-worker.js");
-const sourcePwa = read("assets/pwa-v2-9.js");
-const sourceMaterialDownloads = read("assets/material-downloads-v1.js");
-const sourceMaterialDownloadsCss = read("assets/material-downloads-v1.css");
-for (const marker of [
-  "manifest.webmanifest",
-  "study-navigation-v2-6.css?v=1",
-  "intelligence-v2-9.css?v=1",
-  "reports-v2-10.css?v=2",
-  "material-downloads-v1.css?v=1",
-  "app-v4.js?v=8",
-  "learning-v2-9.js?v=1",
-  "pwa-v2-9.js?v=1",
-  "reports-v2-10.js?v=2",
-  "material-downloads-v1.js?v=1",
-]) requireMarker(sourceIndex, marker, "HTML canônico");
-for (const marker of [
-  'const STUDY_INDEX_URL = "./data/release/study-index.json";',
-  "const indexedQuestions = Object.keys(state.catalog?.question_index || {}).length;",
-  'data-study-view="materias"',
-  'data-study-view="simulados"',
-  'data-study-view="provas"',
-  "function renderDisciplineTopics()",
-  "Catálogo inconsistente.",
-]) requireMarker(sourceApp, marker, "Aplicação canônica");
-for (const marker of [expectedCacheVersion, 'event.request.mode === "navigate"', 'cache: "no-store"', 'type === "SKIP_WAITING"', "material-downloads-v1.js?v=1", "material-downloads-v1.css?v=1"]) {
-  requireMarker(sourceWorker, marker, "Service worker canônico");
-}
-for (const marker of ['updateViaCache: "none"', 'controllerchange', 'registration.update()']) {
-  requireMarker(sourcePwa, marker, "Registro PWA canônico");
-}
-for (const marker of ["data-material-download-card", "PDF para responder", "PDF comentado", "printableDocument"]) {
-  requireMarker(sourceMaterialDownloads, marker, "Download de materiais canônico");
-}
-for (const marker of ["material-download-card", "material-download-actions"]) {
-  requireMarker(sourceMaterialDownloadsCss, marker, "Estilos de download canônicos");
-}
-if (sourceApp.includes("Release incompleta.")) throw new Error("A fonte canônica ainda contém a trava antiga de totais fixos.");
+const canonicalFiles = {
+  index_html: "index.html",
+  app_js: "assets/app-v4.js",
+  service_worker_js: "service-worker.js",
+  pwa_js: "assets/pwa-v2-9.js",
+  material_downloads_js: "assets/material-downloads-v1.js",
+  material_downloads_css: "assets/material-downloads-v1.css",
+  platform_shared_js: "assets/shared-v2-13.js",
+  platform_release_js: "assets/release-v2-13.js",
+  platform_vault_js: "assets/vault-v2-13.js",
+  platform_report_js: "assets/report-v2-13.js",
+  platform_official_exam_js: "assets/official-exam-v2-13.js",
+  platform_adaptive_review_js: "assets/adaptive-review-v2-13.js",
+  platform_css: "assets/platform-v2-13.css",
+};
+const sources = Object.fromEntries(Object.entries(canonicalFiles).map(([key, file]) => [key, read(file)]));
+
+for (const marker of ["manifest.webmanifest", "study-navigation-v2-6.css?v=1", "intelligence-v2-9.css?v=1", "reports-v2-10.css?v=2", "material-downloads-v1.css?v=1", "platform-v2-13.css?v=1", "app-v4.js?v=8", "learning-v2-9.js?v=1", "pwa-v2-9.js?v=1", "reports-v2-10.js?v=2", "material-downloads-v1.js?v=1", "release-v2-13.js?v=1", "vault-v2-13.js?v=1", "report-v2-13.js?v=1", "official-exam-v2-13.js?v=1", "adaptive-review-v2-13.js?v=1"]) requireMarker(sources.index_html, marker, "HTML canônico");
+for (const marker of ['const STUDY_INDEX_URL = "./data/release/study-index.json";', "const indexedQuestions = Object.keys(state.catalog?.question_index || {}).length;", 'data-study-view="materias"', 'data-study-view="simulados"', 'data-study-view="provas"', "function renderDisciplineTopics()", "Catálogo inconsistente."]) requireMarker(sources.app_js, marker, "Aplicação canônica");
+for (const marker of [expectedCacheVersion, 'event.request.mode === "navigate"', 'cache: "no-store"', 'type === "SKIP_WAITING"', "shared-v2-13.js?v=1", "release-v2-13.js?v=1", "vault-v2-13.js?v=1", "report-v2-13.js?v=1", "official-exam-v2-13.js?v=1", "adaptive-review-v2-13.js?v=1", "platform-v2-13.css?v=1", "release-meta"]) requireMarker(sources.service_worker_js, marker, "Service worker canônico");
+for (const marker of ['updateViaCache: "none"', "controllerchange", "registration.update()"]) requireMarker(sources.pwa_js, marker, "Registro PWA canônico");
+for (const marker of ["data-material-download-card", "PDF para responder", "PDF comentado", "printableDocument"]) requireMarker(sources.material_downloads_js, marker, "Download de materiais canônico");
+for (const marker of ["material-download-card", "material-download-actions"]) requireMarker(sources.material_downloads_css, marker, "Estilos de download canônicos");
+for (const marker of ["release-meta.json", "createCompatibleSession"]) requireMarker(sources.platform_shared_js, marker, "Base das melhorias");
+for (const marker of ["Integridade da publicação", "data-release-health"]) requireMarker(sources.platform_release_js, marker, "Release unificada");
+for (const marker of ["sedes-protected-backup", "PBKDF2", "vault-tools"]) requireMarker(sources.platform_vault_js, marker, "Proteção do progresso");
+for (const marker of ["Reportar problema nesta questão", "issues/new"]) requireMarker(sources.platform_report_js, marker, "Reporte por questão");
+for (const marker of ["Prova Real SEDES/DF 2026", "generalIds", "specificIds", "240"]) requireMarker(sources.platform_official_exam_js, marker, "Prova real");
+for (const marker of ["Revisão adaptativa", "mastery", "averageSeconds"]) requireMarker(sources.platform_adaptive_review_js, marker, "Revisão adaptativa");
+for (const marker of ["official-exam-card", "vault-tools", "platform-dialog-backdrop", "adaptive-review"]) requireMarker(sources.platform_css, marker, "Estilos da plataforma");
+if (sources.app_js.includes("Release incompleta.")) throw new Error("A fonte canônica ainda contém a trava antiga de totais fixos.");
 
 fs.rmSync(dist, {recursive: true, force: true});
 fs.mkdirSync(dist, {recursive: true});
-copy("index.html");
-copy("manifest.webmanifest");
-copy("service-worker.js");
-copy("assets");
-copy("data/concurso.json");
-copy("data/release");
+copy("index.html"); copy("manifest.webmanifest"); copy("service-worker.js"); copy("assets"); copy("data/concurso.json"); copy("data/release");
 fs.writeFileSync(path.join(dist, ".nojekyll"), "");
-
-for (const forbidden of ["scripts", ".github", "data/consolidated", "data/true-false"]) {
-  if (fs.existsSync(path.join(dist, forbidden))) throw new Error(`Conteúdo de desenvolvimento exposto no dist: ${forbidden}`);
-}
-
-const distIndex = fs.readFileSync(path.join(dist, "index.html"), "utf8");
-const distApp = fs.readFileSync(path.join(dist, "assets", "app-v4.js"), "utf8");
-const distWorker = fs.readFileSync(path.join(dist, "service-worker.js"), "utf8");
-const distPwa = fs.readFileSync(path.join(dist, "assets", "pwa-v2-9.js"), "utf8");
-const distMaterialDownloads = fs.readFileSync(path.join(dist, "assets", "material-downloads-v1.js"), "utf8");
-const distMaterialDownloadsCss = fs.readFileSync(path.join(dist, "assets", "material-downloads-v1.css"), "utf8");
-if (
-  distIndex !== sourceIndex
-  || distApp !== sourceApp
-  || distWorker !== sourceWorker
-  || distPwa !== sourcePwa
-  || distMaterialDownloads !== sourceMaterialDownloads
-  || distMaterialDownloadsCss !== sourceMaterialDownloadsCss
-) {
-  throw new Error("O pacote público diverge das fontes canônicas.");
-}
+for (const forbidden of ["scripts", ".github", "data/consolidated", "data/true-false"]) if (fs.existsSync(path.join(dist, forbidden))) throw new Error(`Conteúdo de desenvolvimento exposto no dist: ${forbidden}`);
+for (const [key, relative] of Object.entries(canonicalFiles)) if (fs.readFileSync(path.join(dist, relative), "utf8") !== sources[key]) throw new Error(`O pacote público diverge da fonte canônica: ${relative}.`);
 
 const catalog = JSON.parse(fs.readFileSync(path.join(dist, "data/release/catalogo.json"), "utf8"));
 const materialCount = Array.isArray(catalog.materials) ? catalog.materials.length : 0;
 const questionCount = Object.keys(catalog.question_index || {}).length;
 const materialDir = path.join(dist, "data/release/materials");
 const materialFiles = fs.existsSync(materialDir) ? fs.readdirSync(materialDir).filter(file => file.endsWith(".json")).length : 0;
-
+const proofCount = (catalog.materials || []).filter(item => String(item.tipo_material || "").toLowerCase() === "prova").length;
+const simulationCount = materialCount - proofCount;
 if (!materialCount || !questionCount) throw new Error("Dist gerado sem materiais ou questões.");
 if (Number(catalog.summary?.questoes) !== questionCount) throw new Error(`Catálogo divergente: summary.questoes=${catalog.summary?.questoes}, índice=${questionCount}.`);
 if (Number(catalog.summary?.materiais) !== materialCount) throw new Error(`Catálogo divergente: summary.materiais=${catalog.summary?.materiais}, lista=${materialCount}.`);
 if (materialFiles !== materialCount) throw new Error(`Arquivos de material divergentes: ${materialFiles} arquivos para ${materialCount} materiais.`);
 
-const buildInfo = {
-  version: packageData.version,
-  data_release_version: catalog.release_version || null,
-  catalog_schema_version: catalog.schema_version || null,
-  source_sha: process.env.GITHUB_SHA || "local",
-  builder: expectedBuilder,
-  cache_version: expectedCacheVersion,
-  source_files_sha256: {
-    index_html: sha256(sourceIndex),
-    app_js: sha256(sourceApp),
-    service_worker_js: sha256(sourceWorker),
-    pwa_js: sha256(sourcePwa),
-    material_downloads_js: sha256(sourceMaterialDownloads),
-    material_downloads_css: sha256(sourceMaterialDownloadsCss),
-  },
-  questions: questionCount,
-  materials: materialCount,
-  material_files: materialFiles,
-};
+const sourceHashes = Object.fromEntries(Object.entries(sources).map(([key, content]) => [key, sha256(content)]));
+const sourceSha = process.env.GITHUB_SHA || "local";
+const buildInfo = {version: packageData.version, data_release_version: catalog.release_version || null, catalog_schema_version: catalog.schema_version || null, source_sha: sourceSha, builder: expectedBuilder, cache_version: expectedCacheVersion, source_files_sha256: sourceHashes, questions: questionCount, materials: materialCount, material_files: materialFiles};
 fs.writeFileSync(path.join(dist, "data/release/build-info.json"), `${JSON.stringify(buildInfo, null, 2)}\n`);
-
-console.log(`✓ Build público canônico ${packageData.version}: cache ${expectedCacheVersion}, ${questionCount} questões, ${materialCount} materiais e fontes copiadas sem transformação.`);
+const releaseMeta = {schema_version: "1.0", app_version: packageData.version, data_release_version: catalog.release_version || null, catalog_schema_version: catalog.schema_version || null, source_sha: sourceSha, builder: expectedBuilder, cache_version: expectedCacheVersion, exported_at: catalog.exported_at || null, questions: questionCount, materials: materialCount, proofs: proofCount, simulations: simulationCount, banco_mestre: Number(catalog.summary?.banco_mestre || questionCount), awaiting_audit: Number(catalog.summary?.aguardando_auditoria || 0), source_files_sha256: sourceHashes, official_exam: {objective_questions: 60, general_questions: 20, general_weight: 1, specific_questions: 40, specific_weight: 2, total_points: 100, joint_duration_minutes: 240, general_minimum_points: 10, specific_minimum_points: 40, notice: "A duração de 4 horas é conjunta para as provas objetiva e discursiva.", source: "Edital SEDES/DF nº 1/2026, itens 11.1, 11.2, 11.3 e 12.4."}};
+fs.writeFileSync(path.join(dist, "data/release/release-meta.json"), `${JSON.stringify(releaseMeta, null, 2)}\n`);
+console.log(`✓ Build público canônico ${packageData.version}: cache ${expectedCacheVersion}, ${questionCount} questões, ${materialCount} materiais e release-meta unificado.`);

@@ -6,6 +6,8 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = relative => fs.readFileSync(path.join(root, relative), "utf8");
 const exists = relative => fs.existsSync(path.join(root, relative));
 const fail = message => { throw new Error(message); };
+const packageData = JSON.parse(read("package.json"));
+const expectedCacheVersion = `sedes-questoes-v${String(packageData.version || "").replace(/\./g, "-")}`;
 
 for (const file of [
   "dist/index.html", "dist/manifest.webmanifest", "dist/service-worker.js",
@@ -22,7 +24,7 @@ for (const feature of ["reviewSchedule", "D0/D7/D20", "data-smart-today", "Por q
   if (!learning.includes(feature)) fail(`Recurso inteligente ausente: ${feature}`);
 }
 const serviceWorker = read("dist/service-worker.js");
-for (const feature of ["data/release/catalogo.json", "CACHE_VERSION", "networkFirst", "sedes-questoes-v2-12"]) {
+for (const feature of ["data/release/catalogo.json", "CACHE_VERSION", "networkFirst", expectedCacheVersion]) {
   if (!serviceWorker.includes(feature)) fail(`Cache offline incompleto: ${feature}`);
 }
 if (!/release\\\/materials/.test(serviceWorker)) fail("Cache offline dos materiais não está ativo.");
@@ -46,19 +48,8 @@ for (const discipline of study.disciplines || []) {
 if (indexedIds.size !== questionCount) fail(`Cobertura inteligente divergente: ${indexedIds.size}/${questionCount}.`);
 
 const workflow = read(".github/workflows/pages.yml");
-for (const marker of [
-  "path: dist",
-  "playwright",
-  "verify-deployment.mjs",
-  "playwright.public.config.js",
-  "rollback-deployment.mjs",
-  "PUBLICATION_PLAN_PATH",
-  "source_sha:",
-  "steps.traceability.outcome == 'failure'",
-]) {
+for (const marker of ["path: dist", "playwright", "verify-deployment.mjs", "playwright.public.config.js", "rollback-deployment.mjs", "PUBLICATION_PLAN_PATH", "source_sha:", "steps.traceability.outcome == 'failure'"]) {
   if (!workflow.includes(marker)) fail(`Workflow incompleto: ${marker}`);
 }
-if (workflow.includes("export-notion-snapshot.mjs")) {
-  fail("O workflow de Pages não pode substituir o snapshot versionado por leitura ao vivo do Notion.");
-}
-console.log(`✓ Plataforma inteligente validada: ${questionCount} questões, ${materialCount} materiais, ${study.summary.disciplines} matérias, ${study.summary.topics} tópicos, PWA e auditoria pública com plano restrito e rollback.`);
+if (workflow.includes("export-notion-snapshot.mjs")) fail("O workflow de Pages não pode substituir o snapshot versionado por leitura ao vivo do Notion.");
+console.log(`✓ Plataforma inteligente validada: ${questionCount} questões, ${materialCount} materiais, ${study.summary.disciplines} matérias, ${study.summary.topics} tópicos, cache ${expectedCacheVersion}, PWA e auditoria pública com plano restrito e rollback.`);
