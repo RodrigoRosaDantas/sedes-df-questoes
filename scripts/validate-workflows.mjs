@@ -49,6 +49,8 @@ requireMarkers(pages, [
   "pull_request:",
   "workflow_dispatch:",
   "source_sha:",
+  "close_notion:",
+  "default: false",
   "contents: read",
   "pages: write",
   "id-token: write",
@@ -68,6 +70,7 @@ requireMarkers(pages, [
   "verify-deployment.mjs",
   "playwright.public.config.js",
   "id: traceability",
+  "inputs.close_notion == true",
   "mark-notion-published.mjs",
   "steps.traceability.outcome == 'failure'",
   "rollback-deployment.mjs",
@@ -108,6 +111,7 @@ requireMarkers(notion, [
   "build-info.json",
   "gh workflow run pages.yml",
   "source_sha=",
+  "-f close_notion=true",
   "gh run watch",
   "--exit-status",
 ], "Workflow do Notion");
@@ -158,9 +162,7 @@ requireMarkers(notionTraceability, [
   "PUBLICATION_PLAN_PATH",
   "validatePublicationPlan",
   "plannedCodes",
-  "Lote autorizado",
   "publicationProperties",
-  "Rastreabilidade limitada ao plano",
 ], "Fechamento da rastreabilidade no Notion");
 forbidMarkers(notionTraceability, [
   "const selected = (snapshot.records || []).filter(record => !clean(record.github_id))",
@@ -196,6 +198,6 @@ if (!builder.includes("builder: expectedBuilder") || !verifier.includes("buildIn
 }
 
 console.log(
-  `✓ ${workflowFiles.length} workflows auditados: snapshot versionado, plano explícito, limpeza determinística antes do rebase, `
-  + 'deploy automático acompanhado, Actions em Node 24 e auditoria npm de severidade alta.',
+  `✓ ${workflowFiles.length} workflows auditados: snapshot versionado, plano explícito, deploy sem escrita editorial, `
+  + 'fechamento do Notion somente pela sincronização autorizada, Actions em Node 24 e auditoria npm de severidade alta.',
 );
