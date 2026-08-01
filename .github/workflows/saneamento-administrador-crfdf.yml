@@ -4,9 +4,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'scripts/localizar-prova-oficial-crfdf.mjs'
-      - 'scripts/auditar-faixa-81-120-crfdf.mjs'
-      - 'scripts/saneamento-administrador-crfdf-20260731.mjs'
+      - 'scripts/corrigir-faixa-83-120-crfdf.mjs'
       - '.github/workflows/saneamento-administrador-crfdf.yml'
 
 permissions:
@@ -30,15 +28,19 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Localizar prova oficial
-        run: node scripts/localizar-prova-oficial-crfdf.mjs
+      - name: Validar sintaxe
+        run: node --check scripts/corrigir-faixa-83-120-crfdf.mjs
 
-      - name: Mapear faixa 81 a 120
+      - name: Corrigir e bloquear o Banco Mestre
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        run: node scripts/auditar-faixa-81-120-crfdf.mjs
+        run: node scripts/corrigir-faixa-83-120-crfdf.mjs
 
-      - name: Auditar e reconciliar o Banco Mestre
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        run: node scripts/saneamento-administrador-crfdf-20260731.mjs
+      - name: Preservar relatório antes e depois
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: saneamento-administrador-crfdf-20260731
+          path: artifacts/saneamento-administrador-crfdf-20260731.json
+          if-no-files-found: error
+          retention-days: 90
