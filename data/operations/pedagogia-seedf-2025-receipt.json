@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.2",
+  "operation_id": "EDT-2026-08-02-SEEDF-PEDAGOGIA-72",
+  "status": "failure",
+  "stage": "execution",
+  "editorial_outcome": "skipped",
+  "expected_records": 72,
+  "updated_records": 0,
+  "finished_at": "2026-08-02T15:43:55Z",
+  "site_deployed": false,
+  "publication_queue_reopened": false
+}
