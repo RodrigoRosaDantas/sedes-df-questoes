@@ -9,10 +9,17 @@ test("expõe release unificada, prova real, reporte e proteção do progresso", 
   await expect(page.locator("[data-adaptive-review]")).toBeVisible();
   await page.locator("[data-start-official-exam]").click();
   await expect(page.locator(".question-card")).toBeVisible({timeout: 30000});
-  await expect.poll(() => page.evaluate(() => {
-    const session = JSON.parse(localStorage.getItem("sedes.questoes.rodrigo.session.v3") || "null");
-    return {id: session?.material?.id, questionIds: session?.questionIds?.length};
-  })).toEqual({id: "prova-real-sedes-2026", questionIds: 60});
+  await expect.poll(async () => {
+    try {
+      return await page.evaluate(() => {
+        const session = JSON.parse(localStorage.getItem("sedes.questoes.rodrigo.session.v3") || "null");
+        return {id: session?.material?.id, questionIds: session?.questionIds?.length};
+      });
+    } catch (error) {
+      if (/Execution context was destroyed|navigation/i.test(String(error?.message || error))) return null;
+      throw error;
+    }
+  }, {timeout: 30000}).toEqual({id: "prova-real-sedes-2026", questionIds: 60});
   await expect(page.locator("[data-official-remaining]")).toBeVisible();
   await expect(page.locator("[data-report-question]")).toBeVisible();
   await page.locator("[data-report-question]").click();
