@@ -8,6 +8,13 @@ function add(map, name, value) {
   map.get(name).push(value);
 }
 const unique = map => new Map([...map].filter(([, values]) => values.length === 1).map(([name, values]) => [name, values[0]]));
+const codeVariants = value => {
+  const code = clean(value);
+  const variants = new Set([code]);
+  if (code.startsWith('CONSOL-')) variants.add(`SIM-EMILIA-2026-TDAS-${code.slice('CONSOL-'.length)}`);
+  if (code.startsWith('SIM-EMILIA-2026-TDAS-')) variants.add(`CONSOL-${code.slice('SIM-EMILIA-2026-TDAS-'.length)}`);
+  return [...variants].filter(Boolean).map(key);
+};
 
 function indexes(questions) {
   const byCode = new Map();
@@ -16,8 +23,8 @@ function indexes(questions) {
   const byComposite = new Map();
   const byNotionUrl = new Map();
   for (const question of questions) {
-    add(byCode, key(question.code), question);
-    add(byCode, key(question.source_code), question);
+    for (const variant of codeVariants(question.code)) add(byCode, variant, question);
+    for (const variant of codeVariants(question.source_code)) add(byCode, variant, question);
     add(byId, key(question.public_id), question);
     add(byFingerprint, fingerprint(question.prompt, question.alternatives, question.answer), question);
     add(byComposite, composite(question.material_name, question.original_number), question);
@@ -29,10 +36,14 @@ function indexes(questions) {
 function candidateQuestions(entity, index) {
   const found = new Map();
   const include = question => question && found.set(question.public_id, question);
-  for (const question of index.byCode.get(key(entity.code ?? entity['Código'])) || []) include(question);
+  for (const variant of codeVariants(entity.code ?? entity['Código'])) {
+    for (const question of index.byCode.get(variant) || []) include(question);
+  }
   const github = legacyPublicId(entity.github_id ?? entity['Código GitHub']);
   for (const question of index.byId.get(key(github)) || []) include(question);
-  for (const question of index.byCode.get(key(github)) || []) include(question);
+  for (const variant of codeVariants(github)) {
+    for (const question of index.byCode.get(variant) || []) include(question);
+  }
   include(index.byFingerprint.get(fingerprint(
     entity.prompt ?? entity['Enunciado'],
     entity.alternatives ?? alternativesOf(entity),
@@ -48,10 +59,10 @@ function candidateQuestions(entity, index) {
 
 function relationScore(entity, question) {
   let score = 0;
-  const code = key(entity.code ?? entity['Código']);
+  const codes = new Set(codeVariants(entity.code ?? entity['Código']));
   const github = key(legacyPublicId(entity.github_id ?? entity['Código GitHub']));
-  if (question.source_code && code === key(question.source_code)) score += 20000;
-  if (code === key(question.code)) score += 18000;
+  if (question.source_code && codeVariants(question.source_code).some(code => codes.has(code))) score += 20000;
+  if (codeVariants(question.code).some(code => codes.has(code))) score += 18000;
   if (github && github === key(question.public_id)) score += 16000;
   if (github && (github === key(question.code) || github === key(question.source_code))) score += 14000;
   if (key(entity.notion_url) && key(entity.notion_url) === key(question.notion_url)) score += 12000;
