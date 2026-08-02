@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "operation": "trash_unpublished_notion_pages",
+  "authorized": true,
+  "confirmation": "TRASH-2458-OUTSIDE-SITE",
+  "requested_at": "2026-08-02T19:26:00Z",
+  "requested_by": "Rodrigo",
+  "scope": "Mover para a lixeira do Banco Mestre todos os registros que não integram o snapshot público canônico.",
+  "expected": {
+    "all": 4994,
+    "protected": 2536,
+    "target": 2458
+  }
+}
