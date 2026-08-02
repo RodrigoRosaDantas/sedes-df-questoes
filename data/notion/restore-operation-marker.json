@@ -1,9 +1,0 @@
-{
-  "operation": "restore_2458_from_backup",
-  "status": "authorized_pending_main",
-  "backup_page_id": "3b0cf5a2-6731-8199-bc70-e7eec7020747",
-  "expected_active_before": 2536,
-  "expected_restored": 2458,
-  "expected_active_after": 4994,
-  "ids_sha256": "2b4ed19bf9a029a31f5b64fb2d1869e81a368decf1425d6c1cd73c5f50deeaf2"
-}
