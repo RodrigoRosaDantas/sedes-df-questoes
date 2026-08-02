@@ -6,13 +6,13 @@ on:
     paths:
       - '.github/workflows/editorial-pedagogia-seedf-2025.yml'
       - 'data/editorial/pedagogia-seedf-2025.part*.b64'
-      - 'scripts/apply-editorial-completion.mjs'
+      - 'scripts/apply-pedagogia-editorial.mjs'
   pull_request:
     branches: [main]
     paths:
       - '.github/workflows/editorial-pedagogia-seedf-2025.yml'
       - 'data/editorial/pedagogia-seedf-2025.part*.b64'
-      - 'scripts/apply-editorial-completion.mjs'
+      - 'scripts/apply-pedagogia-editorial.mjs'
 
 permissions:
   contents: read
@@ -36,7 +36,6 @@ jobs:
         run: |
           set -euo pipefail
           wc -c data/editorial/pedagogia-seedf-2025.part*.b64
-          sha256sum data/editorial/pedagogia-seedf-2025.part*.b64
           test "$(tr -d '\r\n' < data/editorial/pedagogia-seedf-2025.part1.b64 | sha256sum | cut -d' ' -f1)" = '32983b68f5bb85ea82263afba23428f06d50f35653ee3caaa1eaa36f5fdad40f'
           test "$(tr -d '\r\n' < data/editorial/pedagogia-seedf-2025.part2.b64 | sha256sum | cut -d' ' -f1)" = 'd9df1a70c9af3d5fc1f2ecb7cbcee8502f7a0af7ab0c6cabedc333166d141e2e'
           test "$(tr -d '\r\n' < data/editorial/pedagogia-seedf-2025.part3.b64 | sha256sum | cut -d' ' -f1)" = 'b6c00134057d1b0d98193f5b1985972381c12ae5797b2b0ea949e1c21eca16d1'
@@ -45,13 +44,13 @@ jobs:
             | tr -d '\r\n' | base64 --decode | gzip --decompress > data/editorial/pedagogia-seedf-2025.json
           test "$(sha256sum data/editorial/pedagogia-seedf-2025.json | cut -d' ' -f1)" = 'e8c64cec30c5b2d14562746acf52854b553895676c7c294c4c145e73a90a98b8'
           jq -e '.operation_id == "EDT-2026-08-02-SEEDF-PEDAGOGIA-72" and .expected_records == 72 and (.records | length) == 72' data/editorial/pedagogia-seedf-2025.json >/dev/null
-          node --check scripts/apply-editorial-completion.mjs
+          node --check scripts/apply-pedagogia-editorial.mjs
       - name: Executar preflight, aplicar e verificar
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           EDITORIAL_OPERATION_PATH: data/editorial/pedagogia-seedf-2025.json
           EDITORIAL_RECEIPT_PATH: data/operations/pedagogia-seedf-2025-receipt.json
-        run: node scripts/apply-editorial-completion.mjs
+        run: node scripts/apply-pedagogia-editorial.mjs
       - name: Exibir recibo final
         if: always()
         run: cat data/operations/pedagogia-seedf-2025-receipt.json 2>/dev/null || true
