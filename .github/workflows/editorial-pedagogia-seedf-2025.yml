@@ -7,12 +7,18 @@ on:
       - '.github/workflows/editorial-pedagogia-seedf-2025.yml'
       - 'data/editorial/pedagogia-seedf-2025.part*.b64'
       - 'scripts/apply-editorial-completion.mjs'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/editorial-pedagogia-seedf-2025.yml'
+      - 'data/editorial/pedagogia-seedf-2025.part*.b64'
+      - 'scripts/apply-editorial-completion.mjs'
 
 permissions:
   contents: read
 
 concurrency:
-  group: editorial-pedagogia-seedf-2025
+  group: editorial-pedagogia-seedf-2025-${{ github.event_name }}
   cancel-in-progress: false
 
 jobs:
