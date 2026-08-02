@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {
-  AUDIT_PARENT, EXPECTED, RESTORE_CONFIRMATION, SOURCE, TRASH_CONFIRMATION,
+  EXPECTED, RESTORE_CONFIRMATION, SOURCE, TRASH_CONFIRMATION,
   clean, paths, readActiveRows, readPublicCatalog, readSnapshot, request, sha256,
   sleep, writeJson,
 } from './notion-trash-common.mjs';
@@ -48,6 +48,7 @@ async function prepare() {
     criteria: 'Proteger uma página do Notion para cada uma das 2.536 questões do catálogo público e mover à lixeira todos os demais registros ativos.',
     expected: EXPECTED,
     counts: state.plan.counts,
+    audit_parent_id: [...state.plan.protectedIds].sort()[0],
     snapshot_generated_at: state.snapshot.generated_at || null,
     snapshot_sha256: sha256(state.snapshotRaw),
     catalog_sha256: sha256(state.catalogRaw),
@@ -105,7 +106,7 @@ async function createAuditPage(manifest) {
   const page = await request('/pages', {
     method: 'POST',
     body: JSON.stringify({
-      parent: {type: 'page_id', page_id: AUDIT_PARENT},
+      parent: {type: 'page_id', page_id: manifest.audit_parent_id},
       properties: {title: {type: 'title', title: text(`BACKUP — lixeira dos 2.458 registros fora do site — ${manifest.prepared_at}`)}},
       children: [
         {object: 'block', type: 'paragraph', paragraph: {rich_text: text(summary)}},
