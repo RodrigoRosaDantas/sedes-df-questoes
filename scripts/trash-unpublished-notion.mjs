@@ -1,111 +1,14 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import crypto from 'node:crypto';
 import {fileURLToPath} from 'node:url';
+import {
+  AUDIT_PARENT, EXPECTED, RESTORE_CONFIRMATION, SOURCE, TRASH_CONFIRMATION,
+  clean, paths, readActiveRows, readPublicCatalog, readSnapshot, request, sha256,
+  sleep, writeJson,
+} from './notion-trash-common.mjs';
+import {buildProtectionPlan} from './notion-trash-plan.mjs';
 
 const currentFile = fileURLToPath(import.meta.url);
-const root = path.resolve(path.dirname(currentFile), '..');
-const snapshotPath = path.join(root, 'data', 'notion', 'published.json');
-const requestPath = path.join(root, 'data', 'notion', 'trash-unpublished-request.json');
-const manifestPath = path.join(root, 'data', 'notion', 'trash-unpublished-manifest.json');
-const reportPath = path.join(root, 'data', 'notion', 'trash-unpublished-report.json');
-
-const TOKEN = process.env.NOTION_TOKEN;
-const SOURCE = '784234ae-deca-4514-b60d-19524e122a89';
-const AUDIT_PARENT = '3accf5a2-6731-81fa-a215-e4a9187ff960';
-const API = 'https://api.notion.com/v1';
-const VERSION = '2026-03-11';
-const EXPECTED = Object.freeze({all: 4994, protected: 2536, target: 2458});
-const TRASH_CONFIRMATION = 'TRASH-2458-OUTSIDE-SITE';
-const RESTORE_CONFIRMATION = 'RESTORE-2458-OUTSIDE-SITE';
-
-const sleep = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
-const clean = value => String(value ?? '').replace(/\r/g, '').replace(/[ \t]+/g, ' ').trim();
-const sha256 = value => crypto.createHash('sha256').update(value).digest('hex');
-
-function ensureToken() {
-  if (!TOKEN) throw new Error('NOTION_TOKEN não está disponível.');
-}
-
-async function request(endpoint, options = {}, attempt = 1) {
-  ensureToken();
-  const response = await fetch(`${API}${endpoint}`, {
-    ...options,
-    headers: {
-      Authorization: `Bearer ${TOKEN}`,
-      'Notion-Version': VERSION,
-      'Content-Type': 'application/json',
-      ...(options.headers || {}),
-    },
-  });
-  if (response.ok) return response.json();
-  const body = await response.text();
-  if ((response.status === 429 || response.status >= 500) && attempt < 8) {
-    const retryAfter = Math.max(Number(response.headers.get('retry-after') || 0) * 1000, 500 * 2 ** (attempt - 1));
-    await sleep(retryAfter);
-    return request(endpoint, options, attempt + 1);
-  }
-  throw new Error(`Notion API ${response.status}: ${body.slice(0, 800)}`);
-}
-
-const rich = items => (items || []).map(item => item.plain_text ?? item.text?.content ?? '').join('').trim();
-function propertyValue(property) {
-  if (!property) return null;
-  if (property.type === 'title') return rich(property.title);
-  if (property.type === 'rich_text') return rich(property.rich_text);
-  if (property.type === 'select') return property.select?.name ?? null;
-  if (property.type === 'checkbox') return Boolean(property.checkbox);
-  if (property.type === 'date') return property.date?.start ?? null;
-  return null;
-}
-
-async function readAllActivePages() {
-  const selectedProperties = [
-    'Questão', 'Código', 'Código GitHub', 'Tipo de material',
-    'Nome do material', 'Anulada', 'Duplicada', 'Data da publicação',
-  ];
-  const parameters = new URLSearchParams();
-  for (const property of selectedProperties) parameters.append('filter_properties[]', property);
-  const endpoint = `/data_sources/${SOURCE}/query?${parameters.toString()}`;
-  const rows = [];
-  let cursor;
-  do {
-    const body = {page_size: 100, result_type: 'page'};
-    if (cursor) body.start_cursor = cursor;
-    const page = await request(endpoint, {method: 'POST', body: JSON.stringify(body)});
-    for (const item of page.results || []) {
-      const properties = Object.fromEntries(
-        Object.entries(item.properties || {}).map(([name, property]) => [name, propertyValue(property)]),
-      );
-      rows.push({
-        notion_id: item.id,
-        notion_url: item.url,
-        ...properties,
-      });
-    }
-    cursor = page.has_more ? page.next_cursor : null;
-  } while (cursor);
-  return rows;
-}
-
-async function readSnapshot() {
-  const raw = await fs.readFile(snapshotPath, 'utf8');
-  const snapshot = JSON.parse(raw);
-  const protectedRows = (snapshot.records || []).map(record => ({
-    notion_id: clean(record.notion_id),
-    code: clean(record.code),
-    title: clean(record.title),
-    material_name: clean(record.material_name),
-  }));
-  const ids = protectedRows.map(record => record.notion_id);
-  if (protectedRows.length !== EXPECTED.protected) {
-    throw new Error(`Snapshot possui ${protectedRows.length} registros protegidos; esperado: ${EXPECTED.protected}.`);
-  }
-  if (ids.some(id => !id) || new Set(ids).size !== ids.length) {
-    throw new Error('Snapshot contém notion_id ausente ou duplicado entre os registros protegidos.');
-  }
-  return {raw, snapshot, protectedRows};
-}
 
 function targetRecord(row) {
   return {
@@ -116,317 +19,225 @@ function targetRecord(row) {
     title: clean(row['Questão']),
     material_type: clean(row['Tipo de material']),
     material_name: clean(row['Nome do material']),
+    original_number: Number(row['Número original']) || null,
     annulled: row['Anulada'] === true,
     duplicated: row['Duplicada'] === true,
     publication_date: row['Data da publicação'] || null,
   };
 }
 
+async function currentPlan() {
+  const [{raw: snapshotRaw, snapshot, records, ids}, {raw: catalogRaw, questions}, activeRows] = await Promise.all([
+    readSnapshot(), readPublicCatalog(), readActiveRows(),
+  ]);
+  const plan = buildProtectionPlan(activeRows, questions, records, ids);
+  return {snapshotRaw, snapshot, catalogRaw, activeRows, plan};
+}
+
 async function prepare() {
-  const {raw, snapshot, protectedRows} = await readSnapshot();
-  const activeRows = await readAllActivePages();
-  const protectedIds = new Set(protectedRows.map(record => record.notion_id));
-  const activeIds = new Set(activeRows.map(record => record.notion_id));
-  const missingProtected = protectedRows.filter(record => !activeIds.has(record.notion_id));
-  const targets = activeRows.filter(record => !protectedIds.has(record.notion_id)).map(targetRecord);
-
-  if (activeRows.length !== EXPECTED.all) {
-    throw new Error(`Banco ativo possui ${activeRows.length} registros; esperado: ${EXPECTED.all}. Nenhuma página foi movida.`);
+  const state = await currentPlan();
+  if (state.activeRows.length !== EXPECTED.all) {
+    throw new Error(`Banco ativo possui ${state.activeRows.length}; esperado ${EXPECTED.all}. Nenhuma página foi movida.`);
   }
-  if (missingProtected.length) {
-    throw new Error(`${missingProtected.length} registros publicados não estão ativos no Banco Mestre. Nenhuma página foi movida.`);
-  }
-  if (targets.length !== EXPECTED.target) {
-    throw new Error(`Foram identificados ${targets.length} alvos; esperado: ${EXPECTED.target}. Nenhuma página foi movida.`);
-  }
-
   const manifest = {
-    schema_version: '1.0',
+    schema_version: '2.0',
     operation: 'trash_unpublished_notion_pages',
     status: 'prepared',
     prepared_at: new Date().toISOString(),
-    notion_version: VERSION,
     data_source_id: SOURCE,
-    snapshot_generated_at: snapshot.generated_at || null,
-    snapshot_sha256: sha256(raw),
-    criteria: 'Preservar exatamente os notion_id dos 2.536 registros canônicos de data/notion/published.json e mover para a lixeira todos os demais registros ativos do Banco Mestre.',
+    criteria: 'Proteger uma página do Notion para cada uma das 2.536 questões do catálogo público e mover à lixeira todos os demais registros ativos.',
     expected: EXPECTED,
-    protected_count: protectedRows.length,
-    target_count: targets.length,
-    protected_ids_sha256: sha256([...protectedIds].sort().join('\n')),
-    target_ids_sha256: sha256(targets.map(record => record.notion_id).sort().join('\n')),
-    targets,
+    counts: state.plan.counts,
+    snapshot_generated_at: state.snapshot.generated_at || null,
+    snapshot_sha256: sha256(state.snapshotRaw),
+    catalog_sha256: sha256(state.catalogRaw),
+    protected_ids_sha256: sha256([...state.plan.protectedIds].sort().join('\n')),
+    target_ids_sha256: sha256(state.plan.targets.map(row => row.notion_id).sort().join('\n')),
+    targets: state.plan.targets.map(targetRecord),
   };
-  await fs.mkdir(path.dirname(manifestPath), {recursive: true});
-  await fs.writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
-  console.log(`✓ Plano preparado: ${manifest.protected_count} registros protegidos e ${manifest.target_count} destinados à lixeira.`);
+  await writeJson(paths.manifest, manifest);
+  console.log(`✓ Plano preparado: ${manifest.counts.snapshot} do snapshot + ${manifest.counts.legacy} legadas protegidas; ${manifest.counts.targets} para a lixeira.`);
   return manifest;
 }
 
 async function readManifest() {
-  const raw = await fs.readFile(manifestPath, 'utf8');
-  const manifest = JSON.parse(raw);
-  if (manifest.operation !== 'trash_unpublished_notion_pages') throw new Error('Manifesto de exclusão inválido.');
-  if (manifest.target_count !== EXPECTED.target || manifest.protected_count !== EXPECTED.protected) {
+  const manifest = JSON.parse(await fs.readFile(paths.manifest, 'utf8'));
+  if (manifest.operation !== 'trash_unpublished_notion_pages') throw new Error('Manifesto inválido.');
+  if (manifest.counts?.published !== EXPECTED.published || manifest.counts?.targets !== EXPECTED.target) {
     throw new Error('Manifesto não corresponde às contagens autorizadas.');
   }
-  const targetIds = (manifest.targets || []).map(record => clean(record.notion_id));
-  if (targetIds.some(id => !id) || new Set(targetIds).size !== EXPECTED.target) {
-    throw new Error('Manifesto contém notion_id ausente ou duplicado.');
-  }
-  if (sha256([...targetIds].sort().join('\n')) !== manifest.target_ids_sha256) {
-    throw new Error('Hash dos alvos do manifesto não confere.');
-  }
+  const ids = (manifest.targets || []).map(item => clean(item.notion_id));
+  if (ids.some(id => !id) || new Set(ids).size !== EXPECTED.target) throw new Error('Manifesto contém IDs ausentes ou duplicados.');
+  if (sha256([...ids].sort().join('\n')) !== manifest.target_ids_sha256) throw new Error('Hash do manifesto não confere.');
   return manifest;
 }
 
-function textObject(content) {
-  return [{type: 'text', text: {content}}];
-}
-
-function splitTextByLines(text, maximum = 1900) {
-  const chunks = [];
+const text = content => [{type: 'text', text: {content}}];
+function chunks(lines, maximum = 1900) {
+  const output = [];
   let current = '';
-  for (const line of text.split('\n')) {
-    const candidate = current ? `${current}\n${line}` : line;
-    if (candidate.length > maximum && current) {
-      chunks.push(current);
+  for (const line of lines) {
+    const next = current ? `${current}\n${line}` : line;
+    if (next.length > maximum && current) {
+      output.push(current);
       current = line;
-    } else {
-      current = candidate;
-    }
+    } else current = next;
   }
-  if (current) chunks.push(current);
-  return chunks;
+  if (current) output.push(current);
+  return output;
 }
 
 async function createAuditPage(manifest) {
-  const targetIds = manifest.targets.map(record => record.notion_id).join('\n');
-  const chunks = splitTextByLines(targetIds);
-  if (chunks.length > 90) throw new Error(`Manifesto excedeu o limite seguro de blocos: ${chunks.length}.`);
-  const title = `BACKUP — lixeira dos 2.458 registros fora do site — ${manifest.prepared_at}`;
+  const idChunks = chunks(manifest.targets.map(item => item.notion_id));
+  if (idChunks.length > 90) throw new Error(`Backup excedeu o limite seguro: ${idChunks.length} blocos.`);
   const summary = [
-    'Operação autorizada: mover para a lixeira os registros do Banco Mestre ausentes do snapshot público.',
-    `Banco antes da operação: ${EXPECTED.all}.`,
-    `Registros publicados protegidos: ${EXPECTED.protected}.`,
+    'Backup da operação autorizada de limpeza do Banco Mestre.',
+    `Registros antes da operação: ${EXPECTED.all}.`,
+    `Questões publicadas protegidas: ${EXPECTED.published}.`,
+    `Protegidas pelo snapshot: ${EXPECTED.snapshot}.`,
+    `Protegidas por correspondência com o catálogo legado: ${EXPECTED.published - EXPECTED.snapshot}.`,
     `Registros destinados à lixeira: ${EXPECTED.target}.`,
     `Hash dos alvos: ${manifest.target_ids_sha256}.`,
+    `Hash do catálogo: ${manifest.catalog_sha256}.`,
     `Hash do snapshot: ${manifest.snapshot_sha256}.`,
-    'Os IDs abaixo permitem restauração individual pela API ou pela lixeira do Notion.',
+    'Os IDs abaixo permitem restauração pela API ou pela lixeira do Notion.',
   ].join('\n');
-  const children = [
-    {
-      object: 'block',
-      type: 'paragraph',
-      paragraph: {rich_text: textObject(summary)},
-    },
-    ...chunks.map(content => ({
-      object: 'block',
-      type: 'code',
-      code: {rich_text: textObject(content), language: 'plain text'},
-    })),
-  ];
   const page = await request('/pages', {
     method: 'POST',
     body: JSON.stringify({
       parent: {type: 'page_id', page_id: AUDIT_PARENT},
-      properties: {
-        title: {type: 'title', title: textObject(title)},
-      },
-      children,
+      properties: {title: {type: 'title', title: text(`BACKUP — lixeira dos 2.458 registros fora do site — ${manifest.prepared_at}`)}},
+      children: [
+        {object: 'block', type: 'paragraph', paragraph: {rich_text: text(summary)}},
+        ...idChunks.map(content => ({object: 'block', type: 'code', code: {rich_text: text(content), language: 'plain text'}})),
+      ],
     }),
   });
   return {id: page.id, url: page.url};
 }
 
-async function appendAuditStatus(pageId, message) {
+async function appendStatus(pageId, message) {
   await request(`/blocks/${pageId}/children`, {
     method: 'PATCH',
-    body: JSON.stringify({
-      children: [{
-        object: 'block',
-        type: 'paragraph',
-        paragraph: {rich_text: textObject(message)},
-      }],
-    }),
+    body: JSON.stringify({children: [{object: 'block', type: 'paragraph', paragraph: {rich_text: text(message)}}]}),
   });
 }
 
-async function writeProgress(manifest, fields) {
-  const report = {
-    schema_version: '1.0',
-    operation: manifest.operation,
-    data_source_id: SOURCE,
-    expected: EXPECTED,
-    manifest_target_ids_sha256: manifest.target_ids_sha256,
-    audit_page_id: manifest.audit_page_id || null,
-    audit_page_url: manifest.audit_page_url || null,
+async function report(manifest, fields) {
+  await writeJson(paths.report, {
+    schema_version: '2.0', operation: manifest.operation, data_source_id: SOURCE,
+    expected: EXPECTED, target_ids_sha256: manifest.target_ids_sha256,
+    audit_page_id: manifest.audit_page_id || null, audit_page_url: manifest.audit_page_url || null,
     ...fields,
-  };
-  await fs.writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
+  });
 }
 
-async function setTrashState(pageId, inTrash) {
-  await request(`/pages/${pageId}`, {
-    method: 'PATCH',
-    body: JSON.stringify({in_trash: inTrash}),
-  });
+async function setTrash(pageId, inTrash) {
+  await request(`/pages/${pageId}`, {method: 'PATCH', body: JSON.stringify({in_trash: inTrash})});
 }
 
 async function execute() {
-  if (process.env.TRASH_UNPUBLISHED_CONFIRM !== TRASH_CONFIRMATION) {
-    throw new Error('Confirmação de exclusão ausente ou inválida.');
-  }
+  if (process.env.TRASH_UNPUBLISHED_CONFIRM !== TRASH_CONFIRMATION) throw new Error('Confirmação de exclusão inválida.');
   const manifest = await readManifest();
-  const {protectedRows} = await readSnapshot();
-  const protectedIds = new Set(protectedRows.map(record => record.notion_id));
-  const targetIds = new Set(manifest.targets.map(record => record.notion_id));
-  const activeRows = await readAllActivePages();
-  const activeIds = new Set(activeRows.map(record => record.notion_id));
-  const unexpected = activeRows.filter(record => !protectedIds.has(record.notion_id) && !targetIds.has(record.notion_id));
-  const missingProtected = protectedRows.filter(record => !activeIds.has(record.notion_id));
-  if (unexpected.length) throw new Error(`${unexpected.length} registros ativos não pertencem ao snapshot nem ao manifesto.`);
-  if (missingProtected.length) throw new Error(`${missingProtected.length} registros publicados estão ausentes. Operação interrompida.`);
+  const activeRows = await readActiveRows();
+  const activeIds = new Set(activeRows.map(row => row.notion_id));
+  const targetIds = new Set(manifest.targets.map(item => item.notion_id));
+  const remaining = manifest.targets.filter(item => activeIds.has(item.notion_id));
+  const protectedActive = activeRows.filter(row => !targetIds.has(row.notion_id));
+  if (protectedActive.length !== EXPECTED.published) {
+    throw new Error(`Antes da exclusão há ${protectedActive.length} registros protegidos ativos; esperado ${EXPECTED.published}.`);
+  }
 
-  const remaining = manifest.targets.filter(record => activeIds.has(record.notion_id));
   const alreadyTrashed = EXPECTED.target - remaining.length;
-  await writeProgress(manifest, {
-    status: 'running',
-    started_at: new Date().toISOString(),
-    already_trashed_before_run: alreadyTrashed,
-    remaining_before_run: remaining.length,
-    trashed_this_run: 0,
-  });
-
+  await report(manifest, {status: 'running', started_at: new Date().toISOString(), already_trashed: alreadyTrashed, remaining: remaining.length});
   let completed = 0;
-  for (const record of remaining) {
-    await setTrashState(record.notion_id, true);
+  for (const item of remaining) {
+    await setTrash(item.notion_id, true);
     completed += 1;
     if (completed % 25 === 0 || completed === remaining.length) {
-      await writeProgress(manifest, {
-        status: 'running',
-        updated_at: new Date().toISOString(),
-        already_trashed_before_run: alreadyTrashed,
-        remaining_before_run: remaining.length,
-        trashed_this_run: completed,
-        total_trashed: alreadyTrashed + completed,
-      });
       console.log(`Lixeira: ${alreadyTrashed + completed}/${EXPECTED.target}.`);
+      await report(manifest, {status: 'running', updated_at: new Date().toISOString(), trashed_this_run: completed, total_trashed: alreadyTrashed + completed});
     }
     await sleep(380);
   }
 
-  const finalActive = await readAllActivePages();
-  const finalIds = new Set(finalActive.map(record => record.notion_id));
-  const finalUnexpected = finalActive.filter(record => !protectedIds.has(record.notion_id));
-  const finalMissingProtected = protectedRows.filter(record => !finalIds.has(record.notion_id));
-  if (finalActive.length !== EXPECTED.protected || finalUnexpected.length || finalMissingProtected.length) {
-    throw new Error(
-      `Verificação final falhou: ativos=${finalActive.length}, inesperados=${finalUnexpected.length}, publicados ausentes=${finalMissingProtected.length}.`,
-    );
+  const state = await currentPlan();
+  if (state.activeRows.length !== EXPECTED.published || state.plan.targets.length !== 0) {
+    throw new Error(`Verificação final falhou: ativos=${state.activeRows.length}, alvos ativos=${state.plan.targets.length}.`);
   }
-
   manifest.status = 'completed';
   manifest.completed_at = new Date().toISOString();
   manifest.trashed_count = EXPECTED.target;
-  manifest.remaining_active_count = finalActive.length;
-  await fs.writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
-  await writeProgress(manifest, {
-    status: 'completed',
-    completed_at: manifest.completed_at,
-    trashed_count: EXPECTED.target,
-    remaining_active_count: finalActive.length,
-    protected_count_verified: EXPECTED.protected,
-  });
-  console.log(`✓ Concluído: ${EXPECTED.target} registros na lixeira; ${EXPECTED.protected} registros publicados preservados.`);
+  manifest.remaining_active_count = EXPECTED.published;
+  await writeJson(paths.manifest, manifest);
+  await report(manifest, {status: 'completed', completed_at: manifest.completed_at, trashed_count: EXPECTED.target, remaining_active_count: EXPECTED.published});
+  console.log(`✓ Concluído: ${EXPECTED.target} registros na lixeira; ${EXPECTED.published} publicados preservados.`);
   return manifest;
 }
 
 async function restore() {
-  if (process.env.RESTORE_TRASHED_CONFIRM !== RESTORE_CONFIRMATION) {
-    throw new Error('Confirmação de restauração ausente ou inválida.');
-  }
+  if (process.env.RESTORE_TRASHED_CONFIRM !== RESTORE_CONFIRMATION) throw new Error('Confirmação de restauração inválida.');
   const manifest = await readManifest();
   let restored = 0;
-  for (const record of manifest.targets) {
-    await setTrashState(record.notion_id, false);
+  for (const item of manifest.targets) {
+    await setTrash(item.notion_id, false);
     restored += 1;
-    if (restored % 25 === 0 || restored === manifest.targets.length) {
-      console.log(`Restauração: ${restored}/${manifest.targets.length}.`);
-    }
+    if (restored % 25 === 0 || restored === EXPECTED.target) console.log(`Restauração: ${restored}/${EXPECTED.target}.`);
     await sleep(380);
   }
-  const activeRows = await readAllActivePages();
-  if (activeRows.length !== EXPECTED.all) {
-    throw new Error(`Restauração incompleta: ${activeRows.length} registros ativos; esperado: ${EXPECTED.all}.`);
-  }
-  await writeProgress(manifest, {
-    status: 'restored',
-    restored_at: new Date().toISOString(),
-    restored_count: restored,
-    active_count: activeRows.length,
-  });
-  console.log(`✓ Restaurados ${restored} registros; Banco Mestre voltou a ${activeRows.length} registros ativos.`);
+  const active = await readActiveRows();
+  if (active.length !== EXPECTED.all) throw new Error(`Restauração incompleta: ${active.length}/${EXPECTED.all}.`);
+  await report(manifest, {status: 'restored', restored_at: new Date().toISOString(), restored_count: restored, active_count: active.length});
 }
 
 function validateRequest(payload) {
-  if (payload.operation !== 'trash_unpublished_notion_pages') throw new Error('Solicitação de lixeira inválida.');
-  if (payload.authorized !== true) throw new Error('Solicitação não está autorizada.');
-  if (payload.confirmation !== TRASH_CONFIRMATION) throw new Error('Confirmação da solicitação é inválida.');
-  for (const [name, value] of Object.entries(EXPECTED)) {
-    if (payload.expected?.[name] !== value) throw new Error(`Contagem divergente na solicitação: ${name}.`);
+  if (payload.operation !== 'trash_unpublished_notion_pages' || payload.authorized !== true || payload.confirmation !== TRASH_CONFIRMATION) {
+    throw new Error('Solicitação de lixeira inválida ou não autorizada.');
+  }
+  if (payload.expected?.all !== EXPECTED.all || payload.expected?.protected !== EXPECTED.published || payload.expected?.target !== EXPECTED.target) {
+    throw new Error('Contagens da solicitação divergem da operação autorizada.');
   }
 }
 
 export async function executeAuthorizedTrashRequest() {
   let payload;
   try {
-    payload = JSON.parse(await fs.readFile(requestPath, 'utf8'));
+    payload = JSON.parse(await fs.readFile(paths.request, 'utf8'));
   } catch (error) {
     if (error?.code === 'ENOENT') return;
     throw error;
   }
   validateRequest(payload);
-
-  const {protectedRows} = await readSnapshot();
-  const protectedIds = new Set(protectedRows.map(record => record.notion_id));
-  const activeRows = await readAllActivePages();
-  const activeIds = new Set(activeRows.map(record => record.notion_id));
-  const missingProtected = protectedRows.filter(record => !activeIds.has(record.notion_id));
-  const unexpectedAfterCompletion = activeRows.filter(record => !protectedIds.has(record.notion_id));
-  if (activeRows.length === EXPECTED.protected && !missingProtected.length && !unexpectedAfterCompletion.length) {
-    console.log('✓ Solicitação de lixeira já foi concluída; os 2.536 registros publicados permanecem ativos.');
+  const state = await currentPlan();
+  if (state.activeRows.length === EXPECTED.published && state.plan.targets.length === 0) {
+    console.log('✓ Limpeza já concluída; 2.536 registros publicados permanecem ativos.');
     return;
   }
-  if (activeRows.length !== EXPECTED.all) {
-    throw new Error(`Estado intermediário não autorizado: ${activeRows.length} registros ativos.`);
+  if (state.activeRows.length !== EXPECTED.all || state.plan.targets.length !== EXPECTED.target) {
+    throw new Error(`Estado não autorizado: ativos=${state.activeRows.length}, alvos=${state.plan.targets.length}.`);
   }
 
   const manifest = await prepare();
   const audit = await createAuditPage(manifest);
   manifest.audit_page_id = audit.id;
   manifest.audit_page_url = audit.url;
-  await fs.writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
-  await appendAuditStatus(audit.id, `Manifesto criado. Início da movimentação em ${new Date().toISOString()}.`);
-
+  await writeJson(paths.manifest, manifest);
+  await appendStatus(audit.id, `Manifesto criado. Início em ${new Date().toISOString()}.`);
   process.env.TRASH_UNPUBLISHED_CONFIRM = TRASH_CONFIRMATION;
   try {
     const completed = await execute();
-    await appendAuditStatus(
-      audit.id,
-      `CONCLUÍDO em ${completed.completed_at}: ${EXPECTED.target} registros movidos para a lixeira e ${EXPECTED.protected} publicados preservados.`,
-    );
+    await appendStatus(audit.id, `CONCLUÍDO em ${completed.completed_at}: 2.458 registros na lixeira e 2.536 publicados preservados.`);
   } catch (error) {
-    await appendAuditStatus(audit.id, `FALHA em ${new Date().toISOString()}: ${clean(error?.message || error)}`).catch(() => {});
+    await appendStatus(audit.id, `FALHA em ${new Date().toISOString()}: ${clean(error?.message || error)}`).catch(() => {});
     throw error;
   }
 }
 
-const invokedDirectly = Boolean(process.argv[1]) && path.resolve(process.argv[1]) === currentFile;
-if (invokedDirectly) {
+const direct = Boolean(process.argv[1]) && path.resolve(process.argv[1]) === currentFile;
+if (direct) {
   const mode = process.argv[2] || 'prepare';
   if (mode === 'prepare') await prepare();
   else if (mode === 'execute') await execute();
   else if (mode === 'restore') await restore();
-  else throw new Error(`Modo inválido: ${mode}. Use prepare, execute ou restore.`);
+  else throw new Error(`Modo inválido: ${mode}.`);
 }
