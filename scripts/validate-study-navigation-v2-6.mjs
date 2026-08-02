@@ -41,7 +41,7 @@ if (indexedIds.size !== catalogIds.size) fail("Cobertura global do índice de es
 for (const id of catalogIds) if (!indexedIds.has(id)) fail(`Questão ausente do índice de estudos: ${id}.`);
 
 const proof = catalog.materials.find(item => item.id === "prova-qdx-seedf-2022-gppgadm-a");
-if (!proof || String(proof.tipo_material).toLowerCase() !== "prova" || proof.quantidade_questoes !== 120) fail("Prova Quadrix 2022 não está disponível como material completo.");
+if (!proof || String(proof.tipo_material).toLowerCase() !== "prova" || proof.quantidade_questoes !== 119) fail("Prova Quadrix 2022 não preserva os 119 itens válidos após a retirada da questão anulada.");
 
 for (const feature of [
   'const STUDY_INDEX_URL = "./data/release/study-index.json"',

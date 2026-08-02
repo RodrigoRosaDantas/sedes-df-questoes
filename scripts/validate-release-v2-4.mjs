@@ -64,6 +64,7 @@ function validateAlternatives(question, material) {
 const ids = new Set();
 const codes = new Set();
 const sourceCodes = new Set();
+const publicQuestionsByCode = new Map();
 let questions = 0;
 let trueFalseQuestions = 0;
 for (const meta of catalog.materials) {
@@ -82,7 +83,7 @@ for (const meta of catalog.materials) {
     if (pendingComment && String(material.tipo_material).toLowerCase() !== "prova") fail(`${question.codigo}: comentário pendente fora de prova anterior.`);
     if (question.possui_imagem && (!question.imagem || !question.descricao_imagem || !fs.existsSync(resolve(question.imagem)))) fail(`${question.codigo}: recurso visual publicado está incompleto.`);
     if (ids.has(question.id) || codes.has(question.codigo)) fail(`Questão duplicada: ${question.id}/${question.codigo}.`);
-    ids.add(question.id); codes.add(question.codigo);
+    ids.add(question.id); codes.add(question.codigo); publicQuestionsByCode.set(question.codigo, question);
     if (question.codigo_fonte) sourceCodes.add(question.codigo_fonte);
     if (catalog.question_index[question.id] !== meta.id) fail(`${question.id}: índice aponta para material incorreto.`);
     if (validateAlternatives(question, material) === "Certo / Errado") trueFalseQuestions += 1;
@@ -90,6 +91,9 @@ for (const meta of catalog.materials) {
 }
 if (questions !== expectedQuestions || ids.size !== expectedQuestions || codes.size !== expectedQuestions) fail("Fechamento global da release inválido.");
 if (snapshot ? trueFalseQuestions < activeQuestions : trueFalseQuestions !== expectedTrueFalse) fail(`Total C/E ativo divergente: mínimo/esperado ${snapshot ? activeQuestions : expectedTrueFalse}, encontrado ${trueFalseQuestions}.`);
+if (codes.has("PROVA-QDX-SEEDF-2022-GPPGADM-A-031")) fail("Item 31 anulado voltou ao catálogo público.");
+const corrected113 = publicQuestionsByCode.get("PROVA-QDX-SEEDF-2022-GPPGADM-A-113");
+if (!corrected113 || corrected113.gabarito !== "Certo" || corrected113.anulada !== false) fail("Item 113 não reproduz o gabarito definitivo Certo.");
 
 if (snapshot) {
   for (const record of snapshot.records) {

@@ -164,7 +164,7 @@ test("GitHub Pages serve a release completa e executável", async ({page, reques
   const examCard = page.locator(".material-card").filter({hasText: "Gestor em Políticas Públicas"});
   await expect(examCard).toBeVisible();
   await examCard.locator("[data-open-material]").click();
-  await expect(page.locator(".detail-summary")).toContainText("120");
+  await expect(page.locator(".detail-summary")).toContainText("119");
 
   const studyURL = resourceURL("");
   studyURL.hash = "/estudar";

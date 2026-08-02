@@ -15,9 +15,9 @@ test("fluxo principal, prova completa, matérias e recursos inteligentes", async
   const examButton = page.locator('[data-open-material="prova-qdx-seedf-2022-gppgadm-a"]');
   const examCard = examButton.locator("xpath=ancestor::article[contains(@class, 'material-card')]");
   await expect(examButton).toBeVisible();
-  await expect(examCard).toContainText("120 questões");
+  await expect(examCard).toContainText("119 questões");
   await examButton.click();
-  await expect(page.locator(".detail-summary")).toContainText("120");
+  await expect(page.locator(".detail-summary")).toContainText("119");
 
   await page.goto("/#/estudar");
   await page.locator('[data-study-view="materias"]').click();
