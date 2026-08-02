@@ -35,6 +35,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          wc -c data/editorial/pedagogia-seedf-2025.part*.b64
+          sha256sum data/editorial/pedagogia-seedf-2025.part*.b64
+          test "$(tr -d '\r\n' < data/editorial/pedagogia-seedf-2025.part1.b64 | sha256sum | cut -d' ' -f1)" = '32983b68f5bb85ea82263afba23428f06d50f35653ee3caaa1eaa36f5fdad40f'
+          test "$(tr -d '\r\n' < data/editorial/pedagogia-seedf-2025.part2.b64 | sha256sum | cut -d' ' -f1)" = 'd9df1a70c9af3d5fc1f2ecb7cbcee8502f7a0af7ab0c6cabedc333166d141e2e'
+          test "$(tr -d '\r\n' < data/editorial/pedagogia-seedf-2025.part3.b64 | sha256sum | cut -d' ' -f1)" = 'b6c00134057d1b0d98193f5b1985972381c12ae5797b2b0ea949e1c21eca16d1'
+          test "$(tr -d '\r\n' < data/editorial/pedagogia-seedf-2025.part4.b64 | sha256sum | cut -d' ' -f1)" = '6f706b2e59cbc218cc60f33e29618a54c8c428bb0854339d53bed6a0008d9c42'
           cat data/editorial/pedagogia-seedf-2025.part1.b64 data/editorial/pedagogia-seedf-2025.part2.b64 data/editorial/pedagogia-seedf-2025.part3.b64 data/editorial/pedagogia-seedf-2025.part4.b64 \
             | tr -d '\r\n' | base64 --decode | gzip --decompress > data/editorial/pedagogia-seedf-2025.json
           test "$(sha256sum data/editorial/pedagogia-seedf-2025.json | cut -d' ' -f1)" = 'e8c64cec30c5b2d14562746acf52854b553895676c7c294c4c145e73a90a98b8'
