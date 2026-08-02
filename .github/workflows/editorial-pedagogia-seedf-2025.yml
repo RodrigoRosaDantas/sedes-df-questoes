@@ -1,0 +1,45 @@
+name: Aplicar saneamento editorial de Pedagogia
+
+on:
+  push:
+    branches: [agent/editorial-pedagogia-seedf-2025]
+    paths:
+      - '.github/workflows/editorial-pedagogia-seedf-2025.yml'
+      - 'data/editorial/pedagogia-seedf-2025.part*.b64'
+      - 'scripts/apply-editorial-completion.mjs'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: editorial-pedagogia-seedf-2025
+  cancel-in-progress: false
+
+jobs:
+  sanitize-notion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Restaurar e validar o lote
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat data/editorial/pedagogia-seedf-2025.part1.b64 data/editorial/pedagogia-seedf-2025.part2.b64 data/editorial/pedagogia-seedf-2025.part3.b64 data/editorial/pedagogia-seedf-2025.part4.b64 \
+            | tr -d '\r\n' | base64 --decode | gzip --decompress > data/editorial/pedagogia-seedf-2025.json
+          test "$(sha256sum data/editorial/pedagogia-seedf-2025.json | cut -d' ' -f1)" = 'e8c64cec30c5b2d14562746acf52854b553895676c7c294c4c145e73a90a98b8'
+          jq -e '.operation_id == "EDT-2026-08-02-SEEDF-PEDAGOGIA-72" and .expected_records == 72 and (.records | length) == 72' data/editorial/pedagogia-seedf-2025.json >/dev/null
+          node --check scripts/apply-editorial-completion.mjs
+      - name: Executar preflight, aplicar e verificar
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          EDITORIAL_OPERATION_PATH: data/editorial/pedagogia-seedf-2025.json
+          EDITORIAL_RECEIPT_PATH: data/operations/pedagogia-seedf-2025-receipt.json
+        run: node scripts/apply-editorial-completion.mjs
+      - name: Exibir recibo final
+        if: always()
+        run: cat data/operations/pedagogia-seedf-2025-receipt.json 2>/dev/null || true
