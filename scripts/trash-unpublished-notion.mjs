@@ -3,30 +3,32 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const currentFile = fileURLToPath(import.meta.url);
+const root = path.resolve(path.dirname(currentFile), '..');
 const snapshotPath = path.join(root, 'data', 'notion', 'published.json');
+const requestPath = path.join(root, 'data', 'notion', 'trash-unpublished-request.json');
 const manifestPath = path.join(root, 'data', 'notion', 'trash-unpublished-manifest.json');
 const reportPath = path.join(root, 'data', 'notion', 'trash-unpublished-report.json');
 
 const TOKEN = process.env.NOTION_TOKEN;
 const SOURCE = '784234ae-deca-4514-b60d-19524e122a89';
+const AUDIT_PARENT = '3accf5a2-6731-81fa-a215-e4a9187ff960';
 const API = 'https://api.notion.com/v1';
 const VERSION = '2026-03-11';
 const EXPECTED = Object.freeze({all: 4994, protected: 2536, target: 2458});
 const TRASH_CONFIRMATION = 'TRASH-2458-OUTSIDE-SITE';
 const RESTORE_CONFIRMATION = 'RESTORE-2458-OUTSIDE-SITE';
-const mode = process.argv[2] || 'prepare';
-
-if (!TOKEN) throw new Error('NOTION_TOKEN não está disponível.');
-if (!['prepare', 'execute', 'restore'].includes(mode)) {
-  throw new Error(`Modo inválido: ${mode}. Use prepare, execute ou restore.`);
-}
 
 const sleep = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
 const clean = value => String(value ?? '').replace(/\r/g, '').replace(/[ \t]+/g, ' ').trim();
 const sha256 = value => crypto.createHash('sha256').update(value).digest('hex');
 
+function ensureToken() {
+  if (!TOKEN) throw new Error('NOTION_TOKEN não está disponível.');
+}
+
 async function request(endpoint, options = {}, attempt = 1) {
+  ensureToken();
   const response = await fetch(`${API}${endpoint}`, {
     ...options,
     headers: {
@@ -158,6 +160,7 @@ async function prepare() {
   await fs.mkdir(path.dirname(manifestPath), {recursive: true});
   await fs.writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
   console.log(`✓ Plano preparado: ${manifest.protected_count} registros protegidos e ${manifest.target_count} destinados à lixeira.`);
+  return manifest;
 }
 
 async function readManifest() {
@@ -177,6 +180,78 @@ async function readManifest() {
   return manifest;
 }
 
+function textObject(content) {
+  return [{type: 'text', text: {content}}];
+}
+
+function splitTextByLines(text, maximum = 1900) {
+  const chunks = [];
+  let current = '';
+  for (const line of text.split('\n')) {
+    const candidate = current ? `${current}\n${line}` : line;
+    if (candidate.length > maximum && current) {
+      chunks.push(current);
+      current = line;
+    } else {
+      current = candidate;
+    }
+  }
+  if (current) chunks.push(current);
+  return chunks;
+}
+
+async function createAuditPage(manifest) {
+  const targetIds = manifest.targets.map(record => record.notion_id).join('\n');
+  const chunks = splitTextByLines(targetIds);
+  if (chunks.length > 90) throw new Error(`Manifesto excedeu o limite seguro de blocos: ${chunks.length}.`);
+  const title = `BACKUP — lixeira dos 2.458 registros fora do site — ${manifest.prepared_at}`;
+  const summary = [
+    'Operação autorizada: mover para a lixeira os registros do Banco Mestre ausentes do snapshot público.',
+    `Banco antes da operação: ${EXPECTED.all}.`,
+    `Registros publicados protegidos: ${EXPECTED.protected}.`,
+    `Registros destinados à lixeira: ${EXPECTED.target}.`,
+    `Hash dos alvos: ${manifest.target_ids_sha256}.`,
+    `Hash do snapshot: ${manifest.snapshot_sha256}.`,
+    'Os IDs abaixo permitem restauração individual pela API ou pela lixeira do Notion.',
+  ].join('\n');
+  const children = [
+    {
+      object: 'block',
+      type: 'paragraph',
+      paragraph: {rich_text: textObject(summary)},
+    },
+    ...chunks.map(content => ({
+      object: 'block',
+      type: 'code',
+      code: {rich_text: textObject(content), language: 'plain text'},
+    })),
+  ];
+  const page = await request('/pages', {
+    method: 'POST',
+    body: JSON.stringify({
+      parent: {type: 'page_id', page_id: AUDIT_PARENT},
+      properties: {
+        title: {type: 'title', title: textObject(title)},
+      },
+      children,
+    }),
+  });
+  return {id: page.id, url: page.url};
+}
+
+async function appendAuditStatus(pageId, message) {
+  await request(`/blocks/${pageId}/children`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      children: [{
+        object: 'block',
+        type: 'paragraph',
+        paragraph: {rich_text: textObject(message)},
+      }],
+    }),
+  });
+}
+
 async function writeProgress(manifest, fields) {
   const report = {
     schema_version: '1.0',
@@ -184,6 +259,8 @@ async function writeProgress(manifest, fields) {
     data_source_id: SOURCE,
     expected: EXPECTED,
     manifest_target_ids_sha256: manifest.target_ids_sha256,
+    audit_page_id: manifest.audit_page_id || null,
+    audit_page_url: manifest.audit_page_url || null,
     ...fields,
   };
   await fs.writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
@@ -262,6 +339,7 @@ async function execute() {
     protected_count_verified: EXPECTED.protected,
   });
   console.log(`✓ Concluído: ${EXPECTED.target} registros na lixeira; ${EXPECTED.protected} registros publicados preservados.`);
+  return manifest;
 }
 
 async function restore() {
@@ -291,6 +369,64 @@ async function restore() {
   console.log(`✓ Restaurados ${restored} registros; Banco Mestre voltou a ${activeRows.length} registros ativos.`);
 }
 
-if (mode === 'prepare') await prepare();
-if (mode === 'execute') await execute();
-if (mode === 'restore') await restore();
+function validateRequest(payload) {
+  if (payload.operation !== 'trash_unpublished_notion_pages') throw new Error('Solicitação de lixeira inválida.');
+  if (payload.authorized !== true) throw new Error('Solicitação não está autorizada.');
+  if (payload.confirmation !== TRASH_CONFIRMATION) throw new Error('Confirmação da solicitação é inválida.');
+  for (const [name, value] of Object.entries(EXPECTED)) {
+    if (payload.expected?.[name] !== value) throw new Error(`Contagem divergente na solicitação: ${name}.`);
+  }
+}
+
+export async function executeAuthorizedTrashRequest() {
+  let payload;
+  try {
+    payload = JSON.parse(await fs.readFile(requestPath, 'utf8'));
+  } catch (error) {
+    if (error?.code === 'ENOENT') return;
+    throw error;
+  }
+  validateRequest(payload);
+
+  const {protectedRows} = await readSnapshot();
+  const protectedIds = new Set(protectedRows.map(record => record.notion_id));
+  const activeRows = await readAllActivePages();
+  const activeIds = new Set(activeRows.map(record => record.notion_id));
+  const missingProtected = protectedRows.filter(record => !activeIds.has(record.notion_id));
+  const unexpectedAfterCompletion = activeRows.filter(record => !protectedIds.has(record.notion_id));
+  if (activeRows.length === EXPECTED.protected && !missingProtected.length && !unexpectedAfterCompletion.length) {
+    console.log('✓ Solicitação de lixeira já foi concluída; os 2.536 registros publicados permanecem ativos.');
+    return;
+  }
+  if (activeRows.length !== EXPECTED.all) {
+    throw new Error(`Estado intermediário não autorizado: ${activeRows.length} registros ativos.`);
+  }
+
+  const manifest = await prepare();
+  const audit = await createAuditPage(manifest);
+  manifest.audit_page_id = audit.id;
+  manifest.audit_page_url = audit.url;
+  await fs.writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+  await appendAuditStatus(audit.id, `Manifesto criado. Início da movimentação em ${new Date().toISOString()}.`);
+
+  process.env.TRASH_UNPUBLISHED_CONFIRM = TRASH_CONFIRMATION;
+  try {
+    const completed = await execute();
+    await appendAuditStatus(
+      audit.id,
+      `CONCLUÍDO em ${completed.completed_at}: ${EXPECTED.target} registros movidos para a lixeira e ${EXPECTED.protected} publicados preservados.`,
+    );
+  } catch (error) {
+    await appendAuditStatus(audit.id, `FALHA em ${new Date().toISOString()}: ${clean(error?.message || error)}`).catch(() => {});
+    throw error;
+  }
+}
+
+const invokedDirectly = Boolean(process.argv[1]) && path.resolve(process.argv[1]) === currentFile;
+if (invokedDirectly) {
+  const mode = process.argv[2] || 'prepare';
+  if (mode === 'prepare') await prepare();
+  else if (mode === 'execute') await execute();
+  else if (mode === 'restore') await restore();
+  else throw new Error(`Modo inválido: ${mode}. Use prepare, execute ou restore.`);
+}
