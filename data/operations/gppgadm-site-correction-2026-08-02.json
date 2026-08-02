@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "GPPGADM-SITE-CORRECTION-2026-08-02",
+  "material_id": "prova-qdx-seedf-2022-gppgadm-a",
+  "canonical_source": "./data/true-false/qdx-seedf-2022-gppgadm-a.json",
+  "source_of_truth": "Banco Mestre do Notion",
+  "source_review_url": "https://ps-adm-861.selecao.net.br/uploads/861/concursos/1180/anexos/7aaaec2a52a98fd7e3093ac1d937e4de.pdf?v152514=",
+  "remove_codes": [
+    "PROVA-QDX-SEEDF-2022-GPPGADM-A-031"
+  ],
+  "replace_codes": [
+    "PROVA-QDX-SEEDF-2022-GPPGADM-A-113"
+  ],
+  "expected_questions_before": 2536,
+  "expected_questions_after": 2535,
+  "expected_material_questions_after": 119,
+  "preserve_public_ids": true,
+  "scope": "Correção de conteúdo já publicado; nenhuma questão nova é liberada."
+}
