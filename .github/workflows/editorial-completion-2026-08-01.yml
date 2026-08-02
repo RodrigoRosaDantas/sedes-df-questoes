@@ -5,12 +5,12 @@ on:
     branches:
       - agent/editorial-pedagogia-seedf-2025
     paths:
-      - data/editorial/pedagogia-seedf-2025.json
+      - data/editorial/pedagogia-seedf-2025.json.gz.b64
       - scripts/apply-editorial-completion.mjs
   pull_request:
     branches: [main]
     paths:
-      - data/editorial/pedagogia-seedf-2025.json
+      - data/editorial/pedagogia-seedf-2025.json.gz.b64
       - scripts/apply-editorial-completion.mjs
 
 permissions:
@@ -21,6 +21,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
+  EDITORIAL_COMPRESSED_PATH: data/editorial/pedagogia-seedf-2025.json.gz.b64
   EDITORIAL_OPERATION_PATH: data/editorial/pedagogia-seedf-2025.json
   EDITORIAL_RECEIPT_PATH: data/operations/pedagogia-seedf-2025-receipt.json
 
@@ -40,8 +41,13 @@ jobs:
           node-version: 22
           package-manager-cache: false
 
-      - name: Validar sintaxe do aplicador
-        run: node --check scripts/apply-editorial-completion.mjs
+      - name: Restaurar e validar o lote editorial
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 --decode "${EDITORIAL_COMPRESSED_PATH}" | gzip --decompress > "${EDITORIAL_OPERATION_PATH}"
+          node --check scripts/apply-editorial-completion.mjs
+          jq -e '.operation_id == "EDT-2026-08-02-SEEDF-PEDAGOGIA-72" and .expected_records == 72 and (.records | length) == 72' "${EDITORIAL_OPERATION_PATH}" >/dev/null
 
       - name: Aplicar correções com preflight e verificação integral
         id: editorial
@@ -59,6 +65,7 @@ jobs:
           EDITORIAL_OUTCOME: ${{ steps.editorial.outcome }}
         run: |
           set -euo pipefail
+          rm -f "${EDITORIAL_OPERATION_PATH}"
           if [ ! -f "${EDITORIAL_RECEIPT_PATH}" ]; then
             mkdir -p "$(dirname "${EDITORIAL_RECEIPT_PATH}")"
             jq -n \
