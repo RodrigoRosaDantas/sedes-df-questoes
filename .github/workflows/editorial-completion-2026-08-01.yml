@@ -3,13 +3,15 @@ name: Saneamento editorial das questões publicadas
 on:
   push:
     branches:
-      - agent/editorial-completion-2026-08-01
+      - agent/editorial-pedagogia-seedf-2025
     paths:
-      - data/editorial/editorial-completion-2026-08-01.json
+      - data/editorial/pedagogia-seedf-2025.json
+      - scripts/apply-editorial-completion.mjs
   pull_request:
     branches: [main]
     paths:
-      - data/editorial/editorial-completion-2026-08-01.json
+      - data/editorial/pedagogia-seedf-2025.json
+      - scripts/apply-editorial-completion.mjs
 
 permissions:
   contents: write
@@ -19,9 +21,8 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  EDITORIAL_MANIFEST_PATH: data/editorial/editorial-completion-2026-08-01.json
-  EDITORIAL_ASSEMBLED_PATH: data/editorial/editorial-completion-assembled.json
-  EDITORIAL_RECEIPT_PATH: data/operations/editorial-completion-receipt.json
+  EDITORIAL_OPERATION_PATH: data/editorial/pedagogia-seedf-2025.json
+  EDITORIAL_RECEIPT_PATH: data/operations/pedagogia-seedf-2025-receipt.json
 
 jobs:
   sanitize-notion:
@@ -31,7 +32,7 @@ jobs:
       - name: Baixar o lote editorial isolado
         uses: actions/checkout@v6
         with:
-          ref: agent/editorial-completion-2026-08-01
+          ref: agent/editorial-pedagogia-seedf-2025
 
       - name: Preparar Node.js
         uses: actions/setup-node@v6
@@ -39,55 +40,46 @@ jobs:
           node-version: 22
           package-manager-cache: false
 
-      - name: Montar e validar as partes do lote
-        id: assemble
-        continue-on-error: true
-        shell: bash
-        run: |
-          set -o pipefail
-          node scripts/assemble-editorial-operation.mjs 2>&1 | tee /tmp/editorial-assemble.log
+      - name: Validar sintaxe do aplicador
+        run: node --check scripts/apply-editorial-completion.mjs
 
       - name: Aplicar correções com preflight e verificação integral
         id: editorial
-        if: steps.assemble.outcome == 'success'
         continue-on-error: true
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          EDITORIAL_OPERATION_PATH: data/editorial/editorial-completion-assembled.json
+          EDITORIAL_OPERATION_PATH: ${{ env.EDITORIAL_OPERATION_PATH }}
+          EDITORIAL_RECEIPT_PATH: ${{ env.EDITORIAL_RECEIPT_PATH }}
         run: node scripts/apply-editorial-completion.mjs
 
       - name: Registrar recibo auditável no branch de saneamento
         if: always()
         shell: bash
         env:
-          ASSEMBLE_OUTCOME: ${{ steps.assemble.outcome }}
           EDITORIAL_OUTCOME: ${{ steps.editorial.outcome }}
         run: |
           set -euo pipefail
           if [ ! -f "${EDITORIAL_RECEIPT_PATH}" ]; then
             mkdir -p "$(dirname "${EDITORIAL_RECEIPT_PATH}")"
-            ASSEMBLY_LOG=$(tail -n 80 /tmp/editorial-assemble.log 2>/dev/null || echo 'Recibo editorial não foi produzido.')
             jq -n \
-              --arg operation_id 'EDT-2026-08-01-CREFITO17-AUXILIAR-120' \
+              --arg operation_id 'EDT-2026-08-02-SEEDF-PEDAGOGIA-72' \
               --arg status 'failure' \
-              --arg stage 'assembly' \
-              --arg assemble_outcome "${ASSEMBLE_OUTCOME:-unknown}" \
-              --arg editorial_outcome "${EDITORIAL_OUTCOME:-skipped}" \
-              --arg error "${ASSEMBLY_LOG}" \
+              --arg stage 'execution' \
+              --arg editorial_outcome "${EDITORIAL_OUTCOME:-unknown}" \
               --arg finished_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-              '{schema_version:"1.0",operation_id:$operation_id,status:$status,stage:$stage,assemble_outcome:$assemble_outcome,editorial_outcome:$editorial_outcome,expected_records:120,updated_records:0,error:$error,finished_at:$finished_at}' \
+              '{schema_version:"1.2",operation_id:$operation_id,status:$status,stage:$stage,editorial_outcome:$editorial_outcome,expected_records:72,updated_records:0,finished_at:$finished_at,site_deployed:false,publication_queue_reopened:false}' \
               > "${EDITORIAL_RECEIPT_PATH}"
           fi
           git config user.name 'sedes-df-editorial-sanitizer[bot]'
           git config user.email 'sedes-df-editorial-sanitizer[bot]@users.noreply.github.com'
           git add "${EDITORIAL_RECEIPT_PATH}"
           if ! git diff --cached --quiet; then
-            git commit -m 'Registrar saneamento editorial do CREFITO-17'
-            git push origin HEAD:agent/editorial-completion-2026-08-01
+            git commit -m 'Registrar saneamento editorial da prova de Pedagogia'
+            git push origin HEAD:agent/editorial-pedagogia-seedf-2025
           fi
 
       - name: Reprovar lote não concluído
-        if: steps.assemble.outcome != 'success' || steps.editorial.outcome != 'success'
+        if: steps.editorial.outcome != 'success'
         run: |
           echo 'O saneamento foi interrompido; consulte o recibo persistido no branch.'
           exit 1
