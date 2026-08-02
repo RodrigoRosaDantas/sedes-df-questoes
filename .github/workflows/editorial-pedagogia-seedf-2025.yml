@@ -35,7 +35,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          echo 'Reexecução 3 — pacote fracionado, hash e observabilidade por PR.'
           cat data/editorial/pedagogia-seedf-2025.part1.b64 data/editorial/pedagogia-seedf-2025.part2.b64 data/editorial/pedagogia-seedf-2025.part3.b64 data/editorial/pedagogia-seedf-2025.part4.b64 \
             | tr -d '\r\n' | base64 --decode | gzip --decompress > data/editorial/pedagogia-seedf-2025.json
           test "$(sha256sum data/editorial/pedagogia-seedf-2025.json | cut -d' ' -f1)" = 'e8c64cec30c5b2d14562746acf52854b553895676c7c294c4c145e73a90a98b8'
