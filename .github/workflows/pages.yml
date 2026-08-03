@@ -83,10 +83,10 @@ jobs:
         run: |
           python3 -m http.server 4173 --directory dist >/tmp/sedes-http.log 2>&1 &
           for i in {1..30}; do curl -fsS http://127.0.0.1:4173/ >/dev/null && break; sleep 1; done
-          npx playwright test --grep-invert "publica somente as 50 questões autorizadas de Direito"
-      - name: Acrescentar somente o lote validado de Direito
+          npx playwright test --grep-invert "publica somente os lotes adicionais autorizados"
+      - name: Acrescentar somente os lotes adicionais validados
         run: node scripts/apply-publication-additions.mjs
-      - name: Testar as 50 novas questões no navegador
+      - name: Testar os lotes adicionais no navegador
         run: npx playwright test tests/publication-additions.spec.js
       - name: Preservar exatamente o pacote aprovado
         uses: actions/upload-artifact@v7
