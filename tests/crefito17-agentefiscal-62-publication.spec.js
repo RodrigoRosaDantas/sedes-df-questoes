@@ -5,7 +5,7 @@ const plan = JSON.parse(fs.readFileSync('data/notion/publication-additions/crefi
 const expectedCodes = plan.lots?.[0]?.codes || [];
 const blockedCode = 'PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-046';
 
-test('publica somente as 62 questões inéditas do Agente Fiscal e preserva o item 46 bloqueado', async ({page}) => {
+test('publica somente as 50 questões autorizadas de Direito e, após os lotes cumulativos, as 62 questões inéditas do Agente Fiscal', async ({page}) => {
   expect(expectedCodes).toHaveLength(62);
   expect(expectedCodes).not.toContain(blockedCode);
 
