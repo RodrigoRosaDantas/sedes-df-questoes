@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "confirmed_at": "2026-08-03T02:09:50.157Z",
+  "public_url": "https://rodrigorosadantas.github.io/sedes-df-questoes",
+  "source_sha": "e35df9befc89d2d279cc9701c9e7fa4e423c3196",
+  "app_version": "2.13.0",
+  "cache_version": "sedes-questoes-v2-13-0",
+  "questions": 2585,
+  "materials": 64,
+  "lot": "SEEDF-2025-DIR-A-071-120-20260802",
+  "added_questions": 50,
+  "verification": {
+    "static_files": "success",
+    "public_browser": "success",
+    "public_metadata_refetched": "success"
+  }
+}
