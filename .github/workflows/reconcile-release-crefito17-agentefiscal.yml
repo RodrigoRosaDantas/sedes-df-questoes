@@ -1,0 +1,46 @@
+name: Reconciliar e liberar Agente Fiscal CREFITO-17
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/reconcile-release-crefito17-agentefiscal.yml
+      - scripts/reconcile-release-crefito17-agentefiscal.mjs
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: reconcile-release-crefito17-agentefiscal
+  cancel-in-progress: false
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: main
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Reconciliar 57 publicados e liberar 63 inéditos
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/reconcile-release-crefito17-agentefiscal.mjs
+      - name: Remover operação temporária após sucesso
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'sedes-df-publish[bot]'
+          git config user.email 'sedes-df-publish[bot]@users.noreply.github.com'
+          git rm .github/workflows/reconcile-release-crefito17-agentefiscal.yml
+          git rm scripts/reconcile-release-crefito17-agentefiscal.mjs
+          git commit -m 'Concluir reconciliação do Agente Fiscal CREFITO-17 [skip ci]'
+          git fetch origin main
+          if ! git merge-base --is-ancestor origin/main HEAD; then git rebase origin/main; fi
+          git push origin HEAD:main
