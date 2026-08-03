@@ -1,11 +1,13 @@
+import fs from 'node:fs';
 import {test, expect} from '@playwright/test';
 
-const expectedCodes = Array.from(
-  {length: 50},
-  (_, index) => `PROVA-QDX-SEEDF-2025-DIR-A-${String(index + 71).padStart(3, '0')}`,
-);
+const config = JSON.parse(fs.readFileSync(new URL('../data/operations/publication-additions.json', import.meta.url), 'utf8'));
+const expectedCodes = (config.lots || []).flatMap(lot => Array.from(
+  {length: Number(lot.expected_count)},
+  (_, index) => `${lot.code_prefix}${String(Number(lot.first_number) + index).padStart(3, '0')}`,
+));
 
-test('publica somente as 50 questões autorizadas de Direito', async ({page}) => {
+test('publica somente os lotes adicionais autorizados', async ({page}) => {
   await page.goto('/#/inicio', {waitUntil: 'domcontentloaded'});
   await expect(page.locator('[data-release-health]')).toBeVisible({timeout: 30000});
 
@@ -14,7 +16,7 @@ test('publica somente as 50 questões autorizadas de Direito', async ({page}) =>
     if (!catalogResponse.ok) throw new Error(`Catálogo: HTTP ${catalogResponse.status}`);
     const catalog = await catalogResponse.json();
     const found = new Map(codes.map(code => [code, 0]));
-    let targetMaterial = '';
+    const targetMaterials = new Set();
 
     for (const metadata of catalog.materials || []) {
       const file = String(metadata.file || '').replace(/^\.\//, '');
@@ -24,20 +26,20 @@ test('publica somente as 50 questões autorizadas de Direito', async ({page}) =>
       for (const question of material.questoes || []) {
         if (!found.has(question.codigo)) continue;
         found.set(question.codigo, found.get(question.codigo) + 1);
-        targetMaterial = material.nome;
+        targetMaterials.add(material.nome);
       }
     }
 
     return {
       questions: Number(catalog.summary?.questoes),
       materials: Number(catalog.summary?.materiais),
-      targetMaterial,
+      targetMaterials: [...targetMaterials],
       occurrences: Object.fromEntries(found),
     };
   }, expectedCodes);
 
-  expect(result.questions).toBe(2585);
+  expect(result.questions).toBe(Number(config.expected_final_questions));
   expect(result.materials).toBeGreaterThanOrEqual(63);
-  expect(result.targetMaterial).toContain('Direito');
+  expect(result.targetMaterials).toHaveLength((config.lots || []).length);
   for (const code of expectedCodes) expect(result.occurrences[code], code).toBe(1);
 });
