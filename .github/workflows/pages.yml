@@ -120,6 +120,10 @@ jobs:
         run: node scripts/apply-alto-paraiso-orientador-37-addition.mjs
       - name: Testar as 37 questões e os sete recursos visuais de Orientador Social
         run: npx playwright test tests/alto-paraiso-orientador-37-publication.spec.js
+      - name: Acrescentar somente as 62 questões inéditas de Agente Fiscal
+        run: node scripts/apply-crefito17-agentefiscal-62-addition.mjs
+      - name: Testar as 62 novas questões do Agente Fiscal
+        run: npx playwright test tests/crefito17-agentefiscal-62-publication.spec.js
       - name: Preservar exatamente o pacote aprovado
         uses: actions/upload-artifact@v7
         with:
