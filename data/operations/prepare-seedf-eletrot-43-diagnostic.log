@@ -1,0 +1,19 @@
+Operação: SEEDF-2025-ELETROT-A-071-120-20260803
+Commit de origem: 3d5bdfabf3525b9486f1f54e925b9542a8b9b835
+Início: 2026-08-03T17:13:48Z
+== Exportar Banco Mestre ==
+Banco Mestre: 5034 registros lidos em 51 lotes com 43 propriedades selecionadas.
+✓ Snapshot autorizado: 1840 questões canônicas, 39 materiais, 0 duplicidade(s) ignorada(s) e 3194 registros mantidos fora do site.
+== Isolar 43 itens ==
+file:///home/runner/work/sedes-df-questoes/sedes-df-questoes/scripts/filter-seedf-eletrot-43-snapshot.mjs:16
+const fail = message => { throw new Error(message); };
+                                ^
+
+Error: O lote de Eletrotécnica está incompleto no snapshot vivo: PROVA-QDX-SEEDF-2025-ELETROT-A-110, PROVA-QDX-SEEDF-2025-ELETROT-A-111, PROVA-QDX-SEEDF-2025-ELETROT-A-112, PROVA-QDX-SEEDF-2025-ELETROT-A-113, PROVA-QDX-SEEDF-2025-ELETROT-A-114, PROVA-QDX-SEEDF-2025-ELETROT-A-115, PROVA-QDX-SEEDF-2025-ELETROT-A-116, PROVA-QDX-SEEDF-2025-ELETROT-A-117, PROVA-QDX-SEEDF-2025-ELETROT-A-118, PROVA-QDX-SEEDF-2025-ELETROT-A-119, PROVA-QDX-SEEDF-2025-ELETROT-A-120.
+    at fail (file:///home/runner/work/sedes-df-questoes/sedes-df-questoes/scripts/filter-seedf-eletrot-43-snapshot.mjs:16:33)
+    at file:///home/runner/work/sedes-df-questoes/sedes-df-questoes/scripts/filter-seedf-eletrot-43-snapshot.mjs:22:21
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.23.1
