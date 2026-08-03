@@ -1,0 +1,141 @@
+name: Mapear páginas do caderno SEEDF Eletrotécnica
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/map-seedf-eletrot-pages.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: map-seedf-eletrot-pages
+  cancel-in-progress: false
+
+jobs:
+  map:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Instalar extrator de PDF
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils
+
+      - name: Baixar fonte oficial e mapear itens 110 a 120
+        id: map
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p data/operations /tmp/seedf-eletrot
+          LOG=data/operations/seedf-eletrot-page-map-diagnostic.log
+          {
+            python - <<'PY'
+          import html
+          import re
+          import urllib.request
+
+          article = 'https://ajuda.quadrix.org.br/pt-BR/articles/11198235-provas-anteriores-realizadas-em-2025'
+          request = urllib.request.Request(article, headers={'User-Agent': 'Mozilla/5.0'})
+          body = urllib.request.urlopen(request, timeout=60).read().decode('utf-8', 'replace')
+          matches = re.findall(r'href=["\']([^"\']*SEEDF_2025\.zip[^"\']*)["\']', body, flags=re.I)
+          if not matches:
+              raise SystemExit('Link oficial SEEDF_2025.zip não encontrado na Central de Ajuda Quadrix.')
+          url = html.unescape(matches[0])
+          open('/tmp/seedf-eletrot/zip-url.txt', 'w', encoding='utf-8').write(url)
+          print('Link oficial localizado na Central de Ajuda Quadrix.')
+          PY
+
+            ZIP_URL="$(cat /tmp/seedf-eletrot/zip-url.txt)"
+            curl --fail --location --retry 3 --connect-timeout 30 "$ZIP_URL" --output /tmp/seedf-eletrot/SEEDF_2025.zip
+
+            python - <<'PY'
+          import pathlib
+          import unicodedata
+          import zipfile
+
+          archive = zipfile.ZipFile('/tmp/seedf-eletrot/SEEDF_2025.zip')
+          candidates = []
+          for name in archive.namelist():
+              normalized = unicodedata.normalize('NFKD', name).encode('ascii', 'ignore').decode().lower()
+              if 'a_111' in normalized and 'eletrotecnica' in normalized and normalized.endswith('.pdf'):
+                  candidates.append(name)
+          if len(candidates) != 1:
+              raise SystemExit(f'Esperado um caderno A_111 Eletrotécnica; encontrados: {candidates}')
+          target = candidates[0]
+          output = pathlib.Path('/tmp/seedf-eletrot/caderno.pdf')
+          output.write_bytes(archive.read(target))
+          print(f'Caderno extraído: {target}')
+          PY
+
+            pdfinfo /tmp/seedf-eletrot/caderno.pdf | tee /tmp/seedf-eletrot/pdfinfo.txt
+            pdftotext -layout /tmp/seedf-eletrot/caderno.pdf /tmp/seedf-eletrot/caderno.txt
+
+            python - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+
+          text = Path('/tmp/seedf-eletrot/caderno.txt').read_text(encoding='utf-8', errors='replace')
+          pages = text.split('\f')
+          expected = list(range(110, 121))
+          found = {}
+          snippets = {}
+          for page_number, page in enumerate(pages, start=1):
+              lines = page.splitlines()
+              for index, line in enumerate(lines):
+                  match = re.match(r'^\s*(110|111|112|113|114|115|116|117|118|119|120)\s+', line)
+                  if not match:
+                      continue
+                  number = int(match.group(1))
+                  if number in found:
+                      raise SystemExit(f'Item {number} encontrado em mais de uma página: {found[number]} e {page_number}.')
+                  found[number] = page_number
+                  excerpt = ' '.join(part.strip() for part in lines[index:index + 4] if part.strip())
+                  snippets[str(number)] = excerpt[:500]
+          missing = [number for number in expected if number not in found]
+          if missing:
+              raise SystemExit(f'Itens sem página identificada: {missing}')
+          result = {
+              'source': 'Central de Ajuda Quadrix — SEEDF_2025.zip',
+              'caderno': 'A_111_Eletrotécnica_SEEDF_2025_QUADRIX.pdf',
+              'generated_from_official_package': True,
+              'pages': {str(number): found[number] for number in expected},
+              'snippets': snippets,
+          }
+          Path('data/operations/seedf-eletrot-page-map.json').write_text(
+              json.dumps(result, ensure_ascii=False, indent=2) + '\n', encoding='utf-8'
+          )
+          print('Mapa confirmado:', result['pages'])
+          PY
+          } 2>&1 | tee "$LOG"
+          status=${PIPESTATUS[0]}
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit "$status"
+
+      - name: Versionar mapa ou diagnóstico
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'sedes-df-publish[bot]'
+          git config user.email 'sedes-df-publish[bot]@users.noreply.github.com'
+          git add data/operations/seedf-eletrot-page-map-diagnostic.log
+          if [ "${{ steps.map.outcome }}" = "success" ]; then
+            git add data/operations/seedf-eletrot-page-map.json
+          fi
+          git commit -m 'Registrar mapa oficial de páginas de Eletrotécnica [skip ci]'
+          git fetch origin main
+          if ! git merge-base --is-ancestor origin/main HEAD; then git rebase origin/main; fi
+          git push origin HEAD:main
+
+      - name: Encerrar em caso de falha
+        if: steps.map.outcome == 'failure'
+        run: exit 1
