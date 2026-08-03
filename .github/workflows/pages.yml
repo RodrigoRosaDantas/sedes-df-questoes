@@ -112,6 +112,10 @@ jobs:
         run: node scripts/apply-seedf-biomed-50-addition.mjs
       - name: Testar as 50 novas questões de Biomedicina no navegador
         run: npx playwright test tests/seedf-biomed-50-publication.spec.js
+      - name: Acrescentar somente os 43 itens aptos de Eletrotécnica
+        run: node scripts/apply-seedf-eletrot-43-addition.mjs
+      - name: Testar as 43 novas questões de Eletrotécnica no navegador
+        run: npx playwright test tests/seedf-eletrot-43-publication.spec.js
       - name: Preservar exatamente o pacote aprovado
         uses: actions/upload-artifact@v7
         with:
