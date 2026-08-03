@@ -29,7 +29,7 @@ jobs:
         with:
           node-version: 22
           package-manager-cache: false
-      - name: Preparar regra de reconciliação histórica
+      - name: Preparar regras corrigidas de reconciliação
         shell: bash
         run: |
           python - <<'PY'
@@ -37,24 +37,31 @@ jobs:
 
           source = Path('scripts/reconcile-release-crefito17-agentefiscal.mjs')
           text = source.read_text(encoding='utf-8')
-          old = """for (const row of livePublic) {
+
+          old_historical = """for (const row of livePublic) {
             const p = row.properties || {};
             const code = plain(p['Código']);
             if (plain(p['Código GitHub']) !== HISTORICAL_RECEIPT) fail(`${code}: recibo atual diverge do catálogo.`);
             validateEditorialGates(row);
           }
           """
-          new = """for (const row of livePublic) {
+          new_historical = """for (const row of livePublic) {
             const p = row.properties || {};
             const code = plain(p['Código']);
             if (plain(p['Código GitHub']) !== HISTORICAL_RECEIPT) fail(`${code}: recibo atual diverge do catálogo.`);
           }
           """
-          if old not in text:
+          if old_historical not in text:
               raise SystemExit('Trecho histórico esperado não foi encontrado no script.')
-          Path('/tmp/reconcile-release-crefito17-agentefiscal.mjs').write_text(
-              text.replace(old, new, 1), encoding='utf-8'
-          )
+          text = text.replace(old_historical, new_historical, 1)
+
+          old_gabarito = "if (!checked(p['Gabarito conferido - registro manual anterior'])) fail(`${code}: gabarito definitivo não confirmado.`);"
+          new_gabarito = "if (!checked(p['Gabarito conferido']) && !checked(p['Gabarito conferido - registro manual anterior'])) fail(`${code}: gabarito definitivo não confirmado.`);"
+          if old_gabarito not in text:
+              raise SystemExit('Gate de gabarito esperado não foi encontrado no script.')
+          text = text.replace(old_gabarito, new_gabarito, 1)
+
+          Path('/tmp/reconcile-release-crefito17-agentefiscal.mjs').write_text(text, encoding='utf-8')
           PY
       - name: Executar reconciliação com diagnóstico persistente
         id: reconcile
