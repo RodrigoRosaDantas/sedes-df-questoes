@@ -1,0 +1,85 @@
+name: Preparar e integrar lote de Orientador Social
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+    paths:
+      - .github/workflows/prepare-alto-paraiso-orientador-37.yml
+      - scripts/export-alto-paraiso-orientador-37.mjs
+      - scripts/apply-alto-paraiso-orientador-37-addition.mjs
+      - tests/alto-paraiso-orientador-37-publication.spec.js
+      - assets/question-images-v2-5.js
+
+permissions:
+  contents: write
+
+concurrency:
+  group: prepare-alto-paraiso-orientador-37
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    if: github.head_ref == 'agent/publish-alto-paraiso-orientador-37-20260803'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: agent/publish-alto-paraiso-orientador-37-20260803
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Consultar o Banco Mestre e gerar snapshot restrito
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/export-alto-paraiso-orientador-37.mjs
+      - name: Validar snapshot e plano imutáveis
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp data/notion/published.json /tmp/current-published.json
+          cp data/notion/publication-plan.json /tmp/current-plan.json
+          cp data/notion/publication-additions/alto-paraiso-orientador-37.json data/notion/published.json
+          cp data/notion/publication-additions/alto-paraiso-orientador-37-plan.json data/notion/publication-plan.json
+          node scripts/validate-notion-snapshot.mjs
+          node scripts/validate-publication-plan.mjs
+          cp /tmp/current-published.json data/notion/published.json
+          cp /tmp/current-plan.json data/notion/publication-plan.json
+      - name: Acrescentar a operação ao pipeline cumulativo
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('.github/workflows/pages.yml')
+          text = path.read_text()
+          needle = """      - name: Testar as 43 novas questões de Eletrotécnica no navegador
+        run: npx playwright test tests/seedf-eletrot-43-publication.spec.js
+"""
+          addition = needle + """      - name: Acrescentar somente as 37 questões válidas de Orientador Social
+        run: node scripts/apply-alto-paraiso-orientador-37-addition.mjs
+      - name: Testar as 37 questões e os sete recursos visuais de Orientador Social
+        run: npx playwright test tests/alto-paraiso-orientador-37-publication.spec.js
+"""
+          if 'apply-alto-paraiso-orientador-37-addition.mjs' not in text:
+              if needle not in text:
+                  raise SystemExit('Ponto de inserção do pipeline não encontrado.')
+              path.write_text(text.replace(needle, addition, 1))
+          PY
+          grep -q 'apply-alto-paraiso-orientador-37-addition.mjs' .github/workflows/pages.yml
+      - name: Versionar pacote e integração
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'sedes-df-publish[bot]'
+          git config user.email 'sedes-df-publish[bot]@users.noreply.github.com'
+          git rm .github/workflows/prepare-alto-paraiso-orientador-37.yml
+          git rm scripts/export-alto-paraiso-orientador-37.mjs
+          git add .github/workflows/pages.yml
+          git add data/notion/publication-additions/alto-paraiso-orientador-37.json
+          git add data/notion/publication-additions/alto-paraiso-orientador-37-plan.json
+          git commit -m 'Preparar publicação de 37 questões de Orientador Social [skip ci]'
+          git push origin HEAD:agent/publish-alto-paraiso-orientador-37-20260803
