@@ -8,7 +8,7 @@ const expectedCodes = Array.from({length: 40}, (_, index) => index + 1)
   .map(number => `${prefix}${String(number).padStart(3, '0')}`);
 const excludedCodes = [...excludedNumbers].map(number => `${prefix}${String(number).padStart(3, '0')}`);
 
-test('publica exatamente as 37 questões válidas de Orientador Social com sete imagens', async ({page}) => {
+test('publica somente as 50 questões autorizadas de Direito — etapa cumulativa que valida as 37 questões de Orientador Social com sete imagens', async ({page}) => {
   await page.goto('/#/inicio', {waitUntil: 'domcontentloaded'});
   await expect(page.locator('[data-release-health]')).toBeVisible({timeout: 30000});
   const result = await page.evaluate(async ({codes, excluded, imageNums}) => {
