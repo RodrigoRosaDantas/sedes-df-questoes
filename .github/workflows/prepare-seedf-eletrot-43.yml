@@ -1,0 +1,65 @@
+name: Preparar lote SEEDF Eletrotécnica — 43 itens aptos
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/prepare-seedf-eletrot-43.yml
+      - data/operations/prepare-seedf-eletrot-43.json
+      - scripts/filter-seedf-eletrot-43-snapshot.mjs
+      - scripts/validate-seedf-eletrot-43-operation.mjs
+
+permissions:
+  contents: write
+
+concurrency:
+  group: prepare-seedf-eletrot-43
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: main
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Consultar a fonte editorial viva
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/export-notion-snapshot.mjs
+      - name: Isolar somente os 43 itens aptos de Eletrotécnica
+        run: node scripts/filter-seedf-eletrot-43-snapshot.mjs
+      - name: Gerar e validar o plano restrito
+        run: |
+          node scripts/create-publication-plan.mjs
+          node scripts/validate-notion-snapshot.mjs
+          node scripts/validate-publication-plan.mjs
+          node scripts/validate-seedf-eletrot-43-operation.mjs
+      - name: Criar cópia imutável da adição
+        run: |
+          mkdir -p data/notion/publication-additions
+          cp data/notion/published.json data/notion/publication-additions/seedf-eletrot-43.json
+          cp data/notion/publication-plan.json data/notion/publication-additions/seedf-eletrot-43-plan.json
+      - name: Versionar somente o pacote validado
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'sedes-df-publish[bot]'
+          git config user.email 'sedes-df-publish[bot]@users.noreply.github.com'
+          git rm .github/workflows/prepare-seedf-eletrot-43.yml
+          git rm scripts/filter-seedf-eletrot-43-snapshot.mjs
+          git rm scripts/validate-seedf-eletrot-43-operation.mjs
+          git rm data/operations/prepare-seedf-eletrot-43.json
+          git add data/notion/published.json data/notion/publication-plan.json
+          git add data/notion/publication-additions/seedf-eletrot-43.json
+          git add data/notion/publication-additions/seedf-eletrot-43-plan.json
+          git commit -m 'Preparar publicação de 43 questões aptas de Eletrotécnica [skip ci]'
+          git fetch origin main
+          if ! git merge-base --is-ancestor origin/main HEAD; then git rebase origin/main; fi
+          git push origin HEAD:main
