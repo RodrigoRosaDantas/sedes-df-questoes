@@ -29,24 +29,61 @@ jobs:
         with:
           node-version: 22
           package-manager-cache: false
-      - name: Consultar a fonte editorial viva
+
+      - name: Executar preparação com diagnóstico persistente
+        id: prepare
+        continue-on-error: true
+        shell: bash
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        run: node scripts/export-notion-snapshot.mjs
-      - name: Isolar somente os 43 itens aptos de Eletrotécnica
-        run: node scripts/filter-seedf-eletrot-43-snapshot.mjs
-      - name: Gerar e validar o plano restrito
         run: |
-          node scripts/create-publication-plan.mjs
-          node scripts/validate-notion-snapshot.mjs
-          node scripts/validate-publication-plan.mjs
-          node scripts/validate-seedf-eletrot-43-operation.mjs
+          set -o pipefail
+          mkdir -p data/operations
+          LOG=data/operations/prepare-seedf-eletrot-43-diagnostic.log
+          {
+            echo "Operação: SEEDF-2025-ELETROT-A-071-120-20260803"
+            echo "Commit de origem: $GITHUB_SHA"
+            echo "Início: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "== Exportar Banco Mestre =="
+            node scripts/export-notion-snapshot.mjs
+            echo "== Isolar 43 itens =="
+            node scripts/filter-seedf-eletrot-43-snapshot.mjs
+            echo "== Gerar plano =="
+            node scripts/create-publication-plan.mjs
+            echo "== Validar snapshot =="
+            node scripts/validate-notion-snapshot.mjs
+            echo "== Validar plano =="
+            node scripts/validate-publication-plan.mjs
+            echo "== Validar operação restrita =="
+            node scripts/validate-seedf-eletrot-43-operation.mjs
+            echo "Fim com sucesso: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          } 2>&1 | tee "$LOG"
+          status=${PIPESTATUS[0]}
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit "$status"
+
+      - name: Persistir diagnóstico quando houver falha
+        if: steps.prepare.outcome == 'failure'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'sedes-df-publish[bot]'
+          git config user.email 'sedes-df-publish[bot]@users.noreply.github.com'
+          git add data/operations/prepare-seedf-eletrot-43-diagnostic.log
+          git commit -m 'Registrar diagnóstico da preparação de Eletrotécnica [skip ci]'
+          git fetch origin main
+          if ! git merge-base --is-ancestor origin/main HEAD; then git rebase origin/main; fi
+          git push origin HEAD:main
+
       - name: Criar cópia imutável da adição
+        if: steps.prepare.outcome == 'success'
         run: |
           mkdir -p data/notion/publication-additions
           cp data/notion/published.json data/notion/publication-additions/seedf-eletrot-43.json
           cp data/notion/publication-plan.json data/notion/publication-additions/seedf-eletrot-43-plan.json
+
       - name: Versionar somente o pacote validado
+        if: steps.prepare.outcome == 'success'
         shell: bash
         run: |
           set -euo pipefail
@@ -56,6 +93,7 @@ jobs:
           git rm scripts/filter-seedf-eletrot-43-snapshot.mjs
           git rm scripts/validate-seedf-eletrot-43-operation.mjs
           git rm data/operations/prepare-seedf-eletrot-43.json
+          git rm -f data/operations/prepare-seedf-eletrot-43-diagnostic.log || true
           git add data/notion/published.json data/notion/publication-plan.json
           git add data/notion/publication-additions/seedf-eletrot-43.json
           git add data/notion/publication-additions/seedf-eletrot-43-plan.json
@@ -63,3 +101,7 @@ jobs:
           git fetch origin main
           if ! git merge-base --is-ancestor origin/main HEAD; then git rebase origin/main; fi
           git push origin HEAD:main
+
+      - name: Encerrar como falha após registrar diagnóstico
+        if: steps.prepare.outcome == 'failure'
+        run: exit 1
