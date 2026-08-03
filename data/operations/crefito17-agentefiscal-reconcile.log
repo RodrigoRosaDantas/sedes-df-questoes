@@ -1,11 +1,11 @@
-file:///home/runner/work/sedes-df-questoes/sedes-df-questoes/scripts/reconcile-release-crefito17-agentefiscal.mjs:19
+file:///tmp/reconcile-release-crefito17-agentefiscal.mjs:19
 const fail = message => { throw new Error(message); };
                                 ^
 
-Error: PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-028: gabarito definitivo não confirmado.
-    at fail (file:///home/runner/work/sedes-df-questoes/sedes-df-questoes/scripts/reconcile-release-crefito17-agentefiscal.mjs:19:33)
-    at validateEditorialGates (file:///home/runner/work/sedes-df-questoes/sedes-df-questoes/scripts/reconcile-release-crefito17-agentefiscal.mjs:101:69)
-    at file:///home/runner/work/sedes-df-questoes/sedes-df-questoes/scripts/reconcile-release-crefito17-agentefiscal.mjs:149:3
+Error: PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-001: gabarito definitivo não confirmado.
+    at fail (file:///tmp/reconcile-release-crefito17-agentefiscal.mjs:19:33)
+    at validateEditorialGates (file:///tmp/reconcile-release-crefito17-agentefiscal.mjs:101:69)
+    at file:///tmp/reconcile-release-crefito17-agentefiscal.mjs:155:3
     at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
 
 Node.js v22.23.1
