@@ -8,6 +8,7 @@ on:
     paths:
       - .github/workflows/publish-seedf-direito-50.yml
       - data/operations/publish-seedf-dir-50.json
+      - scripts/filter-seedf-dir-50-snapshot.mjs
       - scripts/validate-seedf-dir-50-operation.mjs
 
 permissions:
@@ -46,6 +47,9 @@ jobs:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         run: node scripts/export-notion-snapshot.mjs
 
+      - name: Restringir o pacote ao lote autorizado
+        run: node scripts/filter-seedf-dir-50-snapshot.mjs
+
       - name: Gerar plano explícito de publicação
         run: node scripts/create-publication-plan.mjs
 
@@ -66,6 +70,7 @@ jobs:
           git config user.email 'sedes-df-publish[bot]@users.noreply.github.com'
 
           git rm .github/workflows/publish-seedf-direito-50.yml
+          git rm scripts/filter-seedf-dir-50-snapshot.mjs
           git rm scripts/validate-seedf-dir-50-operation.mjs
           git rm data/operations/publish-seedf-dir-50.json
           git add data/notion/published.json "${PUBLICATION_PLAN_PATH}"
