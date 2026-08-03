@@ -2,9 +2,9 @@ file:///tmp/reconcile-release-crefito17-agentefiscal.mjs:19
 const fail = message => { throw new Error(message); };
                                 ^
 
-Error: PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-001: gabarito definitivo não confirmado.
+Error: PROVA-QDX-CREFITO17-2026-AGENTE-FISCAL-401-046: bloqueio manual ativo.
     at fail (file:///tmp/reconcile-release-crefito17-agentefiscal.mjs:19:33)
-    at validateEditorialGates (file:///tmp/reconcile-release-crefito17-agentefiscal.mjs:101:69)
+    at validateEditorialGates (file:///tmp/reconcile-release-crefito17-agentefiscal.mjs:99:52)
     at file:///tmp/reconcile-release-crefito17-agentefiscal.mjs:155:3
     at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
 
