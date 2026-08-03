@@ -3,5 +3,6 @@
   "authorized": true,
   "expected_public": 57,
   "expected_pending": 63,
-  "requested_at": "2026-08-03T18:40:00-03:00"
+  "requested_at": "2026-08-03T18:53:00-03:00",
+  "diagnostic_mode": true
 }
