@@ -1,0 +1,7 @@
+{
+  "operation_id": "SEEDF-2025-ELETROT-A-071-120-20260803",
+  "action": "retrigger_prepare_workflow",
+  "scope_changed": false,
+  "expected_count": 43,
+  "excluded_original_numbers": [76, 77, 78, 79, 80, 94, 102]
+}
