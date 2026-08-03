@@ -6,6 +6,7 @@ on:
     paths:
       - .github/workflows/reconcile-release-crefito17-agentefiscal.yml
       - scripts/reconcile-release-crefito17-agentefiscal.mjs
+      - data/operations/run-crefito17-agentefiscal-reconcile.json
   workflow_dispatch:
 
 permissions:
@@ -40,6 +41,7 @@ jobs:
           git config user.email 'sedes-df-publish[bot]@users.noreply.github.com'
           git rm .github/workflows/reconcile-release-crefito17-agentefiscal.yml
           git rm scripts/reconcile-release-crefito17-agentefiscal.mjs
+          git rm data/operations/run-crefito17-agentefiscal-reconcile.json
           git commit -m 'Concluir reconciliação do Agente Fiscal CREFITO-17 [skip ci]'
           git fetch origin main
           if ! git merge-base --is-ancestor origin/main HEAD; then git rebase origin/main; fi
