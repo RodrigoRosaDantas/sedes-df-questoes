@@ -1,6 +1,7 @@
 name: Publicar lote SEEDF Direito 71 a 120
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
