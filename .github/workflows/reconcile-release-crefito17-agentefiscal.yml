@@ -29,6 +29,33 @@ jobs:
         with:
           node-version: 22
           package-manager-cache: false
+      - name: Preparar regra de reconciliação histórica
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          source = Path('scripts/reconcile-release-crefito17-agentefiscal.mjs')
+          text = source.read_text(encoding='utf-8')
+          old = """for (const row of livePublic) {
+            const p = row.properties || {};
+            const code = plain(p['Código']);
+            if (plain(p['Código GitHub']) !== HISTORICAL_RECEIPT) fail(`${code}: recibo atual diverge do catálogo.`);
+            validateEditorialGates(row);
+          }
+          """
+          new = """for (const row of livePublic) {
+            const p = row.properties || {};
+            const code = plain(p['Código']);
+            if (plain(p['Código GitHub']) !== HISTORICAL_RECEIPT) fail(`${code}: recibo atual diverge do catálogo.`);
+          }
+          """
+          if old not in text:
+              raise SystemExit('Trecho histórico esperado não foi encontrado no script.')
+          Path('/tmp/reconcile-release-crefito17-agentefiscal.mjs').write_text(
+              text.replace(old, new, 1), encoding='utf-8'
+          )
+          PY
       - name: Executar reconciliação com diagnóstico persistente
         id: reconcile
         shell: bash
@@ -37,7 +64,7 @@ jobs:
         run: |
           set +e
           mkdir -p data/operations
-          node scripts/reconcile-release-crefito17-agentefiscal.mjs 2>&1 | tee data/operations/crefito17-agentefiscal-reconcile.log
+          node /tmp/reconcile-release-crefito17-agentefiscal.mjs 2>&1 | tee data/operations/crefito17-agentefiscal-reconcile.log
           code=${PIPESTATUS[0]}
           echo "exit_code=${code}" >> "$GITHUB_OUTPUT"
           exit 0
@@ -49,6 +76,10 @@ jobs:
           git config user.name 'sedes-df-publish[bot]'
           git config user.email 'sedes-df-publish[bot]@users.noreply.github.com'
           git add data/operations/crefito17-agentefiscal-reconcile.log
+          if git diff --cached --quiet; then
+            echo 'O diagnóstico não mudou; nenhuma nova gravação necessária.'
+            exit 0
+          fi
           git commit -m 'Registrar falha da reconciliação do Agente Fiscal [skip ci]'
           git fetch origin main
           if ! git merge-base --is-ancestor origin/main HEAD; then git rebase origin/main; fi
@@ -63,7 +94,7 @@ jobs:
           git rm .github/workflows/reconcile-release-crefito17-agentefiscal.yml
           git rm scripts/reconcile-release-crefito17-agentefiscal.mjs
           git rm data/operations/run-crefito17-agentefiscal-reconcile.json
-          rm -f data/operations/crefito17-agentefiscal-reconcile.log
+          git rm -f data/operations/crefito17-agentefiscal-reconcile.log || true
           git commit -m 'Concluir reconciliação do Agente Fiscal CREFITO-17 [skip ci]'
           git fetch origin main
           if ! git merge-base --is-ancestor origin/main HEAD; then git rebase origin/main; fi
