@@ -1,0 +1,20 @@
+{
+  "operation_id": "SEEDF-2025-ELETROT-A-071-120-20260803",
+  "authorized": true,
+  "scope": {
+    "code_prefix": "PROVA-QDX-SEEDF-2025-ELETROT-A-",
+    "first_original_number": 71,
+    "last_original_number": 120,
+    "expected_count": 43,
+    "excluded_original_numbers": [76, 77, 78, 79, 80, 94, 102]
+  },
+  "source": "View 23 — Fila oficial de exportação",
+  "rules": [
+    "publicar somente os 43 registros integralmente conferidos e explicitamente liberados",
+    "excluir os itens 76, 77, 78, 79, 80 e 94 por pendência documental",
+    "excluir o item 102 por anulação oficial",
+    "exigir lote idêntico ao operation_id",
+    "isolar registros já publicados ou pertencentes a outros lotes",
+    "preservar integralmente o acervo público existente"
+  ]
+}
