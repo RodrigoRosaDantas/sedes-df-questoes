@@ -28,7 +28,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y poppler-utils imagemagick
-      - name: Baixar fontes e gerar recortes
+      - name: Baixar caderno e gerar recortes
         shell: bash
         run: |
           set -euo pipefail
@@ -37,21 +37,23 @@ jobs:
           TMP_DIR=$(mktemp -d)
           mkdir -p "$SOURCE_DIR" "$IMAGE_DIR"
           curl --fail --location --retry 3 \
-            'https://www.pciconcursos.com.br/provas/29195355/231ef03a961a/orientador_social.pdf' \
+            'https://arquivos.qconcursos.com/prova/arquivo_prova/91150/quadrix-2023-prefeitura-de-alto-paraiso-de-goias-go-orientador-social-prova.pdf' \
             --output "$SOURCE_DIR/orientador-social.pdf"
-          curl --fail --location --retry 3 \
-            'https://www.pciconcursos.com.br/provas/29195355/77902fc9813a/gabarito.pdf' \
-            --output "$SOURCE_DIR/gabarito-preliminar.pdf"
-          pdftoppm -f 2 -l 6 -png -r 160 "$SOURCE_DIR/orientador-social.pdf" "$TMP_DIR/page"
+          test "$(head -c 4 "$SOURCE_DIR/orientador-social.pdf")" = '%PDF'
+          pdfinfo "$SOURCE_DIR/orientador-social.pdf" | grep -q 'Pages:[[:space:]]*11'
+          pdftoppm -f 2 -l 2 -singlefile -png -r 160 "$SOURCE_DIR/orientador-social.pdf" "$TMP_DIR/page-02"
+          pdftoppm -f 4 -l 4 -singlefile -png -r 160 "$SOURCE_DIR/orientador-social.pdf" "$TMP_DIR/page-04"
+          pdftoppm -f 5 -l 5 -singlefile -png -r 160 "$SOURCE_DIR/orientador-social.pdf" "$TMP_DIR/page-05"
+          pdftoppm -f 6 -l 6 -singlefile -png -r 160 "$SOURCE_DIR/orientador-social.pdf" "$TMP_DIR/page-06"
           convert "$TMP_DIR/page-02.png" -crop 442x570+128+140 +repage "$IMAGE_DIR/q006-q008-tirinha.png"
           convert "$TMP_DIR/page-04.png" -crop 537x350+88+820 +repage "$IMAGE_DIR/q017-conversao-placas.png"
           convert "$TMP_DIR/page-04.png" -crop 526x430+706+165 +repage "$IMAGE_DIR/q018-mapa-escala.png"
           convert "$TMP_DIR/page-05.png" -crop 450x345+120+450 +repage "$IMAGE_DIR/q020-piscina.png"
           convert "$TMP_DIR/page-06.png" -crop 492x490+108+745 +repage "$IMAGE_DIR/q025-mapa-capitanias.png"
           test -s "$SOURCE_DIR/orientador-social.pdf"
-          test -s "$SOURCE_DIR/gabarito-preliminar.pdf"
           for image in "$IMAGE_DIR"/*.png; do test -s "$image"; done
-          file "$SOURCE_DIR"/*.pdf "$IMAGE_DIR"/*.png
+          sha256sum "$SOURCE_DIR/orientador-social.pdf" "$IMAGE_DIR"/*.png > "$SOURCE_DIR/SHA256SUMS.txt"
+          file "$SOURCE_DIR/orientador-social.pdf" "$IMAGE_DIR"/*.png
       - name: Versionar anexos no branch
         shell: bash
         run: |
