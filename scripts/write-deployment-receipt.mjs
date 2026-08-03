@@ -3,28 +3,38 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const readJSON = relative => JSON.parse(fs.readFileSync(path.join(root, relative), 'utf8'));
 const fail = message => { throw new Error(message); };
-
-const expectedSha = String(process.env.DEPLOYED_SOURCE_SHA || process.env.GITHUB_SHA || '').trim();
+const expectedSha = String(process.env.DEPLOYED_SOURCE_SHA || '').trim();
 const publicUrl = String(process.env.PUBLIC_DEPLOYMENT_URL || '').replace(/\/+$/, '');
 if (!/^[0-9a-f]{40}$/.test(expectedSha)) fail('Commit público inválido ou ausente.');
 if (!publicUrl.startsWith('https://')) fail('URL pública inválida ou ausente.');
 
-const build = readJSON('dist/data/release/build-info.json');
-const release = readJSON('dist/data/release/release-meta.json');
-const catalog = readJSON('dist/data/release/catalogo.json');
+async function fetchJSON(relative) {
+  const url = `${publicUrl}/${relative}?receipt=${Date.now()}`;
+  const response = await fetch(url, {
+    cache: 'no-store',
+    headers: {'cache-control': 'no-cache, no-store', pragma: 'no-cache'},
+  });
+  if (!response.ok) fail(`${relative}: HTTP ${response.status}.`);
+  return response.json();
+}
+
+const [build, release, catalog] = await Promise.all([
+  fetchJSON('data/release/build-info.json'),
+  fetchJSON('data/release/release-meta.json'),
+  fetchJSON('data/release/catalogo.json'),
+]);
 const questions = Object.keys(catalog.question_index || {}).length;
 const materials = Array.isArray(catalog.materials) ? catalog.materials.length : 0;
 
 if (build.source_sha !== expectedSha || release.source_sha !== expectedSha) {
-  fail(`Pacote validado pertence a outro commit: ${build.source_sha || release.source_sha || 'ausente'}.`);
+  fail(`Site público pertence a outro commit: ${build.source_sha || release.source_sha || 'ausente'}.`);
 }
 if (Number(build.questions) !== questions || Number(release.questions) !== questions) {
-  fail('Contagem de questões diverge entre o pacote validado e o catálogo.');
+  fail('Contagem de questões diverge entre os metadados públicos e o catálogo.');
 }
 if (Number(build.materials) !== materials || Number(release.materials) !== materials) {
-  fail('Contagem de materiais diverge entre o pacote validado e o catálogo.');
+  fail('Contagem de materiais diverge entre os metadados públicos e o catálogo.');
 }
 if (questions !== 2585) fail(`Publicação final com ${questions} questões; esperado 2585.`);
 
@@ -42,6 +52,7 @@ const receipt = {
   verification: {
     static_files: 'success',
     public_browser: 'success',
+    public_metadata_refetched: 'success',
   },
 };
 
