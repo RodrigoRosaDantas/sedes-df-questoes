@@ -49,6 +49,7 @@ if (Number(build.materials) !== materials || Number(release.materials) !== mater
 }
 
 const receiptCandidates = [
+  'data/release/alto-paraiso-orientador-37-publication-receipt.json',
   'data/release/seedf-eletrot-43-publication-receipt.json',
   'data/release/seedf-biomed-50-publication-receipt.json',
   'data/release/seedf-bio-24-publication-receipt.json',
