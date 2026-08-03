@@ -5,7 +5,7 @@ const expectedCodes = Array.from(
   (_, index) => `PROVA-QDX-SEEDF-2025-BIO-A-${String(index + 97).padStart(3, '0')}`,
 );
 
-test('publica somente as 24 questões autorizadas de Biologia', async ({page}) => {
+test('publica somente as 50 questões autorizadas de Direito e depois as 24 questões autorizadas de Biologia', async ({page}) => {
   await page.goto('/#/inicio', {waitUntil: 'domcontentloaded'});
   await expect(page.locator('[data-release-health]')).toBeVisible({timeout: 30000});
 
