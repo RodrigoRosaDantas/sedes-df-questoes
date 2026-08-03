@@ -1,0 +1,7 @@
+{
+  "requested_at": "2026-08-03T01:31:00Z",
+  "source_sha": "781caa3a851133e34c703d4b9b265e48890c6e44",
+  "publication_plan": "SEEDF-2025-DIR-A-071-120-20260802",
+  "expected_new_questions": 50,
+  "purpose": "Trigger the validated GitHub Pages pipeline for the already-versioned publication package."
+}
