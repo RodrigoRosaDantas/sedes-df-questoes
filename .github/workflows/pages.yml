@@ -28,7 +28,7 @@ on:
         type: boolean
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
   actions: write
@@ -126,6 +126,8 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v6
         with:
           node-version: 22
@@ -167,39 +169,52 @@ jobs:
         run: npx playwright test --config=playwright.public.config.js
       - name: Fechar somente os lotes do plano explícito no Notion
         id: traceability
-        if: steps.static_verify.outcome == 'success' && steps.browser_verify.outcome == 'success' && inputs.close_notion == true
+        if: steps.static_verify.outcome == 'success' && steps.browser_verify.outcome == 'success' && (github.event_name == 'push' || inputs.close_notion == true)
         continue-on-error: true
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           RELEASE_COMMIT: ${{ github.sha }}
           PUBLICATION_PLAN_PATH: ${{ env.PUBLICATION_PLAN_PATH }}
         run: node scripts/dist-mark-notion-published.mjs
-      - name: Solicitar registro independente do deploy
+      - name: Registrar recibo público confirmado na main
+        id: receipt
         if: steps.static_verify.outcome == 'success' && steps.browser_verify.outcome == 'success'
+        continue-on-error: true
         env:
-          GH_TOKEN: ${{ github.token }}
-          SOURCE_SHA: ${{ github.sha }}
-          PUBLIC_URL: ${{ steps.deployment.outputs.page_url }}
+          DEPLOYED_SOURCE_SHA: ${{ github.sha }}
+          PUBLIC_DEPLOYMENT_URL: ${{ steps.deployment.outputs.page_url }}
         shell: bash
         run: |
           set -euo pipefail
-          gh workflow run deployment-receipt.yml --ref main \
-            -f source_sha="${SOURCE_SHA}" \
-            -f public_url="${PUBLIC_URL}"
+          node scripts/write-deployment-receipt.mjs
+          git config user.name 'sedes-df-deploy[bot]'
+          git config user.email 'sedes-df-deploy[bot]@users.noreply.github.com'
+          git add data/operations/latest-deployment.json
+          if git diff --cached --quiet; then
+            echo 'O recibo público já está atualizado.'
+            exit 0
+          fi
+          git commit -m 'Registrar deploy público confirmado [skip ci]'
+          git fetch origin main
+          if ! git merge-base --is-ancestor origin/main HEAD; then
+            git rebase origin/main
+          fi
+          git push origin HEAD:main
       - name: Acionar rollback para a última release aprovada
         if: steps.static_verify.outcome == 'failure' || steps.browser_verify.outcome == 'failure'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/rollback-deployment.mjs
       - name: Reprovar publicação inconsistente
-        if: steps.static_verify.outcome == 'failure' || steps.browser_verify.outcome == 'failure' || steps.traceability.outcome == 'failure'
+        if: steps.static_verify.outcome == 'failure' || steps.browser_verify.outcome == 'failure' || steps.traceability.outcome == 'failure' || steps.receipt.outcome == 'failure'
         env:
           STATIC_OUTCOME: ${{ steps.static_verify.outcome }}
           BROWSER_OUTCOME: ${{ steps.browser_verify.outcome }}
           TRACEABILITY_OUTCOME: ${{ steps.traceability.outcome }}
+          RECEIPT_OUTCOME: ${{ steps.receipt.outcome }}
         run: |
-          if [ "${TRACEABILITY_OUTCOME}" = 'failure' ] && [ "${STATIC_OUTCOME}" = 'success' ] && [ "${BROWSER_OUTCOME}" = 'success' ]; then
-            echo "O conteúdo público passou na auditoria e foi preservado; a rastreabilidade idempotente deverá ser concluída no próximo ciclo."
+          if [ "${STATIC_OUTCOME}" = 'success' ] && [ "${BROWSER_OUTCOME}" = 'success' ]; then
+            echo "O conteúdo público passou na auditoria e foi preservado; rastreabilidade ou recibo deverão ser concluídos no próximo ciclo."
           else
             echo "A publicação pública falhou e o rollback foi acionado."
           fi
