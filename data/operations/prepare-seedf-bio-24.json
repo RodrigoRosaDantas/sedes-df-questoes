@@ -1,0 +1,18 @@
+{
+  "operation_id": "SEEDF-2025-BIO-A-097-120-20260802",
+  "authorized": true,
+  "scope": {
+    "code_prefix": "PROVA-QDX-SEEDF-2025-BIO-A-",
+    "first_original_number": 97,
+    "last_original_number": 120,
+    "expected_count": 24
+  },
+  "source": "View 23 — Fila oficial de exportação",
+  "rules": [
+    "considerar a triagem editorial concluída pela rotina anterior",
+    "publicar somente registros explicitamente liberados",
+    "exigir lote idêntico ao operation_id",
+    "isolar registros já publicados ou de outros lotes",
+    "preservar integralmente o acervo público existente"
+  ]
+}
