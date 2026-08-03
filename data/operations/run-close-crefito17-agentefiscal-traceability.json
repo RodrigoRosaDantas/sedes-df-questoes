@@ -1,0 +1,7 @@
+{
+  "operation": "close-crefito17-agentefiscal-traceability",
+  "authorized": true,
+  "expected_records": 62,
+  "release_commit": "3c8d6b161d27c0d4cf04d52288f4bf9f916a9d75",
+  "requested_at": "2026-08-03T19:45:00-03:00"
+}
