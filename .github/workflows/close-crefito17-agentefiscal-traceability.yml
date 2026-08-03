@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - .github/workflows/close-crefito17-agentefiscal-traceability.yml
+      - data/operations/run-close-crefito17-agentefiscal-traceability.json
 
 permissions:
   contents: read
