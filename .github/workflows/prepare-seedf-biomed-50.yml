@@ -1,0 +1,65 @@
+name: Preparar lote SEEDF Biomedicina 71 a 120
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/prepare-seedf-biomed-50.yml
+      - data/operations/prepare-seedf-biomed-50.json
+      - scripts/filter-seedf-biomed-50-snapshot.mjs
+      - scripts/validate-seedf-biomed-50-operation.mjs
+
+permissions:
+  contents: write
+
+concurrency:
+  group: prepare-seedf-biomed-50
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: main
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Consultar a fonte editorial viva
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/export-notion-snapshot.mjs
+      - name: Isolar somente Biomedicina
+        run: node scripts/filter-seedf-biomed-50-snapshot.mjs
+      - name: Gerar e validar plano
+        run: |
+          node scripts/create-publication-plan.mjs
+          node scripts/validate-notion-snapshot.mjs
+          node scripts/validate-publication-plan.mjs
+          node scripts/validate-seedf-biomed-50-operation.mjs
+      - name: Criar cópia imutável da adição
+        run: |
+          mkdir -p data/notion/publication-additions
+          cp data/notion/published.json data/notion/publication-additions/seedf-biomed-50.json
+          cp data/notion/publication-plan.json data/notion/publication-additions/seedf-biomed-50-plan.json
+      - name: Versionar somente o pacote validado
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'sedes-df-publish[bot]'
+          git config user.email 'sedes-df-publish[bot]@users.noreply.github.com'
+          git rm .github/workflows/prepare-seedf-biomed-50.yml
+          git rm scripts/filter-seedf-biomed-50-snapshot.mjs
+          git rm scripts/validate-seedf-biomed-50-operation.mjs
+          git rm data/operations/prepare-seedf-biomed-50.json
+          git add data/notion/published.json data/notion/publication-plan.json
+          git add data/notion/publication-additions/seedf-biomed-50.json
+          git add data/notion/publication-additions/seedf-biomed-50-plan.json
+          git commit -m 'Preparar publicação de 50 questões de Biomedicina da SEEDF [skip ci]'
+          git fetch origin main
+          if ! git merge-base --is-ancestor origin/main HEAD; then git rebase origin/main; fi
+          git push origin HEAD:main
