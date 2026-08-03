@@ -1,14 +1,17 @@
-name: Preparar lote SEEDF Direito 71 a 120
+name: Publicar lote SEEDF Direito 71 a 120
 
 on:
   push:
     branches:
-      - agent/publish-seedf-direito-50
+      - main
     paths:
       - .github/workflows/publish-seedf-direito-50.yml
+      - data/operations/publish-seedf-dir-50.json
+      - scripts/validate-seedf-dir-50-operation.mjs
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: publish-seedf-direito-50
@@ -18,15 +21,15 @@ env:
   PUBLICATION_PLAN_PATH: data/notion/publication-plan.json
 
 jobs:
-  prepare:
+  publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 120
     steps:
-      - name: Baixar branch isolada
+      - name: Baixar main autorizada
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          ref: agent/publish-seedf-direito-50
+          ref: main
 
       - name: Preparar Node.js
         uses: actions/setup-node@v6
@@ -54,6 +57,7 @@ jobs:
           node scripts/validate-seedf-dir-50-operation.mjs
 
       - name: Versionar somente o pacote aprovado
+        id: snapshot
         shell: bash
         run: |
           set -euo pipefail
@@ -65,7 +69,45 @@ jobs:
           git rm data/operations/publish-seedf-dir-50.json
           git add data/notion/published.json "${PUBLICATION_PLAN_PATH}"
 
-          git commit -m 'Preparar publicação de 50 questões de Direito da SEEDF'
-          git push origin HEAD:agent/publish-seedf-direito-50
+          git commit -m 'Preparar publicação de 50 questões de Direito da SEEDF [skip ci]'
+          git fetch origin main
+          if ! git merge-base --is-ancestor origin/main HEAD; then
+            git rebase origin/main
+          fi
+          git push origin HEAD:main
 
-          echo '✓ Snapshot e plano versionados; arquivos temporários removidos da diferença final.'
+          echo "source_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo '✓ Snapshot e plano versionados; arquivos temporários removidos da main.'
+
+      - name: Acionar e acompanhar o deploy aprovado
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_SHA: ${{ steps.snapshot.outputs.source_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          DISPATCHED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          gh workflow run pages.yml --ref main -f source_sha="${SOURCE_SHA}" -f close_notion=true
+
+          RUN_ID=''
+          for attempt in $(seq 1 60); do
+            gh api "repos/${GITHUB_REPOSITORY}/actions/runs?event=workflow_dispatch&branch=main&per_page=50" > /tmp/pages-runs.json
+            RUN_ID=$(jq -r --arg sha "${SOURCE_SHA}" --arg since "${DISPATCHED_AT}" '
+              .workflow_runs[]
+              | select(.head_sha == $sha)
+              | select(.name == "Validar e publicar GitHub Pages")
+              | select(.event == "workflow_dispatch")
+              | select(.created_at >= $since)
+              | .id
+            ' /tmp/pages-runs.json | head -n1)
+            if [ -n "${RUN_ID}" ]; then break; fi
+            sleep 5
+          done
+
+          if [ -z "${RUN_ID}" ]; then
+            echo 'A execução de Pages não foi criada dentro da janela de segurança.'
+            exit 1
+          fi
+
+          gh run watch "${RUN_ID}" --exit-status --interval 10
+          echo "✓ Publicação concluída para ${SOURCE_SHA}."
