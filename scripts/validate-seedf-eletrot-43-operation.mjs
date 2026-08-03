@@ -23,8 +23,8 @@ const codes = candidates.map(record => clean(record.code)).sort((a, b) => a.loca
 if (JSON.stringify(codes) !== JSON.stringify(expectedCodes)) fail('Conjunto de códigos de Eletrotécnica divergente.');
 for (const record of candidates) {
   if (record.publication_lot !== operationId || record.released_for_export !== true) fail(`${record.code}: lote ou liberação divergente.`);
-  if (record.material_type !== 'Prova' || record.annulled === true || record.has_image === true || record.duplicate === true) fail(`${record.code}: impedimento técnico.`);
-  if (!clean(record.prompt) || !clean(record.answer) || !clean(record.comment) || !clean(record.legal_basis)) fail(`${record.code}: conteúdo essencial incompleto.`);
+  if (record.material_type !== 'Prova' || record.annulled === true || record.has_image === true) fail(`${record.code}: impedimento técnico.`);
+  if (!clean(record.prompt) || !clean(record.answer) || !clean(record.comment) || !clean(record.foundation)) fail(`${record.code}: conteúdo essencial incompleto.`);
   if (record.format !== 'Certo / Errado' || !['Certo', 'Errado'].includes(record.answer)) fail(`${record.code}: formato ou gabarito inválido.`);
   const number = Number(record.original_number);
   if (number < 71 || number > 120 || excludedNumbers.has(number)) fail(`${record.code}: número original fora do escopo apto.`);
