@@ -19,6 +19,17 @@ async function fetchJSON(relative) {
   return response.json();
 }
 
+async function fetchOptionalJSON(relative) {
+  const url = `${publicUrl}/${relative}?receipt=${Date.now()}`;
+  const response = await fetch(url, {
+    cache: 'no-store',
+    headers: {'cache-control': 'no-cache, no-store', pragma: 'no-cache'},
+  });
+  if (response.status === 404) return null;
+  if (!response.ok) fail(`${relative}: HTTP ${response.status}.`);
+  return response.json();
+}
+
 const [build, release, catalog] = await Promise.all([
   fetchJSON('data/release/build-info.json'),
   fetchJSON('data/release/release-meta.json'),
@@ -36,10 +47,30 @@ if (Number(build.questions) !== questions || Number(release.questions) !== quest
 if (Number(build.materials) !== materials || Number(release.materials) !== materials) {
   fail('Contagem de materiais diverge entre os metadados públicos e o catálogo.');
 }
-if (questions !== 2585) fail(`Publicação final com ${questions} questões; esperado 2585.`);
+
+const receiptCandidates = [
+  'data/release/seedf-biomed-50-publication-receipt.json',
+  'data/release/seedf-bio-24-publication-receipt.json',
+  'data/release/seedf-dir-50-publication-receipt.json',
+];
+const availableReceipts = [];
+for (const relative of receiptCandidates) {
+  const receipt = await fetchOptionalJSON(relative);
+  if (receipt) availableReceipts.push({relative, receipt});
+}
+const selected = availableReceipts.find(item => Number(item.receipt.final_questions) === questions);
+if (!selected) {
+  const described = availableReceipts.map(item => `${item.relative}=${item.receipt.final_questions}`).join(', ') || 'nenhum';
+  fail(`Nenhum recibo de lote corresponde ao total público ${questions}. Recibos encontrados: ${described}.`);
+}
+const lot = String(selected.receipt.operation_id || '').trim();
+const addedQuestions = Number(selected.receipt.added_questions);
+if (!lot || !Number.isInteger(addedQuestions) || addedQuestions <= 0) {
+  fail(`Recibo do lote público inválido: ${selected.relative}.`);
+}
 
 const receipt = {
-  schema_version: '1.0',
+  schema_version: '1.1',
   confirmed_at: new Date().toISOString(),
   public_url: publicUrl,
   source_sha: expectedSha,
@@ -47,8 +78,9 @@ const receipt = {
   cache_version: build.cache_version,
   questions,
   materials,
-  lot: 'SEEDF-2025-DIR-A-071-120-20260802',
-  added_questions: 50,
+  lot,
+  added_questions: addedQuestions,
+  lot_receipt: selected.relative,
   verification: {
     static_files: 'success',
     public_browser: 'success',
@@ -59,4 +91,4 @@ const receipt = {
 const output = path.join(root, 'data', 'operations', 'latest-deployment.json');
 fs.mkdirSync(path.dirname(output), {recursive: true});
 fs.writeFileSync(output, `${JSON.stringify(receipt, null, 2)}\n`);
-console.log(`✓ Recibo público preparado: ${questions} questões em ${publicUrl}, commit ${expectedSha}.`);
+console.log(`✓ Recibo público preparado: ${questions} questões em ${publicUrl}, lote ${lot}, commit ${expectedSha}.`);
