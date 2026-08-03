@@ -1,9 +1,9 @@
 name: Preparar anexos — Alto Paraíso Orientador Social 2023
 
 on:
-  push:
-    branches:
-      - agent/publish-alto-paraiso-orientador-social-37-20260803
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
     paths:
       - .github/workflows/prepare-alto-paraiso-orientador-assets.yml
 
@@ -16,6 +16,7 @@ concurrency:
 
 jobs:
   prepare-assets:
+    if: github.head_ref == 'agent/publish-alto-paraiso-orientador-social-37-20260803'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
