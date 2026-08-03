@@ -41,6 +41,7 @@ env:
   PLAYWRIGHT_VERSION: 1.61.1
   PUBLICATION_PLAN_PATH: data/notion/publication-plan.json
   VALIDATED_DIST_ARTIFACT: validated-dist-${{ github.sha }}
+  BASE_SNAPSHOT_COMMIT: c060ed9a6d4c46c637a5215b3a2738b28a8d405e
 
 jobs:
   validate:
@@ -69,8 +70,23 @@ jobs:
         run: |
           node scripts/export-editorial-platform-sync.mjs
           node scripts/export-pedagogia-editorial-sync.mjs
-      - name: Gerar e validar aplicação, banco, plano e informações da prova
+      - name: Preservar lote corrente e restaurar snapshot-base
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp data/notion/published.json /tmp/current-publication-snapshot.json
+          cp data/notion/publication-plan.json /tmp/current-publication-plan.json
+          git fetch origin "${BASE_SNAPSHOT_COMMIT}" --depth=1
+          git show "${BASE_SNAPSHOT_COMMIT}:data/notion/published.json" > data/notion/published.json
+          git show "${BASE_SNAPSHOT_COMMIT}:data/notion/publication-plan.json" > data/notion/publication-plan.json
+          echo '✓ Snapshot-base público restaurado apenas no workspace de validação.'
+      - name: Gerar e validar aplicação, banco e base pública
         run: npm run check
+      - name: Restaurar snapshot e plano do lote corrente
+        run: |
+          cp /tmp/current-publication-snapshot.json data/notion/published.json
+          cp /tmp/current-publication-plan.json data/notion/publication-plan.json
+          echo '✓ Lote corrente restaurado para adição e rastreabilidade.'
       - name: Instalar navegador de teste e auditar dependências
         run: |
           AUDIT_DIR=$(mktemp -d)
@@ -88,6 +104,10 @@ jobs:
         run: node scripts/apply-publication-additions.mjs
       - name: Testar as 50 novas questões no navegador
         run: npx playwright test tests/publication-additions.spec.js
+      - name: Acrescentar somente o lote validado de Biologia
+        run: node scripts/apply-seedf-bio-24-addition.mjs
+      - name: Testar as 24 novas questões de Biologia no navegador
+        run: npx playwright test tests/seedf-bio-24-publication.spec.js
       - name: Preservar exatamente o pacote aprovado
         uses: actions/upload-artifact@v7
         with:
