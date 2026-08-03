@@ -1,0 +1,6 @@
+4088ec978c2840db43b725c6b80c18727715c99a601b4cfef3165a1e001a7932  assets/source-files/alto-paraiso-go-2023-orientador-social/orientador-social.pdf
+55a042070a5bc9d6f54eae66bdf4cd06c52f9eb918a55a8d9246fb06dacbf48a  assets/question-images/alto-paraiso-go-2023-orientador-social/q006-q008-tirinha.png
+06c32907bd01aa7e349082e576edc44c7c2013e4f057e265e260e78f163fc661  assets/question-images/alto-paraiso-go-2023-orientador-social/q017-conversao-placas.png
+6573a77160edea1b1064b5a6fd2a673e5c75154769cf8f891cba343d556ca665  assets/question-images/alto-paraiso-go-2023-orientador-social/q018-mapa-escala.png
+1157797b6e0af9e98ea6c458522ae49b2aa28403e5a3eeff750b7e31ae938b1a  assets/question-images/alto-paraiso-go-2023-orientador-social/q020-piscina.png
+8cdeba0b9e01c1a8afe91156634efdecb24b0cc47c311303640395e6d37ccc73  assets/question-images/alto-paraiso-go-2023-orientador-social/q025-mapa-capitanias.png
