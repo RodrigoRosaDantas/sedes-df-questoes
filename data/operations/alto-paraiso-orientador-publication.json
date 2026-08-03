@@ -1,0 +1,10 @@
+{
+  "operation": "QDX-ALTOPARAISO-GO-2023-ORIENTADOR-SOCIAL-202-001-040-20260803",
+  "material": "Orientador Social — Prefeitura de Alto Paraíso de Goiás/GO — Quadrix 2023",
+  "expectedRecords": 40,
+  "publishableRecords": 37,
+  "excludedOriginalNumbers": [9, 12, 19],
+  "imageOriginalNumbers": [6, 7, 8, 17, 18, 20, 25],
+  "authorizedAt": "2026-08-03T14:22:00-03:00",
+  "status": "assets-preparation"
+}
