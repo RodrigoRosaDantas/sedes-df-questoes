@@ -1,0 +1,71 @@
+name: Preparar lote SEEDF Direito 71 a 120
+
+on:
+  push:
+    branches:
+      - agent/publish-seedf-direito-50
+    paths:
+      - .github/workflows/publish-seedf-direito-50.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-seedf-direito-50
+  cancel-in-progress: false
+
+env:
+  PUBLICATION_PLAN_PATH: data/notion/publication-plan.json
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Baixar branch isolada
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: agent/publish-seedf-direito-50
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Preservar snapshot anterior
+        run: cp data/notion/published.json /tmp/published-before.json
+
+      - name: Consultar a fonte editorial viva
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/export-notion-snapshot.mjs
+
+      - name: Gerar plano explícito de publicação
+        run: node scripts/create-publication-plan.mjs
+
+      - name: Validar integridade e escopo autorizado
+        env:
+          SNAPSHOT_BEFORE: /tmp/published-before.json
+        run: |
+          node scripts/validate-notion-snapshot.mjs
+          node scripts/validate-publication-plan.mjs
+          node scripts/validate-seedf-dir-50-operation.mjs
+
+      - name: Versionar somente o pacote aprovado
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'sedes-df-publish[bot]'
+          git config user.email 'sedes-df-publish[bot]@users.noreply.github.com'
+
+          git rm .github/workflows/publish-seedf-direito-50.yml
+          git rm scripts/validate-seedf-dir-50-operation.mjs
+          git rm data/operations/publish-seedf-dir-50.json
+          git add data/notion/published.json "${PUBLICATION_PLAN_PATH}"
+
+          git commit -m 'Preparar publicação de 50 questões de Direito da SEEDF'
+          git push origin HEAD:agent/publish-seedf-direito-50
+
+          echo '✓ Snapshot e plano versionados; arquivos temporários removidos da diferença final.'
