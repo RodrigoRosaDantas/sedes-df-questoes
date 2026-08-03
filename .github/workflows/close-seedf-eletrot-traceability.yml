@@ -1,0 +1,51 @@
+name: Fechar rastreabilidade SEEDF Eletrotécnica — 43 itens
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/close-seedf-eletrot-traceability.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: close-seedf-eletrot-traceability
+  cancel-in-progress: false
+
+jobs:
+  close:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Restaurar a base pública estável
+        run: |
+          git fetch origin c060ed9a6d4c46c637a5215b3a2738b28a8d405e --depth=1
+          git show c060ed9a6d4c46c637a5215b3a2738b28a8d405e:data/notion/published.json > data/notion/published.json
+          git show c060ed9a6d4c46c637a5215b3a2738b28a8d405e:data/notion/publication-plan.json > data/notion/publication-plan.json
+
+      - name: Reconstruir o catálogo público confirmado
+        run: |
+          npm run build
+          node scripts/apply-publication-additions.mjs
+          node scripts/apply-seedf-bio-24-addition.mjs
+          node scripts/apply-seedf-biomed-50-addition.mjs
+          node scripts/apply-seedf-eletrot-43-addition.mjs
+
+      - name: Confirmar total e fechar somente Eletrotécnica no Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          RELEASE_COMMIT: 022e966cc7587231fe25131a48dd1cf20798f4c3
+          NOTION_SNAPSHOT_PATH: data/notion/publication-additions/seedf-eletrot-43.json
+          PUBLICATION_PLAN_PATH: data/notion/publication-additions/seedf-eletrot-43-plan.json
+        run: |
+          node -e "const c=require('./data/release/catalogo.json'); if(Number(c.summary?.questoes)!==2702) throw new Error('Catálogo reconstruído não contém 2702 questões.');"
+          node scripts/mark-notion-published.mjs
