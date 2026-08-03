@@ -28,7 +28,7 @@ on:
         type: boolean
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
   actions: write
@@ -119,6 +119,11 @@ jobs:
   deploy:
     if: github.event_name != 'pull_request'
     needs: validate
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+      actions: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
