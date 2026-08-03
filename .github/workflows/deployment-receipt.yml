@@ -1,0 +1,60 @@
+name: Registrar confirmação do deploy público
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: Commit efetivamente publicado e aprovado
+        required: true
+        type: string
+      public_url:
+        description: Endereço público aprovado pelo workflow de Pages
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deployment-receipt
+  cancel-in-progress: false
+
+jobs:
+  receipt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Baixar a main vigente
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Preparar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Reconfirmar o conteúdo público e gerar recibo
+        env:
+          DEPLOYED_SOURCE_SHA: ${{ inputs.source_sha }}
+          PUBLIC_DEPLOYMENT_URL: ${{ inputs.public_url }}
+        run: |
+          node scripts/verify-deployment.mjs "${PUBLIC_DEPLOYMENT_URL}" "${DEPLOYED_SOURCE_SHA}"
+          node scripts/write-deployment-receipt.mjs
+      - name: Versionar somente o recibo confirmado
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'sedes-df-deploy[bot]'
+          git config user.email 'sedes-df-deploy[bot]@users.noreply.github.com'
+          git add data/operations/latest-deployment.json
+          if git diff --cached --quiet; then
+            echo 'O recibo público já está atualizado.'
+            exit 0
+          fi
+          git commit -m 'Registrar deploy público confirmado [skip ci]'
+          git fetch origin main
+          if ! git merge-base --is-ancestor origin/main HEAD; then
+            git rebase origin/main
+          fi
+          git push origin HEAD:main

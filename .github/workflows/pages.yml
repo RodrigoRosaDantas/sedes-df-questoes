@@ -12,6 +12,7 @@ on:
       - 'scripts/assemble-editorial-operation.mjs'
       - 'data/editorial/**'
       - 'data/operations/editorial-completion-receipt.json'
+      - 'data/operations/latest-deployment.json'
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -153,6 +154,18 @@ jobs:
           RELEASE_COMMIT: ${{ github.sha }}
           PUBLICATION_PLAN_PATH: ${{ env.PUBLICATION_PLAN_PATH }}
         run: node scripts/dist-mark-notion-published.mjs
+      - name: Solicitar registro independente do deploy
+        if: steps.static_verify.outcome == 'success' && steps.browser_verify.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_SHA: ${{ github.sha }}
+          PUBLIC_URL: ${{ steps.deployment.outputs.page_url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run deployment-receipt.yml --ref main \
+            -f source_sha="${SOURCE_SHA}" \
+            -f public_url="${PUBLIC_URL}"
       - name: Acionar rollback para a última release aprovada
         if: steps.static_verify.outcome == 'failure' || steps.browser_verify.outcome == 'failure'
         env:
