@@ -2,8 +2,8 @@
   "operation_id": "SEEDF-2025-ELETROT-A-071-120-20260803",
   "authorized": true,
   "retry": {
-    "requested_at": "2026-08-03T17:00:00-03:00",
-    "reason": "O primeiro merge integrou o pacote de preparação, mas não gerou o snapshot imutável nem o commit automático esperado; reacionamento rastreável sem mudança de escopo."
+    "requested_at": "2026-08-03T14:24:00-03:00",
+    "reason": "Os itens 110 a 120 receberam Página do PDF = 10 após conferência literal do caderno; novo disparo para validar o lote completo de 43 questões."
   },
   "scope": {
     "code_prefix": "PROVA-QDX-SEEDF-2025-ELETROT-A-",
