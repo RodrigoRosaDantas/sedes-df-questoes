@@ -56,14 +56,8 @@ jobs:
           from pathlib import Path
           path = Path('.github/workflows/pages.yml')
           text = path.read_text()
-          needle = """      - name: Testar as 43 novas questões de Eletrotécnica no navegador
-        run: npx playwright test tests/seedf-eletrot-43-publication.spec.js
-"""
-          addition = needle + """      - name: Acrescentar somente as 37 questões válidas de Orientador Social
-        run: node scripts/apply-alto-paraiso-orientador-37-addition.mjs
-      - name: Testar as 37 questões e os sete recursos visuais de Orientador Social
-        run: npx playwright test tests/alto-paraiso-orientador-37-publication.spec.js
-"""
+          needle = "      - name: Testar as 43 novas questões de Eletrotécnica no navegador\n        run: npx playwright test tests/seedf-eletrot-43-publication.spec.js\n"
+          addition = needle + "      - name: Acrescentar somente as 37 questões válidas de Orientador Social\n        run: node scripts/apply-alto-paraiso-orientador-37-addition.mjs\n      - name: Testar as 37 questões e os sete recursos visuais de Orientador Social\n        run: npx playwright test tests/alto-paraiso-orientador-37-publication.spec.js\n"
           if 'apply-alto-paraiso-orientador-37-addition.mjs' not in text:
               if needle not in text:
                   raise SystemExit('Ponto de inserção do pipeline não encontrado.')
