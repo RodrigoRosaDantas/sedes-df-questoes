@@ -1,0 +1,64 @@
+name: Preparar anexos — Alto Paraíso Orientador Social 2023
+
+on:
+  push:
+    branches:
+      - agent/publish-alto-paraiso-orientador-social-37-20260803
+    paths:
+      - .github/workflows/prepare-alto-paraiso-orientador-assets.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: prepare-alto-paraiso-orientador-assets
+  cancel-in-progress: false
+
+jobs:
+  prepare-assets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: agent/publish-alto-paraiso-orientador-social-37-20260803
+          fetch-depth: 0
+      - name: Instalar ferramentas
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils imagemagick
+      - name: Baixar fontes e gerar recortes
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE_DIR=assets/source-files/alto-paraiso-go-2023-orientador-social
+          IMAGE_DIR=assets/question-images/alto-paraiso-go-2023-orientador-social
+          TMP_DIR=$(mktemp -d)
+          mkdir -p "$SOURCE_DIR" "$IMAGE_DIR"
+          curl --fail --location --retry 3 \
+            'https://www.pciconcursos.com.br/provas/29195355/231ef03a961a/orientador_social.pdf' \
+            --output "$SOURCE_DIR/orientador-social.pdf"
+          curl --fail --location --retry 3 \
+            'https://www.pciconcursos.com.br/provas/29195355/77902fc9813a/gabarito.pdf' \
+            --output "$SOURCE_DIR/gabarito-preliminar.pdf"
+          pdftoppm -f 2 -l 6 -png -r 160 "$SOURCE_DIR/orientador-social.pdf" "$TMP_DIR/page"
+          convert "$TMP_DIR/page-02.png" -crop 442x570+128+140 +repage "$IMAGE_DIR/q006-q008-tirinha.png"
+          convert "$TMP_DIR/page-04.png" -crop 537x350+88+820 +repage "$IMAGE_DIR/q017-conversao-placas.png"
+          convert "$TMP_DIR/page-04.png" -crop 526x430+706+165 +repage "$IMAGE_DIR/q018-mapa-escala.png"
+          convert "$TMP_DIR/page-05.png" -crop 450x345+120+450 +repage "$IMAGE_DIR/q020-piscina.png"
+          convert "$TMP_DIR/page-06.png" -crop 492x490+108+745 +repage "$IMAGE_DIR/q025-mapa-capitanias.png"
+          test -s "$SOURCE_DIR/orientador-social.pdf"
+          test -s "$SOURCE_DIR/gabarito-preliminar.pdf"
+          for image in "$IMAGE_DIR"/*.png; do test -s "$image"; done
+          file "$SOURCE_DIR"/*.pdf "$IMAGE_DIR"/*.png
+      - name: Versionar anexos no branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'sedes-df-publish[bot]'
+          git config user.email 'sedes-df-publish[bot]@users.noreply.github.com'
+          git rm .github/workflows/prepare-alto-paraiso-orientador-assets.yml
+          git add assets/source-files/alto-paraiso-go-2023-orientador-social
+          git add assets/question-images/alto-paraiso-go-2023-orientador-social
+          git commit -m 'Adicionar fontes e imagens da prova de Orientador Social [skip ci]'
+          git push origin HEAD:agent/publish-alto-paraiso-orientador-social-37-20260803
