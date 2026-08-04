@@ -21,15 +21,15 @@ const candidates = scoped.filter(record => !clean(record.github_id)
 
 const expectedNewNumbers = Array.from({length: 70}, (_, index) => index + 1);
 const expectedNewCodes = expectedNewNumbers.map(number => `${prefix}${String(number).padStart(3, '0')}`);
-const expectedHistoricalNumbers = Array.from({length: 30}, (_, index) => index + 71);
+const expectedHistoricalNumbers = Array.from({length: 50}, (_, index) => index + 71);
 const expectedHistoricalCodes = expectedHistoricalNumbers.map(number => `${prefix}${String(number).padStart(3, '0')}`);
 
 const historicalCodes = historical.map(record => clean(record.code)).sort((left, right) => left.localeCompare(right, 'pt-BR'));
 if (JSON.stringify(historicalCodes) !== JSON.stringify(expectedHistoricalCodes)) {
-  fail(`Histórico divergente. Esperados os 30 códigos 071–100; encontrados ${historicalCodes.length}.`);
+  fail(`Histórico divergente. Esperados os 50 códigos 071–120; encontrados ${historicalCodes.length}.`);
 }
 if (historical.some(record => record.released_for_export === true || clean(record.publication_lot))) {
-  fail('Os itens históricos 071–100 não podem permanecer liberados ou vinculados ao lote novo.');
+  fail('Os itens históricos 071–120 não podem permanecer liberados ou vinculados ao lote novo.');
 }
 if (candidates.length !== 70) fail(`Esperadas 70 questões liberadas; encontradas ${candidates.length}.`);
 
@@ -59,8 +59,8 @@ snapshot.totals = {
 };
 snapshot.source = {
   ...snapshot.source,
-  publication_rule: `${clean(snapshot.source?.publication_rule)}; operação restrita aos 70 itens novos do lote ${operationId}, com preservação dos 30 itens históricos 071–100`,
+  publication_rule: `${clean(snapshot.source?.publication_rule)}; operação restrita aos 70 itens novos do lote ${operationId}, com preservação dos 50 itens históricos 071–120`,
 };
 snapshot.generated_at = new Date().toISOString();
 fs.writeFileSync(file, `${JSON.stringify(snapshot, null, 2)}\n`);
-console.log(`✓ Snapshot restrito: 70 questões novas de Contador, 30 históricas preservadas e ${unrelated.length} registro(s) pendente(s) de outros lotes excluído(s) somente deste pacote.`);
+console.log(`✓ Snapshot restrito: 70 questões novas de Contador, 50 históricas preservadas e ${unrelated.length} registro(s) pendente(s) de outros lotes excluído(s) somente deste pacote.`);
