@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - .github/workflows/sync-contador-070-correction.yml
+      - data/operations/sync-contador-070-correction.json
 
 permissions:
   actions: write
