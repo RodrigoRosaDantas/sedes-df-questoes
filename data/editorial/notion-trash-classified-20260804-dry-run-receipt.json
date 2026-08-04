@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "NOTION-TRASH-CLASSIFIED-20260804",
+  "mode": "dry-run",
+  "status": "blocked",
+  "created_at": "2026-08-04T23:21:18.145Z",
+  "source_sha": "619847f4bff4ef66e2fa5f2e39a51f2b27f67466",
+  "classification_counts": {
+    "all_active": 5034,
+    "pending_blockers": 1627,
+    "traceability_incomplete": 415,
+    "excess_historical": 1141,
+    "union_targets": 3183,
+    "public_snapshot": 1776,
+    "editorial_candidates": 75,
+    "target_public_overlap": 0,
+    "target_candidate_overlap": 0
+  },
+  "expected": {
+    "expected": {
+      "pending_blockers": 1627,
+      "traceability_incomplete": 415,
+      "excess_historical": 46,
+      "union_targets": 2088,
+      "public_snapshot": 2871,
+      "editorial_candidates": 75
+    },
+    "matches": {
+      "pending_blockers": true,
+      "traceability_incomplete": true,
+      "excess_historical": false,
+      "union_targets": false,
+      "public_snapshot": false,
+      "editorial_candidates": true
+    },
+    "all_match": false
+  },
+  "safety": {
+    "expected_counts_match": false,
+    "zero_public_snapshot_overlap": true,
+    "zero_editorial_candidate_overlap": true,
+    "approved_for_execution": false
+  },
+  "overlaps": {
+    "public_snapshot": [],
+    "editorial_candidates": []
+  },
+  "targets_path": "data/editorial/notion-trash-classified-20260804-targets.json",
+  "targets_sha256": "acdb64c72b7bacc366b9ac82652d6385b14d75b3cf7495733e61f10267d9fad6"
+}
