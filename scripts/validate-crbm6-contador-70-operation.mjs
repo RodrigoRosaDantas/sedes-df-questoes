@@ -13,6 +13,8 @@ const operationId = 'CRBM6-2026-CONTADOR-402-001-070-20260803';
 const prefix = 'PROVA-QDX-CRBM6-2026-CONTADOR-402-';
 const expectedNumbers = Array.from({length: 70}, (_, index) => index + 1);
 const expectedCodes = expectedNumbers.map(number => `${prefix}${String(number).padStart(3, '0')}`);
+const expectedHistoricalNumbers = Array.from({length: 50}, (_, index) => index + 71);
+const expectedHistoricalCodes = expectedHistoricalNumbers.map(number => `${prefix}${String(number).padStart(3, '0')}`);
 
 if (marker.operation_id !== operationId || marker.authorized !== true) fail('Marcador da operação inválido.');
 if (marker.scope?.expected_new_count !== 70 || marker.scope?.first_original_number !== 1 || marker.scope?.last_original_number !== 70) {
@@ -21,11 +23,13 @@ if (marker.scope?.expected_new_count !== 70 || marker.scope?.first_original_numb
 
 const candidates = (snapshot.records || []).filter(record => clean(record.code).startsWith(prefix) && !clean(record.github_id));
 const historical = (snapshot.records || []).filter(record => clean(record.code).startsWith(prefix) && clean(record.github_id));
-if (historical.length !== 0) fail(`Esperados zero registros históricos; encontrados ${historical.length}.`);
 if (candidates.length !== 70) fail(`Esperados 70 registros novos; encontrados ${candidates.length}.`);
+if (historical.length !== 50) fail(`Esperados 50 registros históricos; encontrados ${historical.length}.`);
 
-const codes = candidates.map(record => clean(record.code)).sort((a, b) => a.localeCompare(b, 'pt-BR'));
-if (JSON.stringify(codes) !== JSON.stringify(expectedCodes)) fail('Conjunto de códigos de Contador divergente.');
+const codes = candidates.map(record => clean(record.code)).sort((left, right) => left.localeCompare(right, 'pt-BR'));
+if (JSON.stringify(codes) !== JSON.stringify(expectedCodes)) fail('Conjunto de códigos novos de Contador divergente.');
+const historicalCodes = historical.map(record => clean(record.code)).sort((left, right) => left.localeCompare(right, 'pt-BR'));
+if (JSON.stringify(historicalCodes) !== JSON.stringify(expectedHistoricalCodes)) fail('Conjunto histórico de Contador deve corresponder exatamente aos códigos 071–120.');
 
 for (const record of candidates) {
   if (clean(record.publication_lot) !== operationId || record.released_for_export !== true) fail(`${record.code}: lote ou liberação divergente.`);
@@ -41,9 +45,15 @@ for (const record of candidates) {
   if (!expectedNumbers.includes(number)) fail(`${record.code}: número original fora do intervalo 1–70.`);
 }
 
-if (plan.total_records !== 70 || !Array.isArray(plan.lots) || plan.lots.length !== 1) fail('Plano deve conter um lote e 70 registros.');
+for (const record of historical) {
+  if (!clean(record.github_id)) fail(`${record.code}: recibo GitHub histórico ausente.`);
+  if (record.released_for_export === true || clean(record.publication_lot)) fail(`${record.code}: item histórico ainda liberado ou vinculado ao lote novo.`);
+  if (!expectedHistoricalNumbers.includes(Number(record.original_number))) fail(`${record.code}: número histórico fora do intervalo 71–120.`);
+}
+
+if (plan.total_records !== 70 || !Array.isArray(plan.lots) || plan.lots.length !== 1) fail('Plano deve conter um lote e 70 registros novos.');
 const [lot] = plan.lots;
 if (lot.lot !== operationId || lot.expected_count !== 70 || JSON.stringify(lot.codes) !== JSON.stringify(expectedCodes)) {
   fail('Plano divergente do lote autorizado de Contador.');
 }
-console.log('✓ Operação restrita validada: 70 questões inéditas de Contador, sequência 1–70 e gates editoriais completos.');
+console.log('✓ Operação restrita validada: 70 questões novas de Contador, 50 históricas preservadas, sequência 001–070 e gates editoriais completos.');

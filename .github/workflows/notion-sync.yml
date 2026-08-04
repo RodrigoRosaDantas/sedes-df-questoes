@@ -16,6 +16,9 @@ concurrency:
 env:
   PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes
   PUBLICATION_PLAN_PATH: data/notion/publication-plan.json
+  CONTADOR_MARKER_PATH: data/operations/prepare-crbm6-contador-70.json
+  CONTADOR_SNAPSHOT_PATH: data/notion/publication-additions/crbm6-contador-70.json
+  CONTADOR_PLAN_PATH: data/notion/publication-additions/crbm6-contador-70-plan.json
 
 jobs:
   sync:
@@ -44,6 +47,20 @@ jobs:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         run: node scripts/export-notion-snapshot.mjs
 
+      - name: Isolar somente a operação autorizada de Contador
+        id: contador_operation
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f "${CONTADOR_MARKER_PATH}" ]; then
+            node scripts/filter-crbm6-contador-70-snapshot.mjs
+            echo 'active=true' >> "$GITHUB_OUTPUT"
+            echo '✓ Operação CRBM6 detectada; o snapshot foi limitado às questões 001–070.'
+          else
+            echo 'active=false' >> "$GITHUB_OUTPUT"
+            echo 'Nenhuma operação especial de Contador está ativa.'
+          fi
+
       - name: Gerar plano explícito de lotes, contagens e códigos
         run: node scripts/create-publication-plan.mjs
 
@@ -52,13 +69,38 @@ jobs:
           node scripts/validate-notion-snapshot.mjs
           node scripts/validate-publication-plan.mjs
 
+      - name: Validar e preservar o pacote imutável de Contador
+        if: steps.contador_operation.outputs.active == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/validate-crbm6-contador-70-operation.mjs
+          mkdir -p data/notion/publication-additions
+          cp data/notion/published.json "${CONTADOR_SNAPSHOT_PATH}"
+          cp "${PUBLICATION_PLAN_PATH}" "${CONTADOR_PLAN_PATH}"
+          cmp --silent data/notion/published.json "${CONTADOR_SNAPSHOT_PATH}"
+          cmp --silent "${PUBLICATION_PLAN_PATH}" "${CONTADOR_PLAN_PATH}"
+          echo '✓ Pacote imutável de Contador preservado sem divergência de bytes.'
+
       - name: Versionar snapshot e plano no branch principal
         id: publish_snapshot
+        env:
+          CONTADOR_ACTIVE: ${{ steps.contador_operation.outputs.active }}
         shell: bash
         run: |
           set -euo pipefail
           CHANGED=false
           git add data/notion/published.json "${PUBLICATION_PLAN_PATH}"
+
+          if [ "${CONTADOR_ACTIVE}" = 'true' ]; then
+            git add "${CONTADOR_SNAPSHOT_PATH}" "${CONTADOR_PLAN_PATH}"
+            git rm --ignore-unmatch .github/workflows/prepare-crbm6-contador-70.yml
+            git rm --ignore-unmatch scripts/filter-crbm6-contador-70-snapshot.mjs
+            git rm --ignore-unmatch scripts/validate-crbm6-contador-70-operation.mjs
+            git rm --ignore-unmatch "${CONTADOR_MARKER_PATH}"
+            git rm --ignore-unmatch data/operations/crbm6-contador-70-prepare.log
+          fi
+
           if git diff --cached --quiet; then
             echo 'Nenhuma mudança semântica no Banco Mestre ou no plano de publicação.'
           else

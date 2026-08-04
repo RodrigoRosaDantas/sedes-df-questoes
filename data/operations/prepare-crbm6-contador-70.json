@@ -1,9 +1,9 @@
 {
   "operation_id": "CRBM6-2026-CONTADOR-402-001-070-20260803",
   "authorized": true,
-  "requested_at": "2026-08-03T21:44:00-03:00",
-  "attempt": 3,
-  "trigger_reason": "Disparo direto na main após validação integral do workflow corrigido",
+  "requested_at": "2026-08-04T11:22:00-03:00",
+  "attempt": 4,
+  "trigger_reason": "Orquestração pelo Pages e sincronização oficial do Banco Mestre",
   "scope": {
     "material": "Contador — CRBM-6 — Quadrix 2026",
     "code_prefix": "PROVA-QDX-CRBM6-2026-CONTADOR-402-",
