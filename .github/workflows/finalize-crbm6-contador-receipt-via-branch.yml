@@ -165,10 +165,8 @@ jobs:
           console.log(`✓ Comprovante produzido após releitura direta: ${verified}/70.`);
           NODE
 
-      - name: Enviar comprovante e limpeza para branch automática
+      - name: Enviar somente o comprovante para branch automática
         shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           BRANCH="automation/crbm6-contador-traceability-${GITHUB_RUN_ID}"
@@ -177,15 +175,6 @@ jobs:
           git switch -c "${BRANCH}"
           test -s "${TRACEABILITY_RECEIPT_PATH}"
           git add "${TRACEABILITY_RECEIPT_PATH}"
-          for workflow in \
-            .github/workflows/finalize-crbm6-contador-traceability.yml \
-            .github/workflows/reconcile-crbm6-contador-traceability.yml \
-            .github/workflows/finalize-crbm6-contador-receipt-via-branch.yml
-          do
-            if [ -f "${workflow}" ]; then
-              git rm "${workflow}"
-            fi
-          done
-          git commit -m 'Registrar rastreabilidade 70/70 de Contador e remover temporários [skip ci]'
+          git commit -m 'Registrar rastreabilidade 70/70 de Contador [skip ci]'
           git push origin "HEAD:${BRANCH}"
           echo "✓ Branch automática criada: ${BRANCH}"
