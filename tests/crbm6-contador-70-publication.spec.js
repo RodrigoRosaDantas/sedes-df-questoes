@@ -8,7 +8,7 @@ const expectedCodes = plan?.lots?.[0]?.codes || [];
 const prefix = 'PROVA-QDX-CRBM6-2026-CONTADOR-402-';
 const historicalCodes = Array.from({length: 30}, (_, index) => `${prefix}${String(index + 71).padStart(3, '0')}`);
 
-test('preserva os 30 itens históricos e publica somente as 70 questões autorizadas de Contador', async ({page}) => {
+test('publica somente as 50 questões autorizadas de Direito e, após os lotes cumulativos, preserva 30 e acrescenta 70 questões de Contador', async ({page}) => {
   if (packageAvailable) {
     expect(plan.total_records).toBe(70);
     expect(plan.lots).toHaveLength(1);
