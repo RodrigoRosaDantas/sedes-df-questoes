@@ -1,8 +1,8 @@
 {
   "schema_version": "1.1",
-  "confirmed_at": "2026-08-04T17:45:59.260Z",
+  "confirmed_at": "2026-08-04T17:57:52.800Z",
   "public_url": "https://rodrigorosadantas.github.io/sedes-df-questoes",
-  "source_sha": "db055b03ba57dc73e565918dc4c4715e7e5da2e9",
+  "source_sha": "c54279058b18d34a46ca58eb005756ad960d943d",
   "app_version": "2.13.0",
   "cache_version": "sedes-questoes-v2-13-0",
   "questions": 2871,
