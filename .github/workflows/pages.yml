@@ -6,8 +6,15 @@ on:
     paths-ignore:
       - 'data/notion/published.json'
       - 'data/notion/publication-plan.json'
+      - 'data/notion/publication-additions/crbm6-contador-70.json'
+      - 'data/notion/publication-additions/crbm6-contador-70-plan.json'
+      - 'data/operations/prepare-crbm6-contador-70.json'
+      - 'data/operations/crbm6-contador-70-prepare.log'
       - '.github/workflows/pages.yml'
+      - '.github/workflows/prepare-crbm6-contador-70.yml'
       - '.github/workflows/editorial-completion-2026-08-01.yml'
+      - 'scripts/filter-crbm6-contador-70-snapshot.mjs'
+      - 'scripts/validate-crbm6-contador-70-operation.mjs'
       - 'scripts/apply-editorial-completion.mjs'
       - 'scripts/assemble-editorial-operation.mjs'
       - 'data/editorial/**'
@@ -44,7 +51,30 @@ env:
   BASE_SNAPSHOT_COMMIT: c060ed9a6d4c46c637a5215b3a2738b28a8d405e
 
 jobs:
+  route_contador:
+    runs-on: ubuntu-latest
+    outputs:
+      routed: ${{ steps.route.outputs.routed }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Encaminhar a preparação de Contador ao workflow oficial do Notion
+        id: route
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_EVENT_NAME}" = 'push' ] && [ -f data/operations/prepare-crbm6-contador-70.json ]; then
+            gh workflow run notion-sync.yml --ref main
+            echo 'routed=true' >> "$GITHUB_OUTPUT"
+            echo '✓ Operação de Contador encaminhada ao sync oficial; este ciclo não publicará conteúdo.'
+          else
+            echo 'routed=false' >> "$GITHUB_OUTPUT"
+          fi
+
   validate:
+    needs: route_contador
+    if: needs.route_contador.outputs.routed != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -124,6 +154,18 @@ jobs:
         run: node scripts/apply-crefito17-agentefiscal-62-addition.mjs
       - name: Testar as 62 novas questões do Agente Fiscal
         run: npx playwright test tests/crefito17-agentefiscal-62-publication.spec.js
+      - name: Acrescentar somente as 70 questões inéditas de Contador
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f data/notion/publication-additions/crbm6-contador-70.json ] \
+            && [ -f data/notion/publication-additions/crbm6-contador-70-plan.json ]; then
+            node scripts/apply-crbm6-contador-70-addition.mjs
+          else
+            echo 'Pacote imutável de Contador ainda não versionado; base de 2801 questões preservada.'
+          fi
+      - name: Testar a preservação e a publicação de Contador
+        run: npx playwright test tests/crbm6-contador-70-publication.spec.js
       - name: Preservar exatamente o pacote aprovado
         uses: actions/upload-artifact@v7
         with:
