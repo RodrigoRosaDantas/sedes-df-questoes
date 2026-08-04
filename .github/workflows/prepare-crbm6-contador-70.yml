@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - agent/notion-trash-classified-20260804
     paths:
       - data/editorial/notion-trash-classified-20260804-trigger.json
 
@@ -11,7 +12,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: notion-trash-classified-20260804
+  group: notion-trash-classified-20260804-${{ github.ref_name }}
   cancel-in-progress: false
 
 jobs:
@@ -19,10 +20,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - name: Baixar branch principal
+      - name: Baixar branch operacional
         uses: actions/checkout@v6
         with:
-          ref: main
+          ref: ${{ github.ref_name }}
           fetch-depth: 0
 
       - name: Preparar Node.js
@@ -31,12 +32,18 @@ jobs:
           node-version: 22
           package-manager-cache: false
 
-      - name: Validar script e gatilho
+      - name: Validar scripts e gatilho
         run: |
           set -euo pipefail
+          node --check data/editorial/reconcile-public-snapshot-notion-ids.mjs
           node --check data/editorial/notion-trash-classified-records.mjs
           jq -e '.operation_id == "NOTION-TRASH-CLASSIFIED-20260804" and (.mode == "dry-run" or .mode == "execute")' \
             data/editorial/notion-trash-classified-20260804-trigger.json >/dev/null
+
+      - name: Reconciliar identidades públicas somente no workspace
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node data/editorial/reconcile-public-snapshot-notion-ids.mjs
 
       - name: Executar classificação ou envio à lixeira
         id: operation
@@ -45,26 +52,27 @@ jobs:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         run: node data/editorial/notion-trash-classified-records.mjs
 
-      - name: Persistir alvos e recibos no branch principal
+      - name: Persistir alvos e recibos no branch operacional
         if: always()
         shell: bash
         run: |
           set -euo pipefail
+          git restore data/notion/published.json
           git config user.name 'sedes-df-notion-cleanup[bot]'
           git config user.email 'sedes-df-notion-cleanup[bot]@users.noreply.github.com'
           git add data/editorial/notion-trash-classified-20260804-*.json
           if ! git diff --cached --quiet; then
             MODE=$(jq -r '.mode' data/editorial/notion-trash-classified-20260804-trigger.json)
             git commit -m "Registrar ${MODE} da limpeza classificada do Notion [skip ci]"
-            git fetch origin main
-            if ! git merge-base --is-ancestor origin/main HEAD; then
-              git rebase origin/main
+            git fetch origin "${GITHUB_REF_NAME}"
+            if ! git merge-base --is-ancestor "origin/${GITHUB_REF_NAME}" HEAD; then
+              git rebase "origin/${GITHUB_REF_NAME}"
             fi
-            git push origin HEAD:main
+            git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
 
       - name: Reprovar operação não concluída
         if: steps.operation.outcome != 'success'
         run: |
-          echo 'A operação foi interrompida. Consulte o recibo persistido no branch principal.'
+          echo 'A operação foi interrompida. Consulte o recibo persistido no branch operacional.'
           exit 1
