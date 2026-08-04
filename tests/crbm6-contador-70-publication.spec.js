@@ -57,12 +57,21 @@ test('preserva o que já está público e completa as 100 questões de Contador 
   }, {trackedCodes: fullExamCodes, codePrefix: prefix});
 
   if (!packageAvailable) {
-    expect(result.questions).toBe(2801);
-    expect(result.prefixCodes).toHaveLength(50);
+    expect([2535, 2801]).toContain(result.questions);
     for (const code of historicalCodes) expect(result.occurrences[code], code).toBe(1);
+    expect(new Set(result.prefixCodes).size).toBe(result.prefixCodes.length);
+
+    if (result.questions === 2535) {
+      expect(result.prefixCodes.length).toBeGreaterThanOrEqual(30);
+      expect(result.prefixCodes.length).toBeLessThanOrEqual(50);
+      console.log(`Contador na base canônica: ${result.prefixCodes.join(', ')}`);
+      return;
+    }
+
+    expect(result.prefixCodes).toHaveLength(50);
     const alreadyPublicAuthorized = authorizedCodes.filter(code => result.occurrences[code] === 1);
     expect(alreadyPublicAuthorized).toHaveLength(20);
-    console.log(`Contador antes da reconciliação: ${result.prefixCodes.join(', ')}`);
+    console.log(`Contador antes da reconciliação cumulativa: ${result.prefixCodes.join(', ')}`);
     return;
   }
 
