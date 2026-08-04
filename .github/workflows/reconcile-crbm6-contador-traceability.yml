@@ -1,0 +1,317 @@
+name: Reconciliar rastreabilidade CRBM-6 Contador
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/reconcile-crbm6-contador-traceability.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: reconcile-crbm6-contador-traceability
+  cancel-in-progress: false
+
+env:
+  PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes
+  CONTADOR_OPERATION: CRBM6-2026-CONTADOR-402-001-070-20260803
+  CONTADOR_SNAPSHOT_PATH: data/notion/publication-additions/crbm6-contador-70.json
+  CONTADOR_PLAN_PATH: data/notion/publication-additions/crbm6-contador-70-plan.json
+  DEPLOYMENT_RECEIPT_PATH: data/operations/latest-deployment.json
+  TRACEABILITY_RECEIPT_PATH: data/operations/crbm6-contador-70-traceability-receipt.json
+  LEGACY_WORKFLOW_PATH: .github/workflows/finalize-crbm6-contador-traceability.yml
+  SELF_WORKFLOW_PATH: .github/workflows/reconcile-crbm6-contador-traceability.yml
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Baixar o commit que deverá ser publicado
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Aguardar o recibo público deste commit
+        id: deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          READY=false
+          for attempt in $(seq 1 120); do
+            git fetch origin main --quiet
+            if git show "origin/main:${DEPLOYMENT_RECEIPT_PATH}" > /tmp/latest-deployment.json 2>/dev/null; then
+              if EXPECTED_SHA="${GITHUB_SHA}" node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const receipt = JSON.parse(fs.readFileSync('/tmp/latest-deployment.json', 'utf8'));
+          const verification = receipt.verification || {};
+          const valid = (
+            receipt.source_sha === process.env.EXPECTED_SHA
+            && Number(receipt.questions) === 2871
+            && Number(receipt.added_questions) === 70
+            && receipt.lot === process.env.CONTADOR_OPERATION
+            && verification.static_files === 'success'
+            && verification.public_browser === 'success'
+            && verification.public_metadata_refetched === 'success'
+          );
+          process.exit(valid ? 0 : 1);
+          NODE
+              then
+                READY=true
+                break
+              fi
+            fi
+            echo "Recibo do deploy ${GITHUB_SHA} ainda não confirmado (${attempt}/120)."
+            sleep 5
+          done
+          if [ "${READY}" != true ]; then
+            echo 'O deploy correspondente não foi confirmado dentro da janela segura.'
+            exit 1
+          fi
+          echo "release_sha=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+          echo "✓ Deploy público do commit ${GITHUB_SHA} confirmado."
+
+      - name: Reconfirmar a produção pública
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ steps.deployment.outputs.release_sha }}
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          const base = process.env.PUBLIC_BASE_URL.replace(/\/+$/, '');
+          const expectedSha = process.env.EXPECTED_SHA;
+          const operation = process.env.CONTADOR_OPERATION;
+          const prefix = 'PROVA-QDX-CRBM6-2026-CONTADOR-402-';
+          const expectedCodes = Array.from({length: 120}, (_, index) => `${prefix}${String(index + 1).padStart(3, '0')}`);
+          const fetchJSON = async relative => {
+            const response = await fetch(`${base}/${relative}?trace=${Date.now()}`, {
+              cache: 'no-store',
+              headers: {'cache-control': 'no-cache, no-store', pragma: 'no-cache'},
+            });
+            if (!response.ok) throw new Error(`${relative}: HTTP ${response.status}`);
+            return response.json();
+          };
+          const [build, catalog, receipt] = await Promise.all([
+            fetchJSON('data/release/build-info.json'),
+            fetchJSON('data/release/catalogo.json'),
+            fetchJSON('data/release/crbm6-contador-70-publication-receipt.json'),
+          ]);
+          const questions = Object.keys(catalog.question_index || {}).length;
+          const metadata = (catalog.materials || []).find(item => String(item.id) === 'notion-contador-crbm-6-quadrix-2026');
+          if (!metadata) throw new Error('Material público de Contador ausente.');
+          const material = await fetchJSON(String(metadata.file).replace(/^\.\//, ''));
+          const codes = (material.questoes || []).map(question => String(question.codigo || ''));
+          if (build.source_sha !== expectedSha || Number(build.questions) !== 2871 || questions !== 2871) {
+            throw new Error(`Produção diverge do commit confirmado: ${build.source_sha}; questões=${questions}.`);
+          }
+          if (Number(metadata.quantidade_questoes) !== 120 || JSON.stringify(codes) !== JSON.stringify(expectedCodes)) {
+            throw new Error('Material público de Contador não contém a sequência exata 001–120.');
+          }
+          if (
+            receipt.operation_id !== operation
+            || Number(receipt.baseline_questions) !== 2801
+            || Number(receipt.added_questions) !== 70
+            || Number(receipt.final_questions) !== 2871
+          ) throw new Error('Recibo público do lote de Contador é divergente.');
+          console.log(`✓ Produção confirmada: 2.871 questões e Contador 001–120 no commit ${expectedSha}.`);
+          NODE
+          node scripts/verify-deployment.mjs "${PUBLIC_BASE_URL}" "${EXPECTED_SHA}"
+
+      - name: Reconciliar somente os 70 recibos autorizados
+        shell: bash
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          RELEASE_COMMIT: ${{ steps.deployment.outputs.release_sha }}
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+
+          const token = process.env.NOTION_TOKEN;
+          const releaseSha = process.env.RELEASE_COMMIT;
+          const operation = process.env.CONTADOR_OPERATION;
+          const snapshotPath = process.env.CONTADOR_SNAPSHOT_PATH;
+          const planPath = process.env.CONTADOR_PLAN_PATH;
+          const outputPath = process.env.TRACEABILITY_RECEIPT_PATH;
+          const api = 'https://api.notion.com/v1';
+          const version = '2026-03-11';
+          const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+          const clean = value => String(value ?? '').trim();
+          const appVersion = JSON.parse(fs.readFileSync('package.json', 'utf8')).version;
+          const releaseCode = `release-${appVersion}:${releaseSha}`;
+          const receiptPattern = /^release-\d+\.\d+\.\d+:[0-9a-f]{40}$/;
+          const publicationDate = new Intl.DateTimeFormat('en-CA', {
+            timeZone: 'America/Sao_Paulo',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          }).format(new Date());
+
+          if (!token) throw new Error('NOTION_TOKEN não está disponível.');
+          if (!releaseSha) throw new Error('Commit da release não informado.');
+
+          async function request(endpoint, options = {}, attempt = 1) {
+            const response = await fetch(`${api}${endpoint}`, {
+              ...options,
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Notion-Version': version,
+                'Content-Type': 'application/json',
+                ...(options.headers || {}),
+              },
+            });
+            if (response.ok) return response.status === 204 ? {} : response.json();
+            const body = await response.text();
+            if ((response.status === 429 || response.status >= 500) && attempt < 9) {
+              await sleep(Math.max(Number(response.headers.get('retry-after') || 0) * 1000, 400 * 2 ** (attempt - 1)));
+              return request(endpoint, options, attempt + 1);
+            }
+            throw new Error(`Notion API ${response.status}: ${body.slice(0, 600)}`);
+          }
+
+          function plain(property) {
+            if (!property) return '';
+            if (property.type === 'title') return (property.title || []).map(item => item.plain_text || '').join('');
+            if (property.type === 'rich_text') return (property.rich_text || []).map(item => item.plain_text || '').join('');
+            return '';
+          }
+
+          function booleanValue(property) {
+            if (!property) return false;
+            if (property.type === 'checkbox') return property.checkbox === true;
+            if (property.type === 'formula' && property.formula?.type === 'boolean') return property.formula.boolean === true;
+            return false;
+          }
+
+          const snapshot = JSON.parse(fs.readFileSync(snapshotPath, 'utf8'));
+          const plan = JSON.parse(fs.readFileSync(planPath, 'utf8'));
+          const lot = plan.lots?.[0];
+          const expectedCodes = lot?.codes || [];
+          if (plan.total_records !== 70 || expectedCodes.length !== 70 || lot?.lot !== operation) {
+            throw new Error('Plano deixou de representar exatamente os 70 itens autorizados.');
+          }
+          const byCode = new Map((snapshot.records || []).map(record => [clean(record.code), record]));
+          if (byCode.size < 70) throw new Error('Snapshot não contém os 70 registros autorizados.');
+
+          let updated = 0;
+          let unchanged = 0;
+          const reconciledFrom = new Map();
+
+          for (const code of expectedCodes) {
+            const record = byCode.get(code);
+            if (!record?.notion_id) throw new Error(`${code}: página ausente no snapshot.`);
+            const current = await request(`/pages/${record.notion_id}`);
+            const properties = current.properties || {};
+            const currentCode = clean(plain(properties['Código']));
+            const currentLot = clean(plain(properties['Lote de publicação']));
+            const currentGithub = clean(plain(properties['Código GitHub']));
+            const currentDate = clean(properties['Data da publicação']?.date?.start);
+            const githubProperty = properties['Código GitHub'];
+            const dateProperty = properties['Data da publicação'];
+            const statusProperty = properties['Status editorial - registro manual anterior'];
+
+            if (currentCode !== code) throw new Error(`${code}: código atual divergiu.`);
+            if (currentLot !== operation) throw new Error(`${code}: lote atual divergiu: ${currentLot || 'vazio'}.`);
+            if (githubProperty?.type !== 'rich_text') throw new Error(`${code}: propriedade Código GitHub incompatível.`);
+            if (dateProperty?.type !== 'date') throw new Error(`${code}: propriedade Data da publicação incompatível.`);
+            if (!currentGithub && !booleanValue(properties['Liberada para exportação'])) {
+              throw new Error(`${code}: liberação para exportação foi retirada após o snapshot.`);
+            }
+            if (currentGithub && currentGithub !== releaseCode && !receiptPattern.test(currentGithub)) {
+              throw new Error(`${code}: recibo preexistente não reconhecido: ${currentGithub}.`);
+            }
+
+            if (currentGithub === releaseCode && currentDate === publicationDate) {
+              unchanged += 1;
+              continue;
+            }
+
+            if (currentGithub && currentGithub !== releaseCode) {
+              reconciledFrom.set(currentGithub, (reconciledFrom.get(currentGithub) || 0) + 1);
+            }
+
+            const patch = {
+              'Código GitHub': {rich_text: [{type: 'text', text: {content: releaseCode}}]},
+              'Data da publicação': {date: {start: publicationDate}},
+            };
+            if (statusProperty?.type === 'select') {
+              patch['Status editorial - registro manual anterior'] = {select: {name: 'Publicada'}};
+            }
+            await request(`/pages/${record.notion_id}`, {
+              method: 'PATCH',
+              body: JSON.stringify({properties: patch}),
+            });
+            updated += 1;
+            if (updated % 10 === 0) console.log(`${updated} registro(s) reconciliados no Notion.`);
+          }
+
+          let verified = 0;
+          for (const code of expectedCodes) {
+            const record = byCode.get(code);
+            const current = await request(`/pages/${record.notion_id}`);
+            const properties = current.properties || {};
+            const currentCode = clean(plain(properties['Código']));
+            const currentGithub = clean(plain(properties['Código GitHub']));
+            const currentDate = clean(properties['Data da publicação']?.date?.start);
+            if (currentCode !== code) throw new Error(`${code}: código divergiu na releitura.`);
+            if (currentGithub !== releaseCode) throw new Error(`${code}: Código GitHub divergente: ${currentGithub || 'vazio'}.`);
+            if (currentDate !== publicationDate) throw new Error(`${code}: data divergente: ${currentDate || 'vazia'}.`);
+            verified += 1;
+          }
+
+          const receipt = {
+            schema_version: '1.1',
+            verified_at: new Date().toISOString(),
+            public_url: process.env.PUBLIC_BASE_URL,
+            operation_id: operation,
+            release_commit: releaseSha,
+            release_code: releaseCode,
+            publication_date: publicationDate,
+            public_questions: 2871,
+            material_questions: 120,
+            expected_count: 70,
+            updated_count: updated,
+            unchanged_count: unchanged,
+            verified_count: verified,
+            reconciled_from: Object.fromEntries([...reconciledFrom.entries()].sort()),
+            codes_sha256: lot.codes_sha256,
+            codes: expectedCodes,
+            source_snapshot: snapshotPath,
+            source_plan: planPath,
+            verification: {
+              public_deployment: 'success',
+              immutable_package: 'success',
+              live_identity_and_lot: 'success',
+              notion_receipts: 'success',
+            },
+          };
+          fs.mkdirSync(path.dirname(outputPath), {recursive: true});
+          fs.writeFileSync(outputPath, `${JSON.stringify(receipt, null, 2)}\n`);
+          console.log(`✓ Rastreabilidade confirmada: ${verified}/70 registros com ${releaseCode}.`);
+          NODE
+
+      - name: Versionar o recibo e remover os workflows temporários
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git pull --rebase origin main
+          test -s "${TRACEABILITY_RECEIPT_PATH}"
+          git add "${TRACEABILITY_RECEIPT_PATH}"
+          if [ -f "${LEGACY_WORKFLOW_PATH}" ]; then
+            git rm "${LEGACY_WORKFLOW_PATH}"
+          fi
+          if [ -f "${SELF_WORKFLOW_PATH}" ]; then
+            git rm "${SELF_WORKFLOW_PATH}"
+          fi
+          git commit -m 'Registrar rastreabilidade 70/70 de Contador [skip ci]'
+          git push origin HEAD:main
