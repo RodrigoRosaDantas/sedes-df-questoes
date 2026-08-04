@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - .github/workflows/close-crbm6-contador-traceability.yml
+      - scripts/mark-notion-published.mjs
 
 permissions:
   contents: write
