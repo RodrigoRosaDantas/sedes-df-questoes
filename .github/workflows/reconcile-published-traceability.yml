@@ -1,0 +1,66 @@
+name: Reconciliar rastreabilidade de lotes já públicos
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/reconcile-published-traceability.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: reconcile-published-traceability
+  cancel-in-progress: false
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Restaurar a base pública anterior aos lotes cumulativos
+        run: |
+          git fetch origin c060ed9a6d4c46c637a5215b3a2738b28a8d405e --depth=1
+          git show c060ed9a6d4c46c637a5215b3a2738b28a8d405e:data/notion/published.json > data/notion/published.json
+          git show c060ed9a6d4c46c637a5215b3a2738b28a8d405e:data/notion/publication-plan.json > data/notion/publication-plan.json
+
+      - name: Reconstruir o catálogo público confirmado
+        run: |
+          npm run build
+          node scripts/apply-publication-additions.mjs
+          node scripts/apply-seedf-bio-24-addition.mjs
+          node scripts/apply-seedf-biomed-50-addition.mjs
+          node scripts/apply-seedf-eletrot-43-addition.mjs
+          node scripts/apply-alto-paraiso-orientador-37-addition.mjs
+          node scripts/apply-crefito17-agentefiscal-62-addition.mjs
+          node -e "const c=require('./data/release/catalogo.json'); if(Number(c.summary?.questoes)!==2801) throw new Error('Catálogo reconstruído não contém 2.801 questões.');"
+
+      - name: Fechar as 50 questões de Direito no Banco Mestre
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          RELEASE_COMMIT: e35df9befc89d2d279cc9701c9e7fa4e423c3196
+          NOTION_SNAPSHOT_PATH: data/notion/publication-additions/seedf-dir-50.json
+          PUBLICATION_PLAN_PATH: data/notion/publication-additions/seedf-dir-50-plan.json
+        run: node scripts/mark-notion-published.mjs
+
+      - name: Fechar as 62 questões do Agente Fiscal no Banco Mestre
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          RELEASE_COMMIT: 3c8d6b161d27c0d4cf04d52288f4bf9f916a9d75
+          NOTION_SNAPSHOT_PATH: data/notion/publication-additions/crefito17-agentefiscal-62.json
+          PUBLICATION_PLAN_PATH: data/notion/publication-additions/crefito17-agentefiscal-62-plan.json
+        run: node scripts/mark-notion-published.mjs
+
+      - name: Confirmar escopo reconciliado
+        run: |
+          echo '✓ Direito: 50 registros reconciliados com o deploy público de 2.585 questões.'
+          echo '✓ Agente Fiscal CREFITO-17: 62 registros reconciliados com o catálogo público de 2.801 questões.'
