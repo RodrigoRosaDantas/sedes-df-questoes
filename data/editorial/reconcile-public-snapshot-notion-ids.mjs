@@ -4,6 +4,7 @@ import {fileURLToPath} from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const snapshotPath = path.join(root, 'data', 'notion', 'published.json');
+const reconciliationPath = path.join(root, 'data', 'editorial', 'notion-trash-classified-20260804-public-reconciliation.json');
 const TOKEN = process.env.NOTION_TOKEN;
 const SOURCE = '784234ae-deca-4514-b60d-19524e122a89';
 const API = 'https://api.notion.com/v1';
@@ -73,6 +74,7 @@ const [snapshot, rows] = await Promise.all([
   fs.readFile(snapshotPath, 'utf8').then(JSON.parse),
   readActiveIdentities(),
 ]);
+const notionIdsBefore = new Set((snapshot.records || []).map(record => clean(record.notion_id)).filter(Boolean)).size;
 const byId = new Map(rows.map(row => [row.notion_id, row]));
 const byCode = new Map();
 for (const row of rows) {
@@ -115,8 +117,23 @@ for (const record of snapshot.records || []) {
   record.notion_id = row.notion_id;
 }
 
-if (unmatched.length || selected.size !== (snapshot.records || []).length) {
-  throw new Error(`Reconciliação pública incompleta: ${selected.size}/${(snapshot.records || []).length}; ausentes: ${JSON.stringify(unmatched.slice(0, 20))}`);
+const afterIds = new Set((snapshot.records || []).map(record => clean(record.notion_id)).filter(Boolean));
+const reconciliation = {
+  schema_version: '1.0',
+  operation_id: 'NOTION-TRASH-CLASSIFIED-20260804',
+  created_at: new Date().toISOString(),
+  public_records: (snapshot.records || []).length,
+  notion_ids_before: notionIdsBefore,
+  notion_ids_after: afterIds.size,
+  selected_ids: selected.size,
+  methods,
+  unmatched_count: unmatched.length,
+  unmatched: unmatched.slice(0, 200),
+  canonical_notion_ids: [...selected].sort(),
+};
+await fs.writeFile(reconciliationPath, `${JSON.stringify(reconciliation, null, 2)}\n`);
+if (unmatched.length || selected.size !== (snapshot.records || []).length || afterIds.size !== (snapshot.records || []).length) {
+  throw new Error(`Reconciliação pública incompleta: selecionados ${selected.size}, IDs finais ${afterIds.size}/${(snapshot.records || []).length}; ausentes: ${JSON.stringify(unmatched.slice(0, 20))}`);
 }
 await fs.writeFile(snapshotPath, `${JSON.stringify(snapshot, null, 2)}\n`);
 console.log(`✓ Identidades públicas reconciliadas no workspace: ${selected.size} registros (${JSON.stringify(methods)}).`);
