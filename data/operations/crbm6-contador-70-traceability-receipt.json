@@ -1,11 +1,12 @@
 {
-  "schema_version": "1.0",
-  "verified_at": "2026-08-04T19:35:34Z",
+  "schema_version": "1.2",
+  "verified_at": "2026-08-04T19:41:57Z",
   "public_url": "https://rodrigorosadantas.github.io/sedes-df-questoes",
   "operation_id": "CRBM6-2026-CONTADOR-402-001-070-20260803",
-  "release_commit": "487a79c2c81bc9008436fe3a4f6cbeb7c2a593a6",
-  "release_code": "release-2.13.0:487a79c2c81bc9008436fe3a4f6cbeb7c2a593a6",
+  "release_commit": "ea20017dd53389bddb357bb89beff717106d788d",
+  "release_code": "release-2.13.0:ea20017dd53389bddb357bb89beff717106d788d",
   "publication_date": "2026-08-04",
+  "public_source_commit": "e176ae191de41ecef8d3318e80c6b61da17a3f01",
   "public_questions": 2871,
   "material_questions": 120,
   "expected_count": 70,
@@ -85,12 +86,13 @@
   ],
   "source_snapshot": "data/notion/publication-additions/crbm6-contador-70.json",
   "source_plan": "data/notion/publication-additions/crbm6-contador-70-plan.json",
+  "source_deployment_receipt": "data/operations/latest-deployment.json",
   "verification": {
     "public_deployment": "success",
+    "public_source_descends_from_release": "success",
     "immutable_package": "success",
-    "notion_updates": "success",
-    "notion_final_records_066_070": "success",
+    "live_identity_and_lot": "success",
     "notion_receipts": "success"
   },
-  "verification_note": "Os 65 primeiros registros tiveram gravação confirmada na rodada anterior; os registros 066–070 foram localizados, atualizados e relidos individualmente nesta rodada."
+  "verification_note": "Consulta agregada direta ao Banco Mestre confirmou 70 registros distintos, todos com o mesmo Código GitHub e a data de publicação de 2026-08-04."
 }
