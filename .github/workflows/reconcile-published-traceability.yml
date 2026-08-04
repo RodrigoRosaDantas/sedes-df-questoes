@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: reconcile-published-traceability
+  group: reconcile-published-traceability-v2
   cancel-in-progress: false
 
 jobs:
@@ -20,47 +20,154 @@ jobs:
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v6
         with:
           node-version: 22
           package-manager-cache: false
 
-      - name: Restaurar a base pública anterior aos lotes cumulativos
-        run: |
-          git fetch origin c060ed9a6d4c46c637a5215b3a2738b28a8d405e --depth=1
-          git show c060ed9a6d4c46c637a5215b3a2738b28a8d405e:data/notion/published.json > data/notion/published.json
-          git show c060ed9a6d4c46c637a5215b3a2738b28a8d405e:data/notion/publication-plan.json > data/notion/publication-plan.json
-
-      - name: Reconstruir o catálogo público confirmado
-        run: |
-          npm run build
-          node scripts/apply-publication-additions.mjs
-          node scripts/apply-seedf-bio-24-addition.mjs
-          node scripts/apply-seedf-biomed-50-addition.mjs
-          node scripts/apply-seedf-eletrot-43-addition.mjs
-          node scripts/apply-alto-paraiso-orientador-37-addition.mjs
-          node scripts/apply-crefito17-agentefiscal-62-addition.mjs
-          node -e "const c=require('./data/release/catalogo.json'); if(Number(c.summary?.questoes)!==2801) throw new Error('Catálogo reconstruído não contém 2.801 questões.');"
-
-      - name: Fechar as 50 questões de Direito no Banco Mestre
+      - name: Reconciliar somente os códigos dos planos públicos
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          RELEASE_COMMIT: e35df9befc89d2d279cc9701c9e7fa4e423c3196
-          NOTION_SNAPSHOT_PATH: data/notion/publication-additions/seedf-dir-50.json
-          PUBLICATION_PLAN_PATH: data/notion/publication-additions/seedf-dir-50-plan.json
-        run: node scripts/mark-notion-published.mjs
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
 
-      - name: Fechar as 62 questões do Agente Fiscal no Banco Mestre
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          RELEASE_COMMIT: 3c8d6b161d27c0d4cf04d52288f4bf9f916a9d75
-          NOTION_SNAPSHOT_PATH: data/notion/publication-additions/crefito17-agentefiscal-62.json
-          PUBLICATION_PLAN_PATH: data/notion/publication-additions/crefito17-agentefiscal-62-plan.json
-        run: node scripts/mark-notion-published.mjs
+          const TOKEN = process.env.NOTION_TOKEN;
+          const API = 'https://api.notion.com/v1';
+          const VERSION = '2026-03-11';
+          const SOURCE = '784234ae-deca-4514-b60d-19524e122a89';
+          if (!TOKEN) throw new Error('NOTION_TOKEN não está disponível.');
+
+          const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+          const clean = value => String(value ?? '').trim();
+          const rich = text => ({rich_text: [{type: 'text', text: {content: text}}]});
+          const plain = property => {
+            if (!property) return '';
+            if (property.type === 'title') return (property.title || []).map(item => item.plain_text || '').join('');
+            if (property.type === 'rich_text') return (property.rich_text || []).map(item => item.plain_text || '').join('');
+            return '';
+          };
+          const checked = property => property?.type === 'checkbox' && property.checkbox === true;
+
+          async function request(endpoint, options = {}, attempt = 1) {
+            const response = await fetch(`${API}${endpoint}`, {
+              ...options,
+              headers: {
+                Authorization: `Bearer ${TOKEN}`,
+                'Notion-Version': VERSION,
+                'Content-Type': 'application/json',
+                ...(options.headers || {}),
+              },
+            });
+            if (response.ok) return response.status === 204 ? {} : response.json();
+            const body = await response.text();
+            if ((response.status === 429 || response.status >= 500) && attempt < 9) {
+              await sleep(Math.max(Number(response.headers.get('retry-after') || 0) * 1000, 500 * 2 ** (attempt - 1)));
+              return request(endpoint, options, attempt + 1);
+            }
+            throw new Error(`Notion API ${response.status}: ${body.slice(0, 700)}`);
+          }
+
+          async function rowsForLot(lot) {
+            const rows = [];
+            let cursor;
+            do {
+              const body = {
+                page_size: 100,
+                result_type: 'page',
+                filter: {property: 'Lote de publicação', rich_text: {equals: lot}},
+              };
+              if (cursor) body.start_cursor = cursor;
+              const page = await request(`/data_sources/${SOURCE}/query`, {method: 'POST', body: JSON.stringify(body)});
+              rows.push(...(page.results || []));
+              cursor = page.has_more ? page.next_cursor : null;
+            } while (cursor);
+            return rows;
+          }
+
+          const operations = [
+            {
+              name: 'Direito SEEDF',
+              lot: 'SEEDF-2025-DIR-A-071-120-20260802',
+              plan: 'data/notion/publication-additions/seedf-dir-50-plan.json',
+              expected: 50,
+              release: 'release-2.13.0:e35df9befc89d2d279cc9701c9e7fa4e423c3196',
+              date: '2026-08-02',
+            },
+            {
+              name: 'Agente Fiscal CREFITO-17',
+              lot: 'CREFITO17-2026-AGENTE-FISCAL-APTOS-62-20260803',
+              plan: 'data/notion/publication-additions/crefito17-agentefiscal-62-plan.json',
+              expected: 62,
+              release: 'release-2.13.0:3c8d6b161d27c0d4cf04d52288f4bf9f916a9d75',
+              date: '2026-08-03',
+            },
+          ];
+
+          for (const operation of operations) {
+            const plan = JSON.parse(fs.readFileSync(operation.plan, 'utf8'));
+            const codes = plan.lots?.flatMap(item => item.codes || []) || [];
+            if (plan.total_records !== operation.expected || codes.length !== operation.expected || new Set(codes).size !== operation.expected) {
+              throw new Error(`${operation.name}: plano imutável divergente da contagem esperada.`);
+            }
+
+            const rows = await rowsForLot(operation.lot);
+            const selected = new Map();
+            for (const row of rows) {
+              const properties = row.properties || {};
+              const code = clean(plain(properties['Código']));
+              if (!codes.includes(code)) continue;
+              if (!checked(properties['Liberada para exportação'])) throw new Error(`${code}: liberação foi retirada.`);
+              if (selected.has(code)) throw new Error(`${code}: mais de uma linha liberada no mesmo lote.`);
+              selected.set(code, row);
+            }
+            if (selected.size !== operation.expected) {
+              const missing = codes.filter(code => !selected.has(code));
+              throw new Error(`${operation.name}: encontrados ${selected.size}/${operation.expected}; ausentes: ${missing.slice(0, 10).join(', ')}`);
+            }
+
+            let updated = 0;
+            let alreadyClosed = 0;
+            for (const code of codes) {
+              const row = selected.get(code);
+              const properties = row.properties || {};
+              const currentGithub = clean(plain(properties['Código GitHub']));
+              if (currentGithub && currentGithub !== operation.release) {
+                throw new Error(`${code}: Código GitHub divergente: ${currentGithub}.`);
+              }
+              if (currentGithub === operation.release) {
+                alreadyClosed += 1;
+                continue;
+              }
+
+              const patch = {
+                'Código GitHub': rich(operation.release),
+                'Data da publicação': {date: {start: operation.date}},
+              };
+              if (properties['Status editorial — registro manual anterior']?.type === 'select') {
+                patch['Status editorial — registro manual anterior'] = {select: {name: 'Publicada'}};
+              }
+              await request(`/pages/${row.id}`, {method: 'PATCH', body: JSON.stringify({properties: patch})});
+              updated += 1;
+              if (updated % 20 === 0) console.log(`${operation.name}: ${updated}/${operation.expected} atualizados.`);
+              await sleep(120);
+            }
+
+            const after = await rowsForLot(operation.lot);
+            const confirmed = after.filter(row => {
+              const properties = row.properties || {};
+              const code = clean(plain(properties['Código']));
+              return codes.includes(code) && clean(plain(properties['Código GitHub'])) === operation.release;
+            });
+            if (confirmed.length !== operation.expected) {
+              throw new Error(`${operation.name}: persistência confirmou ${confirmed.length}/${operation.expected}.`);
+            }
+            console.log(`✓ ${operation.name}: ${updated} atualizados, ${alreadyClosed} já fechados; ${confirmed.length} confirmados.`);
+          }
+          NODE
 
       - name: Confirmar escopo reconciliado
         run: |
-          echo '✓ Direito: 50 registros reconciliados com o deploy público de 2.585 questões.'
-          echo '✓ Agente Fiscal CREFITO-17: 62 registros reconciliados com o catálogo público de 2.801 questões.'
+          echo '✓ Direito: 50 registros vinculados ao deploy público confirmado.'
+          echo '✓ Agente Fiscal CREFITO-17: 62 registros vinculados ao catálogo público confirmado.'
