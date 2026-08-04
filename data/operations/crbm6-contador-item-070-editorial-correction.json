@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "CRBM6-2026-CONTADOR-402-070-EDITORIAL-20260804",
+  "question_code": "PROVA-QDX-CRBM6-2026-CONTADOR-402-070",
+  "correction": "Suppress internal editorial observations from the public material while preserving the immutable source snapshot.",
+  "source_snapshot_preserved": true,
+  "public_observations_expected": "",
+  "public_questions_expected": 2871,
+  "material_questions_expected": 120
+}

@@ -125,7 +125,7 @@ for (const record of additions) {
     comentarios_alternativas: record.alternative_comments || {},
     fundamento: clean(record.foundation),
     pegadinha: clean(record.trap),
-    observacoes: clean(record.observations),
+    observacoes: clean(record.code) === `${prefix}070` ? '' : clean(record.observations),
     formato_questao: 'Certo / Errado',
     pagina_pdf: clean(record.pdf_page),
     fonte_oficial: record.source_url || record.notion_url,
@@ -223,5 +223,9 @@ for (const [code, count] of occurrences) {
 }
 if (!publishedMaterial || publishedMaterial.quantidade_questoes !== 120) {
   fail('Material público de Contador não contém exatamente 120 questões.');
+}
+const publishedItem070 = publishedMaterial.questoes.find(question => question.codigo === `${prefix}070`);
+if (!publishedItem070 || clean(publishedItem070.observacoes)) {
+  fail('Questão 070 de Contador mantém observação editorial interna no pacote público.');
 }
 console.log(`✓ Lote ${operationId} aplicado: 70 novas questões, 50 históricas preservadas, 120 no material e 2871 no pacote público.`);
