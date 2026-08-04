@@ -1,0 +1,75 @@
+name: Auditar códigos do catálogo e alvos do Notion
+
+on:
+  push:
+    branches:
+      - agent/notion-trash-classified-20260804
+    paths:
+      - data/editorial/notion-trash-classified-20260804-trigger.json
+
+permissions:
+  contents: write
+
+concurrency:
+  group: catalog-code-audit-20260804
+  cancel-in-progress: false
+
+env:
+  BASE_SNAPSHOT_COMMIT: c060ed9a6d4c46c637a5215b3a2738b28a8d405e
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: agent/notion-trash-classified-20260804
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Reconstruir catálogo público
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp data/notion/published.json /tmp/current-snapshot.json
+          cp data/notion/publication-plan.json /tmp/current-plan.json
+          git fetch origin "${BASE_SNAPSHOT_COMMIT}" --depth=1
+          git show "${BASE_SNAPSHOT_COMMIT}:data/notion/published.json" > data/notion/published.json
+          git show "${BASE_SNAPSHOT_COMMIT}:data/notion/publication-plan.json" > data/notion/publication-plan.json
+          npm run build
+          cp /tmp/current-snapshot.json data/notion/published.json
+          cp /tmp/current-plan.json data/notion/publication-plan.json
+          node scripts/apply-publication-additions.mjs
+          node scripts/apply-seedf-bio-24-addition.mjs
+          node scripts/apply-seedf-biomed-50-addition.mjs
+          node scripts/apply-seedf-eletrot-43-addition.mjs
+          node scripts/apply-alto-paraiso-orientador-37-addition.mjs
+          node scripts/apply-crefito17-agentefiscal-62-addition.mjs
+          node scripts/apply-crbm6-contador-70-addition.mjs
+          jq -e '.summary.questoes == 2871' data/release/catalogo.json >/dev/null
+      - name: Extrair códigos públicos
+        run: node data/editorial/reconcile-public-snapshot-notion-ids.mjs
+      - name: Gerar e refinar alvos sem excluir
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: |
+          jq '.mode = "dry-run"' data/editorial/notion-trash-classified-20260804-trigger.json > /tmp/trigger.json
+          cp /tmp/trigger.json data/editorial/notion-trash-classified-20260804-trigger.json
+          node data/editorial/notion-trash-classified-records.mjs
+          node data/editorial/refine-notion-trash-targets.mjs
+      - name: Persistir recibos
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'sedes-df-catalog-audit[bot]'
+          git config user.email 'sedes-df-catalog-audit[bot]@users.noreply.github.com'
+          git add data/editorial/notion-trash-classified-20260804-public-codes.json
+          git add data/editorial/notion-trash-classified-20260804-targets.json
+          git add data/editorial/notion-trash-classified-20260804-dry-run-receipt.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Registrar auditoria definitiva dos alvos [skip ci]'
+            git push origin HEAD:agent/notion-trash-classified-20260804
+          fi
