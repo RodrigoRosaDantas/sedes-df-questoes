@@ -16,6 +16,7 @@ concurrency:
 
 env:
   BASE_SNAPSHOT_COMMIT: c060ed9a6d4c46c637a5215b3a2738b28a8d405e
+  DIAGNOSTIC_PATH: data/editorial/notion-trash-classified-20260804-diagnostic.json
 
 jobs:
   run:
@@ -35,6 +36,9 @@ jobs:
           package-manager-cache: false
 
       - name: Validar scripts e gatilho
+        id: validation
+        continue-on-error: true
+        shell: bash
         run: |
           set -euo pipefail
           node --check data/editorial/reconcile-public-snapshot-notion-ids.mjs
@@ -43,6 +47,9 @@ jobs:
           jq -e '.operation_id == "NOTION-TRASH-CLASSIFIED-20260804" and (.mode == "dry-run" or .mode == "execute")' data/editorial/notion-trash-classified-20260804-trigger.json >/dev/null
 
       - name: Reconstruir o catálogo público somente no workspace
+        id: reconstruction
+        if: steps.validation.outcome == 'success'
+        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
@@ -64,10 +71,14 @@ jobs:
           jq -e '.summary.questoes == 2871' data/release/catalogo.json >/dev/null
 
       - name: Extrair os códigos públicos
+        id: extraction
+        if: steps.reconstruction.outcome == 'success'
+        continue-on-error: true
         run: node data/editorial/reconcile-public-snapshot-notion-ids.mjs
 
       - name: Executar classificação ou envio à lixeira
         id: operation
+        if: steps.extraction.outcome == 'success'
         continue-on-error: true
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
@@ -82,9 +93,36 @@ jobs:
           set -euo pipefail
           if [ "$(jq -r '.mode' data/editorial/notion-trash-classified-20260804-trigger.json)" = 'dry-run' ]; then
             node data/editorial/refine-notion-trash-targets.mjs
+          else
+            echo 'Execução real utiliza o conjunto imutável aprovado no dry-run.'
           fi
 
-      - name: Persistir somente os recibos operacionais
+      - name: Registrar estágio alcançado
+        if: always()
+        shell: bash
+        env:
+          VALIDATION_OUTCOME: ${{ steps.validation.outcome }}
+          RECONSTRUCTION_OUTCOME: ${{ steps.reconstruction.outcome }}
+          EXTRACTION_OUTCOME: ${{ steps.extraction.outcome }}
+          OPERATION_OUTCOME: ${{ steps.operation.outcome }}
+          REFINEMENT_OUTCOME: ${{ steps.refinement.outcome }}
+        run: |
+          set -euo pipefail
+          MODE=$(jq -r '.mode' data/editorial/notion-trash-classified-20260804-trigger.json)
+          jq -n \
+            --arg operation_id 'NOTION-TRASH-CLASSIFIED-20260804' \
+            --arg mode "${MODE}" \
+            --arg source_sha "${GITHUB_SHA}" \
+            --arg created_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg validation "${VALIDATION_OUTCOME:-unknown}" \
+            --arg reconstruction "${RECONSTRUCTION_OUTCOME:-unknown}" \
+            --arg extraction "${EXTRACTION_OUTCOME:-unknown}" \
+            --arg operation "${OPERATION_OUTCOME:-unknown}" \
+            --arg refinement "${REFINEMENT_OUTCOME:-unknown}" \
+            '{schema_version:"1.0",operation_id:$operation_id,mode:$mode,source_sha:$source_sha,created_at:$created_at,stages:{validation:$validation,reconstruction:$reconstruction,extraction:$extraction,operation:$operation,refinement:$refinement}}' \
+            > "${DIAGNOSTIC_PATH}"
+
+      - name: Persistir recibos e diagnóstico
         if: always()
         shell: bash
         run: |
@@ -98,6 +136,20 @@ jobs:
             git push origin HEAD:main
           fi
 
-      - name: Reprovar operação não concluída
-        if: steps.operation.outcome != 'success' || steps.refinement.outcome == 'failure'
-        run: exit 1
+      - name: Reprovar estágio incompleto
+        if: always()
+        shell: bash
+        env:
+          VALIDATION_OUTCOME: ${{ steps.validation.outcome }}
+          RECONSTRUCTION_OUTCOME: ${{ steps.reconstruction.outcome }}
+          EXTRACTION_OUTCOME: ${{ steps.extraction.outcome }}
+          OPERATION_OUTCOME: ${{ steps.operation.outcome }}
+          REFINEMENT_OUTCOME: ${{ steps.refinement.outcome }}
+        run: |
+          set -euo pipefail
+          MODE=$(jq -r '.mode' data/editorial/notion-trash-classified-20260804-trigger.json)
+          test "${VALIDATION_OUTCOME}" = 'success'
+          test "${RECONSTRUCTION_OUTCOME}" = 'success'
+          test "${EXTRACTION_OUTCOME}" = 'success'
+          test "${OPERATION_OUTCOME}" = 'success'
+          if [ "${MODE}" = 'dry-run' ]; then test "${REFINEMENT_OUTCOME}" = 'success'; fi
