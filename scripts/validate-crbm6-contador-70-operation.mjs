@@ -33,7 +33,7 @@ for (const record of candidates) {
   if (!clean(record.prompt) || !clean(record.answer) || !clean(record.comment) || !clean(record.foundation) || !clean(record.pdf_page)) {
     fail(`${record.code}: conteúdo essencial ou página do PDF incompleta.`);
   }
-  if (!clean(record.discipline) || !clean(record.subject) || !clean(record.source_url) || !clean(record.organization) || !clean(record.position)) {
+  if (!clean(record.discipline) || !clean(record.subject) || !clean(record.source_url) || !clean(record.organization) || !clean(record.cargo)) {
     fail(`${record.code}: metadados essenciais incompletos.`);
   }
   if (record.format !== 'Certo / Errado' || !['Certo', 'Errado'].includes(record.answer)) fail(`${record.code}: formato ou gabarito inválido.`);
