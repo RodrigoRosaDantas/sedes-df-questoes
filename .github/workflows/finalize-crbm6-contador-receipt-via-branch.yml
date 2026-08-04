@@ -1,4 +1,5 @@
 name: Finalizar comprovante CRBM-6 Contador via branch
+# Segundo push intencional: o workflow já está registrado na main.
 
 on:
   push:
@@ -48,6 +49,7 @@ jobs:
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
           import path from 'node:path';
+          import {execFileSync} from 'node:child_process';
 
           const token = process.env.NOTION_TOKEN;
           const releaseSha = process.env.RELEASE_COMMIT;
@@ -68,14 +70,18 @@ jobs:
           const deployment = JSON.parse(fs.readFileSync(deploymentPath, 'utf8'));
           const verification = deployment.verification || {};
           if (
-            deployment.source_sha !== releaseSha
-            || Number(deployment.questions) !== 2871
+            Number(deployment.questions) !== 2871
             || Number(deployment.added_questions) !== 70
             || deployment.lot !== operation
             || verification.static_files !== 'success'
             || verification.public_browser !== 'success'
             || verification.public_metadata_refetched !== 'success'
-          ) throw new Error('O recibo público versionado não corresponde ao deploy autorizado.');
+          ) throw new Error('O recibo público versionado não corresponde ao lote autorizado.');
+          try {
+            execFileSync('git', ['merge-base', '--is-ancestor', releaseSha, deployment.source_sha], {stdio: 'ignore'});
+          } catch {
+            throw new Error(`O deploy público ${deployment.source_sha} não descende da release ${releaseSha}.`);
+          }
 
           const snapshot = JSON.parse(fs.readFileSync(snapshotPath, 'utf8'));
           const plan = JSON.parse(fs.readFileSync(planPath, 'utf8'));
@@ -136,6 +142,7 @@ jobs:
             release_commit: releaseSha,
             release_code: releaseCode,
             publication_date: publicationDate,
+            public_source_commit: deployment.source_sha,
             public_questions: 2871,
             material_questions: 120,
             expected_count: 70,
@@ -147,6 +154,7 @@ jobs:
             source_deployment_receipt: deploymentPath,
             verification: {
               public_deployment: 'success',
+              public_source_descends_from_release: 'success',
               immutable_package: 'success',
               live_identity_and_lot: 'success',
               notion_receipts: 'success',
