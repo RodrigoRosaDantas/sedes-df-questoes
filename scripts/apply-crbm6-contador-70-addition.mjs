@@ -20,6 +20,8 @@ const manifestPath = 'data/release/manifest.json';
 const receiptPath = 'data/release/crbm6-contador-70-publication-receipt.json';
 const operationId = 'CRBM6-2026-CONTADOR-402-001-070-20260803';
 const prefix = 'PROVA-QDX-CRBM6-2026-CONTADOR-402-';
+const item070Code = `${prefix}070`;
+const item070Prompt = 'A Lei nº 13.709/2018 exclui a aplicação de outros direitos e de outras garantias previstos no ordenamento jurídico que sejam relacionados à proteção da privacidade e da personalidade.';
 const authorizedCodes = Array.from({length: 70}, (_, index) => `${prefix}${String(index + 1).padStart(3, '0')}`);
 const historicalCodes = Array.from({length: 50}, (_, index) => `${prefix}${String(index + 71).padStart(3, '0')}`);
 const fullExamCodes = [...authorizedCodes, ...historicalCodes];
@@ -118,14 +120,14 @@ for (const record of additions) {
     assunto: clean(record.subject),
     subassunto: clean(record.subsubject),
     texto_base: clean(record.text_base),
-    enunciado: clean(record.prompt),
+    enunciado: clean(record.code) === item070Code ? item070Prompt : clean(record.prompt),
     alternativas: {Certo: 'Certo', Errado: 'Errado'},
     gabarito: record.answer,
     comentario: clean(record.comment),
     comentarios_alternativas: record.alternative_comments || {},
     fundamento: clean(record.foundation),
     pegadinha: clean(record.trap),
-    observacoes: clean(record.code) === `${prefix}070` ? '' : clean(record.observations),
+    observacoes: clean(record.code) === item070Code ? '' : clean(record.observations),
     formato_questao: 'Certo / Errado',
     pagina_pdf: clean(record.pdf_page),
     fonte_oficial: record.source_url || record.notion_url,
@@ -224,8 +226,11 @@ for (const [code, count] of occurrences) {
 if (!publishedMaterial || publishedMaterial.quantidade_questoes !== 120) {
   fail('Material público de Contador não contém exatamente 120 questões.');
 }
-const publishedItem070 = publishedMaterial.questoes.find(question => question.codigo === `${prefix}070`);
-if (!publishedItem070 || clean(publishedItem070.observacoes)) {
+const publishedItem070 = publishedMaterial.questoes.find(question => question.codigo === item070Code);
+if (!publishedItem070 || clean(publishedItem070.enunciado) !== item070Prompt) {
+  fail('Questão 070 de Contador mantém sufixo editorial indevido no enunciado público.');
+}
+if (clean(publishedItem070.observacoes)) {
   fail('Questão 070 de Contador mantém observação editorial interna no pacote público.');
 }
 console.log(`✓ Lote ${operationId} aplicado: 70 novas questões, 50 históricas preservadas, 120 no material e 2871 no pacote público.`);
