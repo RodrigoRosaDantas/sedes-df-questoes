@@ -191,7 +191,7 @@ const notionTraceability = read("scripts/mark-notion-published.mjs");
 requireMarkers(notionTraceability, [
   "Código GitHub",
   "Data da publicação",
-  "Status editorial — registro manual anterior",
+  "Status editorial - registro manual anterior",
   "PUBLICATION_PLAN_PATH",
   "validatePublicationPlan",
   "plannedCodes",
@@ -199,7 +199,7 @@ requireMarkers(notionTraceability, [
 ], "Fechamento da rastreabilidade no Notion");
 forbidMarkers(notionTraceability, [
   "const selected = (snapshot.records || []).filter(record => !clean(record.github_id))",
-  "Status editorial - registro manual anterior",
+  "Status editorial — registro manual anterior",
 ], "Fechamento da rastreabilidade no Notion");
 
 const worker = read("service-worker.js");
