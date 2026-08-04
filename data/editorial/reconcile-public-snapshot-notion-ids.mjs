@@ -9,6 +9,8 @@ const TOKEN = process.env.NOTION_TOKEN;
 const SOURCE = '784234ae-deca-4514-b60d-19524e122a89';
 const API = 'https://api.notion.com/v1';
 const VERSION = '2026-03-11';
+const EXPECTED_PUBLIC = 2871;
+const EXPECTED_EXCESS = 46;
 if (!TOKEN) throw new Error('NOTION_TOKEN não está disponível.');
 
 const clean = value => String(value ?? '').trim();
@@ -74,66 +76,60 @@ const [snapshot, rows] = await Promise.all([
   fs.readFile(snapshotPath, 'utf8').then(JSON.parse),
   readActiveIdentities(),
 ]);
-const notionIdsBefore = new Set((snapshot.records || []).map(record => clean(record.notion_id)).filter(Boolean)).size;
-const byId = new Map(rows.map(row => [row.notion_id, row]));
-const byCode = new Map();
-for (const row of rows) {
+const trustedSnapshotIds = new Set((snapshot.records || []).map(record => clean(record.notion_id)).filter(Boolean));
+const traced = rows.filter(row => clean(row.github_id) && clean(row.publication_date));
+const withoutCode = traced.filter(row => !clean(row.code));
+if (withoutCode.length) throw new Error(`${withoutCode.length} linha(s) rastreadas estão sem Código.`);
+
+const groups = new Map();
+for (const row of traced) {
   const codeKey = key(row.code);
-  if (!byCode.has(codeKey)) byCode.set(codeKey, []);
-  byCode.get(codeKey).push(row);
+  if (!groups.has(codeKey)) groups.set(codeKey, []);
+  groups.get(codeKey).push(row);
 }
-
 const selected = new Set();
-const methods = {notion_id: 0, github_id: 0, canonical_code: 0};
-const unmatched = [];
-for (const record of snapshot.records || []) {
-  let row = null;
-  let method = null;
-  if (record.notion_id && byId.has(clean(record.notion_id)) && !selected.has(clean(record.notion_id))) {
-    row = byId.get(clean(record.notion_id));
-    method = 'notion_id';
-  } else {
-    const available = (byCode.get(key(record.code)) || []).filter(candidate => !selected.has(candidate.notion_id));
-    row = available.find(candidate => clean(candidate.github_id) && clean(candidate.github_id) === clean(record.github_id)) || null;
-    if (row) method = 'github_id';
-    if (!row) {
-      row = [...available].sort((left, right) => {
-        const score = candidate => (candidate.duplicated ? 0 : 100)
-          + (clean(candidate.github_id) ? 20 : 0)
-          + (clean(candidate.publication_date) ? 20 : 0);
-        return score(right) - score(left)
-          || Date.parse(right.last_edited_time || 0) - Date.parse(left.last_edited_time || 0)
-          || right.notion_id.localeCompare(left.notion_id);
-      })[0] || null;
-      if (row) method = 'canonical_code';
-    }
+const excess = [];
+const methods = {trusted_snapshot_id: 0, canonical_code: 0};
+for (const candidates of groups.values()) {
+  const trusted = candidates.filter(row => trustedSnapshotIds.has(row.notion_id));
+  if (trusted.length > 1) {
+    throw new Error(`Mais de uma linha confiável para o código ${candidates[0].code}.`);
   }
-  if (!row) {
-    unmatched.push({code: clean(record.code), notion_id: clean(record.notion_id), github_id: clean(record.github_id)});
-    continue;
-  }
-  selected.add(row.notion_id);
-  methods[method] += 1;
-  record.notion_id = row.notion_id;
+  const canonical = trusted[0] || [...candidates].sort((left, right) => {
+    const score = candidate => (candidate.duplicated ? 0 : 100)
+      + (clean(candidate.github_id) ? 20 : 0)
+      + (clean(candidate.publication_date) ? 20 : 0);
+    return score(right) - score(left)
+      || Date.parse(right.last_edited_time || 0) - Date.parse(left.last_edited_time || 0)
+      || right.notion_id.localeCompare(left.notion_id);
+  })[0];
+  selected.add(canonical.notion_id);
+  methods[trusted[0] ? 'trusted_snapshot_id' : 'canonical_code'] += 1;
+  excess.push(...candidates.filter(row => row.notion_id !== canonical.notion_id));
 }
 
-const afterIds = new Set((snapshot.records || []).map(record => clean(record.notion_id)).filter(Boolean));
 const reconciliation = {
-  schema_version: '1.0',
+  schema_version: '1.1',
   operation_id: 'NOTION-TRASH-CLASSIFIED-20260804',
   created_at: new Date().toISOString(),
-  public_records: (snapshot.records || []).length,
-  notion_ids_before: notionIdsBefore,
-  notion_ids_after: afterIds.size,
+  active_rows: rows.length,
+  traced_rows: traced.length,
+  unique_traced_codes: groups.size,
+  public_records: groups.size,
+  trusted_snapshot_ids: trustedSnapshotIds.size,
   selected_ids: selected.size,
+  excess_rows: excess.length,
   methods,
-  unmatched_count: unmatched.length,
-  unmatched: unmatched.slice(0, 200),
+  unmatched_count: 0,
+  unmatched: [],
   canonical_notion_ids: [...selected].sort(),
+  excess_notion_ids: excess.map(row => row.notion_id).sort(),
 };
 await fs.writeFile(reconciliationPath, `${JSON.stringify(reconciliation, null, 2)}\n`);
-if (unmatched.length || selected.size !== (snapshot.records || []).length || afterIds.size !== (snapshot.records || []).length) {
-  throw new Error(`Reconciliação pública incompleta: selecionados ${selected.size}, IDs finais ${afterIds.size}/${(snapshot.records || []).length}; ausentes: ${JSON.stringify(unmatched.slice(0, 20))}`);
+if (traced.length !== EXPECTED_PUBLIC + EXPECTED_EXCESS
+  || groups.size !== EXPECTED_PUBLIC
+  || selected.size !== EXPECTED_PUBLIC
+  || excess.length !== EXPECTED_EXCESS) {
+  throw new Error(`Reconciliação divergente: ${JSON.stringify({traced: traced.length, unique_codes: groups.size, selected: selected.size, excess: excess.length})}`);
 }
-await fs.writeFile(snapshotPath, `${JSON.stringify(snapshot, null, 2)}\n`);
-console.log(`✓ Identidades públicas reconciliadas no workspace: ${selected.size} registros (${JSON.stringify(methods)}).`);
+console.log(`✓ Catálogo canônico reconciliado: ${selected.size} linhas públicas e ${excess.length} excedentes históricos.`);
