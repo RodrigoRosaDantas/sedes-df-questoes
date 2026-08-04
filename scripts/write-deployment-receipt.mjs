@@ -49,6 +49,7 @@ if (Number(build.materials) !== materials || Number(release.materials) !== mater
 }
 
 const receiptCandidates = [
+  'data/release/crbm6-contador-70-publication-receipt.json',
   'data/release/crefito17-agentefiscal-62-publication-receipt.json',
   'data/release/alto-paraiso-orientador-37-publication-receipt.json',
   'data/release/seedf-eletrot-43-publication-receipt.json',
