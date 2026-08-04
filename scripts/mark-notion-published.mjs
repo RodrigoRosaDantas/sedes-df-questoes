@@ -93,7 +93,7 @@ function booleanValue(property) {
 function publicationProperties(properties, recordCode) {
   const githubProperty = properties['Código GitHub'];
   const publicationDateProperty = properties['Data da publicação'];
-  const manualStatusProperty = properties['Status editorial — registro manual anterior'];
+  const manualStatusProperty = properties['Status editorial - registro manual anterior'];
 
   if (githubProperty?.type !== 'rich_text') {
     throw new Error(`${recordCode}: propriedade Código GitHub ausente ou incompatível.`);
@@ -108,7 +108,7 @@ function publicationProperties(properties, recordCode) {
   };
 
   if (manualStatusProperty?.type === 'select') {
-    patch['Status editorial — registro manual anterior'] = {select: {name: 'Publicada'}};
+    patch['Status editorial - registro manual anterior'] = {select: {name: 'Publicada'}};
   }
 
   return patch;
@@ -118,7 +118,7 @@ function exceptionalPublicationProperties() {
   return {
     'Código GitHub': rich(releaseCode),
     'Data da publicação': {date: {start: publicationDate}},
-    'Status editorial — registro manual anterior': {select: {name: 'Publicada'}},
+    'Status editorial - registro manual anterior': {select: {name: 'Publicada'}},
   };
 }
 
