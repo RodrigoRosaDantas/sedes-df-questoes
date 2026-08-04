@@ -6,10 +6,10 @@ const packageAvailable = fs.existsSync(planPath);
 const plan = packageAvailable ? JSON.parse(fs.readFileSync(planPath, 'utf8')) : null;
 const prefix = 'PROVA-QDX-CRBM6-2026-CONTADOR-402-';
 const authorizedCodes = Array.from({length: 70}, (_, index) => `${prefix}${String(index + 1).padStart(3, '0')}`);
-const historicalCodes = Array.from({length: 30}, (_, index) => `${prefix}${String(index + 71).padStart(3, '0')}`);
+const historicalCodes = Array.from({length: 50}, (_, index) => `${prefix}${String(index + 71).padStart(3, '0')}`);
 const fullExamCodes = [...authorizedCodes, ...historicalCodes];
 
-test('preserva o que já está público e completa as 100 questões de Contador sem duplicação', async ({page}) => {
+test('preserva os 50 itens históricos e completa as 120 questões de Contador sem duplicação', async ({page}) => {
   if (packageAvailable) {
     expect(plan.total_records).toBe(70);
     expect(plan.lots).toHaveLength(1);
@@ -58,28 +58,18 @@ test('preserva o que já está público e completa as 100 questões de Contador 
 
   if (!packageAvailable) {
     expect([2535, 2801]).toContain(result.questions);
+    expect(result.prefixCodes).toEqual(historicalCodes);
     for (const code of historicalCodes) expect(result.occurrences[code], code).toBe(1);
-    expect(new Set(result.prefixCodes).size).toBe(result.prefixCodes.length);
-
-    if (result.questions === 2535) {
-      expect(result.prefixCodes.length).toBeGreaterThanOrEqual(30);
-      expect(result.prefixCodes.length).toBeLessThanOrEqual(50);
-      console.log(`Contador na base canônica: ${result.prefixCodes.join(', ')}`);
-      return;
-    }
-
-    expect(result.prefixCodes).toHaveLength(50);
-    const alreadyPublicAuthorized = authorizedCodes.filter(code => result.occurrences[code] === 1);
-    expect(alreadyPublicAuthorized).toHaveLength(20);
-    console.log(`Contador antes da reconciliação cumulativa: ${result.prefixCodes.join(', ')}`);
+    for (const code of authorizedCodes) expect(result.occurrences[code], code).toBe(0);
+    expect(new Set(result.prefixCodes).size).toBe(50);
     return;
   }
 
-  expect(result.questions).toBe(2851);
+  expect(result.questions).toBe(2871);
   expect(result.materials).toBeGreaterThanOrEqual(67);
   expect(result.targetMaterial).toContain('Contador');
   expect(result.targetMaterial).toContain('CRBM-6');
-  expect(result.targetMaterialQuestions).toBe(100);
+  expect(result.targetMaterialQuestions).toBe(120);
   expect(result.prefixCodes).toEqual(fullExamCodes);
   for (const code of fullExamCodes) expect(result.occurrences[code], code).toBe(1);
 });
