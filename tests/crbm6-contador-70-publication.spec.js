@@ -2,8 +2,11 @@ import fs from 'node:fs';
 import {test, expect} from '@playwright/test';
 
 const planPath = 'data/notion/publication-additions/crbm6-contador-70-plan.json';
+const receiptPath = 'data/release/crbm6-contador-70-publication-receipt.json';
 const packageAvailable = fs.existsSync(planPath);
+const applicationApplied = fs.existsSync(receiptPath);
 const plan = packageAvailable ? JSON.parse(fs.readFileSync(planPath, 'utf8')) : null;
+const receipt = applicationApplied ? JSON.parse(fs.readFileSync(receiptPath, 'utf8')) : null;
 const prefix = 'PROVA-QDX-CRBM6-2026-CONTADOR-402-';
 const authorizedCodes = Array.from({length: 70}, (_, index) => `${prefix}${String(index + 1).padStart(3, '0')}`);
 const historicalCodes = Array.from({length: 50}, (_, index) => `${prefix}${String(index + 71).padStart(3, '0')}`);
@@ -56,7 +59,7 @@ test('preserva os 50 itens históricos e completa as 120 questões de Contador s
     };
   }, {trackedCodes: fullExamCodes, codePrefix: prefix});
 
-  if (!packageAvailable) {
+  if (!applicationApplied) {
     expect([2535, 2801]).toContain(result.questions);
     expect(result.prefixCodes).toEqual(historicalCodes);
     for (const code of historicalCodes) expect(result.occurrences[code], code).toBe(1);
@@ -65,6 +68,8 @@ test('preserva os 50 itens históricos e completa as 120 questões de Contador s
     return;
   }
 
+  expect(receipt.operation_id).toBe('CRBM6-2026-CONTADOR-402-001-070-20260803');
+  expect(receipt.added_questions).toBe(70);
   expect(result.questions).toBe(2871);
   expect(result.materials).toBeGreaterThanOrEqual(67);
   expect(result.targetMaterial).toContain('Contador');
