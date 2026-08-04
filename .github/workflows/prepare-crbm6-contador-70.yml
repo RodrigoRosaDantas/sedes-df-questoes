@@ -37,6 +37,7 @@ jobs:
           set -euo pipefail
           node --check data/editorial/reconcile-public-snapshot-notion-ids.mjs
           node --check data/editorial/notion-trash-classified-records.mjs
+          node --check data/editorial/refine-notion-trash-targets.mjs
           jq -e '.operation_id == "NOTION-TRASH-CLASSIFIED-20260804" and (.mode == "dry-run" or .mode == "execute")' \
             data/editorial/notion-trash-classified-20260804-trigger.json >/dev/null
 
@@ -51,6 +52,19 @@ jobs:
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         run: node data/editorial/notion-trash-classified-records.mjs
+
+      - name: Refinar as linhas excedentes contra os 2.871 IDs canônicos
+        id: refinement
+        if: steps.operation.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$(jq -r '.mode' data/editorial/notion-trash-classified-20260804-trigger.json)" = 'dry-run' ]; then
+            node data/editorial/refine-notion-trash-targets.mjs
+          else
+            echo 'Execução real: alvos refinados do dry-run foram usados sem alteração.'
+          fi
 
       - name: Persistir alvos e recibos no branch operacional
         if: always()
@@ -72,7 +86,7 @@ jobs:
           fi
 
       - name: Reprovar operação não concluída
-        if: steps.operation.outcome != 'success'
+        if: steps.operation.outcome != 'success' || steps.refinement.outcome == 'failure'
         run: |
           echo 'A operação foi interrompida. Consulte o recibo persistido no branch operacional.'
           exit 1
