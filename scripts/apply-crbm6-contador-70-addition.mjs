@@ -20,9 +20,10 @@ const manifestPath = 'data/release/manifest.json';
 const receiptPath = 'data/release/crbm6-contador-70-publication-receipt.json';
 const operationId = 'CRBM6-2026-CONTADOR-402-001-070-20260803';
 const prefix = 'PROVA-QDX-CRBM6-2026-CONTADOR-402-';
-const expectedCodes = Array.from({length: 70}, (_, index) => `${prefix}${String(index + 1).padStart(3, '0')}`);
-const expectedHistoricalCodes = Array.from({length: 30}, (_, index) => `${prefix}${String(index + 71).padStart(3, '0')}`);
-const expectedSet = new Set(expectedCodes);
+const authorizedCodes = Array.from({length: 70}, (_, index) => `${prefix}${String(index + 1).padStart(3, '0')}`);
+const historicalCodes = Array.from({length: 30}, (_, index) => `${prefix}${String(index + 71).padStart(3, '0')}`);
+const fullExamCodes = [...authorizedCodes, ...historicalCodes];
+const fullExamSet = new Set(fullExamCodes);
 
 for (const required of [snapshotPath, planPath, catalogPath, manifestPath]) {
   if (!fs.existsSync(resolve(required))) fail(`Arquivo obrigatório ausente: ${required}.`);
@@ -38,17 +39,17 @@ if (plan.total_records !== 70 || !Array.isArray(plan.lots) || plan.lots.length !
   fail('Plano de Contador deve conter exatamente 70 registros em um lote.');
 }
 const [lot] = plan.lots;
-if (lot.lot !== operationId || lot.expected_count !== 70 || JSON.stringify(lot.codes) !== JSON.stringify(expectedCodes)) {
+if (lot.lot !== operationId || lot.expected_count !== 70 || JSON.stringify(lot.codes) !== JSON.stringify(authorizedCodes)) {
   fail('Plano de Contador diverge do lote autorizado ou da sequência 001–070.');
 }
 if (sha256(snapshotBytes) !== plan.snapshot_sha256) fail('Hash do snapshot de Contador diverge do plano.');
-if (sha256(expectedCodes.join('\n')) !== lot.codes_sha256) fail('Hash dos códigos de Contador diverge do plano.');
+if (sha256(authorizedCodes.join('\n')) !== lot.codes_sha256) fail('Hash dos códigos de Contador diverge do plano.');
 
 const byCode = new Map((snapshot.records || []).map(record => [clean(record.code), record]));
-const additions = expectedCodes.map(code => byCode.get(code));
-if (additions.some(record => !record)) fail('Snapshot de Contador está incompleto.');
+const authorizedRecords = authorizedCodes.map(code => byCode.get(code));
+if (authorizedRecords.some(record => !record)) fail('Snapshot de Contador está incompleto.');
 
-for (const record of additions) {
+for (const record of authorizedRecords) {
   if (clean(record.github_id) || record.released_for_export !== true || clean(record.publication_lot) !== operationId) {
     fail(`${record.code}: rastreabilidade, liberação ou lote inválido.`);
   }
@@ -81,26 +82,38 @@ for (const metadata of catalog.materials || []) {
     for (const code of [question.codigo, question.codigo_fonte]) {
       if (!code) continue;
       existingCodes.add(key(code));
-      if (clean(code).startsWith(prefix)) existingContadorCodes.add(clean(code));
+      const normalized = clean(code);
+      if (normalized.startsWith(prefix)) existingContadorCodes.add(normalized);
     }
   }
 }
-const sortedHistorical = [...existingContadorCodes].sort((left, right) => left.localeCompare(right, 'pt-BR'));
-if (JSON.stringify(sortedHistorical) !== JSON.stringify(expectedHistoricalCodes)) {
-  fail(`Catálogo deveria conter somente os 30 itens históricos 071–100 de Contador; encontrou ${sortedHistorical.length}.`);
-}
-for (const code of expectedCodes) if (existingCodes.has(key(code))) fail(`${code}: já existe no catálogo.`);
 
-const first = additions[0];
+const unexpectedExisting = [...existingContadorCodes].filter(code => !fullExamSet.has(code));
+if (unexpectedExisting.length) fail(`Catálogo contém códigos de Contador fora da prova 001–100: ${unexpectedExisting.join(', ')}.`);
+if (existingContadorCodes.size !== 50) {
+  fail(`Catálogo deveria conter 50 questões de Contador antes da operação; contém ${existingContadorCodes.size}.`);
+}
+const missingHistorical = historicalCodes.filter(code => !existingContadorCodes.has(code));
+if (missingHistorical.length) fail(`Itens históricos 071–100 ausentes: ${missingHistorical.join(', ')}.`);
+
+const alreadyPublicAuthorizedCodes = authorizedCodes.filter(code => existingContadorCodes.has(code));
+const missingAuthorizedCodes = authorizedCodes.filter(code => !existingContadorCodes.has(code));
+if (alreadyPublicAuthorizedCodes.length !== 20 || missingAuthorizedCodes.length !== 50) {
+  fail(`Interseção inesperada: ${alreadyPublicAuthorizedCodes.length} autorizados já públicos e ${missingAuthorizedCodes.length} ausentes.`);
+}
+const additions = missingAuthorizedCodes.map(code => byCode.get(code));
+
+const first = authorizedRecords[0];
 const target = materialByName.get(key(first.material_name));
 if (!target) fail(`Material existente não encontrado: ${first.material_name}.`);
-if (target.material.questoes.length !== 30) {
-  fail(`Material de Contador deveria ter 30 questões históricas; contém ${target.material.questoes.length}.`);
+if (target.material.questoes.length !== 50) {
+  fail(`Material de Contador deveria ter 50 questões antes da operação; contém ${target.material.questoes.length}.`);
 }
 
 for (const record of additions) {
   const id = slug(record.code);
   if (!id || existingIds.has(key(id))) fail(`${record.code}: ID público duplicado.`);
+  if (existingCodes.has(key(record.code))) fail(`${record.code}: código já existe no catálogo.`);
   target.material.questoes.push({
     id,
     codigo: record.code,
@@ -123,7 +136,7 @@ for (const record of additions) {
     pagina_pdf: clean(record.pdf_page),
     fonte_oficial: record.source_url || record.notion_url,
     fonte_consolidada: record.source_url || record.notion_url,
-    auditoria: 'Banco Mestre — lote formalmente liberado e validado em 03/08/2026',
+    auditoria: 'Banco Mestre — lote formalmente liberado e validado em 03/08/2026; itens já públicos preservados sem duplicação',
     notion_url: record.notion_url,
     codigo_fonte: record.code,
     anulada: false,
@@ -133,6 +146,7 @@ for (const record of additions) {
   });
   catalog.question_index[id] = target.material.id;
   existingIds.add(key(id));
+  existingCodes.add(key(record.code));
 }
 
 target.material.questoes.sort((left, right) => Number(left.numero) - Number(right.numero));
@@ -152,8 +166,8 @@ catalog.summary.questoes = Object.keys(catalog.question_index || {}).length;
 catalog.summary.provas = catalog.materials.filter(item => key(item.tipo_material) === 'prova').length;
 catalog.summary.simulados = catalog.materials.filter(item => key(item.tipo_material) === 'simulado').length;
 catalog.summary.aguardando_auditoria = Math.max(0, Number(catalog.summary.banco_mestre || 0) - catalog.summary.questoes);
-if (catalog.summary.questoes !== 2871) fail(`Acervo após Contador: ${catalog.summary.questoes}; esperado 2871.`);
-catalog.source.criteria = `${catalog.summary.questoes} questões públicas após inclusão restrita do lote ${operationId}; 30 itens históricos preservados.`;
+if (catalog.summary.questoes !== 2851) fail(`Acervo após Contador: ${catalog.summary.questoes}; esperado 2851.`);
+catalog.source.criteria = `${catalog.summary.questoes} questões públicas após reconciliação do lote ${operationId}; 20 códigos autorizados já públicos preservados e 50 itens ausentes acrescentados.`;
 
 const catalogContent = `${JSON.stringify(catalog, null, 2)}\n`;
 fs.writeFileSync(resolve(catalogPath), catalogContent);
@@ -172,18 +186,22 @@ manifest.materials = catalog.materials.map(metadata => {
 fs.writeFileSync(resolve(manifestPath), `${JSON.stringify(manifest, null, 2)}\n`);
 
 const receipt = {
-  schema_version: '1.0',
+  schema_version: '1.1',
   operation_id: operationId,
   applied_at: new Date().toISOString(),
   baseline_questions: baseline,
-  historical_public_questions: 30,
-  added_questions: 70,
+  authorized_codes: authorizedCodes.length,
+  historical_public_questions: historicalCodes.length,
+  already_public_authorized_questions: alreadyPublicAuthorizedCodes.length,
+  added_questions: additions.length,
   final_questions: catalog.summary.questoes,
   material_id: target.material.id,
   material_questions: target.material.quantidade_questoes,
-  codes: expectedCodes,
-  historical_codes: expectedHistoricalCodes,
-  codes_sha256: sha256(`${expectedCodes.join('\n')}\n`),
+  codes: authorizedCodes,
+  already_public_authorized_codes: alreadyPublicAuthorizedCodes,
+  added_codes: missingAuthorizedCodes,
+  historical_codes: historicalCodes,
+  codes_sha256: sha256(`${authorizedCodes.join('\n')}\n`),
   preserved_existing_catalog: true,
   source_snapshot: snapshotPath,
   source_plan: planPath,
@@ -193,9 +211,9 @@ fs.writeFileSync(resolve(receiptPath), `${JSON.stringify(receipt, null, 2)}\n`);
 execFileSync(process.execPath, ['--import=./scripts/fixed-build-time.mjs', 'scripts/build-study-index.mjs'], {cwd: root, stdio: 'inherit'});
 execFileSync(process.execPath, ['scripts/build-public.mjs'], {cwd: root, stdio: 'inherit'});
 const distCatalog = readJSON('dist/data/release/catalogo.json');
-if (Number(distCatalog.summary?.questoes) !== 2871) fail('Pacote público não contém 2871 questões.');
+if (Number(distCatalog.summary?.questoes) !== 2851) fail('Pacote público não contém 2851 questões.');
 
-const occurrences = new Map([...expectedCodes, ...expectedHistoricalCodes].map(code => [code, 0]));
+const occurrences = new Map(fullExamCodes.map(code => [code, 0]));
 let publishedMaterial = null;
 for (const metadata of distCatalog.materials || []) {
   const material = readJSON(`dist/${String(metadata.file).replace(/^\.\//, '')}`);
@@ -212,4 +230,4 @@ for (const [code, count] of occurrences) {
 if (!publishedMaterial || publishedMaterial.quantidade_questoes !== 100) {
   fail('Material público de Contador não contém exatamente 100 questões.');
 }
-console.log(`✓ Lote ${operationId} aplicado: 70 novas questões, 100 no material e 2871 no pacote público.`);
+console.log(`✓ Lote ${operationId} reconciliado: 20 códigos autorizados já públicos, 50 novas questões, 100 no material e 2851 no pacote público.`);
