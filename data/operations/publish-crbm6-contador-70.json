@@ -1,0 +1,11 @@
+{
+  "operation_id": "CRBM6-2026-CONTADOR-402-001-070-20260803",
+  "action": "publish",
+  "authorized": true,
+  "authorized_by": "Rodrigo Rosa Dantas",
+  "requested_at": "2026-08-04T13:49:00-03:00",
+  "source_snapshot_commit": "5c3e29bcc61531f8f270a27a4387df0e3de7aec8",
+  "expected_additions": 70,
+  "expected_total_questions": 2871,
+  "purpose": "Acionar o pipeline completo de validação, publicação, auditoria pública e rastreabilidade do lote de Contador."
+}
