@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "NOTION-TRASH-CLASSIFIED-20260804",
+  "mode": "dry-run",
+  "requested_at": "2026-08-05T00:24:00Z",
+  "requested_by": "Rodrigo Rosa Dantas",
+  "expected_counts": {
+    "pending_blockers": 1627,
+    "traceability_incomplete": 415,
+    "excess_historical": 46,
+    "union_targets": 2088,
+    "public_snapshot": 2871,
+    "editorial_candidates": 75
+  }
+}

@@ -1,0 +1,103 @@
+name: Auditar e limpar registros classificados do Notion
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - data/editorial/notion-trash-classified-20260804-trigger.json
+
+permissions:
+  contents: write
+
+concurrency:
+  group: notion-trash-classified-20260804
+  cancel-in-progress: false
+
+env:
+  BASE_SNAPSHOT_COMMIT: c060ed9a6d4c46c637a5215b3a2738b28a8d405e
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Baixar branch principal
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Validar scripts e gatilho
+        run: |
+          set -euo pipefail
+          node --check data/editorial/reconcile-public-snapshot-notion-ids.mjs
+          node --check data/editorial/notion-trash-classified-records.mjs
+          node --check data/editorial/refine-notion-trash-targets.mjs
+          jq -e '.operation_id == "NOTION-TRASH-CLASSIFIED-20260804" and (.mode == "dry-run" or .mode == "execute")' data/editorial/notion-trash-classified-20260804-trigger.json >/dev/null
+
+      - name: Reconstruir o catálogo público somente no workspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp data/notion/published.json /tmp/current-snapshot.json
+          cp data/notion/publication-plan.json /tmp/current-plan.json
+          git fetch origin "${BASE_SNAPSHOT_COMMIT}" --depth=1
+          git show "${BASE_SNAPSHOT_COMMIT}:data/notion/published.json" > data/notion/published.json
+          git show "${BASE_SNAPSHOT_COMMIT}:data/notion/publication-plan.json" > data/notion/publication-plan.json
+          npm run build
+          cp /tmp/current-snapshot.json data/notion/published.json
+          cp /tmp/current-plan.json data/notion/publication-plan.json
+          node scripts/apply-publication-additions.mjs
+          node scripts/apply-seedf-bio-24-addition.mjs
+          node scripts/apply-seedf-biomed-50-addition.mjs
+          node scripts/apply-seedf-eletrot-43-addition.mjs
+          node scripts/apply-alto-paraiso-orientador-37-addition.mjs
+          node scripts/apply-crefito17-agentefiscal-62-addition.mjs
+          node scripts/apply-crbm6-contador-70-addition.mjs
+          jq -e '.summary.questoes == 2871' data/release/catalogo.json >/dev/null
+
+      - name: Extrair os códigos públicos
+        run: node data/editorial/reconcile-public-snapshot-notion-ids.mjs
+
+      - name: Executar classificação ou envio à lixeira
+        id: operation
+        continue-on-error: true
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node data/editorial/notion-trash-classified-records.mjs
+
+      - name: Refinar os alvos contra o catálogo público
+        id: refinement
+        if: steps.operation.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$(jq -r '.mode' data/editorial/notion-trash-classified-20260804-trigger.json)" = 'dry-run' ]; then
+            node data/editorial/refine-notion-trash-targets.mjs
+          fi
+
+      - name: Persistir somente os recibos operacionais
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'sedes-df-notion-cleanup[bot]'
+          git config user.email 'sedes-df-notion-cleanup[bot]@users.noreply.github.com'
+          git add data/editorial/notion-trash-classified-20260804-*.json
+          if ! git diff --cached --quiet; then
+            MODE=$(jq -r '.mode' data/editorial/notion-trash-classified-20260804-trigger.json)
+            git commit -m "Registrar ${MODE} da limpeza classificada do Notion [skip ci]"
+            git push origin HEAD:main
+          fi
+
+      - name: Reprovar operação não concluída
+        if: steps.operation.outcome != 'success' || steps.refinement.outcome == 'failure'
+        run: exit 1
