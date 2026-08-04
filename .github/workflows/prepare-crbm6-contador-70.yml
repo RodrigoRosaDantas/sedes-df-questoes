@@ -3,7 +3,7 @@ name: Auditar e limpar registros classificados do Notion
 on:
   push:
     branches:
-      - agent/notion-trash-classified-20260804
+      - main
     paths:
       - data/editorial/notion-trash-classified-20260804-trigger.json
 
@@ -22,10 +22,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
-      - name: Baixar branch operacional
+      - name: Baixar branch principal
         uses: actions/checkout@v6
         with:
-          ref: agent/notion-trash-classified-20260804
+          ref: main
           fetch-depth: 0
 
       - name: Preparar Node.js
@@ -95,7 +95,7 @@ jobs:
           if ! git diff --cached --quiet; then
             MODE=$(jq -r '.mode' data/editorial/notion-trash-classified-20260804-trigger.json)
             git commit -m "Registrar ${MODE} da limpeza classificada do Notion [skip ci]"
-            git push origin HEAD:agent/notion-trash-classified-20260804
+            git push origin HEAD:main
           fi
 
       - name: Reprovar operação não concluída
