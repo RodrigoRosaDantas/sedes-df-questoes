@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "NOTION-TRASH-CLASSIFIED-20260804",
+  "mode": "dry-run",
+  "source_sha": "a438650d1c4b7ec62977382c2b76191eb0bb8ae6",
+  "created_at": "2026-08-04T23:59:36Z",
+  "stages": {
+    "validation": "success",
+    "reconstruction": "failure",
+    "extraction": "skipped",
+    "operation": "skipped",
+    "refinement": "skipped"
+  }
+}
