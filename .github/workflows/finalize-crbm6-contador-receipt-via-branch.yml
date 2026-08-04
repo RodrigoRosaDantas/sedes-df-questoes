@@ -1,4 +1,5 @@
 name: Finalizar comprovante CRBM-6 Contador via branch
+# Segundo push intencional: o workflow já está registrado na main.
 
 on:
   push:
