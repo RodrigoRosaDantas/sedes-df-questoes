@@ -3,8 +3,8 @@
   "operation_id": "NOTION-TRASH-CLASSIFIED-20260804",
   "mode": "dry-run",
   "status": "blocked",
-  "created_at": "2026-08-04T23:21:18.145Z",
-  "source_sha": "619847f4bff4ef66e2fa5f2e39a51f2b27f67466",
+  "created_at": "2026-08-04T23:30:37.392Z",
+  "source_sha": "60231a90730307a355d9fdc5ef8472f6c80fb625",
   "classification_counts": {
     "all_active": 5034,
     "pending_blockers": 1627,
