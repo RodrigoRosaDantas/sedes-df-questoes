@@ -15,6 +15,7 @@ concurrency:
 
 env:
   PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes
+  BASE_SNAPSHOT_COMMIT: c060ed9a6d4c46c637a5215b3a2738b28a8d405e
   CONTADOR_OPERATION: CRBM6-2026-CONTADOR-402-001-070-20260803
   CONTADOR_SNAPSHOT_PATH: data/notion/publication-additions/crbm6-contador-70.json
   CONTADOR_PLAN_PATH: data/notion/publication-additions/crbm6-contador-70-plan.json
@@ -140,6 +141,30 @@ jobs:
           throw new Error(`Produção não confirmou o commit autorizado dentro da janela de segurança: ${last}`);
           NODE
           node scripts/verify-deployment.mjs "${PUBLIC_BASE_URL}" "${EXPECTED_SHA}"
+
+      - name: Reconstruir localmente o catálogo público confirmado
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${BASE_SNAPSHOT_COMMIT}" --depth=1
+          git show "${BASE_SNAPSHOT_COMMIT}:data/notion/published.json" > data/notion/published.json
+          git show "${BASE_SNAPSHOT_COMMIT}:data/notion/publication-plan.json" > data/notion/publication-plan.json
+          npm run build
+          node scripts/apply-publication-additions.mjs
+          node scripts/apply-seedf-bio-24-addition.mjs
+          node scripts/apply-seedf-biomed-50-addition.mjs
+          node scripts/apply-seedf-eletrot-43-addition.mjs
+          node scripts/apply-alto-paraiso-orientador-37-addition.mjs
+          node scripts/apply-crefito17-agentefiscal-62-addition.mjs
+          node scripts/apply-crbm6-contador-70-addition.mjs
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const catalog = JSON.parse(fs.readFileSync('data/release/catalogo.json', 'utf8'));
+          const metadata = (catalog.materials || []).find(item => item.id === 'notion-contador-crbm-6-quadrix-2026');
+          if (Number(catalog.summary?.questoes) !== 2871) throw new Error('Catálogo local reconstruído não contém 2.871 questões.');
+          if (Number(metadata?.quantidade_questoes) !== 120) throw new Error('Material local de Contador não contém 120 questões.');
+          console.log('✓ Catálogo local reconstruído: 2.871 questões e 120 itens de Contador.');
+          NODE
 
       - name: Registrar Código GitHub somente nos 70 itens publicados
         env:
