@@ -14,7 +14,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: prepare-crbm6-contador-70
+  group: prepare-crbm6-contador-70-v2
   cancel-in-progress: false
 
 jobs:
@@ -31,28 +31,52 @@ jobs:
           node-version: 22
           package-manager-cache: false
 
-      - name: Consultar a fonte editorial viva
+      - name: Executar preparação com diagnóstico persistente
+        id: prepare
+        shell: bash
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        run: node scripts/export-notion-snapshot.mjs
-
-      - name: Isolar somente as 70 questões de Contador
-        run: node scripts/filter-crbm6-contador-70-snapshot.mjs
-
-      - name: Gerar e validar o plano restrito
         run: |
-          node scripts/create-publication-plan.mjs
-          node scripts/validate-notion-snapshot.mjs
-          node scripts/validate-publication-plan.mjs
-          node scripts/validate-crbm6-contador-70-operation.mjs
+          set +e
+          mkdir -p data/operations
+          {
+            echo '== Consultar a fonte editorial viva =='
+            node scripts/export-notion-snapshot.mjs
+            echo '== Isolar somente as 70 questões de Contador =='
+            node scripts/filter-crbm6-contador-70-snapshot.mjs
+            echo '== Gerar e validar o plano restrito =='
+            node scripts/create-publication-plan.mjs
+            node scripts/validate-notion-snapshot.mjs
+            node scripts/validate-publication-plan.mjs
+            node scripts/validate-crbm6-contador-70-operation.mjs
+            echo '== Criar cópia imutável da adição =='
+            mkdir -p data/notion/publication-additions
+            cp data/notion/published.json data/notion/publication-additions/crbm6-contador-70.json
+            cp data/notion/publication-plan.json data/notion/publication-additions/crbm6-contador-70-plan.json
+          } 2>&1 | tee data/operations/crbm6-contador-70-prepare.log
+          code=${PIPESTATUS[0]}
+          echo "exit_code=${code}" >> "$GITHUB_OUTPUT"
+          exit 0
 
-      - name: Criar cópia imutável da adição
+      - name: Registrar diagnóstico quando houver falha
+        if: steps.prepare.outputs.exit_code != '0'
+        shell: bash
         run: |
-          mkdir -p data/notion/publication-additions
-          cp data/notion/published.json data/notion/publication-additions/crbm6-contador-70.json
-          cp data/notion/publication-plan.json data/notion/publication-additions/crbm6-contador-70-plan.json
+          set -euo pipefail
+          git config user.name 'sedes-df-publish[bot]'
+          git config user.email 'sedes-df-publish[bot]@users.noreply.github.com'
+          git add data/operations/crbm6-contador-70-prepare.log
+          if git diff --cached --quiet; then
+            echo 'O diagnóstico não mudou; nenhuma gravação necessária.'
+            exit 0
+          fi
+          git commit -m 'Registrar falha da preparação do lote de Contador [skip ci]'
+          git fetch origin main
+          if ! git merge-base --is-ancestor origin/main HEAD; then git rebase origin/main; fi
+          git push origin HEAD:main
 
       - name: Versionar somente o pacote validado
+        if: steps.prepare.outputs.exit_code == '0'
         shell: bash
         run: |
           set -euo pipefail
@@ -62,6 +86,7 @@ jobs:
           git rm scripts/filter-crbm6-contador-70-snapshot.mjs
           git rm scripts/validate-crbm6-contador-70-operation.mjs
           git rm data/operations/prepare-crbm6-contador-70.json
+          git rm -f data/operations/crbm6-contador-70-prepare.log || true
           git add data/notion/published.json data/notion/publication-plan.json
           git add data/notion/publication-additions/crbm6-contador-70.json
           git add data/notion/publication-additions/crbm6-contador-70-plan.json
@@ -69,3 +94,7 @@ jobs:
           git fetch origin main
           if ! git merge-base --is-ancestor origin/main HEAD; then git rebase origin/main; fi
           git push origin HEAD:main
+
+      - name: Encerrar com falha após registrar o diagnóstico
+        if: steps.prepare.outputs.exit_code != '0'
+        run: exit 1
