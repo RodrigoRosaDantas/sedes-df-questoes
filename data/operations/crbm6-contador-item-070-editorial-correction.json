@@ -1,9 +1,11 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "operation_id": "CRBM6-2026-CONTADOR-402-070-EDITORIAL-20260804",
   "question_code": "PROVA-QDX-CRBM6-2026-CONTADOR-402-070",
-  "correction": "Suppress internal editorial observations from the public material while preserving the immutable source snapshot.",
+  "correction": "Remover o marcador editorial RASCUNHO do enunciado público e impedir a exposição de observações internas, preservando o snapshot imutável.",
   "source_snapshot_preserved": true,
+  "public_prompt_expected": "A Lei nº 13.709/2018 exclui a aplicação de outros direitos e de outras garantias previstos no ordenamento jurídico que sejam relacionados à proteção da privacidade e da personalidade.",
+  "public_answer_expected": "Errado",
   "public_observations_expected": "",
   "public_questions_expected": 2871,
   "material_questions_expected": 120
