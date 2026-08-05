@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "operation": "MANUAL-DASHBOARD-CARD-DEPLOY-20260805",
+  "status": "success",
+  "confirmed_at": "2026-08-05T11:48:18Z",
+  "public_url": "https://rodrigorosadantas.github.io/sedes-df-questoes/",
+  "source_sha": "5d106a50b2316cecaec1325809ad58d80e869770",
+  "workflow_run_id": 31002745526,
+  "dashboard": {
+    "banco_mestre": 2946,
+    "available_on_site": 2871,
+    "awaiting_editorial_audit": 75,
+    "materials": 67
+  },
+  "verification": {
+    "build_and_checks": "success",
+    "immutable_packages": "success",
+    "static_deployment": "success",
+    "public_browser_suite": "success",
+    "public_dashboard_card": "success",
+    "release_meta": "success"
+  },
+  "controls": {
+    "notion_write": false,
+    "catalog_content_changed": false,
+    "main_pages_remained_suspended": true,
+    "all_automatic_workflows_suspended": true,
+    "temporary_workflows_removed": true,
+    "temporary_markers_removed": true
+  }
+}
