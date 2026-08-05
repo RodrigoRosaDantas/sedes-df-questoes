@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "operation": "PUBLISH-SEEDF-CONTABILIDADE-ELETRONICA-75-20260805",
+  "status": "validated_for_deploy",
+  "completed_at": "2026-08-05T18:12:14Z",
+  "workflow_run_id": "31033535230",
+  "base_questions_preserved": 2971,
+  "objective_questions_added": 75,
+  "questions": 3046,
+  "discursive_display_items": 2,
+  "banco_mestre": 3048,
+  "awaiting_audit": 0,
+  "materials": 71,
+  "proofs": 36,
+  "simulations": 35,
+  "lots": [
+    "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
+    "SEEDF-2025-ELETRONICA-A-071-095-20260805"
+  ],
+  "audit": {
+    "reviewed": 75,
+    "format": "Certo / Errado",
+    "all_required_fields_complete": true
+  },
+  "hashes": {
+    "snapshot_sha256": "e76dbbec6fd31d6a312fe9818578000b3a03668374f2542ec84f71aca6dc24e1",
+    "publication_plan_sha256": "94266346c87750e9dc4d37f86ad8ff69efee99db26b6a518efa73b6fe4f1d6c7",
+    "catalog_sha256": "52fb994b2cddcc35b5d59340beb510af95a9fb9e9078eb79bfca7dbc5f325bdb"
+  },
+  "validation": {
+    "base_ids_preserved": true,
+    "sequences_complete": true,
+    "manifest_hashes": true
+  }
+}

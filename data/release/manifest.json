@@ -1,17 +1,17 @@
 {
   "schema_version": "3.1",
   "release_version": "2.9.0",
-  "generated_at": "2026-08-05T16:57:11.096Z",
+  "generated_at": "2026-08-05T18:12:14.427Z",
   "summary": {
     "banco_mestre": 3048,
-    "materiais": 69,
-    "questoes": 2971,
-    "aguardando_auditoria": 75,
-    "provas": 34,
+    "materiais": 71,
+    "questoes": 3046,
+    "aguardando_auditoria": 0,
+    "provas": 36,
     "simulados": 35,
     "discursivas_consulta": 2
   },
-  "catalog_sha256": "095caf81ba780a2d7d05cc8e20a1a02ad1289604ad96698a0cbb64f251e31838",
+  "catalog_sha256": "52fb994b2cddcc35b5d59340beb510af95a9fb9e9078eb79bfca7dbc5f325bdb",
   "materials": [
     {
       "id": "notion-administrador-crf-df-quadrix-2026",
@@ -98,7 +98,7 @@
       "file": "./data/release/materials/notion-analista-i-atendimento-e-cobranca-cra-sp-quadrix-2025.json",
       "questions": 50,
       "bytes": 163530,
-      "sha256": "1d7ccf0c2b9084263ff7c0cff3164a6a69f57b1185fd8f42b6ec3176b3a4d920",
+      "sha256": "df4d953267caf9706b11cc7bafe391d4b72d7f5d79f9c14c410abec7a91c993a",
       "display_items": 1
     },
     {
@@ -106,7 +106,7 @@
       "file": "./data/release/materials/notion-assistente-administrativo-cremam-quadrix-2025.json",
       "questions": 50,
       "bytes": 169315,
-      "sha256": "c8dae6c014b5203499571d4f786f1f2240e45600529a42b83ee73cd6ee3a9811",
+      "sha256": "730dcc398daa7099121f9058fa9645166290fd97dccd003446288273f65d4880",
       "display_items": 1
     },
     {
@@ -238,11 +238,27 @@
       "display_items": 0
     },
     {
+      "id": "notion-professor-de-educacao-basica-contabilidade-seedf-df-quadrix-2025-tipo-a",
+      "file": "./data/release/materials/notion-professor-de-educacao-basica-contabilidade-seedf-df-quadrix-2025-tipo-a.json",
+      "questions": 50,
+      "bytes": 139846,
+      "sha256": "5d03fa6caa8f1ae99a46fb9ab904b42d79cc42ae8728cb52860a3b0bae54d30b",
+      "display_items": 0
+    },
+    {
       "id": "notion-professor-de-educacao-basica-direito-seedf-df-quadrix-2025-tipo-a",
       "file": "./data/release/materials/notion-professor-de-educacao-basica-direito-seedf-df-quadrix-2025-tipo-a.json",
       "questions": 50,
       "bytes": 102509,
       "sha256": "2665c98eb86b00168a972987bd561fd1560f6f8ef280cae9a32a97a70f95578e",
+      "display_items": 0
+    },
+    {
+      "id": "notion-professor-de-educacao-basica-eletronica-seedf-df-quadrix-2025-tipo-a",
+      "file": "./data/release/materials/notion-professor-de-educacao-basica-eletronica-seedf-df-quadrix-2025-tipo-a.json",
+      "questions": 25,
+      "bytes": 65281,
+      "sha256": "2a6a01b169ab255cabcaec1922f40ca42daeb44d891038f704ff87b62e3127f2",
       "display_items": 0
     },
     {

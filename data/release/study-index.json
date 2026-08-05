@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
   "release_version": "2.9.0",
-  "generated_at": "2026-08-05T16:57:11.026Z",
+  "generated_at": "2026-08-05T18:12:14.576Z",
   "summary": {
-    "disciplines": 161,
-    "topics": 1282,
-    "questions": 2971
+    "disciplines": 163,
+    "topics": 1324,
+    "questions": 3046
   },
   "disciplines": [
     {
@@ -7538,6 +7538,316 @@
       ]
     },
     {
+      "name": "Contabilidade",
+      "question_count": 50,
+      "question_ids": [
+        "prova-qdx-seedf-2025-cont-a-071",
+        "prova-qdx-seedf-2025-cont-a-072",
+        "prova-qdx-seedf-2025-cont-a-073",
+        "prova-qdx-seedf-2025-cont-a-074",
+        "prova-qdx-seedf-2025-cont-a-075",
+        "prova-qdx-seedf-2025-cont-a-076",
+        "prova-qdx-seedf-2025-cont-a-077",
+        "prova-qdx-seedf-2025-cont-a-078",
+        "prova-qdx-seedf-2025-cont-a-079",
+        "prova-qdx-seedf-2025-cont-a-080",
+        "prova-qdx-seedf-2025-cont-a-081",
+        "prova-qdx-seedf-2025-cont-a-082",
+        "prova-qdx-seedf-2025-cont-a-083",
+        "prova-qdx-seedf-2025-cont-a-084",
+        "prova-qdx-seedf-2025-cont-a-085",
+        "prova-qdx-seedf-2025-cont-a-086",
+        "prova-qdx-seedf-2025-cont-a-087",
+        "prova-qdx-seedf-2025-cont-a-088",
+        "prova-qdx-seedf-2025-cont-a-089",
+        "prova-qdx-seedf-2025-cont-a-090",
+        "prova-qdx-seedf-2025-cont-a-091",
+        "prova-qdx-seedf-2025-cont-a-092",
+        "prova-qdx-seedf-2025-cont-a-093",
+        "prova-qdx-seedf-2025-cont-a-094",
+        "prova-qdx-seedf-2025-cont-a-095",
+        "prova-qdx-seedf-2025-cont-a-096",
+        "prova-qdx-seedf-2025-cont-a-097",
+        "prova-qdx-seedf-2025-cont-a-098",
+        "prova-qdx-seedf-2025-cont-a-099",
+        "prova-qdx-seedf-2025-cont-a-100",
+        "prova-qdx-seedf-2025-cont-a-101",
+        "prova-qdx-seedf-2025-cont-a-102",
+        "prova-qdx-seedf-2025-cont-a-103",
+        "prova-qdx-seedf-2025-cont-a-104",
+        "prova-qdx-seedf-2025-cont-a-105",
+        "prova-qdx-seedf-2025-cont-a-106",
+        "prova-qdx-seedf-2025-cont-a-107",
+        "prova-qdx-seedf-2025-cont-a-108",
+        "prova-qdx-seedf-2025-cont-a-109",
+        "prova-qdx-seedf-2025-cont-a-110",
+        "prova-qdx-seedf-2025-cont-a-111",
+        "prova-qdx-seedf-2025-cont-a-112",
+        "prova-qdx-seedf-2025-cont-a-113",
+        "prova-qdx-seedf-2025-cont-a-114",
+        "prova-qdx-seedf-2025-cont-a-115",
+        "prova-qdx-seedf-2025-cont-a-116",
+        "prova-qdx-seedf-2025-cont-a-117",
+        "prova-qdx-seedf-2025-cont-a-118",
+        "prova-qdx-seedf-2025-cont-a-119",
+        "prova-qdx-seedf-2025-cont-a-120"
+      ],
+      "material_count": 1,
+      "material_ids": [
+        "notion-professor-de-educacao-basica-contabilidade-seedf-df-quadrix-2025-tipo-a"
+      ],
+      "topics": [
+        {
+          "name": "Educação Profissional e Tecnológica",
+          "question_count": 5,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-115",
+            "prova-qdx-seedf-2025-cont-a-116",
+            "prova-qdx-seedf-2025-cont-a-117",
+            "prova-qdx-seedf-2025-cont-a-118",
+            "prova-qdx-seedf-2025-cont-a-120"
+          ]
+        },
+        {
+          "name": "Ensino de Contabilidade",
+          "question_count": 4,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-111",
+            "prova-qdx-seedf-2025-cont-a-112",
+            "prova-qdx-seedf-2025-cont-a-113",
+            "prova-qdx-seedf-2025-cont-a-114"
+          ]
+        },
+        {
+          "name": "Estrutura Conceitual",
+          "question_count": 4,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-077",
+            "prova-qdx-seedf-2025-cont-a-078",
+            "prova-qdx-seedf-2025-cont-a-079",
+            "prova-qdx-seedf-2025-cont-a-080"
+          ]
+        },
+        {
+          "name": "Contabilidade de Custos",
+          "question_count": 3,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-089",
+            "prova-qdx-seedf-2025-cont-a-090",
+            "prova-qdx-seedf-2025-cont-a-092"
+          ]
+        },
+        {
+          "name": "Demonstrações Contábeis",
+          "question_count": 3,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-072",
+            "prova-qdx-seedf-2025-cont-a-075",
+            "prova-qdx-seedf-2025-cont-a-076"
+          ]
+        },
+        {
+          "name": "Obrigações Acessórias Digitais",
+          "question_count": 3,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-108",
+            "prova-qdx-seedf-2025-cont-a-109",
+            "prova-qdx-seedf-2025-cont-a-110"
+          ]
+        },
+        {
+          "name": "SIAFI",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-101",
+            "prova-qdx-seedf-2025-cont-a-102"
+          ]
+        },
+        {
+          "name": "Ajuste a Valor Presente",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-087"
+          ]
+        },
+        {
+          "name": "Ativo Imobilizado no Setor Público",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-097"
+          ]
+        },
+        {
+          "name": "Combinação de Negócios",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-082"
+          ]
+        },
+        {
+          "name": "Conta Única do Tesouro Nacional",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-100"
+          ]
+        },
+        {
+          "name": "Contabilidade Aplicada ao Setor Público",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-094"
+          ]
+        },
+        {
+          "name": "Contabilidade Gerencial",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-093"
+          ]
+        },
+        {
+          "name": "Contabilidade Tributária",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-073"
+          ]
+        },
+        {
+          "name": "CPC 01 — Redução ao Valor Recuperável",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-081"
+          ]
+        },
+        {
+          "name": "CPC 03 — Fluxos de Caixa",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-086"
+          ]
+        },
+        {
+          "name": "CPC 05 — Partes Relacionadas",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-084"
+          ]
+        },
+        {
+          "name": "CPC 27 — Ativo Imobilizado",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-083"
+          ]
+        },
+        {
+          "name": "CPC 48 — Instrumentos Financeiros",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-085"
+          ]
+        },
+        {
+          "name": "Currículo da Educação Profissional",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-119"
+          ]
+        },
+        {
+          "name": "Demonstrações Contábeis Consolidadas",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-098"
+          ]
+        },
+        {
+          "name": "Estoques",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-091"
+          ]
+        },
+        {
+          "name": "Legislação Societária",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-071"
+          ]
+        },
+        {
+          "name": "Mensuração Contábil",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-088"
+          ]
+        },
+        {
+          "name": "Normas Contábeis",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-074"
+          ]
+        },
+        {
+          "name": "PCASP",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-095"
+          ]
+        },
+        {
+          "name": "Receita e Tributos sobre Vendas",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-103"
+          ]
+        },
+        {
+          "name": "Receita Orçamentária",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-099"
+          ]
+        },
+        {
+          "name": "Retenções Previdenciárias",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-106"
+          ]
+        },
+        {
+          "name": "Retenções Tributárias Federais",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-107"
+          ]
+        },
+        {
+          "name": "Sistema Tributário Nacional",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-104"
+          ]
+        },
+        {
+          "name": "Tributação sobre Serviços",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-105"
+          ]
+        },
+        {
+          "name": "Variações Patrimoniais",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-cont-a-096"
+          ]
+        }
+      ]
+    },
+    {
       "name": "Direito",
       "question_count": 50,
       "question_ids": [
@@ -10175,6 +10485,122 @@
           "question_count": 1,
           "question_ids": [
             "prova-qdx-crtr12-2026-auxiliar-administrativo-200-111"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Eletrônica",
+      "question_count": 25,
+      "question_ids": [
+        "prova-qdx-seedf-2025-eletr-a-071",
+        "prova-qdx-seedf-2025-eletr-a-072",
+        "prova-qdx-seedf-2025-eletr-a-073",
+        "prova-qdx-seedf-2025-eletr-a-074",
+        "prova-qdx-seedf-2025-eletr-a-075",
+        "prova-qdx-seedf-2025-eletr-a-076",
+        "prova-qdx-seedf-2025-eletr-a-077",
+        "prova-qdx-seedf-2025-eletr-a-078",
+        "prova-qdx-seedf-2025-eletr-a-079",
+        "prova-qdx-seedf-2025-eletr-a-080",
+        "prova-qdx-seedf-2025-eletr-a-081",
+        "prova-qdx-seedf-2025-eletr-a-082",
+        "prova-qdx-seedf-2025-eletr-a-083",
+        "prova-qdx-seedf-2025-eletr-a-084",
+        "prova-qdx-seedf-2025-eletr-a-085",
+        "prova-qdx-seedf-2025-eletr-a-086",
+        "prova-qdx-seedf-2025-eletr-a-087",
+        "prova-qdx-seedf-2025-eletr-a-088",
+        "prova-qdx-seedf-2025-eletr-a-089",
+        "prova-qdx-seedf-2025-eletr-a-090",
+        "prova-qdx-seedf-2025-eletr-a-091",
+        "prova-qdx-seedf-2025-eletr-a-092",
+        "prova-qdx-seedf-2025-eletr-a-093",
+        "prova-qdx-seedf-2025-eletr-a-094",
+        "prova-qdx-seedf-2025-eletr-a-095"
+      ],
+      "material_count": 1,
+      "material_ids": [
+        "notion-professor-de-educacao-basica-eletronica-seedf-df-quadrix-2025-tipo-a"
+      ],
+      "topics": [
+        {
+          "name": "Análise de Circuitos",
+          "question_count": 5,
+          "question_ids": [
+            "prova-qdx-seedf-2025-eletr-a-071",
+            "prova-qdx-seedf-2025-eletr-a-072",
+            "prova-qdx-seedf-2025-eletr-a-073",
+            "prova-qdx-seedf-2025-eletr-a-074",
+            "prova-qdx-seedf-2025-eletr-a-075"
+          ]
+        },
+        {
+          "name": "Eletrônica Digital",
+          "question_count": 5,
+          "question_ids": [
+            "prova-qdx-seedf-2025-eletr-a-081",
+            "prova-qdx-seedf-2025-eletr-a-082",
+            "prova-qdx-seedf-2025-eletr-a-083",
+            "prova-qdx-seedf-2025-eletr-a-084",
+            "prova-qdx-seedf-2025-eletr-a-085"
+          ]
+        },
+        {
+          "name": "Máquinas Elétricas",
+          "question_count": 5,
+          "question_ids": [
+            "prova-qdx-seedf-2025-eletr-a-086",
+            "prova-qdx-seedf-2025-eletr-a-087",
+            "prova-qdx-seedf-2025-eletr-a-088",
+            "prova-qdx-seedf-2025-eletr-a-089",
+            "prova-qdx-seedf-2025-eletr-a-090"
+          ]
+        },
+        {
+          "name": "Eletrônica Analógica",
+          "question_count": 3,
+          "question_ids": [
+            "prova-qdx-seedf-2025-eletr-a-076",
+            "prova-qdx-seedf-2025-eletr-a-077",
+            "prova-qdx-seedf-2025-eletr-a-080"
+          ]
+        },
+        {
+          "name": "Proteção de Sistemas Elétricos",
+          "question_count": 3,
+          "question_ids": [
+            "prova-qdx-seedf-2025-eletr-a-091",
+            "prova-qdx-seedf-2025-eletr-a-092",
+            "prova-qdx-seedf-2025-eletr-a-093"
+          ]
+        },
+        {
+          "name": "Análise de Circuitos em CA",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-eletr-a-079"
+          ]
+        },
+        {
+          "name": "Eletrônica de Potência",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-eletr-a-078"
+          ]
+        },
+        {
+          "name": "Filtros Analógicos",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-eletr-a-095"
+          ]
+        },
+        {
+          "name": "Processamento de Sinais",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-seedf-2025-eletr-a-094"
           ]
         }
       ]
