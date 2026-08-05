@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "operation": "SUSPEND-SITE-AUTOMATIONS",
+  "suspended_at": "2026-08-05T10:40:11Z",
+  "requested_by": "user",
+  "mode": "manual_only_noop",
+  "automatic_triggers_blocked": [
+    "push",
+    "pull_request",
+    "schedule"
+  ],
+  "workflows_suspended": [
+    ".github/workflows/pages.yml",
+    ".github/workflows/notion-sync.yml",
+    ".github/workflows/notion-compatibility.yml",
+    ".github/workflows/release-qdx-2022.yml",
+    ".github/workflows/editorial-completion-2026-08-01.yml",
+    ".github/workflows/fix-dashboard-card-source.yml",
+    ".github/workflows/inspect-dashboard-card-fix.yml",
+    ".github/workflows/apply-dashboard-card-source-direct.yml",
+    ".github/workflows/suspend-site-automations.yml"
+  ],
+  "effects": {
+    "automatic_notion_sync": "suspended",
+    "automatic_site_build_and_deploy": "suspended",
+    "automatic_public_browser_monitoring": "suspended",
+    "automatic_rollback": "suspended",
+    "automatic_editorial_checks": "suspended",
+    "temporary_dashboard_card_routines": "suspended"
+  },
+  "site_content_changed": false,
+  "published_site_removed": false,
+  "user_progress_changed": false,
+  "reversible_through_git_history": true,
+  "note": "Os arquivos permanecem no repositório como stubs manuais sem efeito operacional. Execuções que já estivessem em andamento antes da suspensão não puderam ter o cancelamento confirmado pela integração disponível."
+}
