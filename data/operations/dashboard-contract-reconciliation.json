@@ -1,7 +1,7 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "operation": "RECONCILE-DASHBOARD-PUBLIC-CONTRACT",
-  "status": "prepared_pending_validation",
+  "status": "artifact_validated_pending_full_pipeline",
   "expected": {
     "banco_mestre": 2946,
     "questions": 2871,
@@ -16,6 +16,13 @@
     "deployment receipts",
     "temporary status files"
   ],
+  "validation": {
+    "new_scripts_syntax": "success",
+    "published_artifact_reconciliation": "success",
+    "catalog_manifest_release_meta": "2946/2871/75/67",
+    "catalog_hash_recalculated": "success",
+    "full_npm_check": "pending_manual_deploy_pipeline"
+  },
   "site_changed": false,
   "notion_changed": false,
   "deploy_required": true
