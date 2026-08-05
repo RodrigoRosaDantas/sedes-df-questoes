@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "GPPGADM-SITE-CORRECTION-2026-08-02",
+  "applied_at": "2026-07-30T00:00:00.000Z",
+  "source_of_truth": "Banco Mestre do Notion",
+  "material_id": "prova-qdx-seedf-2022-gppgadm-a",
+  "removed_codes": [
+    "PROVA-QDX-SEEDF-2022-GPPGADM-A-031"
+  ],
+  "replaced_codes": [
+    "PROVA-QDX-SEEDF-2022-GPPGADM-A-113"
+  ],
+  "questions_before": 2536,
+  "questions_after": 2535,
+  "material_questions_after": 119,
+  "preserved_public_id": "qdx-seedf-2022-gppgadm-a-113",
+  "scope": "Correção de conteúdo já publicado; nenhuma questão nova é liberada."
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "operation": "PUBLISH-QDX-CRASP-CREMAM-20260805",
+  "status": "artifact_validated",
+  "completed_at": "2026-08-05T16:57:47Z",
+  "workflow_run_id": "31027652639",
+  "base_questions_preserved": 2871,
+  "objective_questions_added": 100,
+  "annulled_objectives": 2,
+  "discursive_display_items": 2,
+  "questions": 2971,
+  "banco_mestre": 3048,
+  "awaiting_audit": 75,
+  "materials": 69,
+  "validation": {
+    "base_ids_preserved": true,
+    "manifest_hashes": true,
+    "browser": true
+  }
+}

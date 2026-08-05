@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "PLATFORM-EDITORIAL-SYNC-2026-08-01",
+  "applied_at": "2026-07-30T00:00:00.000Z",
+  "total_questions_preserved": 2536,
+  "updated_records": 165,
+  "full_editorial": 120,
+  "foundation_only": 45,
+  "changed_materials": 2,
+  "source": "Banco Mestre do Notion",
+  "site_scope": "Atualização corretiva de questões já publicadas; nenhum código foi adicionado ou removido."
+}
