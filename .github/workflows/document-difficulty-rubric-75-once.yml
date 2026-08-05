@@ -1,0 +1,136 @@
+name: Documentar rubrica pedagógica dos 75 registros — temporário
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/document-difficulty-rubric-75-once.yml]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: document-difficulty-rubric-75-20260805
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Aplicar rubrica e validar campos protegidos
+        run: |
+          node scripts/document-difficulty-rubric-75.mjs apply
+          node scripts/document-difficulty-rubric-75.mjs validate
+          test "$(jq '.records | length' data/editorial/rubrica-dificuldade-seedf-75.json)" = 75
+          test "$(jq '[.records[] | select(.classification == "Fácil")] | length' data/editorial/rubrica-dificuldade-seedf-75.json)" = 41
+          test "$(jq '[.records[] | select(.classification == "Média")] | length' data/editorial/rubrica-dificuldade-seedf-75.json)" = 22
+          test "$(jq '[.records[] | select(.classification == "Difícil")] | length' data/editorial/rubrica-dificuldade-seedf-75.json)" = 12
+
+      - name: Versionar conteúdo pedagógico canônico
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            data/editorial/rubrica-dificuldade-seedf-75.json \
+            data/notion/published.json \
+            data/release/catalogo.json \
+            data/release/manifest.json \
+            data/release/release-meta.json \
+            data/release/build-info.json \
+            data/release/materials/notion-professor-de-educacao-basica-contabilidade-seedf-df-quadrix-2025-tipo-a.json \
+            data/release/materials/notion-professor-de-educacao-basica-eletronica-seedf-df-quadrix-2025-tipo-a.json \
+            assets/app-v4.js index.html service-worker.js
+          git commit -m 'Documentar rubrica pedagógica dos 75 registros [skip ci]'
+          git push origin HEAD:main
+          echo "CONTENT_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Reconciliar SHA e justificar cada questão no Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: |
+          node scripts/document-difficulty-rubric-75.mjs reconcile "$CONTENT_SHA"
+          node scripts/document-difficulty-rubric-75.mjs validate
+
+      - name: Versionar metadados canônicos
+        run: |
+          git add data/release/release-meta.json data/release/build-info.json
+          git commit -m 'Reconciliar release 2.9.2 com rubrica pedagógica [skip ci]'
+          git push origin HEAD:main
+          echo "METADATA_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Montar pacote público isolado
+        run: |
+          rm -rf dist
+          mkdir -p dist
+          cp -a index.html manifest.webmanifest service-worker.js assets data dist/
+          touch dist/.nojekyll
+          node --check dist/assets/app-v4.js
+          node --check dist/service-worker.js
+          test "$(jq '.questions' dist/data/release/release-meta.json)" = 3046
+          test "$(jq '.materials' dist/data/release/release-meta.json)" = 71
+          test "$(jq '.data_release_version' dist/data/release/release-meta.json)" = '"2.9.2"'
+          test "$(jq -r '.source_sha' dist/data/release/release-meta.json)" = "$CONTENT_SHA"
+          test "$(jq '.records | length' dist/data/editorial/rubrica-dificuldade-seedf-75.json)" = 75
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+      - name: Publicar no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Validar rubrica no estado público
+        run: |
+          URL='https://rodrigorosadantas.github.io/sedes-df-questoes'
+          CONT='data/release/materials/notion-professor-de-educacao-basica-contabilidade-seedf-df-quadrix-2025-tipo-a.json'
+          ELETR='data/release/materials/notion-professor-de-educacao-basica-eletronica-seedf-df-quadrix-2025-tipo-a.json'
+          for i in $(seq 1 30); do
+            curl -fsS "$URL/data/release/release-meta.json?rubric=$GITHUB_RUN_ID-$i" -o /tmp/meta.json || true
+            curl -fsS "$URL/$CONT?rubric=$GITHUB_RUN_ID-$i" -o /tmp/cont.json || true
+            curl -fsS "$URL/$ELETR?rubric=$GITHUB_RUN_ID-$i" -o /tmp/eletr.json || true
+            curl -fsS "$URL/data/editorial/rubrica-dificuldade-seedf-75.json?rubric=$GITHUB_RUN_ID-$i" -o /tmp/rubric.json || true
+            if jq -e --arg sha "$CONTENT_SHA" '.data_release_version == "2.9.2" and .source_sha == $sha and .difficulty_rubric.id == "SEDES-RD-1.0"' /tmp/meta.json >/dev/null 2>&1 \
+              && jq -e '[.questoes[] | select(.dificuldade_rubrica == "SEDES-RD-1.0" and (.dificuldade_justificativa | length) >= 120)] | length == 50' /tmp/cont.json >/dev/null 2>&1 \
+              && jq -e '[.questoes[] | select(.dificuldade_rubrica == "SEDES-RD-1.0" and (.dificuldade_justificativa | length) >= 120)] | length == 25' /tmp/eletr.json >/dev/null 2>&1 \
+              && jq -e '.records | length == 75' /tmp/rubric.json >/dev/null 2>&1; then
+              break
+            fi
+            sleep 10
+          done
+          jq -e --arg sha "$CONTENT_SHA" '.questions == 3046 and .materials == 71 and .data_release_version == "2.9.2" and .source_sha == $sha' /tmp/meta.json
+          jq -e '[.questoes[] | select(.dificuldade_rubrica == "SEDES-RD-1.0")] | length == 50' /tmp/cont.json
+          jq -e '[.questoes[] | select(.dificuldade_rubrica == "SEDES-RD-1.0")] | length == 25' /tmp/eletr.json
+          jq -e '.records | length == 75 and .limitation != ""' /tmp/rubric.json
+
+      - name: Registrar recibo e remover rotinas temporárias
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          mkdir -p data/operations
+          jq -n \
+            --arg confirmed_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg run_id "$GITHUB_RUN_ID" \
+            --arg canonical_content_sha "$CONTENT_SHA" \
+            --arg metadata_commit_sha "$METADATA_SHA" \
+            --arg public_url "$PAGE_URL" \
+            '{schema_version:"1.0",operation:"DOCUMENT-DIFFICULTY-RUBRIC-SEEDF-75-20260805",status:"success",confirmed_at:$confirmed_at,workflow_run_id:$run_id,canonical_content_sha:$canonical_content_sha,metadata_commit_sha:$metadata_commit_sha,public_url:$public_url,data_release_version:"2.9.2",cache_version:"sedes-questoes-v2-13-0-r5",rubric:{id:"SEDES-RD-1.0",nature:"editorial-pedagogica",records:75,dimensions:4,score_range:"0-6",thresholds:{easy:"0-2",medium:"3-4",hard:"5-6"},limitation:"Não substitui calibração psicométrica baseada em dados de resposta."},distribution:{easy:41,medium:22,hard:12},scope:{contabilidade:50,eletronica:25,total:75},preservation:{public_ids:true,answers:true,statements:true,sequences:true,user_statistics_structure:true},notion:{score_filled:75,justification_filled:75,canonical_sha_reconciled:75},public_validation:"success"}' \
+            > data/operations/difficulty-rubric-seedf-75-receipt.json
+          rm -f scripts/document-difficulty-rubric-75.mjs .github/workflows/document-difficulty-rubric-75-once.yml
+          git add data/operations/difficulty-rubric-seedf-75-receipt.json scripts/document-difficulty-rubric-75.mjs .github/workflows/document-difficulty-rubric-75-once.yml
+          git commit -m 'Registrar rubrica pedagógica dos 75 registros [skip ci]'
+          git push origin HEAD:main
