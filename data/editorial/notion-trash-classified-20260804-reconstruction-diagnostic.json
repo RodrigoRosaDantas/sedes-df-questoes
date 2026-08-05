@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "NOTION-TRASH-CLASSIFIED-20260804",
+  "status": "failure",
+  "stage": "build_base_catalog",
+  "command": "npm run build",
+  "exit_code": 1,
+  "source_sha": "dfa0f2dffbe0cd70b457603de73306edf8767d8d",
+  "created_at": "2026-08-05T00:01:29Z"
+}

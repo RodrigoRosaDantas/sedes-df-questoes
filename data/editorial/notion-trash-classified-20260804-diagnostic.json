@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "operation_id": "NOTION-TRASH-CLASSIFIED-20260804",
   "mode": "dry-run",
-  "source_sha": "a438650d1c4b7ec62977382c2b76191eb0bb8ae6",
-  "created_at": "2026-08-04T23:59:36Z",
+  "source_sha": "dfa0f2dffbe0cd70b457603de73306edf8767d8d",
+  "created_at": "2026-08-05T00:01:29Z",
   "stages": {
     "validation": "success",
     "reconstruction": "failure",
