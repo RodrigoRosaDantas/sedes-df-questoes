@@ -1,0 +1,173 @@
+name: Deploy manual one-shot do cartão Banco Mestre
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/operations/manual-dashboard-card-deploy-20260805.json'
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: manual-dashboard-card-deploy-20260805
+  cancel-in-progress: false
+
+env:
+  TARGET_BRANCH: manual-dashboard-card-deploy-20260805
+  TARGET_SHA: 26a235367ea204d45abec1e79f853323c4ee538b
+  PUBLIC_URL: https://rodrigorosadantas.github.io/sedes-df-questoes/
+
+jobs:
+  deploy_once:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Confirmar autorização one-shot
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f data/operations/manual-dashboard-card-deploy-20260805.json
+          STATUS=$(jq -r '.status // empty' data/operations/manual-dashboard-card-deploy-20260805.json)
+          test "${STATUS}" = 'authorized'
+          CURRENT=$(git ls-remote origin "refs/heads/${TARGET_BRANCH}" | cut -f1)
+          test "${CURRENT}" = "${TARGET_SHA}"
+          echo "✓ Branch temporária fixa no commit autorizado ${TARGET_SHA}."
+
+      - name: Disparar somente o Pages manual da branch temporária
+        id: dispatch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          DISPATCHED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          gh workflow run pages.yml --ref "${TARGET_BRANCH}" \
+            -f source_sha="${TARGET_SHA}" \
+            -f close_notion=false
+
+          RUN_ID=''
+          for attempt in $(seq 1 60); do
+            gh api "repos/${GITHUB_REPOSITORY}/actions/runs?event=workflow_dispatch&branch=${TARGET_BRANCH}&per_page=50" > /tmp/runs.json
+            RUN_ID=$(jq -r --arg sha "${TARGET_SHA}" --arg since "${DISPATCHED_AT}" '
+              .workflow_runs[]
+              | select(.name == "Validar e publicar GitHub Pages")
+              | select(.head_sha == $sha)
+              | select(.created_at >= $since)
+              | .id
+            ' /tmp/runs.json | head -n1)
+            if [ -n "${RUN_ID}" ]; then break; fi
+            sleep 5
+          done
+          test -n "${RUN_ID}"
+          echo "run_id=${RUN_ID}" >> "$GITHUB_OUTPUT"
+          echo "dispatched_at=${DISPATCHED_AT}" >> "$GITHUB_OUTPUT"
+          echo "✓ Pages manual registrado no run ${RUN_ID}."
+
+      - name: Aguardar validação, deploy e auditoria pública
+        id: wait
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ steps.dispatch.outputs.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          STATUS=''
+          CONCLUSION=''
+          for attempt in $(seq 1 180); do
+            gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}" > /tmp/run.json
+            STATUS=$(jq -r '.status' /tmp/run.json)
+            CONCLUSION=$(jq -r '.conclusion // ""' /tmp/run.json)
+            echo "Pages ${RUN_ID}: ${STATUS} ${CONCLUSION}"
+            if [ "${STATUS}" = 'completed' ]; then break; fi
+            sleep 15
+          done
+          test "${STATUS}" = 'completed'
+          test "${CONCLUSION}" = 'success'
+          echo "conclusion=${CONCLUSION}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Confirmar os três valores no navegador público
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save "@playwright/test@1.61.1"
+          npx playwright install --with-deps chromium
+          node <<'NODE'
+          const {chromium} = require('@playwright/test');
+          (async () => {
+            const browser = await chromium.launch({headless: true});
+            const page = await browser.newPage();
+            const url = new URL(process.env.PUBLIC_URL);
+            url.searchParams.set('manual_dashboard_card', Date.now().toString());
+            await page.goto(url.href, {waitUntil: 'networkidle', timeout: 120000});
+            await page.locator('.bank-status strong').first().waitFor({state: 'visible', timeout: 60000});
+            const raw = await page.locator('.bank-status strong').allTextContents();
+            const normalized = raw.slice(0, 3).map(value => value.replace(/\D/g, ''));
+            const expected = ['2946', '2871', '75'];
+            if (JSON.stringify(normalized) !== JSON.stringify(expected)) {
+              throw new Error(`Cartão divergente: ${JSON.stringify(raw)} => ${JSON.stringify(normalized)}`);
+            }
+            const integrity = await page.locator('[data-release-health]').innerText();
+            if (!integrity.includes('2.871') || !integrity.includes('67')) {
+              throw new Error(`Bloco de integridade divergente: ${integrity}`);
+            }
+            console.log(`✓ Cartão público confirmado: ${raw.slice(0, 3).join(' / ')}`);
+            await browser.close();
+          })().catch(error => { console.error(error); process.exit(1); });
+          NODE
+
+      - name: Registrar recibo e remover mecanismo temporário
+        env:
+          RUN_ID: ${{ steps.dispatch.outputs.run_id }}
+          DISPATCHED_AT: ${{ steps.dispatch.outputs.dispatched_at }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          CONFIRMED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          mkdir -p data/editorial
+          jq -n \
+            --arg operation 'MANUAL-DASHBOARD-CARD-DEPLOY-20260805' \
+            --arg status 'success' \
+            --arg target_sha "${TARGET_SHA}" \
+            --arg target_branch "${TARGET_BRANCH}" \
+            --argjson pages_run_id "${RUN_ID}" \
+            --arg dispatched_at "${DISPATCHED_AT}" \
+            --arg confirmed_at "${CONFIRMED_AT}" \
+            --arg public_url "${PUBLIC_URL}" \
+            '{
+              schema_version:"1.0",
+              operation:$operation,
+              status:$status,
+              target_sha:$target_sha,
+              temporary_branch:$target_branch,
+              pages_run_id:$pages_run_id,
+              dispatched_at:$dispatched_at,
+              confirmed_at:$confirmed_at,
+              public_url:$public_url,
+              public_card:{banco_mestre:2946,questions:2871,awaiting_audit:75,materials:67},
+              controls:{other_automations_remained_suspended:true,notion_write:false,catalog_content_changed:false,one_shot_workflow_removed:true,temporary_marker_removed:true,temporary_branch_removed:true}
+            }' > data/editorial/manual-dashboard-card-deploy-final-receipt.json
+
+          rm -f .github/workflows/manual-dashboard-card-deploy-one-shot.yml
+          rm -f data/operations/manual-dashboard-card-deploy-20260805.json
+
+          git config user.name 'sedes-df-manual-deploy[bot]'
+          git config user.email 'sedes-df-manual-deploy[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Registrar deploy manual do cartão e remover one-shot [skip ci]'
+          git pull --rebase origin main
+          git push origin HEAD:main
+          git push origin --delete "${TARGET_BRANCH}"
+          echo '✓ Deploy manual encerrado; automações gerais permanecem suspensas.'
