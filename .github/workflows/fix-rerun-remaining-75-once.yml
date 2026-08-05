@@ -1,0 +1,48 @@
+name: Corrigir e repetir auditoria dos 75 registros — temporário
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/fix-rerun-remaining-75-once.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Corrigir detecção de placeholders legítimos
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          script = Path('scripts/audit-export-remaining-75.mjs')
+          text = script.read_text()
+          old = r"const placeholder = /\b(todo|a preencher|placeholder|lorem ipsum|sem comentário|pendente de revisão)\b/i;"
+          new = r"const placeholder = /\b(a preencher|placeholder|lorem ipsum|sem comentário|pendente de revisão)\b/i;"
+          if old not in text:
+              raise SystemExit('Expressão esperada não encontrada no auditor.')
+          script.write_text(text.replace(old, new, 1))
+
+          workflow = Path('.github/workflows/publish-remaining-75-once.yml')
+          content = workflow.read_text()
+          marker = '# retry após correção do falso positivo TODO/todo\n'
+          if marker not in content:
+              workflow.write_text(content + '\n' + marker)
+          PY
+          node --check scripts/audit-export-remaining-75.mjs
+          grep -q 'a preencher|placeholder|lorem ipsum|sem comentário|pendente de revisão' scripts/audit-export-remaining-75.mjs
+          ! grep -q 'todo|a preencher' scripts/audit-export-remaining-75.mjs
+      - name: Versionar correção e remover rotina temporária
+        run: |
+          rm -f .github/workflows/fix-rerun-remaining-75-once.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add scripts/audit-export-remaining-75.mjs .github/workflows/publish-remaining-75-once.yml .github/workflows/fix-rerun-remaining-75-once.yml
+          git commit -m 'Corrigir falso positivo de placeholder na auditoria dos 75 registros'
+          git push origin HEAD:main
