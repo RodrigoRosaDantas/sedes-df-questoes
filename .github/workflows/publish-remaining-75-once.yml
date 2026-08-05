@@ -203,3 +203,5 @@ jobs:
           git add data/operations/remaining-75-deployment-receipt.json .github/workflows/publish-remaining-75-once.yml scripts/audit-export-remaining-75.mjs scripts/mark-remaining-75-published.mjs
           if ! git diff --cached --quiet; then git commit -m 'Registrar publicação dos 75 registros e remover rotinas temporárias [skip ci]'; fi
           git push origin HEAD:main
+
+# retry direto após corrigir falso positivo
