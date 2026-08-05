@@ -18,11 +18,13 @@ concurrency:
 
 env:
   PLAYWRIGHT_VERSION: 1.61.1
+  BASE_SNAPSHOT_COMMIT: c060ed9a6d4c46c637a5215b3a2738b28a8d405e
+  PUBLICATION_PLAN_PATH: data/notion/publication-plan.json
 
 jobs:
   validate-and-deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 70
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -45,6 +47,8 @@ jobs:
           test "$(jq -r '.mode' data/operations/site-automations-suspended.json)" = 'manual_only'
           test "$(head -n 1 .github/workflows/pages.yml)" = 'name: Validar e publicar GitHub Pages — SUSPENSO'
           test "$(head -n 1 .github/workflows/notion-sync.yml)" = 'name: Sincronizar Banco Mestre do Notion — SUSPENSO'
+          rm -f .github/workflows/manual-contract-redeploy-once.yml
+          rm -f .github/workflows/record-manual-contract-run.yml
 
       - name: Exportar saneamentos editoriais autorizados
         env:
@@ -53,13 +57,81 @@ jobs:
           node scripts/export-editorial-platform-sync.mjs
           node scripts/export-pedagogia-editorial-sync.mjs
 
-      - name: Executar validação integral
-        run: npm run check
-
-      - name: Confirmar contrato do artefato
+      - name: Preservar lote corrente e restaurar snapshot-base
         shell: bash
         run: |
           set -euo pipefail
+          cp data/notion/published.json /tmp/current-publication-snapshot.json
+          cp data/notion/publication-plan.json /tmp/current-publication-plan.json
+          git fetch origin "${BASE_SNAPSHOT_COMMIT}" --depth=1
+          git show "${BASE_SNAPSHOT_COMMIT}:data/notion/published.json" > data/notion/published.json
+          git show "${BASE_SNAPSHOT_COMMIT}:data/notion/publication-plan.json" > data/notion/publication-plan.json
+
+      - name: Executar validação integral da base
+        run: npm run check
+
+      - name: Restaurar snapshot e plano do lote corrente
+        run: |
+          cp /tmp/current-publication-snapshot.json data/notion/published.json
+          cp /tmp/current-publication-plan.json data/notion/publication-plan.json
+
+      - name: Instalar Chromium e auditar dependências
+        run: |
+          AUDIT_DIR=$(mktemp -d)
+          printf '{"name":"sedes-contract-audit","private":true}\n' > "$AUDIT_DIR/package.json"
+          npm install --prefix "$AUDIT_DIR" --package-lock-only --ignore-scripts --save-dev "@playwright/test@${PLAYWRIGHT_VERSION}"
+          npm audit --prefix "$AUDIT_DIR" --audit-level=high
+          npm install --no-save "@playwright/test@${PLAYWRIGHT_VERSION}"
+          npx playwright install --with-deps chromium
+
+      - name: Testar plataforma-base como usuário real
+        run: |
+          python3 -m http.server 4173 --directory dist >/tmp/sedes-http.log 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:4173/ >/dev/null && break; sleep 1; done
+          npx playwright test --grep-invert "publica somente as 50 questões autorizadas de Direito"
+
+      - name: Aplicar e testar Direito
+        run: |
+          node scripts/apply-publication-additions.mjs
+          npx playwright test tests/publication-additions.spec.js
+
+      - name: Aplicar e testar Biologia
+        run: |
+          node scripts/apply-seedf-bio-24-addition.mjs
+          npx playwright test tests/seedf-bio-24-publication.spec.js
+
+      - name: Aplicar e testar Biomedicina
+        run: |
+          node scripts/apply-seedf-biomed-50-addition.mjs
+          npx playwright test tests/seedf-biomed-50-publication.spec.js
+
+      - name: Aplicar e testar Eletrotécnica
+        run: |
+          node scripts/apply-seedf-eletrot-43-addition.mjs
+          npx playwright test tests/seedf-eletrot-43-publication.spec.js
+
+      - name: Aplicar e testar Orientador Social
+        run: |
+          node scripts/apply-alto-paraiso-orientador-37-addition.mjs
+          npx playwright test tests/alto-paraiso-orientador-37-publication.spec.js
+
+      - name: Aplicar e testar Agente Fiscal
+        run: |
+          node scripts/apply-crefito17-agentefiscal-62-addition.mjs
+          npx playwright test tests/crefito17-agentefiscal-62-publication.spec.js
+
+      - name: Aplicar e testar Contador
+        run: |
+          test -f data/notion/publication-additions/crbm6-contador-70.json
+          test -f data/notion/publication-additions/crbm6-contador-70-plan.json
+          node scripts/apply-crbm6-contador-70-addition.mjs
+          npx playwright test tests/crbm6-contador-70-publication.spec.js
+
+      - name: Reconciliar e confirmar contrato final
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/reconcile-public-metadata.mjs
           node scripts/validate-public-metadata-consistency.mjs
           test "$(jq -r '.banco_mestre' dist/data/release/release-meta.json)" = '2946'
           test "$(jq -r '.questions' dist/data/release/release-meta.json)" = '2871'
@@ -106,16 +178,6 @@ jobs:
           test "$(jq -r '.awaiting_audit' /tmp/release-meta.json)" = '75'
           test "$(jq -r '.materials' /tmp/release-meta.json)" = '67'
           test "$(sha256sum /tmp/catalogo.json | awk '{print $1}')" = "$(jq -r '.catalog_sha256' /tmp/manifest.json)"
-
-      - name: Instalar Chromium para auditoria pública
-        if: steps.static_verify.outcome == 'success' && steps.metadata_verify.outcome == 'success'
-        run: |
-          AUDIT_DIR=$(mktemp -d)
-          printf '{"name":"sedes-contract-audit","private":true}\n' > "$AUDIT_DIR/package.json"
-          npm install --prefix "$AUDIT_DIR" --package-lock-only --ignore-scripts --save-dev "@playwright/test@${PLAYWRIGHT_VERSION}"
-          npm audit --prefix "$AUDIT_DIR" --audit-level=high
-          npm install --no-save "@playwright/test@${PLAYWRIGHT_VERSION}"
-          npx playwright install --with-deps chromium
 
       - name: Executar suíte pública
         id: browser_verify
