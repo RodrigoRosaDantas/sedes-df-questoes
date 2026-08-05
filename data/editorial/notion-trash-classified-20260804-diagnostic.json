@@ -2,13 +2,13 @@
   "schema_version": "1.0",
   "operation_id": "NOTION-TRASH-CLASSIFIED-20260804",
   "mode": "dry-run",
-  "source_sha": "dfa0f2dffbe0cd70b457603de73306edf8767d8d",
-  "created_at": "2026-08-05T00:01:29Z",
+  "source_sha": "e2fbeee1cd9e8f92693b254ade2a976c28ad191e",
+  "created_at": "2026-08-05T00:05:27Z",
   "stages": {
     "validation": "success",
-    "reconstruction": "failure",
-    "extraction": "skipped",
-    "operation": "skipped",
-    "refinement": "skipped"
+    "reconstruction": "success",
+    "extraction": "success",
+    "operation": "success",
+    "refinement": "failure"
   }
 }
