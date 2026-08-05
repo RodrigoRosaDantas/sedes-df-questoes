@@ -52,10 +52,17 @@ jobs:
         if: steps.validation.outcome == 'success'
         continue-on-error: true
         shell: bash
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         run: |
           set -Eeuo pipefail
           CURRENT_STAGE='initialization'
           trap 'STATUS=$?; jq -n --arg operation_id "NOTION-TRASH-CLASSIFIED-20260804" --arg status "failure" --arg stage "${CURRENT_STAGE}" --arg command "${BASH_COMMAND}" --arg source_sha "${GITHUB_SHA}" --arg created_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --argjson exit_code "${STATUS}" "{schema_version:\"1.0\",operation_id:\$operation_id,status:\$status,stage:\$stage,command:\$command,exit_code:\$exit_code,source_sha:\$source_sha,created_at:\$created_at}" > "${RECONSTRUCTION_DIAGNOSTIC_PATH}"; exit ${STATUS}' ERR
+
+          CURRENT_STAGE='export_editorial_platform_sync'
+          node scripts/export-editorial-platform-sync.mjs
+          CURRENT_STAGE='export_pedagogia_editorial_sync'
+          node scripts/export-pedagogia-editorial-sync.mjs
 
           CURRENT_STAGE='backup_current_snapshot'
           cp data/notion/published.json /tmp/current-snapshot.json
