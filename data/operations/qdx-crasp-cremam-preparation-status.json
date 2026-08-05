@@ -2,12 +2,12 @@
   "schema_version": "1.0",
   "operation": "PREPARE-QDX-CRASP-CREMAM-20260805",
   "status": "failure",
-  "failed_at": "2026-08-05T16:02:48Z",
-  "workflow_run_id": "31023300893",
+  "failed_at": "2026-08-05T16:05:16Z",
+  "workflow_run_id": "31023513591",
   "steps": {
     "export": "success",
-    "scope": "failure",
-    "check": "skipped",
+    "scope": "success",
+    "check": "failure",
     "browser": "skipped",
     "contract": "skipped"
   }
