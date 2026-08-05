@@ -19,7 +19,7 @@ const PREFIXES = (process.env.DISCURSIVE_PREFIXES || [
 
 const EXPORT_PROPERTIES = [
   'Ano', 'Assunto', 'Auditoria de conteúdo', 'Bloco', 'Bloqueio manual de publicação',
-  'Cargo', 'Código', 'Código do cargo', 'Dificuldade', 'Disciplina', 'Duplicada',
+  'Cargo', 'Código', 'Código do cargo', 'Comentário geral', 'Dificuldade', 'Disciplina', 'Duplicada',
   'Enunciado', 'Fonte / Banca', 'Formato da questão', 'Fundamento legal',
   'Nome do material', 'Número original', 'Observações', 'Órgão', 'Página do PDF',
   'Pegadinha', 'Questão', 'Subassunto', 'Texto-base', 'Tipo de material',
