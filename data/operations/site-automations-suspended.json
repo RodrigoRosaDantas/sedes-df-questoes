@@ -1,9 +1,10 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "operation": "SUSPEND-SITE-AUTOMATIONS",
   "confirmed_at": "2026-08-05T12:10:00Z",
   "requested_by": "user",
   "mode": "manual_only",
+  "workflow_functionality": "disabled_stubs",
   "automatic_triggers_removed": [
     "push",
     "pull_request",
@@ -42,5 +43,6 @@
   "site_content_changed_by_suspension": false,
   "user_progress_changed": false,
   "reversible_through_git_history": true,
-  "note": "Todos os workflows remanescentes ficam disponíveis apenas para acionamento manual. O deploy manual do cartão foi concluído antes deste fechamento."
+  "manual_execution_note": "Os stubs apenas informam a suspensão e não executam a lógica original. A restauração funcional exige recuperar os workflows pelo histórico do Git e autorização expressa.",
+  "note": "O deploy manual do cartão foi concluído antes deste fechamento. Nenhuma rotina automática permanece ativa."
 }
