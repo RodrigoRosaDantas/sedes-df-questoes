@@ -1,0 +1,11 @@
+{
+  "operation": "FIX-DASHBOARD-CARD-SOURCE-20260805",
+  "requested_at": "2026-08-05T10:16:00Z",
+  "expected": {
+    "banco_mestre": 2946,
+    "questions": 2871,
+    "awaiting_audit": 75,
+    "materials": 67
+  },
+  "reason": "O cartão da página inicial ainda consumia os totais antigos de catalogo.json, embora release-meta.json já estivesse reconciliado."
+}
