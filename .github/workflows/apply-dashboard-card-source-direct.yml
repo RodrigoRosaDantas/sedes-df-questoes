@@ -1,129 +1,14 @@
-name: Aplicar fonte correta do cartão Banco Mestre
+name: Aplicar fonte correta do cartão Banco Mestre — SUSPENSO
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'data/editorial/apply-dashboard-card-source-direct-trigger.json'
+  workflow_dispatch:
 
 permissions:
-  contents: write
-  actions: write
-
-concurrency:
-  group: apply-dashboard-card-source-direct
-  cancel-in-progress: true
+  contents: read
 
 jobs:
-  apply:
+  suspended:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          ref: main
-
-      - name: Aplicar correção idempotente
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-
-          path = Path('assets/app-v4.js')
-          text = path.read_text()
-          if 'const RELEASE_META_URL = "./data/release/release-meta.json";' not in text:
-              text = text.replace(
-                  'const CATALOG_URL = "./data/release/catalogo.json";\n',
-                  'const CATALOG_URL = "./data/release/catalogo.json";\nconst RELEASE_META_URL = "./data/release/release-meta.json";\n',
-                  1,
-              )
-          if '  releaseMeta: null,' not in text:
-              text = text.replace('  catalog: null,\n  exam: null,', '  catalog: null,\n  releaseMeta: null,\n  exam: null,', 1)
-          text = text.replace(
-              '  const masterTotal = Number(state.catalog.summary.banco_mestre || 0);\n  const published = Number(state.catalog.summary.questoes || 0);\n  const pending = Number(state.catalog.summary.aguardando_auditoria || 0);',
-              '  const masterTotal = Number(state.releaseMeta?.banco_mestre ?? state.catalog.summary.banco_mestre ?? 0);\n  const published = Number(state.releaseMeta?.questions ?? state.catalog.summary.questoes ?? 0);\n  const pending = Number(state.releaseMeta?.awaiting_audit ?? state.catalog.summary.aguardando_auditoria ?? 0);',
-              1,
-          )
-          text = text.replace(
-              '    const [catalogResponse, examResponse, studyIndexResponse] = await Promise.all([\n      fetch(CATALOG_URL, {cache: "no-store"}),\n      fetch(EXAM_URL, {cache: "no-store"}),\n      fetch(STUDY_INDEX_URL, {cache: "no-store"}),\n    ]);',
-              '    const [catalogResponse, releaseMetaResponse, examResponse, studyIndexResponse] = await Promise.all([\n      fetch(CATALOG_URL, {cache: "no-store"}),\n      fetch(RELEASE_META_URL, {cache: "no-store"}),\n      fetch(EXAM_URL, {cache: "no-store"}),\n      fetch(STUDY_INDEX_URL, {cache: "no-store"}),\n    ]);',
-              1,
-          )
-          text = text.replace(
-              '    if (!catalogResponse.ok) throw new Error(`Catálogo: HTTP ${catalogResponse.status}`);\n    if (!examResponse.ok) throw new Error(`Concurso: HTTP ${examResponse.status}`);\n    if (!studyIndexResponse.ok) throw new Error(`Índice de estudos: HTTP ${studyIndexResponse.status}`);\n    state.catalog = await catalogResponse.json();\n    state.exam = await examResponse.json();\n    state.studyIndex = await studyIndexResponse.json();',
-              '    if (!catalogResponse.ok) throw new Error(`Catálogo: HTTP ${catalogResponse.status}`);\n    if (!releaseMetaResponse.ok) throw new Error(`Metadados da release: HTTP ${releaseMetaResponse.status}`);\n    if (!examResponse.ok) throw new Error(`Concurso: HTTP ${examResponse.status}`);\n    if (!studyIndexResponse.ok) throw new Error(`Índice de estudos: HTTP ${studyIndexResponse.status}`);\n    state.catalog = await catalogResponse.json();\n    state.releaseMeta = await releaseMetaResponse.json();\n    state.exam = await examResponse.json();\n    state.studyIndex = await studyIndexResponse.json();',
-              1,
-          )
-          text = text.replace(
-              '    syncLabel.textContent = `${state.catalog.summary.banco_mestre} no banco · ${state.catalog.summary.questoes} publicadas`;',
-              '    syncLabel.textContent = `${state.releaseMeta.banco_mestre} no banco · ${state.releaseMeta.questions} publicadas`;',
-              1,
-          )
-          required = [
-              'const RELEASE_META_URL = "./data/release/release-meta.json";',
-              'releaseMeta: null',
-              'state.releaseMeta?.banco_mestre',
-              'releaseMetaResponse',
-              'state.releaseMeta = await releaseMetaResponse.json()',
-              '`${state.releaseMeta.banco_mestre} no banco · ${state.releaseMeta.questions} publicadas`',
-          ]
-          missing = [marker for marker in required if marker not in text]
-          if missing:
-              raise SystemExit(f'Marcadores ausentes após a correção: {missing}')
-          path.write_text(text)
-
-          for filename in ['index.html', 'service-worker.js']:
-              p = Path(filename)
-              value = p.read_text().replace('./assets/app-v4.js?v=8', './assets/app-v4.js?v=9')
-              if './assets/app-v4.js?v=9' not in value:
-                  raise SystemExit(f'{filename}: revisão v9 ausente.')
-              p.write_text(value)
-
-          p = Path('scripts/build-public.mjs')
-          value = p.read_text().replace('"app-v4.js?v=8"', '"app-v4.js?v=9"')
-          if '"app-v4.js?v=9"' not in value:
-              raise SystemExit('scripts/build-public.mjs: marcador v9 ausente.')
-          p.write_text(value)
-          PY
-
-          node --check assets/app-v4.js
-          node --check service-worker.js
-          node --check scripts/build-public.mjs
-          grep -F 'state.releaseMeta?.banco_mestre' assets/app-v4.js
-          grep -F 'app-v4.js?v=9' index.html service-worker.js scripts/build-public.mjs
-
-      - name: Versionar e disparar Pages oficial
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'sedes-df-dashboard-card-direct[bot]'
-          git config user.email 'sedes-df-dashboard-card-direct[bot]@users.noreply.github.com'
-          git add assets/app-v4.js index.html service-worker.js scripts/build-public.mjs
-          if git diff --cached --quiet; then
-            echo 'A correção já estava aplicada.'
-          else
-            git commit -m 'Fazer cartão consumir release-meta [skip ci]'
-            git pull --rebase origin main
-            git push origin HEAD:main
-          fi
-          SOURCE_SHA=$(git rev-parse HEAD)
-          DISPATCHED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-          gh workflow run pages.yml --ref main -f source_sha="${SOURCE_SHA}"
-          RUN_ID=''
-          for attempt in $(seq 1 60); do
-            gh api "repos/${GITHUB_REPOSITORY}/actions/runs?event=workflow_dispatch&branch=main&per_page=50" > /tmp/runs.json
-            RUN_ID=$(jq -r --arg sha "${SOURCE_SHA}" --arg since "${DISPATCHED_AT}" '.workflow_runs[] | select(.name == "Validar e publicar GitHub Pages" and .head_sha == $sha and .created_at >= $since) | .id' /tmp/runs.json | head -n1)
-            if [ -n "${RUN_ID}" ]; then break; fi
-            sleep 5
-          done
-          if [ -z "${RUN_ID}" ]; then exit 1; fi
-          jq -n --arg source_sha "${SOURCE_SHA}" --argjson run_id "${RUN_ID}" --arg dispatched_at "${DISPATCHED_AT}" '{operation:"APPLY-DASHBOARD-CARD-SOURCE-DIRECT-20260805",status:"dispatched",source_sha:$source_sha,pages_run_id:$run_id,dispatched_at:$dispatched_at,expected:{banco_mestre:2946,questions:2871,awaiting_audit:75,materials:67},asset:"app-v4.js?v=9"}' > data/editorial/dashboard-card-source-direct-receipt.json
-          git add data/editorial/dashboard-card-source-direct-receipt.json
-          git commit -m 'Registrar deploy direto do cartão [skip ci]'
-          git pull --rebase origin main
-          git push origin HEAD:main
-          echo "✓ Pages ${RUN_ID} para ${SOURCE_SHA}."
+      - name: Informar suspensão
+        run: echo "Workflow suspenso. Nenhuma alteração ou publicação será executada."
