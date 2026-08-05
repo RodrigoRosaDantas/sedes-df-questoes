@@ -1,4 +1,5 @@
 const CATALOG_URL = "./data/release/catalogo.json";
+const RELEASE_META_URL = "./data/release/release-meta.json";
 const EXAM_URL = "./data/concurso.json";
 const STUDY_INDEX_URL = "./data/release/study-index.json";
 const THEME_KEY = "sedes.questoes.theme";
@@ -25,6 +26,7 @@ const profileButtonAvatar = document.querySelector("#profile-button-avatar");
 
 const state = {
   catalog: null,
+  releaseMeta: null,
   exam: null,
   studyIndex: null,
   studyView: "materias",
@@ -365,9 +367,9 @@ function renderHome() {
   const session = loadSession();
   const history = loadHistory();
   const recentMaterials = relevantMaterials().slice(0, 3);
-  const masterTotal = Number(state.catalog.summary.banco_mestre || 0);
-  const published = Number(state.catalog.summary.questoes || 0);
-  const pending = Number(state.catalog.summary.aguardando_auditoria || 0);
+  const masterTotal = Number(state.releaseMeta?.banco_mestre ?? state.catalog.summary.banco_mestre ?? 0);
+  const published = Number(state.releaseMeta?.questions ?? state.catalog.summary.questoes ?? 0);
+  const pending = Number(state.releaseMeta?.awaiting_audit ?? state.catalog.summary.aguardando_auditoria ?? 0);
   const greeting = session ? "Sua tentativa está salva." : stats.completed ? "Vamos manter a consistência." : "Vamos começar sua preparação.";
 
   app.innerHTML = `<section class="home-hero card">
@@ -1215,15 +1217,18 @@ async function init() {
   try {
     migrateLegacyData();
     loadProfiles();
-    const [catalogResponse, examResponse, studyIndexResponse] = await Promise.all([
+    const [catalogResponse, releaseMetaResponse, examResponse, studyIndexResponse] = await Promise.all([
       fetch(CATALOG_URL, {cache: "no-store"}),
+      fetch(RELEASE_META_URL, {cache: "no-store"}),
       fetch(EXAM_URL, {cache: "no-store"}),
       fetch(STUDY_INDEX_URL, {cache: "no-store"}),
     ]);
     if (!catalogResponse.ok) throw new Error(`Catálogo: HTTP ${catalogResponse.status}`);
+    if (!releaseMetaResponse.ok) throw new Error(`Metadados da release: HTTP ${releaseMetaResponse.status}`);
     if (!examResponse.ok) throw new Error(`Concurso: HTTP ${examResponse.status}`);
     if (!studyIndexResponse.ok) throw new Error(`Índice de estudos: HTTP ${studyIndexResponse.status}`);
     state.catalog = await catalogResponse.json();
+    state.releaseMeta = await releaseMetaResponse.json();
     state.exam = await examResponse.json();
     state.studyIndex = await studyIndexResponse.json();
     const declaredQuestions = Number(state.catalog?.summary?.questoes);
@@ -1236,7 +1241,7 @@ async function init() {
       throw new Error("Catálogo inconsistente.");
     }
     state.route = routeFromHash();
-    syncLabel.textContent = `${state.catalog.summary.banco_mestre} no banco · ${state.catalog.summary.questoes} publicadas`;
+    syncLabel.textContent = `${state.releaseMeta.banco_mestre} no banco · ${state.releaseMeta.questions} publicadas`;
     profileButton?.addEventListener("click", () => go("perfil"));
     updateShell();
     renderRoute();
