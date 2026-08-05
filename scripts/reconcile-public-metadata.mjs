@@ -22,6 +22,7 @@ const reconciledSummary = {
   banco_mestre: Number(releaseMeta.banco_mestre),
   materiais: Number(releaseMeta.materials),
   questoes: Number(releaseMeta.questions),
+  discursivas_consulta: Number(releaseMeta.discursive_display_items || 0),
   aguardando_auditoria: Number(releaseMeta.awaiting_audit),
   provas: Number(releaseMeta.proofs),
   simulados: Number(releaseMeta.simulations),
@@ -30,8 +31,13 @@ const reconciledSummary = {
 for (const [key, value] of Object.entries(reconciledSummary)) {
   if (!Number.isInteger(value) || value < 0) throw new Error(`Resumo reconciliado inválido em ${key}: ${value}`);
 }
-if (reconciledSummary.banco_mestre - reconciledSummary.questoes !== reconciledSummary.aguardando_auditoria) {
-  throw new Error("A decomposição Banco Mestre = publicadas + auditoria não fecha.");
+if (
+  reconciledSummary.banco_mestre
+  - reconciledSummary.questoes
+  - reconciledSummary.discursivas_consulta
+  !== reconciledSummary.aguardando_auditoria
+) {
+  throw new Error("A decomposição Banco Mestre = questões + discursivas de consulta + auditoria não fecha.");
 }
 
 catalog.summary = reconciledSummary;
@@ -43,7 +49,7 @@ manifest.catalog_sha256 = crypto.createHash("sha256").update(catalogText).digest
 fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 
 console.log(
-  `✓ Metadados públicos reconciliados: ${reconciledSummary.banco_mestre} / `
-  + `${reconciledSummary.questoes} / ${reconciledSummary.aguardando_auditoria} / `
-  + `${reconciledSummary.materiais}.`,
+  `✓ Metadados públicos reconciliados: banco ${reconciledSummary.banco_mestre}; `
+  + `${reconciledSummary.questoes} questões; ${reconciledSummary.discursivas_consulta} discursivas de consulta; `
+  + `${reconciledSummary.aguardando_auditoria} em auditoria; ${reconciledSummary.materiais} materiais.`,
 );
