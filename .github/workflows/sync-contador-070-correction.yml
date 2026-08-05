@@ -1,51 +1,13 @@
-name: Sincronizar correção editorial do item 070
+name: Sincronizar correção editorial do item 070 — SUSPENSO
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - .github/workflows/sync-contador-070-correction.yml
+  workflow_dispatch:
 
 permissions:
-  actions: write
   contents: read
 
-concurrency:
-  group: sync-contador-070-correction
-  cancel-in-progress: false
-
 jobs:
-  dispatch-notion-sync:
+  suspended:
     runs-on: ubuntu-latest
-    timeout-minutes: 130
     steps:
-      - name: Acionar e acompanhar sincronização oficial
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          DISPATCHED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-          gh workflow run notion-sync.yml --ref main
-
-          RUN_ID=''
-          for attempt in $(seq 1 60); do
-            RUN_ID=$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/notion-sync.yml/runs?event=workflow_dispatch&branch=main&per_page=20" \
-              --jq ".workflow_runs[] | select(.created_at >= \"${DISPATCHED_AT}\") | .id" \
-              | head -n1)
-            if [ -n "${RUN_ID}" ]; then
-              break
-            fi
-            echo "Aguardando criação da sincronização oficial (${attempt}/60)."
-            sleep 5
-          done
-
-          if [ -z "${RUN_ID}" ]; then
-            echo 'A sincronização oficial não foi criada dentro da janela de segurança.'
-            exit 1
-          fi
-
-          echo "Sincronização oficial criada: ${RUN_ID}."
-          gh run watch "${RUN_ID}" --exit-status --interval 10
-          echo '✓ Correção editorial sincronizada pelo fluxo oficial.'
+      - run: echo "Workflow suspenso. Nenhuma sincronização será executada automaticamente."
