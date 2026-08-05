@@ -3,7 +3,7 @@
   "app_version": "2.13.0",
   "data_release_version": "2.9.2",
   "catalog_schema_version": "5.0",
-  "source_sha": "b28bbcac7f4defbbdd6256124f4701c62ca5c218",
+  "source_sha": "689610bffa5be7b996f42266b482ceac9e40e3bf",
   "builder": "copy-public-v2-13-0",
   "cache_version": "sedes-questoes-v2-13-0-r5",
   "exported_at": "2026-08-05T19:01:53.476Z",
