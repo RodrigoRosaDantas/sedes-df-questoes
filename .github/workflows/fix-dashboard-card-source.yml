@@ -1,0 +1,143 @@
+name: Corrigir fonte do cartão Banco Mestre
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/operations/fix-dashboard-card-source-trigger.json'
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: fix-dashboard-card-source
+  cancel-in-progress: true
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Fazer o cartão consumir o release-meta publicado
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              p = Path(path)
+              text = p.read_text()
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{path}: trecho esperado encontrado {count} vez(es), não exatamente uma.')
+              p.write_text(text.replace(old, new))
+
+          replace_once(
+              'assets/app-v4.js',
+              'const CATALOG_URL = "./data/release/catalogo.json";\n',
+              'const CATALOG_URL = "./data/release/catalogo.json";\nconst RELEASE_META_URL = "./data/release/release-meta.json";\n',
+          )
+          replace_once(
+              'assets/app-v4.js',
+              '  catalog: null,\n  exam: null,',
+              '  catalog: null,\n  releaseMeta: null,\n  exam: null,',
+          )
+          replace_once(
+              'assets/app-v4.js',
+              '  const masterTotal = Number(state.catalog.summary.banco_mestre || 0);\n  const published = Number(state.catalog.summary.questoes || 0);\n  const pending = Number(state.catalog.summary.aguardando_auditoria || 0);',
+              '  const masterTotal = Number(state.releaseMeta?.banco_mestre ?? state.catalog.summary.banco_mestre ?? 0);\n  const published = Number(state.releaseMeta?.questions ?? state.catalog.summary.questoes ?? 0);\n  const pending = Number(state.releaseMeta?.awaiting_audit ?? state.catalog.summary.aguardando_auditoria ?? 0);',
+          )
+          replace_once(
+              'assets/app-v4.js',
+              '    const [catalogResponse, examResponse, studyIndexResponse] = await Promise.all([\n      fetch(CATALOG_URL, {cache: "no-store"}),\n      fetch(EXAM_URL, {cache: "no-store"}),\n      fetch(STUDY_INDEX_URL, {cache: "no-store"}),\n    ]);',
+              '    const [catalogResponse, releaseMetaResponse, examResponse, studyIndexResponse] = await Promise.all([\n      fetch(CATALOG_URL, {cache: "no-store"}),\n      fetch(RELEASE_META_URL, {cache: "no-store"}),\n      fetch(EXAM_URL, {cache: "no-store"}),\n      fetch(STUDY_INDEX_URL, {cache: "no-store"}),\n    ]);',
+          )
+          replace_once(
+              'assets/app-v4.js',
+              '    if (!catalogResponse.ok) throw new Error(`Catálogo: HTTP ${catalogResponse.status}`);\n    if (!examResponse.ok) throw new Error(`Concurso: HTTP ${examResponse.status}`);\n    if (!studyIndexResponse.ok) throw new Error(`Índice de estudos: HTTP ${studyIndexResponse.status}`);\n    state.catalog = await catalogResponse.json();\n    state.exam = await examResponse.json();\n    state.studyIndex = await studyIndexResponse.json();',
+              '    if (!catalogResponse.ok) throw new Error(`Catálogo: HTTP ${catalogResponse.status}`);\n    if (!releaseMetaResponse.ok) throw new Error(`Metadados da release: HTTP ${releaseMetaResponse.status}`);\n    if (!examResponse.ok) throw new Error(`Concurso: HTTP ${examResponse.status}`);\n    if (!studyIndexResponse.ok) throw new Error(`Índice de estudos: HTTP ${studyIndexResponse.status}`);\n    state.catalog = await catalogResponse.json();\n    state.releaseMeta = await releaseMetaResponse.json();\n    state.exam = await examResponse.json();\n    state.studyIndex = await studyIndexResponse.json();',
+          )
+          replace_once('index.html', './assets/app-v4.js?v=8', './assets/app-v4.js?v=9')
+          replace_once('service-worker.js', './assets/app-v4.js?v=8', './assets/app-v4.js?v=9')
+          replace_once('scripts/build-public.mjs', '"app-v4.js?v=8"', '"app-v4.js?v=9"')
+
+          replace_once(
+              'tests-public/release-contract.spec.js',
+              '  const catalog = await fetchEventually(request, "data/release/catalogo.json", value =>\n    Array.isArray(value?.materials)\n    && Object.keys(value?.question_index || {}).length === Number(build.questions));\n  return {build, catalog};',
+              '  const catalog = await fetchEventually(request, "data/release/catalogo.json", value =>\n    Array.isArray(value?.materials)\n    && Object.keys(value?.question_index || {}).length === Number(build.questions));\n  const releaseMeta = await fetchEventually(request, "data/release/release-meta.json", value =>\n    Number(value?.questions) === Number(build.questions)\n    && Number(value?.materials) === Number(build.materials));\n  return {build, catalog, releaseMeta};',
+          )
+          replace_once(
+              'tests-public/release-contract.spec.js',
+              'test("interface pública usa a mesma release", async ({page, request}) => {\n  const {build} = await loadRelease(request);\n  await openRoute(page, "inicio");\n  await expect(page.locator("[data-release-health]")).toContainText(\n    Number(build.questions).toLocaleString("pt-BR"), {timeout: 30000});',
+              'test("interface pública usa a mesma release", async ({page, request}) => {\n  const {build, releaseMeta} = await loadRelease(request);\n  await openRoute(page, "inicio");\n  const bankValues = page.locator(".bank-status strong");\n  await expect(bankValues).toHaveCount(3);\n  await expect(bankValues.nth(0)).toHaveText(Number(releaseMeta.banco_mestre).toLocaleString("pt-BR"));\n  await expect(bankValues.nth(1)).toHaveText(Number(releaseMeta.questions).toLocaleString("pt-BR"));\n  await expect(bankValues.nth(2)).toHaveText(Number(releaseMeta.awaiting_audit).toLocaleString("pt-BR"));\n  await expect(page.locator("[data-release-health]")).toContainText(\n    Number(build.questions).toLocaleString("pt-BR"), {timeout: 30000});',
+          )
+          PY
+
+          node --check assets/app-v4.js
+          node --check service-worker.js
+          node --check scripts/build-public.mjs
+          node --check tests-public/release-contract.spec.js
+          grep -F 'state.releaseMeta?.banco_mestre' assets/app-v4.js
+          grep -F 'app-v4.js?v=9' index.html service-worker.js scripts/build-public.mjs
+          npm run check
+
+      - name: Versionar correção e publicar pelo workflow oficial
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'sedes-df-dashboard-card[bot]'
+          git config user.email 'sedes-df-dashboard-card[bot]@users.noreply.github.com'
+          git add assets/app-v4.js index.html service-worker.js scripts/build-public.mjs tests-public/release-contract.spec.js
+          git commit -m 'Corrigir fonte do cartão Banco Mestre [skip ci]'
+          git pull --rebase origin main
+          git push origin HEAD:main
+          SOURCE_SHA=$(git rev-parse HEAD)
+          DISPATCHED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          gh workflow run pages.yml --ref main -f source_sha="${SOURCE_SHA}"
+
+          RUN_ID=''
+          for attempt in $(seq 1 60); do
+            gh api "repos/${GITHUB_REPOSITORY}/actions/runs?event=workflow_dispatch&branch=main&per_page=50" > /tmp/runs.json
+            RUN_ID=$(jq -r --arg sha "${SOURCE_SHA}" --arg since "${DISPATCHED_AT}" '
+              .workflow_runs[]
+              | select(.name == "Validar e publicar GitHub Pages")
+              | select(.event == "workflow_dispatch")
+              | select(.head_sha == $sha)
+              | select(.created_at >= $since)
+              | .id
+            ' /tmp/runs.json | head -n1)
+            if [ -n "${RUN_ID}" ]; then break; fi
+            sleep 5
+          done
+          if [ -z "${RUN_ID}" ]; then
+            echo 'Execução de Pages não localizada.'
+            exit 1
+          fi
+
+          mkdir -p data/editorial
+          jq -n \
+            --arg operation 'FIX-DASHBOARD-CARD-SOURCE-20260805' \
+            --arg source_sha "${SOURCE_SHA}" \
+            --argjson run_id "${RUN_ID}" \
+            --arg dispatched_at "${DISPATCHED_AT}" \
+            '{operation:$operation,status:"dispatched",source_sha:$source_sha,pages_run_id:$run_id,dispatched_at:$dispatched_at,expected:{banco_mestre:2946,questions:2871,awaiting_audit:75,materials:67},ui_source:"data/release/release-meta.json",asset_revision:"app-v4.js?v=9"}' \
+            > data/editorial/dashboard-card-source-dispatch-receipt.json
+          git add data/editorial/dashboard-card-source-dispatch-receipt.json
+          git commit -m 'Registrar publicação da correção do cartão [skip ci]'
+          git pull --rebase origin main
+          git push origin HEAD:main
+          echo "✓ Correção ${SOURCE_SHA}; Pages run ${RUN_ID}."
