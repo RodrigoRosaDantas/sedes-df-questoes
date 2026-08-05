@@ -1,0 +1,216 @@
+name: Publicar Quadrix sobre artefato público — temporário
+
+on:
+  push:
+    branches: [agent/publish-quadrix-discursive-view-20260805]
+    paths: [.github/workflows/deploy-quadrix-from-public-artifact-once.yml]
+
+permissions:
+  actions: read
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: deploy-quadrix-public-artifact-20260805
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    outputs:
+      content_sha: ${{ steps.commit.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: agent/publish-quadrix-discursive-view-20260805
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Restaurar artefato público validado de 2.871 questões
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          curl -fL \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/RodrigoRosaDantas/sedes-df-questoes/actions/artifacts/8934474233/zip" \
+            -o /tmp/base-pages.zip
+          rm -rf /tmp/base-pages dist
+          mkdir -p /tmp/base-pages dist
+          unzip -q /tmp/base-pages.zip -d /tmp/base-pages
+          tar -xf /tmp/base-pages/artifact.tar -C dist
+          cp dist/data/release/catalogo.json /tmp/base-catalog.json
+          test "$(jq '.summary.questoes' /tmp/base-catalog.json)" = 2871
+          test "$(jq '.materials | length' /tmp/base-catalog.json)" = 67
+          rm -rf data/release
+          mkdir -p data
+          cp -a dist/data/release data/release
+
+      - name: Exportar somente os dois lotes Quadrix
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: |
+          node scripts/export-quadrix-objective-additions.mjs
+          node scripts/reconcile-quadrix-incremental-snapshot.mjs
+          node scripts/export-discursive-display.mjs
+          node scripts/create-publication-plan.mjs
+
+      - name: Aplicar adições sobre a base pública imutável
+        run: |
+          node scripts/apply-notion-snapshot.mjs
+          node scripts/apply-discursive-display.mjs
+          node scripts/build-study-index.mjs
+          rm -rf dist/data/release
+          mkdir -p dist/data
+          cp -a data/release dist/data/release
+          cp index.html service-worker.js dist/
+          cp assets/discursive-display-v2-13.js assets/discursive-display-v2-13.css dist/assets/
+          node scripts/reconcile-quadrix-public-artifact.mjs
+          rm -rf data/release
+          cp -a dist/data/release data/release
+
+      - name: Validar preservação e contrato final
+        run: |
+          node --check scripts/export-quadrix-objective-additions.mjs
+          node --check scripts/apply-discursive-display.mjs
+          node --check scripts/reconcile-quadrix-public-artifact.mjs
+          node --check assets/discursive-display-v2-13.js
+          node scripts/validate-notion-snapshot.mjs
+          node scripts/validate-publication-plan.mjs
+          node scripts/validate-discursive-display.mjs
+          node scripts/validate-runtime-catalog.mjs
+          node <<'NODE'
+          const crypto = require('crypto');
+          const fs = require('fs');
+          const path = require('path');
+          const sha = value => crypto.createHash('sha256').update(value).digest('hex');
+          const base = JSON.parse(fs.readFileSync('/tmp/base-catalog.json', 'utf8'));
+          const catalog = JSON.parse(fs.readFileSync('dist/data/release/catalogo.json', 'utf8'));
+          const manifest = JSON.parse(fs.readFileSync('dist/data/release/manifest.json', 'utf8'));
+          const meta = JSON.parse(fs.readFileSync('dist/data/release/release-meta.json', 'utf8'));
+          const baseIds = Object.keys(base.question_index || {});
+          const finalIds = new Set(Object.keys(catalog.question_index || {}));
+          const missing = baseIds.filter(id => !finalIds.has(id));
+          if (missing.length) throw new Error(`IDs públicos anteriores ausentes: ${missing.slice(0,5).join(', ')}`);
+          if (baseIds.length !== 2871 || finalIds.size !== 2971 || finalIds.size - baseIds.length !== 100) throw new Error('Delta objetivo divergente.');
+          if ((catalog.materials || []).length !== 69) throw new Error('Total de materiais divergente.');
+          let targetObjectives = 0, targetDiscursives = 0, targetAnnulled = 0;
+          const names = new Set(['Analista I — Atendimento e Cobrança — CRA-SP — Quadrix 2025','Assistente Administrativo — CREMAM — Quadrix 2025']);
+          for (const entry of catalog.materials || []) {
+            const file = entry.file.replace(/^\.\//, '');
+            const material = JSON.parse(fs.readFileSync(file, 'utf8'));
+            if (names.has(material.nome)) {
+              targetObjectives += (material.questoes || []).length;
+              targetDiscursives += (material.discursivas || []).length;
+              targetAnnulled += (material.questoes || []).filter(item => item.anulada === true && item.gabarito === 'Anulada').length;
+            }
+          }
+          if (targetObjectives !== 100 || targetDiscursives !== 2 || targetAnnulled !== 2) throw new Error(`Escopo final ${targetObjectives}/${targetDiscursives}/${targetAnnulled}.`);
+          if (meta.questions !== 2971 || meta.materials !== 69 || meta.banco_mestre !== 3048 || meta.awaiting_audit !== 75 || meta.discursive_display_items !== 2) throw new Error('Release-meta divergente.');
+          const catalogBytes = fs.readFileSync('dist/data/release/catalogo.json');
+          if (manifest.catalog_sha256 !== sha(catalogBytes)) throw new Error('Hash do catálogo divergente.');
+          for (const entry of manifest.materials || []) {
+            const bytes = fs.readFileSync(entry.file.replace(/^\.\//, ''));
+            if (entry.sha256 !== sha(bytes) || entry.bytes !== bytes.length) throw new Error(`Manifesto divergente: ${entry.id}`);
+          }
+          if (!fs.readFileSync('dist/index.html','utf8').includes('discursive-display-v2-13.js')) throw new Error('Runtime discursivo ausente do HTML.');
+          NODE
+
+      - name: Testar visualização no navegador
+        run: |
+          npm install --no-save @playwright/test@1.61.1
+          npx playwright install --with-deps chromium
+          python3 -m http.server 4173 --directory dist >/tmp/quadrix-public-http.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/ >/dev/null && break; sleep 1; done
+          npx playwright test tests/discursive-display.spec.js
+
+      - name: Versionar pacote e limpar arquivos temporários
+        id: commit
+        run: |
+          rm -f data/operations/qdx-crasp-cremam-preparation-status.json data/operations/qdx-crasp-cremam-validation-status.json
+          jq -n --arg completed_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg run_id "$GITHUB_RUN_ID" '{schema_version:"1.0",operation:"PUBLISH-QDX-CRASP-CREMAM-20260805",status:"artifact_validated",completed_at:$completed_at,workflow_run_id:$run_id,base_questions_preserved:2871,objective_questions_added:100,annulled_objectives:2,discursive_display_items:2,questions:2971,banco_mestre:3048,awaiting_audit:75,materials:69,validation:{base_ids_preserved:true,manifest_hashes:true,browser:true}}' > data/operations/qdx-crasp-cremam-publication-receipt.json
+          rm -f .github/workflows/prepare-quadrix-crasp-cremam-v*-once.yml
+          rm -f .github/workflows/publish-quadrix-final*-once.yml
+          rm -f .github/workflows/validate-quadrix*-once.yml
+          rm -f .github/workflows/deploy-quadrix-pages-once.yml
+          rm -f .github/workflows/deploy-quadrix-from-public-artifact-once.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/notion data/release data/operations assets/discursive-display-v2-13.css assets/discursive-display-v2-13.js index.html service-worker.js scripts package.json tests .github/workflows
+          git add -u
+          git commit -m 'Publicar lote Quadrix sobre artefato público validado [skip ci]'
+          git push origin HEAD:agent/publish-quadrix-discursive-view-20260805
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+
+  deploy:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publicar no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  close:
+    needs: [prepare, deploy]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: agent/publish-quadrix-discursive-view-20260805
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Validar publicação pública
+        run: |
+          URL='https://rodrigorosadantas.github.io/sedes-df-questoes'
+          for i in $(seq 1 30); do
+            curl -fsS "$URL/data/release/release-meta.json?run=$GITHUB_RUN_ID-$i" -o /tmp/release-meta.json || true
+            if jq -e '.questions == 2971 and .banco_mestre == 3048 and .discursive_display_items == 2 and .materials == 69' /tmp/release-meta.json >/dev/null 2>&1; then break; fi
+            sleep 10
+          done
+          jq -e '.questions == 2971 and .banco_mestre == 3048 and .discursive_display_items == 2 and .awaiting_audit == 75 and .materials == 69' /tmp/release-meta.json
+          curl -fsS "$URL/data/release/catalogo.json?run=$GITHUB_RUN_ID" -o /tmp/catalogo.json
+          test "$(jq '.question_index | length' /tmp/catalogo.json)" = 2971
+          test "$(jq '.summary.discursivas_consulta' /tmp/catalogo.json)" = 2
+          curl -fsS "$URL/?run=$GITHUB_RUN_ID" | grep -q 'discursive-display-v2-13.js'
+
+      - name: Fechar rastreabilidade no Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          RELEASE_COMMIT: ${{ needs.prepare.outputs.content_sha }}
+        run: |
+          node scripts/mark-quadrix-objectives-published.mjs
+          node scripts/mark-discursive-display-published.mjs
+
+      - name: Registrar fechamento e avançar main
+        env:
+          PAGE_URL: ${{ needs.deploy.outputs.page_url }}
+          CONTENT_SHA: ${{ needs.prepare.outputs.content_sha }}
+        run: |
+          jq -n --arg confirmed_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg run_id "$GITHUB_RUN_ID" --arg source_sha "$CONTENT_SHA" --arg public_url "$PAGE_URL" '{schema_version:"1.0",operation:"PUBLISH-QDX-CRASP-CREMAM-20260805",status:"success",confirmed_at:$confirmed_at,workflow_run_id:$run_id,source_sha:$source_sha,public_url:$public_url,base_questions_preserved:2871,objective_questions_added:100,questions:2971,discursive_display_items:2,banco_mestre:3048,awaiting_audit:75,materials:69,notion_traceability:"success",public_validation:"success"}' > data/operations/qdx-crasp-cremam-deployment-receipt.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/operations/qdx-crasp-cremam-deployment-receipt.json
+          git commit -m 'Registrar publicação pública do lote Quadrix [skip ci]'
+          git push origin HEAD:agent/publish-quadrix-discursive-view-20260805
+          git push origin HEAD:main || true
