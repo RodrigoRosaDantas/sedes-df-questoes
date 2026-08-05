@@ -14,9 +14,28 @@ function normalizedSnapshot(snapshotContent) {
   return {buffer, snapshot};
 }
 
+function explicitScope(snapshot) {
+  const raw = snapshot.publication_scope?.codes;
+  if (raw == null) return null;
+  if (!Array.isArray(raw) || !raw.length) throw new Error('Escopo explícito de publicação está vazio ou inválido.');
+  const codes = raw.map(clean);
+  if (codes.some(code => !code)) throw new Error('Escopo explícito contém código vazio.');
+  if (new Set(codes).size !== codes.length) throw new Error('Escopo explícito contém código repetido.');
+  return {
+    operation: clean(snapshot.publication_scope?.operation) || null,
+    codes: new Set(codes),
+    sortedCodes: [...codes].sort((left, right) => left.localeCompare(right, 'pt-BR')),
+  };
+}
+
 export function buildPublicationPlan(snapshotContent) {
   const {buffer, snapshot} = normalizedSnapshot(snapshotContent);
-  const candidates = snapshot.records.filter(record => !clean(record.github_id));
+  const scope = explicitScope(snapshot);
+  const candidates = snapshot.records.filter(record => {
+    const code = clean(record.code);
+    if (clean(record.github_id)) return false;
+    return scope ? scope.codes.has(code) : true;
+  });
   const seenCodes = new Set();
   const grouped = new Map();
 
@@ -32,6 +51,14 @@ export function buildPublicationPlan(snapshotContent) {
     seenCodes.add(code);
     if (!grouped.has(lot)) grouped.set(lot, []);
     grouped.get(lot).push(code);
+  }
+
+  if (scope) {
+    const missing = scope.sortedCodes.filter(code => !seenCodes.has(code));
+    if (missing.length) throw new Error(`Escopo explícito não foi resolvido integralmente: ${missing.slice(0, 5).join(', ')}.`);
+    if (seenCodes.size !== scope.codes.size) {
+      throw new Error(`Escopo explícito esperava ${scope.codes.size} registros, mas resolveu ${seenCodes.size}.`);
+    }
   }
 
   const lots = [...grouped.entries()]
@@ -51,6 +78,13 @@ export function buildPublicationPlan(snapshotContent) {
     snapshot_sha256: sha256(buffer),
     snapshot_generated_at: snapshot.generated_at || null,
     total_records: candidates.length,
+    ...(scope ? {
+      scope: {
+        operation: scope.operation,
+        expected_count: scope.sortedCodes.length,
+        codes_sha256: sha256(scope.sortedCodes.join('\n')),
+      },
+    } : {}),
     lots,
   };
 }
@@ -63,7 +97,7 @@ export function validatePublicationPlan(plan, snapshotContent) {
   if (JSON.stringify(plan) !== JSON.stringify(expected)) {
     throw new Error(
       `Plano de publicação não corresponde exatamente ao snapshot: `
-      + `${expected.total_records} registro(s) sem rastreabilidade eram esperados.`,
+      + `${expected.total_records} registro(s) do escopo eram esperados.`,
     );
   }
   return expected;
