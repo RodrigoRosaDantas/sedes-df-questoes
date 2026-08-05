@@ -1,0 +1,11 @@
+{
+  "operation": "REFRESH-BANCO-MESTRE-DASHBOARD-20260804",
+  "requested_at": "2026-08-05T01:36:00Z",
+  "expected": {
+    "active_records": 2946,
+    "public_questions": 2871,
+    "editorial_audit": 75,
+    "materials": 67
+  },
+  "reason": "Atualizar o painel público após a movimentação auditada de 2.088 registros para a lixeira do Notion."
+}
