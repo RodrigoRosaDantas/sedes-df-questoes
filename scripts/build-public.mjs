@@ -84,12 +84,14 @@ if (fs.existsSync(cleanupReceiptPath)) {
   if (cleanupIsNewer) {
     const reconciledActive = Number(cleanupReceipt.active_after);
     const completePublic = Number(cleanupReceipt.after_counts?.complete_public_records);
+    const publicCatalog = Number(cleanupReceipt.after_counts?.public_catalog);
     if (cleanupReceipt.status !== "success"
       || Number(cleanupReceipt.target_count) !== 2088
       || Number(cleanupReceipt.remaining_active_count) !== 0
       || !Array.isArray(cleanupReceipt.failures)
       || cleanupReceipt.failures.length !== 0
-      || completePublic !== questionCount
+      || completePublic !== publicCatalog
+      || questionCount > completePublic
       || !Number.isInteger(reconciledActive)
       || reconciledActive < questionCount) {
       throw new Error("O recibo da limpeza do Notion não permite reconciliar o painel público com segurança.");
