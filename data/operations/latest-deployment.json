@@ -1,12 +1,12 @@
 {
-  "schema_version": "1.3",
-  "confirmed_at": "2026-08-05T11:48:18Z",
+  "schema_version": "1.4",
+  "confirmed_at": "2026-08-05T14:36:02Z",
   "public_url": "https://rodrigorosadantas.github.io/sedes-df-questoes",
-  "source_sha": "5d106a50b2316cecaec1325809ad58d80e869770",
-  "workflow_run_id": 31002745526,
-  "workflow_conclusion": "failure",
+  "source_sha": "42dff9230f3656fde4229b0e59fbf0dda32829d1",
+  "workflow_run_id": 31015812783,
+  "workflow_conclusion": "success",
   "deployment_status": "success",
-  "closure_status": "completed_manually_after_failure",
+  "closure_status": "completed",
   "app_version": "2.13.0",
   "cache_version": "sedes-questoes-v2-13-0",
   "questions": 2871,
@@ -20,11 +20,18 @@
     "awaiting_editorial_audit": 75
   },
   "verification": {
+    "full_npm_check": "success",
+    "immutable_packages": "success",
     "static_files": "success",
     "public_browser": "success",
     "public_dashboard_card": "success",
-    "public_metadata_refetched": "success"
+    "public_metadata_refetched": "success",
+    "catalog_manifest_release_meta": "success",
+    "catalog_hash": "success",
+    "independent_artifact_audit": "success"
   },
-  "metadata_contract": "pending_redeploy",
+  "metadata_contract": "consistent",
+  "catalog_sha256": "d53e4febfb715279c826044b4012df61e4ecb717c890116791959f432d4539ff",
+  "artifact_digest": "sha256:169e4e860ff1b99e02eab2efb4e8b9a38397f7df3998770ee16e28e6e56586f0",
   "automation_mode": "manual_only_suspended"
 }
