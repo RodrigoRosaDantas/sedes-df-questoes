@@ -74,10 +74,6 @@ async function enhanceHome() {
   const data = await catalog();
   const displayOnly = Number(data.summary?.discursivas_consulta || 0);
   if (!displayOnly) return;
-  const pendingCard = status.children[2];
-  const pendingStrong = pendingCard?.querySelector('strong');
-  const pending = Number(data.summary?.aguardando_auditoria || pendingStrong?.textContent || 0);
-  if (pendingStrong) pendingStrong.textContent = String(Math.max(0, pending - displayOnly));
   status.insertAdjacentHTML('beforeend', `<div data-discursive-bank><span>Discursivas para consulta</span><strong>${displayOnly}</strong><small>itens visíveis, sem correção automática</small></div>`);
 }
 
