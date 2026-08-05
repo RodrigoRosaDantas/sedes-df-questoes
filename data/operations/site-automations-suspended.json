@@ -1,15 +1,15 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "operation": "SUSPEND-SITE-AUTOMATIONS",
-  "suspended_at": "2026-08-05T10:40:11Z",
+  "confirmed_at": "2026-08-05T12:10:00Z",
   "requested_by": "user",
-  "mode": "manual_only_noop",
-  "automatic_triggers_blocked": [
+  "mode": "manual_only",
+  "automatic_triggers_removed": [
     "push",
     "pull_request",
     "schedule"
   ],
-  "workflows_suspended": [
+  "core_workflows_suspended": [
     ".github/workflows/pages.yml",
     ".github/workflows/notion-sync.yml",
     ".github/workflows/notion-compatibility.yml",
@@ -20,17 +20,27 @@
     ".github/workflows/apply-dashboard-card-source-direct.yml",
     ".github/workflows/suspend-site-automations.yml"
   ],
+  "additional_workflows_reconciled": [
+    ".github/workflows/close-crefito17-agentefiscal-traceability.yml",
+    ".github/workflows/close-qdx-2022-notion.yml",
+    ".github/workflows/close-seedf-biomed-traceability.yml",
+    ".github/workflows/close-seedf-eletrot-traceability.yml",
+    ".github/workflows/editorial-pedagogia-seedf-2025.yml",
+    ".github/workflows/exceptional-release-2026-08-01.yml",
+    ".github/workflows/map-seedf-eletrot-pages.yml",
+    ".github/workflows/reconcile-published-traceability.yml",
+    ".github/workflows/sync-contador-070-correction.yml"
+  ],
   "effects": {
     "automatic_notion_sync": "suspended",
     "automatic_site_build_and_deploy": "suspended",
     "automatic_public_browser_monitoring": "suspended",
     "automatic_rollback": "suspended",
     "automatic_editorial_checks": "suspended",
-    "temporary_dashboard_card_routines": "suspended"
+    "automatic_traceability_closure": "suspended"
   },
-  "site_content_changed": false,
-  "published_site_removed": false,
+  "site_content_changed_by_suspension": false,
   "user_progress_changed": false,
   "reversible_through_git_history": true,
-  "note": "Os arquivos permanecem no repositório como stubs manuais sem efeito operacional. Execuções que já estivessem em andamento antes da suspensão não puderam ter o cancelamento confirmado pela integração disponível."
+  "note": "Todos os workflows remanescentes ficam disponíveis apenas para acionamento manual. O deploy manual do cartão foi concluído antes deste fechamento."
 }
