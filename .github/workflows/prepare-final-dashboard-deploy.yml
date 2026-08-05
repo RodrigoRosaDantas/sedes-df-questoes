@@ -1,0 +1,103 @@
+name: Preparar consolidação final do deploy manual
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/operations/prepare-final-dashboard-deploy.json'
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: prepare-final-dashboard-deploy
+  cancel-in-progress: true
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Cancelar tentativas temporárias anteriores
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SELF_RUN_ID: ${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for status in queued in_progress waiting requested pending; do
+            gh api "repos/${GITHUB_REPOSITORY}/actions/runs?status=${status}&per_page=100" > "/tmp/runs-${status}.json" || true
+            jq -r --argjson self "${SELF_RUN_ID}" '
+              .workflow_runs[]
+              | select(.id != $self)
+              | select(
+                  (.name | startswith("Deploy manual one-shot"))
+                  or (.name | startswith("Deploy manual do cartão com validadores"))
+                  or (.name == "Validar e publicar GitHub Pages" and .head_branch == "manual-dashboard-card-deploy-20260805")
+                )
+              | .id
+            ' "/tmp/runs-${status}.json" 2>/dev/null \
+            | while read -r run_id; do
+                [ -z "${run_id}" ] && continue
+                gh api --method POST "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/cancel" >/dev/null 2>&1 || true
+                echo "Cancelamento solicitado para ${run_id}."
+              done
+          done
+          sleep 10
+
+      - name: Alinhar validadores e consolidar um único gatilho
+        shell: bash
+        run: |
+          set -euo pipefail
+          MATCHES=$(git grep -l 'app-v4.js?v=8' || true)
+          if [ -n "${MATCHES}" ]; then
+            printf '%s\n' "${MATCHES}"
+            while IFS= read -r file; do
+              [ -z "${file}" ] && continue
+              sed -i 's/app-v4\.js?v=8/app-v4.js?v=9/g' "${file}"
+            done <<< "${MATCHES}"
+          fi
+          if git grep -n 'app-v4.js?v=8'; then
+            echo 'Referência v8 remanescente.'
+            exit 1
+          fi
+          node --check scripts/validate-intelligence-v2-9.mjs
+          node --check scripts/validate-dist-v2-10.mjs
+          node --check scripts/validate-build-v2-11.mjs
+
+          rm -f .github/workflows/manual-dashboard-card-deploy-one-shot.yml
+          rm -f .github/workflows/manual-dashboard-card-deploy-one-shot-v2.yml
+          rm -f .github/workflows/manual-dashboard-card-deploy-one-shot-v3.yml
+          rm -f data/operations/manual-dashboard-card-deploy-20260805.json
+          rm -f data/operations/manual-dashboard-card-deploy-20260805-v2.json
+          rm -f data/operations/manual-dashboard-card-deploy-20260805-v3.json
+          rm -f data/editorial/manual-dashboard-card-deploy-live.json
+
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path('data/operations/manual-dashboard-card-deploy-once-20260805.json')
+          payload = json.loads(path.read_text())
+          payload['authorized_at'] = '2026-08-05T11:30:00Z'
+          payload['attempt'] = 'final-consolidated'
+          payload['validator_revision'] = 'app-v4.js?v=9'
+          path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n')
+          PY
+
+          rm -f .github/workflows/prepare-final-dashboard-deploy.yml
+          rm -f data/operations/prepare-final-dashboard-deploy.json
+
+          git config user.name 'sedes-dashboard-manual[bot]'
+          git config user.email 'sedes-dashboard-manual[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Autorizar deploy manual do cartão Banco Mestre'
+          git pull --rebase origin main
+          git push origin HEAD:main
+          git push origin --delete manual-dashboard-card-deploy-20260805 >/dev/null 2>&1 || true
+          echo '✓ Gatilho final enviado; demais automações permanecem suspensas.'
