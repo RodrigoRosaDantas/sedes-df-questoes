@@ -1,0 +1,13 @@
+{
+  "operation": "REDEPLOY-RECONCILED-PUBLIC-CONTRACT",
+  "authorized_by": "user",
+  "authorized_at": "2026-08-05T13:26:00Z",
+  "expected": {
+    "banco_mestre": 2946,
+    "questions": 2871,
+    "awaiting_audit": 75,
+    "materials": 67
+  },
+  "notion_write": false,
+  "keep_other_automations_suspended": true
+}
