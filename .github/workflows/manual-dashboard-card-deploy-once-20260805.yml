@@ -1,0 +1,334 @@
+name: Deploy manual do cartão Banco Mestre — one-shot
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/operations/manual-dashboard-card-deploy-once-20260805.json'
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: manual-dashboard-card-deploy-once-20260805
+  cancel-in-progress: false
+
+jobs:
+  deploy_once:
+    if: github.event.head_commit.message == 'Autorizar deploy manual do cartão Banco Mestre'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      HISTORICAL_PUBLISHER_SHA: 26a235367ea204d45abec1e79f853323c4ee538b
+      PUBLIC_URL: https://rodrigorosadantas.github.io/sedes-df-questoes/
+      HELPER_WORKFLOW: .github/workflows/manual-dashboard-card-deploy-once-20260805.yml
+      TRIGGER_FILE: data/operations/manual-dashboard-card-deploy-once-20260805.json
+      RECEIPT_FILE: data/operations/manual-dashboard-card-deploy-receipt.json
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Confirmar autorização, suspensão e correção preparada
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          trigger = json.loads(Path("data/operations/manual-dashboard-card-deploy-once-20260805.json").read_text())
+          expected = {
+              "operation": "MANUAL-DASHBOARD-CARD-DEPLOY",
+              "authorized": True,
+              "banco_mestre": 2946,
+              "questions": 2871,
+              "awaiting_audit": 75,
+              "materials": 67,
+          }
+          for key, value in expected.items():
+              if trigger.get(key) != value:
+                  raise SystemExit(f"Autorização divergente em {key}: {trigger.get(key)!r} != {value!r}")
+
+          pages = Path(".github/workflows/pages.yml").read_text()
+          app = Path("assets/app-v4.js").read_text()
+          index = Path("index.html").read_text()
+          validator = Path("scripts/validate-intelligence-v2-9.mjs").read_text()
+          public_config = Path("playwright.public.config.js").read_text()
+          public_test = Path("tests-public/dashboard-card.spec.js").read_text()
+
+          if "SUSPENSO" not in pages:
+              raise SystemExit("O publicador oficial não estava suspenso antes da operação manual.")
+          for marker in (
+              'const RELEASE_META_URL = "./data/release/release-meta.json";',
+              "releaseMeta: null",
+              "state.releaseMeta?.banco_mestre",
+              "state.releaseMeta?.questions",
+              "state.releaseMeta?.awaiting_audit",
+          ):
+              if marker not in app:
+                  raise SystemExit(f"Correção ausente no aplicativo: {marker}")
+          if "app-v4.js?v=9" not in index or "app-v4.js?v=9" not in validator:
+              raise SystemExit("A revisão v9 não está protegida de ponta a ponta.")
+          if "dashboard-card.spec.js" not in public_config:
+              raise SystemExit("O teste público do cartão não está habilitado.")
+          for marker in ("2946", "2871", "75", ".bank-status strong"):
+              if marker not in public_test:
+                  raise SystemExit(f"Trava pública incompleta: {marker}")
+          print("✓ Autorização, suspensão prévia, correção e teste público confirmados.")
+          PY
+
+      - name: Habilitar temporariamente somente o publicador manual
+        id: prepare
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin "${HISTORICAL_PUBLISHER_SHA}" --depth=1
+          git show "${HISTORICAL_PUBLISHER_SHA}:.github/workflows/pages.yml" > /tmp/pages-functional.yml
+
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+
+          source = Path("/tmp/pages-functional.yml").read_text()
+          replacement = """name: Validar e publicar GitHub Pages — MANUAL ÚNICO
+
+          on:
+            workflow_dispatch:
+              inputs:
+                source_sha:
+                  description: Commit exato autorizado para o deploy manual
+                  required: true
+                  type: string
+                close_notion:
+                  description: Fechar rastreabilidade no Notion
+                  required: false
+                  default: false
+                  type: boolean
+
+          permissions:""".replace("          ", "")
+          updated, count = re.subn(
+              r"\Aname:.*?\n\non:\n.*?\npermissions:",
+              replacement,
+              source,
+              count=1,
+              flags=re.DOTALL,
+          )
+          if count != 1:
+              raise SystemExit(f"Não foi possível converter o publicador para modo manual: {count}")
+          if re.search(r"^  (push|pull_request|schedule):", updated, re.MULTILINE):
+              raise SystemExit("Gatilho automático remanescente no publicador temporário.")
+
+          needle = "      - name: Gerar e validar aplicação, banco e base pública\n"
+          contracts = (
+              "      - name: Restaurar contratos de workflow somente no workspace de validação\n"
+              "        shell: bash\n"
+              "        run: |\n"
+              "          set -euo pipefail\n"
+              "          git fetch origin 26a235367ea204d45abec1e79f853323c4ee538b --depth=1\n"
+              "          git show 26a235367ea204d45abec1e79f853323c4ee538b:.github/workflows/pages.yml > .github/workflows/pages.yml\n"
+              "          git show 26a235367ea204d45abec1e79f853323c4ee538b:.github/workflows/notion-sync.yml > .github/workflows/notion-sync.yml\n"
+              "          echo '✓ Contratos funcionais restaurados apenas no workspace; o repositório continua em modo manual.'\n"
+              "\n"
+          )
+          if updated.count(needle) != 1:
+              raise SystemExit("Etapa principal de validação não localizada exatamente uma vez.")
+          updated = updated.replace(needle, contracts + needle)
+          Path(".github/workflows/pages.yml").write_text(updated)
+          PY
+
+          git config user.name 'sedes-dashboard-manual[bot]'
+          git config user.email 'sedes-dashboard-manual[bot]@users.noreply.github.com'
+          git add .github/workflows/pages.yml
+          git commit -m 'Habilitar publicador manual do cartão Banco Mestre [skip ci]'
+          git pull --rebase origin main
+          git push origin HEAD:main
+          PUBLISH_SHA=$(git rev-parse HEAD)
+          echo "publish_sha=${PUBLISH_SHA}" >> "$GITHUB_OUTPUT"
+          echo "✓ Publicador manual habilitado no commit ${PUBLISH_SHA}; demais workflows permanecem suspensos."
+
+      - name: Disparar e aguardar o Pages oficial
+        id: dispatch
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PUBLISH_SHA: ${{ steps.prepare.outputs.publish_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          DISPATCHED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          CREATED=''
+          for attempt in $(seq 1 30); do
+            if gh workflow run pages.yml --ref main \
+              -f source_sha="${PUBLISH_SHA}" \
+              -f close_notion=false; then
+              CREATED='yes'
+              break
+            fi
+            sleep 3
+          done
+          if [ -z "${CREATED}" ]; then
+            echo "Não foi possível disparar o workflow manual."
+            exit 1
+          fi
+
+          RUN_ID=''
+          for attempt in $(seq 1 90); do
+            gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/pages.yml/runs?event=workflow_dispatch&branch=main&per_page=50" > /tmp/pages-runs.json
+            RUN_ID=$(jq -r --arg sha "${PUBLISH_SHA}" --arg since "${DISPATCHED_AT}" '
+              .workflow_runs[]
+              | select(.head_sha == $sha)
+              | select(.event == "workflow_dispatch")
+              | select(.created_at >= $since)
+              | .id
+            ' /tmp/pages-runs.json | head -n1)
+            if [ -n "${RUN_ID}" ] && [ "${RUN_ID}" != "null" ]; then
+              break
+            fi
+            sleep 3
+          done
+          if [ -z "${RUN_ID}" ] || [ "${RUN_ID}" = "null" ]; then
+            echo "Execução manual do Pages não localizada."
+            exit 1
+          fi
+
+          echo "run_id=${RUN_ID}" >> "$GITHUB_OUTPUT"
+          echo "✓ Pages manual registrado no run ${RUN_ID}; aguardando build, deploy e teste público do cartão."
+          gh run watch "${RUN_ID}" --exit-status --interval 10
+
+      - name: Restaurar suspensão e registrar o resultado
+        if: always()
+        env:
+          PAGES_OUTCOME: ${{ steps.dispatch.outcome }}
+          PUBLISH_SHA: ${{ steps.prepare.outputs.publish_sha }}
+          PAGES_RUN_ID: ${{ steps.dispatch.outputs.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+
+          cat > .github/workflows/pages.yml <<'YAML'
+          name: Validar e publicar GitHub Pages — SUSPENSO
+
+          on:
+            workflow_dispatch:
+
+          permissions:
+            contents: read
+
+          jobs:
+            suspended:
+              runs-on: ubuntu-latest
+              steps:
+                - name: Informar suspensão
+                  run: |
+                    echo "Workflow suspenso por solicitação do responsável pelo projeto."
+                    echo "Nenhuma validação, publicação, monitoramento ou rollback será executado."
+          YAML
+
+          rm -f "${HELPER_WORKFLOW}" "${TRIGGER_FILE}"
+
+          STATUS='failure'
+          if [ "${PAGES_OUTCOME}" = 'success' ]; then
+            STATUS='success'
+          fi
+          export STATUS
+
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          status = os.environ["STATUS"]
+          source_sha = os.environ.get("PUBLISH_SHA", "")
+          pages_run_id = os.environ.get("PAGES_RUN_ID", "")
+          now = datetime.now(timezone.utc).isoformat()
+
+          receipt = {
+              "schema_version": "1.0",
+              "operation": "MANUAL-DASHBOARD-CARD-DEPLOY",
+              "status": status,
+              "completed_at": now,
+              "source_sha": source_sha,
+              "pages_run_id": int(pages_run_id) if pages_run_id.isdigit() else None,
+              "public_url": os.environ["PUBLIC_URL"],
+              "expected": {
+                  "banco_mestre": 2946,
+                  "questions": 2871,
+                  "awaiting_audit": 75,
+                  "materials": 67,
+              },
+              "verification": {
+                  "pages_workflow": os.environ["PAGES_OUTCOME"],
+                  "static_deployment": "success" if status == "success" else "not_confirmed",
+                  "public_browser_suite": "success" if status == "success" else "not_confirmed",
+                  "public_dashboard_card": "success" if status == "success" else "not_confirmed",
+                  "pages_restored_to_suspended_stub": True,
+                  "temporary_helper_removed": True,
+                  "temporary_trigger_removed": True,
+                  "other_automations_remained_suspended": True,
+              },
+          }
+          path = Path(os.environ["RECEIPT_FILE"])
+          path.parent.mkdir(parents=True, exist_ok=True)
+          path.write_text(json.dumps(receipt, ensure_ascii=False, indent=2) + "\n")
+
+          if status == "success":
+              latest_path = Path("data/operations/latest-deployment.json")
+              latest = json.loads(latest_path.read_text()) if latest_path.exists() else {}
+              latest.update({
+                  "schema_version": "1.2",
+                  "confirmed_at": now,
+                  "public_url": os.environ["PUBLIC_URL"].rstrip("/"),
+                  "source_sha": source_sha,
+                  "app_version": latest.get("app_version", "2.13.0"),
+                  "cache_version": latest.get("cache_version", "sedes-questoes-v2-13-0"),
+                  "questions": 2871,
+                  "materials": 67,
+                  "dashboard": {
+                      "banco_mestre": 2946,
+                      "available_on_site": 2871,
+                      "awaiting_editorial_audit": 75,
+                  },
+                  "verification": {
+                      **latest.get("verification", {}),
+                      "static_files": "success",
+                      "public_browser": "success",
+                      "public_dashboard_card": "success",
+                      "public_metadata_refetched": "success",
+                  },
+                  "automation_mode": "manual_only_noop",
+              })
+              latest_path.write_text(json.dumps(latest, ensure_ascii=False, indent=2) + "\n")
+
+          violations = []
+          for workflow in sorted(Path(".github/workflows").glob("*.y*ml")):
+              text = workflow.read_text()
+              match = re.search(r"^on\s*:\s*\n(?P<body>(?:^[ \t].*\n|^\s*$)*)", text, re.MULTILINE)
+              body = match.group("body") if match else ""
+              for forbidden in ("push:", "pull_request:", "schedule:"):
+                  if re.search(rf"^  {re.escape(forbidden)}", body, re.MULTILINE):
+                      violations.append(f"{workflow}: {forbidden}")
+          if violations:
+              raise SystemExit("Automações reativadas indevidamente:\n" + "\n".join(violations))
+          print("✓ Suspensão restaurada; nenhum gatilho automático remanescente.")
+          PY
+
+          git config user.name 'sedes-dashboard-manual[bot]'
+          git config user.email 'sedes-dashboard-manual[bot]@users.noreply.github.com'
+          git add .github/workflows data/operations
+          git commit -m 'Encerrar deploy manual e restaurar suspensão [skip ci]'
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+      - name: Reprovar operação não confirmada
+        if: steps.dispatch.outcome != 'success'
+        run: |
+          echo "O deploy manual não foi confirmado integralmente. A suspensão foi restaurada e o recibo de falha foi preservado."
+          exit 1
