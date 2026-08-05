@@ -1,0 +1,14 @@
+{
+  "operation": "REFRESH-BANCO-MESTRE-DASHBOARD-20260804-R4",
+  "dispatched_at": "2026-08-05T02:36:44Z",
+  "pages_run_id": 30969856998,
+  "pages_head_sha": "59faf020fc71bc377030f3bce5e9c8223d08aa4c",
+  "pages_status_at_registration": "in_progress",
+  "pages_conclusion_at_registration": "",
+  "pages_created_at": "2026-08-05T02:36:45Z",
+  "expected": {
+    "banco_mestre": 2946,
+    "questions": 2871,
+    "awaiting_audit": 75
+  }
+}
