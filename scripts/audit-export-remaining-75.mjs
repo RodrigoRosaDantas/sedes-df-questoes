@@ -145,7 +145,7 @@ function assertQuality(row) {
   if (clean(row['Comentário geral']).length < 30) throw new Error(`${code}: comentário geral insuficiente.`);
   if (clean(row['Fundamento legal']).length < 5) throw new Error(`${code}: fundamento insuficiente.`);
   if (clean(row['Pegadinha']).length < 10) throw new Error(`${code}: pegadinha insuficiente.`);
-  const placeholder = /\b(todo|a preencher|placeholder|lorem ipsum|sem comentário|pendente de revisão)\b/i;
+  const placeholder = /\b(a preencher|placeholder|lorem ipsum|sem comentário|pendente de revisão)\b/i;
   for (const [label, field] of required) if (placeholder.test(clean(field))) throw new Error(`${code}: placeholder detectado em ${label}.`);
   if ([row['Alternativa A'], row['Alternativa B'], row['Alternativa C'], row['Alternativa D'], row['Alternativa E']].some(item => clean(item))) {
     throw new Error(`${code}: questão C/E contém alternativa A–E preenchida.`);
