@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "operation": "PUBLISH-SEEDF-CONTABILIDADE-ELETRONICA-75-20260805",
+  "status": "success",
+  "confirmed_at": "2026-08-05T18:13:25Z",
+  "workflow_run_id": "31033535230",
+  "source_sha": "b672d7437ca3a2d0641eb0c174a77274c128c21f",
+  "public_url": "https://rodrigorosadantas.github.io/sedes-df-questoes/",
+  "base_questions_preserved": 2971,
+  "objective_questions_added": 75,
+  "questions": 3046,
+  "discursive_display_items": 2,
+  "banco_mestre": 3048,
+  "awaiting_audit": 0,
+  "materials": 71,
+  "proofs": 36,
+  "simulations": 35,
+  "notion_traceability": "success",
+  "public_validation": "success"
+}
