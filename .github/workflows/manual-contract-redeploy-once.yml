@@ -46,6 +46,13 @@ jobs:
           test "$(head -n 1 .github/workflows/pages.yml)" = 'name: Validar e publicar GitHub Pages — SUSPENSO'
           test "$(head -n 1 .github/workflows/notion-sync.yml)" = 'name: Sincronizar Banco Mestre do Notion — SUSPENSO'
 
+      - name: Exportar saneamentos editoriais autorizados
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: |
+          node scripts/export-editorial-platform-sync.mjs
+          node scripts/export-pedagogia-editorial-sync.mjs
+
       - name: Executar validação integral
         run: npm run check
 
