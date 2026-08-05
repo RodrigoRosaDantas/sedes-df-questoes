@@ -2,9 +2,9 @@
   "operation": "REDEPLOY-RECONCILED-PUBLIC-CONTRACT",
   "authorized_by": "user",
   "authorized_at": "2026-08-05T13:26:00Z",
-  "attempt": 3,
-  "previous_run_id": 31014950971,
-  "previous_failure": "current snapshot was not the immutable build base expected by the editorial synchronization",
+  "attempt": 4,
+  "previous_run_id": 31015309364,
+  "previous_failure": "legacy intelligence validator required the active Pages workflow while governance was suspended",
   "expected": {
     "banco_mestre": 2946,
     "questions": 2871,
