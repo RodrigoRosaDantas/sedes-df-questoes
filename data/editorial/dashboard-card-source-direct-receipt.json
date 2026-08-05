@@ -1,0 +1,14 @@
+{
+  "operation": "APPLY-DASHBOARD-CARD-SOURCE-DIRECT-20260805",
+  "status": "dispatched",
+  "source_sha": "1769b401a39e26126db0795448e64d8f022056a2",
+  "pages_run_id": 30997779405,
+  "dispatched_at": "2026-08-05T10:31:41Z",
+  "expected": {
+    "banco_mestre": 2946,
+    "questions": 2871,
+    "awaiting_audit": 75,
+    "materials": 67
+  },
+  "asset": "app-v4.js?v=9"
+}
