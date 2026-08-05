@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
   "operation_id": "NOTION-TRASH-CLASSIFIED-20260804",
-  "mode": "dry-run",
-  "requested_at": "2026-08-05T01:48:00Z",
+  "mode": "execute",
+  "requested_at": "2026-08-05T02:02:00Z",
   "requested_by": "Rodrigo Rosa Dantas",
   "expected_counts": {
     "pending_blockers": 1627,
