@@ -1,8 +1,8 @@
 {
-  "schema_version": "1.1",
-  "confirmed_at": "2026-08-05T10:23:50.042Z",
+  "schema_version": "1.2",
+  "confirmed_at": "2026-08-05T11:48:18Z",
   "public_url": "https://rodrigorosadantas.github.io/sedes-df-questoes",
-  "source_sha": "0f5fd50eb83fe7868baf8a1e8ab7447ddb2b83bd",
+  "source_sha": "5d106a50b2316cecaec1325809ad58d80e869770",
   "app_version": "2.13.0",
   "cache_version": "sedes-questoes-v2-13-0",
   "questions": 2871,
@@ -10,9 +10,16 @@
   "lot": "CRBM6-2026-CONTADOR-402-001-070-20260803",
   "added_questions": 70,
   "lot_receipt": "data/release/crbm6-contador-70-publication-receipt.json",
+  "dashboard": {
+    "banco_mestre": 2946,
+    "available_on_site": 2871,
+    "awaiting_editorial_audit": 75
+  },
   "verification": {
     "static_files": "success",
     "public_browser": "success",
+    "public_dashboard_card": "success",
     "public_metadata_refetched": "success"
-  }
+  },
+  "automation_mode": "manual_only_suspended"
 }
