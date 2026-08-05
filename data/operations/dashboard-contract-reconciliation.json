@@ -1,7 +1,10 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "operation": "RECONCILE-DASHBOARD-PUBLIC-CONTRACT",
-  "status": "artifact_validated_pending_full_pipeline",
+  "status": "success",
+  "confirmed_at": "2026-08-05T14:36:02Z",
+  "source_sha": "42dff9230f3656fde4229b0e59fbf0dda32829d1",
+  "workflow_run_id": 31015812783,
   "expected": {
     "banco_mestre": 2946,
     "questions": 2871,
@@ -18,12 +21,25 @@
   ],
   "validation": {
     "new_scripts_syntax": "success",
-    "published_artifact_reconciliation": "success",
+    "full_npm_check": "success",
+    "immutable_base_and_packages": "success",
     "catalog_manifest_release_meta": "2946/2871/75/67",
     "catalog_hash_recalculated": "success",
-    "full_npm_check": "pending_manual_deploy_pipeline"
+    "static_deployment": "success",
+    "public_metadata_contract": "success",
+    "public_browser_suite": "success",
+    "independent_artifact_audit": "success"
   },
-  "site_changed": false,
+  "artifact": {
+    "id": 8934474233,
+    "name": "github-pages",
+    "digest": "sha256:169e4e860ff1b99e02eab2efb4e8b9a38397f7df3998770ee16e28e6e56586f0",
+    "catalog_sha256": "d53e4febfb715279c826044b4012df61e4ecb717c890116791959f432d4539ff"
+  },
+  "site_changed": true,
+  "site_change_scope": "public_metadata_contract_only",
+  "question_content_changed": false,
+  "material_content_changed": false,
   "notion_changed": false,
-  "deploy_required": true
+  "deploy_required": false
 }
