@@ -1,0 +1,12 @@
+{
+  "queried_at": "2026-08-05T11:47:36Z",
+  "run": {
+    "id": 31002745526,
+    "status": "in_progress",
+    "conclusion": null,
+    "head_sha": "5d106a50b2316cecaec1325809ad58d80e869770",
+    "created_at": "2026-08-05T11:45:32Z",
+    "updated_at": "2026-08-05T11:47:32Z",
+    "html_url": "https://github.com/RodrigoRosaDantas/sedes-df-questoes/actions/runs/31002745526"
+  }
+}
