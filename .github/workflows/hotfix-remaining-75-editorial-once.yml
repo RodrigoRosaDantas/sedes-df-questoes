@@ -1,0 +1,209 @@
+name: Hotfix editorial dos 75 registros — temporário
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/hotfix-remaining-75-editorial-once.yml]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+  actions: read
+
+concurrency:
+  group: hotfix-remaining-75-editorial-20260805
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Validar rotina e registrar contrato anterior
+        run: |
+          node --check scripts/hotfix-remaining-75-editorial.mjs
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const catalog = JSON.parse(fs.readFileSync('data/release/catalogo.json', 'utf8'));
+          if (Object.keys(catalog.question_index || {}).length !== 3046 || (catalog.materials || []).length !== 71) {
+            throw new Error('Contrato público anterior divergente.');
+          }
+          const questions = {};
+          for (const metadata of catalog.materials || []) {
+            const material = JSON.parse(fs.readFileSync(path.resolve(metadata.file.replace(/^\.\//, '')), 'utf8'));
+            for (const question of material.questoes || []) {
+              if (questions[question.id]) throw new Error(`ID duplicado antes do hotfix: ${question.id}`);
+              questions[question.id] = {codigo: question.codigo, gabarito: question.gabarito, material: material.id};
+            }
+          }
+          if (Object.keys(questions).length !== 3046) throw new Error(`Baseline com ${Object.keys(questions).length} questões.`);
+          fs.writeFileSync('/tmp/all-public-baseline.json', JSON.stringify(questions));
+          NODE
+
+      - name: Aplicar correções editoriais e renovar a release
+        run: |
+          node scripts/hotfix-remaining-75-editorial.mjs apply
+          node scripts/build-study-index.mjs
+
+      - name: Validar preservação integral antes do commit
+        run: |
+          node <<'NODE'
+          const crypto = require('crypto');
+          const fs = require('fs');
+          const path = require('path');
+          const sha = value => crypto.createHash('sha256').update(value).digest('hex');
+          const baseline = JSON.parse(fs.readFileSync('/tmp/all-public-baseline.json', 'utf8'));
+          const catalog = JSON.parse(fs.readFileSync('data/release/catalogo.json', 'utf8'));
+          const manifest = JSON.parse(fs.readFileSync('data/release/manifest.json', 'utf8'));
+          const current = {};
+          for (const metadata of catalog.materials || []) {
+            const material = JSON.parse(fs.readFileSync(path.resolve(metadata.file.replace(/^\.\//, '')), 'utf8'));
+            for (const question of material.questoes || []) current[question.id] = {codigo: question.codigo, gabarito: question.gabarito, material: material.id};
+          }
+          if (JSON.stringify(current) !== JSON.stringify(baseline)) throw new Error('IDs, códigos, gabaritos ou vínculo de material foram alterados.');
+          if (catalog.release_version !== '2.9.1' || Object.keys(current).length !== 3046 || catalog.materials.length !== 71) throw new Error('Contrato final divergente.');
+          const targets = [
+            'data/release/materials/notion-professor-de-educacao-basica-contabilidade-seedf-df-quadrix-2025-tipo-a.json',
+            'data/release/materials/notion-professor-de-educacao-basica-eletronica-seedf-df-quadrix-2025-tipo-a.json',
+          ];
+          const levels = new Set();
+          let count = 0;
+          for (const file of targets) {
+            const material = JSON.parse(fs.readFileSync(file, 'utf8'));
+            for (const question of material.questoes || []) {
+              if (!question.texto_base) throw new Error(`${question.codigo}: texto-base vazio.`);
+              if (/^O item está (?:correto|errado)\.\s*(?:Certo|Errado)\b/i.test(question.comentario)) throw new Error(`${question.codigo}: veredito duplicado.`);
+              if (question.observacoes.includes('Sem lote, sem liberação para exportação e sem Código GitHub.')) throw new Error(`${question.codigo}: observação antiga mantida.`);
+              if (!question.observacoes.includes('Hotfix editorial concluído em 05/08/2026')) throw new Error(`${question.codigo}: marcador do hotfix ausente.`);
+              if (!['Fácil', 'Média', 'Difícil'].includes(question.dificuldade)) throw new Error(`${question.codigo}: dificuldade inválida.`);
+              levels.add(question.dificuldade);
+              count += 1;
+            }
+          }
+          if (count !== 75 || levels.size !== 3) throw new Error(`Escopo editorial inválido: ${count} questões, níveis ${[...levels].join(', ')}.`);
+          const catalogBytes = fs.readFileSync('data/release/catalogo.json');
+          if (manifest.catalog_sha256 !== sha(catalogBytes)) throw new Error('Hash do catálogo divergente.');
+          for (const entry of manifest.materials || []) {
+            const bytes = fs.readFileSync(entry.file.replace(/^\.\//, ''));
+            if (entry.sha256 !== sha(bytes) || entry.bytes !== bytes.length) throw new Error(`Manifesto divergente: ${entry.id}.`);
+          }
+          if (!fs.readFileSync('assets/app-v4.js', 'utf8').includes('3048-3046-71-r4')) throw new Error('Chave r4 ausente no aplicativo.');
+          if (!fs.readFileSync('index.html', 'utf8').includes('app-v4.js?v=12')) throw new Error('Aplicativo v12 ausente no HTML.');
+          if (!fs.readFileSync('service-worker.js', 'utf8').includes('sedes-questoes-v2-13-0-r4')) throw new Error('Cache r4 ausente.');
+          NODE
+
+      - name: Versionar conteúdo editorial imutável
+        id: content
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            assets/app-v4.js \
+            index.html \
+            service-worker.js \
+            data/notion/published.json \
+            data/release/catalogo.json \
+            data/release/manifest.json \
+            data/release/study-index.json \
+            data/release/materials/notion-professor-de-educacao-basica-contabilidade-seedf-df-quadrix-2025-tipo-a.json \
+            data/release/materials/notion-professor-de-educacao-basica-eletronica-seedf-df-quadrix-2025-tipo-a.json
+          git commit -m 'Aplicar hotfix editorial aos 75 registros publicados [skip ci]'
+          CONTENT_SHA="$(git rev-parse HEAD)"
+          git push origin HEAD:main
+          echo "sha=$CONTENT_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Reconciliar SHA, metadados e Banco Mestre
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: |
+          node scripts/hotfix-remaining-75-editorial.mjs finalize '${{ steps.content.outputs.sha }}'
+          node scripts/hotfix-remaining-75-editorial.mjs validate
+
+      - name: Versionar metadados canônicos
+        id: metadata
+        run: |
+          git add data/release/release-meta.json data/release/build-info.json
+          git commit -m 'Reconciliar release 2.9.1 com SHA canônico [skip ci]'
+          METADATA_SHA="$(git rev-parse HEAD)"
+          git push origin HEAD:main
+          echo "sha=$METADATA_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Montar pacote público isolado
+        run: |
+          rm -rf dist
+          mkdir -p dist/data
+          cp index.html manifest.webmanifest service-worker.js dist/
+          cp -a assets dist/assets
+          cp data/concurso.json dist/data/concurso.json
+          cp -a data/release dist/data/release
+          touch dist/.nojekyll
+          test ! -e dist/scripts
+          test ! -e dist/.github
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+
+      - name: Publicar no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Validar hotfix no estado público
+        run: |
+          URL='https://rodrigorosadantas.github.io/sedes-df-questoes'
+          for i in $(seq 1 30); do
+            curl -fsS "$URL/data/release/release-meta.json?hotfix=$GITHUB_RUN_ID-$i" -o /tmp/meta.json || true
+            curl -fsS "$URL/data/release/catalogo.json?hotfix=$GITHUB_RUN_ID-$i" -o /tmp/catalog.json || true
+            curl -fsS "$URL/data/release/materials/notion-professor-de-educacao-basica-contabilidade-seedf-df-quadrix-2025-tipo-a.json?hotfix=$GITHUB_RUN_ID-$i" -o /tmp/cont.json || true
+            curl -fsS "$URL/data/release/materials/notion-professor-de-educacao-basica-eletronica-seedf-df-quadrix-2025-tipo-a.json?hotfix=$GITHUB_RUN_ID-$i" -o /tmp/eletr.json || true
+            if jq -e --arg sha '${{ steps.content.outputs.sha }}' '.questions == 3046 and .materials == 71 and .awaiting_audit == 0 and .discursive_display_items == 2 and .data_release_version == "2.9.1" and .cache_version == "sedes-questoes-v2-13-0-r4" and .source_sha == $sha' /tmp/meta.json >/dev/null 2>&1 \
+              && jq -e '.release_version == "2.9.1" and (.question_index | length) == 3046 and (.materials | length) == 71' /tmp/catalog.json >/dev/null 2>&1 \
+              && jq -e '[.questoes[] | select((.texto_base | length) == 0 or (.comentario | test("^O item está (correto|errado)\\. (Certo|Errado)"; "i")) or (.observacoes | contains("Sem lote, sem liberação para exportação e sem Código GitHub.")) or (.dificuldade | IN("Fácil", "Média", "Difícil") | not))] | length == 0' /tmp/cont.json >/dev/null 2>&1 \
+              && jq -e '[.questoes[] | select((.texto_base | length) == 0 or (.comentario | test("^O item está (correto|errado)\\. (Certo|Errado)"; "i")) or (.observacoes | contains("Sem lote, sem liberação para exportação e sem Código GitHub.")) or (.dificuldade | IN("Fácil", "Média", "Difícil") | not))] | length == 0' /tmp/eletr.json >/dev/null 2>&1; then
+              break
+            fi
+            sleep 10
+          done
+          jq -e --arg sha '${{ steps.content.outputs.sha }}' '.questions == 3046 and .materials == 71 and .awaiting_audit == 0 and .discursive_display_items == 2 and .data_release_version == "2.9.1" and .cache_version == "sedes-questoes-v2-13-0-r4" and .source_sha == $sha' /tmp/meta.json
+          jq -e '.release_version == "2.9.1" and (.question_index | length) == 3046 and (.materials | length) == 71' /tmp/catalog.json
+          test "$(jq '.questoes | length' /tmp/cont.json)" = 50
+          test "$(jq '.questoes | length' /tmp/eletr.json)" = 25
+          jq -e '[.questoes[] | select((.texto_base | length) == 0 or (.comentario | test("^O item está (correto|errado)\\. (Certo|Errado)"; "i")) or (.observacoes | contains("Sem lote, sem liberação para exportação e sem Código GitHub.")) or (.dificuldade | IN("Fácil", "Média", "Difícil") | not))] | length == 0' /tmp/cont.json
+          jq -e '[.questoes[] | select((.texto_base | length) == 0 or (.comentario | test("^O item está (correto|errado)\\. (Certo|Errado)"; "i")) or (.observacoes | contains("Sem lote, sem liberação para exportação e sem Código GitHub.")) or (.dificuldade | IN("Fácil", "Média", "Difícil") | not))] | length == 0' /tmp/eletr.json
+
+      - name: Registrar recibo final e remover script temporário
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+          CONTENT_SHA: ${{ steps.content.outputs.sha }}
+          METADATA_SHA: ${{ steps.metadata.outputs.sha }}
+        run: |
+          mkdir -p data/operations
+          jq -n \
+            --arg confirmed_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg run_id "$GITHUB_RUN_ID" \
+            --arg content_sha "$CONTENT_SHA" \
+            --arg metadata_sha "$METADATA_SHA" \
+            --arg public_url "$PAGE_URL" \
+            '{schema_version:"1.0",operation:"HOTFIX-SEEDF-CONTABILIDADE-ELETRONICA-75-EDITORIAL-20260805",status:"success",confirmed_at:$confirmed_at,workflow_run_id:$run_id,canonical_content_sha:$content_sha,metadata_commit_sha:$metadata_sha,public_url:$public_url,data_release_version:"2.9.1",cache_version:"sedes-questoes-v2-13-0-r4",questions:3046,discursive_display_items:2,banco_mestre:3048,awaiting_audit:0,materials:71,scope:{contabilidade:50,eletronica:25,total:75},corrections:{text_bases_restored:75,comments_normalized:75,observations_reconciled:75,difficulties_reviewed:75,notion_rows_reconciled:75},preservation:{public_ids:true,answers:true,sequences:true,user_statistics:true},validation:{manifest_hashes:true,public_state:true,canonical_sha_reconciled:true}}' \
+            > data/operations/remaining-75-editorial-hotfix-receipt.json
+          rm -f scripts/hotfix-remaining-75-editorial.mjs
+          git add data/operations/remaining-75-editorial-hotfix-receipt.json scripts/hotfix-remaining-75-editorial.mjs
+          git commit -m 'Registrar hotfix editorial dos 75 registros [skip ci]'
+          git push origin HEAD:main
