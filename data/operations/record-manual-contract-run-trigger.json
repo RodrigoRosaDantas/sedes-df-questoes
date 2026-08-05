@@ -1,4 +1,5 @@
 {
   "operation": "RECORD-MANUAL-CONTRACT-REDEPLOY-RUN",
-  "requested_at": "2026-08-05T13:30:00Z"
+  "requested_at": "2026-08-05T14:22:00Z",
+  "attempt": 2
 }
