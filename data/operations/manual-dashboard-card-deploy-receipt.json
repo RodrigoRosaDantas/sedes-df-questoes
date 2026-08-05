@@ -1,11 +1,14 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "operation": "MANUAL-DASHBOARD-CARD-DEPLOY-20260805",
-  "status": "success",
+  "status": "deployment_success_closure_manual",
   "confirmed_at": "2026-08-05T11:48:18Z",
   "public_url": "https://rodrigorosadantas.github.io/sedes-df-questoes/",
   "source_sha": "5d106a50b2316cecaec1325809ad58d80e869770",
   "workflow_run_id": 31002745526,
+  "workflow_conclusion": "failure",
+  "deployment_status": "success",
+  "closure_status": "completed_manually_after_failure",
   "dashboard": {
     "banco_mestre": 2946,
     "available_on_site": 2871,
@@ -18,7 +21,8 @@
     "static_deployment": "success",
     "public_browser_suite": "success",
     "public_dashboard_card": "success",
-    "release_meta": "success"
+    "release_meta": "success",
+    "catalog_and_manifest_contract": "incomplete_at_deploy"
   },
   "controls": {
     "notion_write": false,
@@ -27,5 +31,6 @@
     "all_automatic_workflows_suspended": true,
     "temporary_workflows_removed": true,
     "temporary_markers_removed": true
-  }
+  },
+  "technical_note": "O deploy e a auditoria pública passaram. A execução terminou em falha apenas porque o token interno não pôde alterar arquivos de workflow durante o fechamento. O fechamento operacional foi concluído posteriormente pela conexão GitHub autorizada."
 }
