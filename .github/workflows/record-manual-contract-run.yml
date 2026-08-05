@@ -21,7 +21,7 @@ jobs:
       - name: Localizar execução
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          EXPECTED_SHA: 43d3b91a761abd0714e0cc16dd4a40a847952387
+          EXPECTED_SHA: 5e7fcc536c08efa31bef77c38d226c364851cce8
         shell: bash
         run: |
           set -euo pipefail
