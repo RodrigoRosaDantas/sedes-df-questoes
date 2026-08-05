@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "operation": "HOTFIX-SEEDF-CONTABILIDADE-ELETRONICA-75-EDITORIAL-20260805",
+  "status": "success",
+  "confirmed_at": "2026-08-05T19:02:58Z",
+  "workflow_run_id": "31037496553",
+  "canonical_content_sha": "b28bbcac7f4defbbdd6256124f4701c62ca5c218",
+  "metadata_commit_sha": "120c8c674c56c36e49e8a995cbf0989eea51d2bb",
+  "public_url": "https://rodrigorosadantas.github.io/sedes-df-questoes/",
+  "data_release_version": "2.9.1",
+  "cache_version": "sedes-questoes-v2-13-0-r4",
+  "questions": 3046,
+  "discursive_display_items": 2,
+  "banco_mestre": 3048,
+  "awaiting_audit": 0,
+  "materials": 71,
+  "scope": {
+    "contabilidade": 50,
+    "eletronica": 25,
+    "total": 75
+  },
+  "corrections": {
+    "text_bases_restored": 75,
+    "comments_normalized": 75,
+    "observations_reconciled": 75,
+    "difficulties_reviewed": 75,
+    "notion_rows_reconciled": 75
+  },
+  "preservation": {
+    "public_ids": true,
+    "answers": true,
+    "sequences": true,
+    "user_statistics": true
+  },
+  "validation": {
+    "manifest_hashes": true,
+    "public_state": true,
+    "canonical_sha_reconciled": true
+  }
+}
