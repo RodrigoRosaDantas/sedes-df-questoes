@@ -30,7 +30,7 @@ for (const reference of [
   "reports-v2-10.js?v=2",
   "material-downloads-v1.css?v=1",
   "material-downloads-v1.js?v=1",
-  "app-v4.js?v=8",
+  "app-v4.js?v=9",
   "pwa-v2-9.js?v=1",
 ]) {
   if (!index.includes(reference)) throw new Error(`Referência ausente no HTML: ${reference}`);
@@ -80,7 +80,7 @@ for (const marker of ["data-material-download-card", "PDF para responder", "PDF 
 const worker = fs.readFileSync(path.join(dist, "service-worker.js"), "utf8");
 for (const marker of [
   expectedCacheVersion,
-  "app-v4.js?v=8",
+  "app-v4.js?v=9",
   "pwa-v2-9.js?v=1",
   "reports-v2-10.js?v=2",
   "material-downloads-v1.js?v=1",

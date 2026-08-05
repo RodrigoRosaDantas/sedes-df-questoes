@@ -1,7 +1,0 @@
-{
-  "operation": "PREPARE-FINAL-DASHBOARD-DEPLOY",
-  "status": "authorized",
-  "authorized_at": "2026-08-05T11:30:00Z",
-  "scope": "dashboard-card-only",
-  "keep_other_automations_suspended": true
-}
