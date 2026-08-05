@@ -1,0 +1,41 @@
+{
+  "schema_version": "2.0",
+  "operation_id": "NOTION-TRASH-CLASSIFIED-20260804",
+  "mode": "execute",
+  "status": "success",
+  "started_at": "2026-08-05T00:13:57.920Z",
+  "finished_at": "2026-08-05T00:49:02.368Z",
+  "source_sha": "318f5b93c135a03e4958d9bbd60986d83b2c6b26",
+  "targets_sha256": "f8a34cbf7ec9f591c2efbccd531c47991bcbf82b72f599abe7d0c2999dd0aa5f",
+  "target_count": 2088,
+  "active_before": 5034,
+  "active_after": 2946,
+  "trashed_confirmed_by_response": 2088,
+  "failures": [],
+  "remaining_active_count": 0,
+  "remaining_active": [],
+  "after_counts": {
+    "all_active": 2946,
+    "pending_blockers": 0,
+    "traceability_incomplete": 0,
+    "excess_historical": 0,
+    "union_targets": 0,
+    "public_catalog": 2871,
+    "complete_public_records": 2871,
+    "editorial_candidates": 75,
+    "target_complete_public_overlap": 0,
+    "target_candidate_overlap": 0
+  },
+  "postconditions": {
+    "zero_remaining_targets": true,
+    "zero_api_failures": true,
+    "active_rows": true,
+    "complete_public_records": true,
+    "editorial_candidates": true,
+    "pending_blockers_removed": true,
+    "traceability_incomplete_removed": true,
+    "excess_historical_removed": true
+  },
+  "public_site_changed": false,
+  "publication_workflow_dispatched": false
+}
