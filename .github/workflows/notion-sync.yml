@@ -2,6 +2,10 @@ name: Sincronizar Banco Mestre do Notion
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'data/editorial/refresh-banco-mestre-dashboard-trigger.json'
   schedule:
     - cron: '20 3,9,15,21 * * *'
 
@@ -108,8 +112,6 @@ jobs:
             CHANGED=true
           fi
 
-          # Depois de preservar snapshot e plano no commit, nenhum arquivo
-          # temporário pode impedir o rebase ou entrar acidentalmente no main.
           git reset --hard HEAD
           git clean -fd
           if [ -n "$(git status --porcelain)" ]; then
