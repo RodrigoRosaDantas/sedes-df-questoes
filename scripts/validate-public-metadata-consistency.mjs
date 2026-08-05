@@ -18,6 +18,7 @@ const expected = {
   banco_mestre: Number(releaseMeta.banco_mestre),
   materiais: Number(releaseMeta.materials),
   questoes: Number(releaseMeta.questions),
+  discursivas_consulta: Number(releaseMeta.discursive_display_items || 0),
   aguardando_auditoria: Number(releaseMeta.awaiting_audit),
   provas: Number(releaseMeta.proofs),
   simulados: Number(releaseMeta.simulations),
@@ -29,8 +30,8 @@ for (const [key, value] of Object.entries(expected)) {
   if (Number(manifest.summary?.[key]) !== value) throw new Error(`manifest.json diverge em ${key}.`);
 }
 
-if (expected.banco_mestre - expected.questoes !== expected.aguardando_auditoria) {
-  throw new Error("A decomposição Banco Mestre = publicadas + auditoria não fecha.");
+if (expected.banco_mestre - expected.questoes - expected.discursivas_consulta !== expected.aguardando_auditoria) {
+  throw new Error("A decomposição Banco Mestre = questões + discursivas de consulta + auditoria não fecha.");
 }
 if (expected.provas + expected.simulados !== expected.materiais) {
   throw new Error("A decomposição materiais = provas + simulados não fecha.");
@@ -42,6 +43,7 @@ if (manifest.catalog_sha256 !== catalogHash) {
 }
 
 console.log(
-  `✓ Contrato público unificado: ${expected.banco_mestre} / ${expected.questoes} / `
-  + `${expected.aguardando_auditoria} / ${expected.materiais}.`,
+  `✓ Contrato público unificado: banco ${expected.banco_mestre}; ${expected.questoes} questões; `
+  + `${expected.discursivas_consulta} discursivas de consulta; ${expected.aguardando_auditoria} em auditoria; `
+  + `${expected.materiais} materiais.`,
 );
