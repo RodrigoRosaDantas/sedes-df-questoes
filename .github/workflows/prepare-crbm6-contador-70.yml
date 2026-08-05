@@ -17,6 +17,7 @@ concurrency:
 env:
   BASE_SNAPSHOT_COMMIT: c060ed9a6d4c46c637a5215b3a2738b28a8d405e
   DIAGNOSTIC_PATH: data/editorial/notion-trash-classified-20260804-diagnostic.json
+  RECONSTRUCTION_DIAGNOSTIC_PATH: data/editorial/notion-trash-classified-20260804-reconstruction-diagnostic.json
 
 jobs:
   run:
@@ -52,23 +53,55 @@ jobs:
         continue-on-error: true
         shell: bash
         run: |
-          set -euo pipefail
+          set -Eeuo pipefail
+          CURRENT_STAGE='initialization'
+          trap 'STATUS=$?; jq -n --arg operation_id "NOTION-TRASH-CLASSIFIED-20260804" --arg status "failure" --arg stage "${CURRENT_STAGE}" --arg command "${BASH_COMMAND}" --arg source_sha "${GITHUB_SHA}" --arg created_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --argjson exit_code "${STATUS}" "{schema_version:\"1.0\",operation_id:\$operation_id,status:\$status,stage:\$stage,command:\$command,exit_code:\$exit_code,source_sha:\$source_sha,created_at:\$created_at}" > "${RECONSTRUCTION_DIAGNOSTIC_PATH}"; exit ${STATUS}' ERR
+
+          CURRENT_STAGE='backup_current_snapshot'
           cp data/notion/published.json /tmp/current-snapshot.json
           cp data/notion/publication-plan.json /tmp/current-plan.json
-          git fetch origin "${BASE_SNAPSHOT_COMMIT}" --depth=1
+
+          CURRENT_STAGE='validate_base_commit'
+          git cat-file -e "${BASE_SNAPSHOT_COMMIT}^{commit}"
+
+          CURRENT_STAGE='restore_base_snapshot'
           git show "${BASE_SNAPSHOT_COMMIT}:data/notion/published.json" > data/notion/published.json
           git show "${BASE_SNAPSHOT_COMMIT}:data/notion/publication-plan.json" > data/notion/publication-plan.json
+
+          CURRENT_STAGE='build_base_catalog'
           npm run build
+
+          CURRENT_STAGE='restore_current_snapshot'
           cp /tmp/current-snapshot.json data/notion/published.json
           cp /tmp/current-plan.json data/notion/publication-plan.json
+
+          CURRENT_STAGE='apply_publication_additions'
           node scripts/apply-publication-additions.mjs
+          CURRENT_STAGE='apply_seedf_bio_24'
           node scripts/apply-seedf-bio-24-addition.mjs
+          CURRENT_STAGE='apply_seedf_biomed_50'
           node scripts/apply-seedf-biomed-50-addition.mjs
+          CURRENT_STAGE='apply_seedf_eletrot_43'
           node scripts/apply-seedf-eletrot-43-addition.mjs
+          CURRENT_STAGE='apply_alto_paraiso_37'
           node scripts/apply-alto-paraiso-orientador-37-addition.mjs
+          CURRENT_STAGE='apply_crefito17_62'
           node scripts/apply-crefito17-agentefiscal-62-addition.mjs
+          CURRENT_STAGE='apply_crbm6_contador_70'
           node scripts/apply-crbm6-contador-70-addition.mjs
+
+          CURRENT_STAGE='verify_2871'
           jq -e '.summary.questoes == 2871' data/release/catalogo.json >/dev/null
+
+          trap - ERR
+          jq -n \
+            --arg operation_id 'NOTION-TRASH-CLASSIFIED-20260804' \
+            --arg status 'success' \
+            --arg stage 'complete' \
+            --arg source_sha "${GITHUB_SHA}" \
+            --arg created_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            '{schema_version:"1.0",operation_id:$operation_id,status:$status,stage:$stage,source_sha:$source_sha,created_at:$created_at}' \
+            > "${RECONSTRUCTION_DIAGNOSTIC_PATH}"
 
       - name: Extrair os códigos públicos
         id: extraction
