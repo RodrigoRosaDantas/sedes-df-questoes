@@ -1,0 +1,118 @@
+name: Publicar Quadrix pela main — temporário
+# Disparo explícito em 2026-08-05 para o lote CRA-SP/CREMAM.
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/deploy-quadrix-main-once.yml]
+
+permissions:
+  actions: read
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: deploy-quadrix-main-20260805
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Restaurar shell público validado
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          curl -fL \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/RodrigoRosaDantas/sedes-df-questoes/actions/artifacts/8934474233/zip" \
+            -o /tmp/base-pages.zip
+          rm -rf /tmp/base-pages dist
+          mkdir -p /tmp/base-pages dist
+          unzip -q /tmp/base-pages.zip -d /tmp/base-pages
+          tar -xf /tmp/base-pages/artifact.tar -C dist
+          rm -rf dist/data/release
+          mkdir -p dist/data
+          cp -a data/release dist/data/release
+          cp index.html service-worker.js dist/
+          cp assets/discursive-display-v2-13.js assets/discursive-display-v2-13.css dist/assets/
+
+      - name: Validar pacote público final
+        run: |
+          node scripts/validate-discursive-display.mjs
+          node scripts/validate-runtime-catalog.mjs
+          node <<'NODE'
+          const crypto = require('crypto');
+          const fs = require('fs');
+          const sha = value => crypto.createHash('sha256').update(value).digest('hex');
+          const catalog = JSON.parse(fs.readFileSync('dist/data/release/catalogo.json','utf8'));
+          const manifest = JSON.parse(fs.readFileSync('dist/data/release/manifest.json','utf8'));
+          const meta = JSON.parse(fs.readFileSync('dist/data/release/release-meta.json','utf8'));
+          if (Object.keys(catalog.question_index || {}).length !== 2971) throw new Error('Catálogo sem 2.971 questões.');
+          if ((catalog.materials || []).length !== 69) throw new Error('Catálogo sem 69 materiais.');
+          if (catalog.summary?.discursivas_consulta !== 2) throw new Error('Catálogo sem duas discursivas.');
+          if (meta.questions !== 2971 || meta.banco_mestre !== 3048 || meta.awaiting_audit !== 75 || meta.materials !== 69 || meta.discursive_display_items !== 2) throw new Error('Release-meta divergente.');
+          const catalogBytes = fs.readFileSync('dist/data/release/catalogo.json');
+          if (manifest.catalog_sha256 !== sha(catalogBytes)) throw new Error('Hash do catálogo divergente.');
+          for (const entry of manifest.materials || []) {
+            const bytes = fs.readFileSync(entry.file.replace(/^\.\//,''));
+            if (entry.sha256 !== sha(bytes) || entry.bytes !== bytes.length) throw new Error(`Manifesto divergente: ${entry.id}`);
+          }
+          NODE
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+      - name: Publicar no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Confirmar site público
+        run: |
+          URL='https://rodrigorosadantas.github.io/sedes-df-questoes'
+          for i in $(seq 1 30); do
+            curl -fsS "$URL/data/release/release-meta.json?run=$GITHUB_RUN_ID-$i" -o /tmp/release-meta.json || true
+            if jq -e '.questions == 2971 and .banco_mestre == 3048 and .discursive_display_items == 2 and .materials == 69' /tmp/release-meta.json >/dev/null 2>&1; then break; fi
+            sleep 10
+          done
+          jq -e '.questions == 2971 and .banco_mestre == 3048 and .discursive_display_items == 2 and .awaiting_audit == 75 and .materials == 69' /tmp/release-meta.json
+          curl -fsS "$URL/data/release/catalogo.json?run=$GITHUB_RUN_ID" -o /tmp/catalogo.json
+          test "$(jq '.question_index | length' /tmp/catalogo.json)" = 2971
+          test "$(jq '.summary.discursivas_consulta' /tmp/catalogo.json)" = 2
+          curl -fsS "$URL/?run=$GITHUB_RUN_ID" | grep -q 'discursive-display-v2-13.js'
+
+      - name: Fechar rastreabilidade no Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          RELEASE_COMMIT: ${{ github.sha }}
+        run: |
+          node scripts/mark-quadrix-objectives-published.mjs
+          node scripts/mark-discursive-display-published.mjs
+
+      - name: Registrar recibo e remover publicador temporário
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          jq -n --arg confirmed_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg run_id "$GITHUB_RUN_ID" --arg source_sha "$GITHUB_SHA" --arg public_url "$PAGE_URL" '{schema_version:"1.0",operation:"PUBLISH-QDX-CRASP-CREMAM-20260805",status:"success",confirmed_at:$confirmed_at,workflow_run_id:$run_id,source_sha:$source_sha,public_url:$public_url,base_questions_preserved:2871,objective_questions_added:100,annulled_objectives:2,questions:2971,discursive_display_items:2,banco_mestre:3048,awaiting_audit:75,materials:69,notion_traceability:"success",public_validation:"success"}' > data/operations/qdx-crasp-cremam-deployment-receipt.json
+          rm -f .github/workflows/deploy-quadrix-main-once.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/operations/qdx-crasp-cremam-deployment-receipt.json .github/workflows/deploy-quadrix-main-once.yml
+          git commit -m 'Registrar publicação Quadrix e remover publicador temporário [skip ci]'
+          git push origin HEAD:main
