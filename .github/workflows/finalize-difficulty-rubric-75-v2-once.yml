@@ -1,0 +1,124 @@
+name: Finalizar rubrica pedagógica dos 75 registros v2 — temporário
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/finalize-difficulty-rubric-75-v2-once.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Revalidar repositório e estado público
+        run: |
+          node scripts/document-difficulty-rubric-75.mjs validate
+          URL='https://rodrigorosadantas.github.io/sedes-df-questoes'
+          CONT='data/release/materials/notion-professor-de-educacao-basica-contabilidade-seedf-df-quadrix-2025-tipo-a.json'
+          ELETR='data/release/materials/notion-professor-de-educacao-basica-eletronica-seedf-df-quadrix-2025-tipo-a.json'
+          curl -fsS "$URL/data/release/release-meta.json?finalv2=$GITHUB_RUN_ID" -o /tmp/meta.json
+          curl -fsS "$URL/$CONT?finalv2=$GITHUB_RUN_ID" -o /tmp/cont.json
+          curl -fsS "$URL/$ELETR?finalv2=$GITHUB_RUN_ID" -o /tmp/eletr.json
+          curl -fsS "$URL/data/editorial/rubrica-dificuldade-seedf-75.json?finalv2=$GITHUB_RUN_ID" -o /tmp/rubric.json
+          jq -e '.questions == 3046 and .materials == 71 and .data_release_version == "2.9.2" and .source_sha == "689610bffa5be7b996f42266b482ceac9e40e3bf" and .difficulty_rubric.id == "SEDES-RD-1.0"' /tmp/meta.json
+          jq -e '[.questoes[] | select(.dificuldade_rubrica == "SEDES-RD-1.0" and (.dificuldade_justificativa | length) >= 120)] | length == 50' /tmp/cont.json
+          jq -e '[.questoes[] | select(.dificuldade_rubrica == "SEDES-RD-1.0" and (.dificuldade_justificativa | length) >= 120)] | length == 25' /tmp/eletr.json
+          jq -e '(.records | length) == 75 and (.limitation != "")' /tmp/rubric.json
+
+      - name: Verificar 75 páginas diretamente no Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          (async () => {
+            const API = 'https://api.notion.com/v1';
+            const VERSION = '2026-03-11';
+            const TOKEN = process.env.NOTION_TOKEN;
+            const SHA = '689610bffa5be7b996f42266b482ceac9e40e3bf';
+            const expectedCode = `release-2.13.0:${SHA}`;
+            const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+            const plain = property => {
+              if (!property) return '';
+              if (property.type === 'title') return (property.title || []).map(item => item.plain_text || '').join('');
+              if (property.type === 'rich_text') return (property.rich_text || []).map(item => item.plain_text || '').join('');
+              return '';
+            };
+            async function request(endpoint, attempt = 1) {
+              const response = await fetch(`${API}${endpoint}`, {headers: {
+                Authorization: `Bearer ${TOKEN}`,
+                'Notion-Version': VERSION,
+                'Content-Type': 'application/json',
+              }});
+              if (response.ok) return response.json();
+              const body = await response.text();
+              if ((response.status === 429 || response.status >= 500) && attempt < 9) {
+                await sleep(Math.max(Number(response.headers.get('retry-after') || 0) * 1000, 500 * 2 ** (attempt - 1)));
+                return request(endpoint, attempt + 1);
+              }
+              throw new Error(`Notion API ${response.status}: ${body.slice(0, 500)}`);
+            }
+            const snapshot = JSON.parse(fs.readFileSync('data/notion/published.json', 'utf8'));
+            const rubric = JSON.parse(fs.readFileSync('data/editorial/rubrica-dificuldade-seedf-75.json', 'utf8'));
+            const byCode = new Map(rubric.records.map(item => [item.codigo, item]));
+            const selected = (snapshot.records || []).filter(record => byCode.has(record.code));
+            if (selected.length !== 75) throw new Error(`Snapshot: ${selected.length}/75 registros.`);
+            let scoreVerified = 0;
+            let justificationVerified = 0;
+            let shaVerified = 0;
+            for (let index = 0; index < selected.length; index += 1) {
+              const record = selected[index];
+              const expected = byCode.get(record.code);
+              const page = await request(`/pages/${record.notion_id}`);
+              const props = page.properties || {};
+              if (Number(props['Pontuação de dificuldade']?.number) !== Number(expected.score)) throw new Error(`${record.code}: pontuação divergente.`);
+              scoreVerified += 1;
+              if (plain(props['Justificativa da dificuldade']) !== expected.justification) throw new Error(`${record.code}: justificativa divergente.`);
+              justificationVerified += 1;
+              if (plain(props['Código GitHub']) !== expectedCode) throw new Error(`${record.code}: SHA divergente.`);
+              shaVerified += 1;
+              if ((index + 1) % 15 === 0) console.log(`${index + 1}/75 linhas verificadas.`);
+            }
+            const result = {total: 75, score_verified: scoreVerified, justification_verified: justificationVerified, canonical_sha_verified: shaVerified};
+            fs.writeFileSync('/tmp/notion-rubric-verification.json', JSON.stringify(result, null, 2));
+            console.log(JSON.stringify(result));
+          })().catch(error => { console.error(error); process.exit(1); });
+          NODE
+          test "$(jq '.score_verified' /tmp/notion-rubric-verification.json)" = 75
+          test "$(jq '.justification_verified' /tmp/notion-rubric-verification.json)" = 75
+          test "$(jq '.canonical_sha_verified' /tmp/notion-rubric-verification.json)" = 75
+
+      - name: Registrar recibo definitivo e limpar temporários
+        run: |
+          mkdir -p data/operations
+          jq -n \
+            --arg confirmed_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg finalizer_run_id "$GITHUB_RUN_ID" \
+            '{schema_version:"1.0",operation:"DOCUMENT-DIFFICULTY-RUBRIC-SEEDF-75-20260805",status:"success",confirmed_at:$confirmed_at,source_workflow_run_id:"31040308870",finalizer_workflow_run_id:$finalizer_run_id,canonical_content_sha:"689610bffa5be7b996f42266b482ceac9e40e3bf",metadata_commit_sha:"47c3d6744aafa62c4bedae1317a9a240d9935ff1",public_url:"https://rodrigorosadantas.github.io/sedes-df-questoes/",data_release_version:"2.9.2",cache_version:"sedes-questoes-v2-13-0-r5",rubric:{id:"SEDES-RD-1.0",nature:"editorial-pedagogica",records:75,dimensions:4,score_range:"0-6",thresholds:{easy:"0-2",medium:"3-4",hard:"5-6"},limitation:"Não substitui calibração psicométrica baseada em dados de resposta."},distribution:{easy:41,medium:22,hard:12},scope:{contabilidade:50,eletronica:25,total:75},notion:{score_verified:75,justification_verified:75,canonical_sha_verified:75},preservation:{public_ids:true,answers:true,statements:true,sequences:true,user_statistics_structure:true},public_validation:"success"}' \
+            > data/operations/difficulty-rubric-seedf-75-receipt.json
+          rm -f \
+            scripts/document-difficulty-rubric-75.mjs \
+            .github/workflows/document-difficulty-rubric-75-once.yml \
+            .github/workflows/finalize-difficulty-rubric-75-once.yml \
+            .github/workflows/finalize-difficulty-rubric-75-v2-once.yml \
+            data/operations/rubric-run-diagnostic.json \
+            data/operations/rubric-run-jobs.json \
+            data/operations/rubric-finalizer-diagnostic.json \
+            data/operations/rubric-finalizer-jobs.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/operations/difficulty-rubric-seedf-75-receipt.json scripts/document-difficulty-rubric-75.mjs .github/workflows/document-difficulty-rubric-75-once.yml .github/workflows/finalize-difficulty-rubric-75-once.yml .github/workflows/finalize-difficulty-rubric-75-v2-once.yml data/operations/rubric-run-diagnostic.json data/operations/rubric-run-jobs.json data/operations/rubric-finalizer-diagnostic.json data/operations/rubric-finalizer-jobs.json
+          git commit -m 'Registrar rubrica pedagógica dos 75 registros [skip ci]'
+          git push origin HEAD:main
