@@ -1,54 +1,13 @@
-name: Fechar rastreabilidade CREFITO-17 Agente Fiscal — 62 itens
+name: Fechar rastreabilidade CREFITO-17 Agente Fiscal — SUSPENSO
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/close-crefito17-agentefiscal-traceability.yml
-      - data/operations/run-close-crefito17-agentefiscal-traceability.json
+  workflow_dispatch:
 
 permissions:
   contents: read
 
-concurrency:
-  group: close-crefito17-agentefiscal-traceability
-  cancel-in-progress: false
-
 jobs:
-  close:
+  suspended:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 22
-          package-manager-cache: false
-
-      - name: Restaurar a base pública estável
-        run: |
-          git fetch origin c060ed9a6d4c46c637a5215b3a2738b28a8d405e --depth=1
-          git show c060ed9a6d4c46c637a5215b3a2738b28a8d405e:data/notion/published.json > data/notion/published.json
-          git show c060ed9a6d4c46c637a5215b3a2738b28a8d405e:data/notion/publication-plan.json > data/notion/publication-plan.json
-
-      - name: Reconstruir o catálogo público confirmado
-        run: |
-          npm run build
-          node scripts/apply-publication-additions.mjs
-          node scripts/apply-seedf-bio-24-addition.mjs
-          node scripts/apply-seedf-biomed-50-addition.mjs
-          node scripts/apply-seedf-eletrot-43-addition.mjs
-          node scripts/apply-alto-paraiso-orientador-37-addition.mjs
-          node scripts/apply-crefito17-agentefiscal-62-addition.mjs
-
-      - name: Confirmar total e fechar somente o lote do Agente Fiscal no Notion
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          RELEASE_COMMIT: 3c8d6b161d27c0d4cf04d52288f4bf9f916a9d75
-          NOTION_SNAPSHOT_PATH: data/notion/publication-additions/crefito17-agentefiscal-62.json
-          PUBLICATION_PLAN_PATH: data/notion/publication-additions/crefito17-agentefiscal-62-plan.json
-        run: |
-          node -e "const c=require('./data/release/catalogo.json'); if(Number(c.summary?.questoes)!==2801) throw new Error('Catálogo reconstruído não contém 2801 questões.'); const m=(c.materials||[]).find(x=>String(x.nome||'').includes('Agente Fiscal')&&String(x.nome||'').includes('CREFITO-17')); if(!m||Number(m.quantidade_questoes)!==119) throw new Error('Material do Agente Fiscal não contém 119 questões.');"
-          node scripts/mark-notion-published.mjs
+      - run: echo "Workflow suspenso. Nenhum fechamento será executado automaticamente."
