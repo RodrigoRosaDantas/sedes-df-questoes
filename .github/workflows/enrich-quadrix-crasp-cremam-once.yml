@@ -1,0 +1,50 @@
+name: Enriquecer provas Quadrix CRA-SP e CREMAM — temporário
+
+on:
+  push:
+    branches:
+      - audit/quadrix-crasp-cremam-20260805
+
+permissions:
+  contents: read
+
+concurrency:
+  group: enrich-quadrix-crasp-cremam-20260805
+  cancel-in-progress: true
+
+jobs:
+  enrich-and-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Completar e auditar 102 registros no Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/enrich-quadrix-crasp-cremam-once.mjs
+
+      - name: Validar exportação real do Banco Mestre
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: |
+          node scripts/export-notion-snapshot.mjs
+          COUNT=$(jq '[.records[] | select((.code | startswith("PROVA-QDX-CRASP-2025-ANACOB-400-")) or (.code | startswith("PROVA-QDX-CREMAM-2025-ASSADM-200-")))] | length' data/notion/published.json)
+          test "$COUNT" -ge 98
+          test "$COUNT" -le 100
+          DISC=$(jq '[.records[] | select(.code | contains("-DISC-")) | select((.code | startswith("PROVA-QDX-CRASP-2025-ANACOB-400-")) or (.code | startswith("PROVA-QDX-CREMAM-2025-ASSADM-200-")))] | length' data/notion/published.json)
+          test "$DISC" = '0'
+          echo "Questões objetivas presentes no snapshot autorizado: $COUNT"
+          echo "Discursivas corretamente mantidas fora do exportador: $DISC"
+
+      - name: Registrar resumo
+        run: |
+          echo '## Auditoria Quadrix concluída' >> "$GITHUB_STEP_SUMMARY"
+          echo '- 102 registros enriquecidos e revisados no Notion.' >> "$GITHUB_STEP_SUMMARY"
+          echo '- 100 questões objetivas avaliadas para exportação.' >> "$GITHUB_STEP_SUMMARY"
+          echo '- 2 discursivas preservadas fora do lote por incompatibilidade do exportador atual.' >> "$GITHUB_STEP_SUMMARY"
