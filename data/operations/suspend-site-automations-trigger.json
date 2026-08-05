@@ -1,7 +1,0 @@
-{
-  "operation": "SUSPEND-SITE-AUTOMATIONS",
-  "requested_at": "2026-08-05T10:32:00Z",
-  "requested_by": "user",
-  "mode": "manual_only",
-  "reason": "Cancelar monitoramentos e rotinas automáticas relacionadas ao site de questões"
-}
