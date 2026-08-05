@@ -1,0 +1,5 @@
+{
+  "operation": "REFRESH-BANCO-MESTRE-DASHBOARD-20260804-R5",
+  "requested_at": "2026-08-05T02:41:00Z",
+  "reason": "Corrigir a validação intermediária do build antes da reaplicação dos pacotes imutáveis."
+}
