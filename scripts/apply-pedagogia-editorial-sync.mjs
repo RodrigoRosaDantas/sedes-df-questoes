@@ -9,6 +9,7 @@ const correctionsPath = resolve('data/editorial-runtime/pedagogia-sync-2026-08-0
 const catalogPath = resolve('data/release/catalogo.json');
 const manifestPath = resolve('data/release/manifest.json');
 const receiptPath = resolve('data/release/pedagogia-editorial-sync-receipt.json');
+const snapshotPath = resolve('data/notion/published.json');
 const operationId = 'PLATFORM-EDITORIAL-SYNC-PEDAGOGIA-2026-08-02';
 const sha256 = value => crypto.createHash('sha256').update(value).digest('hex');
 const clean = value => String(value ?? '').trim();
@@ -18,6 +19,14 @@ const registry = JSON.parse(fs.readFileSync(correctionsPath, 'utf8'));
 const corrections = Array.isArray(registry.corrections) ? registry.corrections : [];
 if (registry.operation_id !== operationId) throw new Error(`Operação inesperada: ${registry.operation_id || 'ausente'}.`);
 if (corrections.length !== 72) throw new Error(`Correções de Pedagogia: ${corrections.length}; esperado 72.`);
+
+let incremental = false;
+let scopedCodes = new Set();
+if (fs.existsSync(snapshotPath) && fs.readFileSync(snapshotPath, 'utf8').trim()) {
+  const snapshot = JSON.parse(fs.readFileSync(snapshotPath, 'utf8'));
+  incremental = snapshot.schema_version === '1.3' && snapshot.scope_mode === 'additions';
+  if (incremental) scopedCodes = new Set((snapshot.publication_scope?.codes || []).map(clean));
+}
 
 const byCode = new Map();
 for (const correction of corrections) {
@@ -37,8 +46,9 @@ for (const correction of corrections) {
 
 const catalog = JSON.parse(fs.readFileSync(catalogPath, 'utf8'));
 const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-if (Number(catalog.summary?.questoes) !== 2536) {
-  throw new Error(`Acervo inicial divergente: ${catalog.summary?.questoes}; esperado 2536.`);
+const initialQuestionCount = Number(catalog.summary?.questoes);
+if (!incremental && initialQuestionCount !== 2536) {
+  throw new Error(`Acervo inicial divergente: ${initialQuestionCount}; esperado 2536.`);
 }
 
 let changedMaterials = 0;
@@ -58,7 +68,7 @@ for (const metadata of catalog.materials || []) {
     question.pegadinha = correction.trap;
     question.fonte_oficial = correction.source_url;
     question.fonte_consolidada = correction.source_url;
-    question.auditoria = `Banco Mestre — Ajustada; saneamento editorial aplicado em 02/08/2026`;
+    question.auditoria = 'Banco Mestre — Ajustada; saneamento editorial aplicado em 02/08/2026';
     updatedRecords += 1;
     changed = true;
   }
@@ -73,24 +83,35 @@ for (const metadata of catalog.materials || []) {
   changedMaterials += 1;
 }
 
+const inheritedCorrections = [];
 for (const correction of byCode.values()) {
-  if (correction.matches !== 1) throw new Error(`${correction.code}: correção aplicada ${correction.matches} vez(es); esperado uma.`);
+  if (correction.matches > 1) throw new Error(`${correction.code}: correção aplicada ${correction.matches} vezes; esperado no máximo uma.`);
+  if (correction.matches === 1) continue;
+  if (!incremental || scopedCodes.has(correction.code)) {
+    throw new Error(`${correction.code}: correção aplicada 0 vezes; esperado uma.`);
+  }
+  inheritedCorrections.push(correction.code);
 }
-if (updatedRecords !== 72) throw new Error(`Aplicação editorial atualizou ${updatedRecords}; esperado 72.`);
-if (Number(catalog.summary?.questoes) !== 2536) throw new Error('A sincronização alterou a quantidade de questões.');
+if (!incremental && updatedRecords !== 72) throw new Error(`Aplicação editorial atualizou ${updatedRecords}; esperado 72.`);
+if (Number(catalog.summary?.questoes) !== initialQuestionCount) throw new Error('A sincronização alterou a quantidade de questões.');
 
 fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 const receipt = {
-  schema_version: '1.0',
+  schema_version: incremental ? '1.1' : '1.0',
   operation_id: operationId,
   applied_at: new Date().toISOString(),
-  total_questions_preserved: 2536,
-  updated_records: 72,
-  full_editorial: 72,
+  total_questions_preserved: initialQuestionCount,
+  requested_records: corrections.length,
+  updated_records: updatedRecords,
+  inherited_records: inheritedCorrections.length,
+  full_editorial: updatedRecords,
   changed_materials: changedMaterials,
   source: 'Banco Mestre do Notion',
   material: registry.source?.material || '',
-  site_scope: 'Atualização corretiva de 72 questões já publicadas; nenhum código foi adicionado ou removido.',
+  mode: incremental ? 'incremental_additions' : 'full_catalog',
+  site_scope: incremental
+    ? 'Correções históricas de Pedagogia aplicadas somente quando o alvo já integra a base desta etapa; itens herdados ausentes permanecem nas camadas cumulativas posteriores.'
+    : 'Atualização corretiva de 72 questões já publicadas; nenhum código foi adicionado ou removido.',
 };
 fs.writeFileSync(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`);
-console.log(`✓ Pedagogia sincronizada no build: 72 registros em ${changedMaterials} material(is); 2.536 questões preservadas.`);
+console.log(`✓ Pedagogia sincronizada no build: ${updatedRecords} correções aplicadas, ${inheritedCorrections.length} herdadas e ${initialQuestionCount} questões preservadas.`);
