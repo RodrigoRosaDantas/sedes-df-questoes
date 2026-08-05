@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "operation": "DOCUMENT-DIFFICULTY-RUBRIC-SEEDF-75-20260805",
+  "status": "success",
+  "confirmed_at": "2026-08-05T19:49:12Z",
+  "source_workflow_run_id": "31040308870",
+  "finalizer_workflow_run_id": "31041133557",
+  "canonical_content_sha": "689610bffa5be7b996f42266b482ceac9e40e3bf",
+  "metadata_commit_sha": "47c3d6744aafa62c4bedae1317a9a240d9935ff1",
+  "public_url": "https://rodrigorosadantas.github.io/sedes-df-questoes/",
+  "data_release_version": "2.9.2",
+  "cache_version": "sedes-questoes-v2-13-0-r5",
+  "rubric": {
+    "id": "SEDES-RD-1.0",
+    "nature": "editorial-pedagogica",
+    "records": 75,
+    "dimensions": 4,
+    "score_range": "0-6",
+    "thresholds": {
+      "easy": "0-2",
+      "medium": "3-4",
+      "hard": "5-6"
+    },
+    "limitation": "Não substitui calibração psicométrica baseada em dados de resposta."
+  },
+  "distribution": {
+    "easy": 41,
+    "medium": 22,
+    "hard": 12
+  },
+  "scope": {
+    "contabilidade": 50,
+    "eletronica": 25,
+    "total": 75
+  },
+  "notion": {
+    "score_verified": 75,
+    "justification_verified": 75,
+    "canonical_sha_verified": 75
+  },
+  "preservation": {
+    "public_ids": true,
+    "answers": true,
+    "statements": true,
+    "sequences": true,
+    "user_statistics_structure": true
+  },
+  "public_validation": "success"
+}
