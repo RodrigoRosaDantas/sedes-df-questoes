@@ -1,0 +1,109 @@
+name: Preparar lote Quadrix CRA-SP e CREMAM — temporário
+
+on:
+  push:
+    branches:
+      - agent/publish-quadrix-discursive-view-20260805
+    paths:
+      - .github/workflows/prepare-quadrix-crasp-cremam-once.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: prepare-quadrix-crasp-cremam-20260805
+  cancel-in-progress: false
+
+jobs:
+  prepare-and-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: agent/publish-quadrix-discursive-view-20260805
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Exportar snapshot objetivo e discursivas de consulta
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: |
+          node scripts/export-notion-snapshot.mjs
+          node scripts/export-discursive-display.mjs
+          node scripts/create-publication-plan.mjs
+
+      - name: Confirmar escopo imutável
+        shell: bash
+        run: |
+          set -euo pipefail
+          CRASP=$(jq '[.records[] | select(.code | startswith("PROVA-QDX-CRASP-2025-ANACOB-400-")) | select(.code | contains("-DISC-") | not)] | length' data/notion/published.json)
+          CREMAM=$(jq '[.records[] | select(.code | startswith("PROVA-QDX-CREMAM-2025-ASSADM-200-")) | select(.code | contains("-DISC-") | not)] | length' data/notion/published.json)
+          PLAN_CRASP=$(jq '[.lots[] | select(.lot == "QDX-2025-CRASP-ANACOB-001-050-20260805") | .codes[]] | length' data/notion/publication-plan.json)
+          PLAN_CREMAM=$(jq '[.lots[] | select(.lot == "QDX-2025-CREMAM-ASSADM-001-050-20260805") | .codes[]] | length' data/notion/publication-plan.json)
+          DISC=$(jq '.total' data/notion/discursive-display.json)
+          test "$CRASP" = '50'
+          test "$CREMAM" = '50'
+          test "$PLAN_CRASP" = '50'
+          test "$PLAN_CREMAM" = '50'
+          test "$DISC" = '2'
+          test "$(jq '[.records[] | select(.display_only != true)] | length' data/notion/discursive-display.json)" = '0'
+
+      - name: Executar validação integral
+        run: npm run check
+
+      - name: Confirmar materiais gerados
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const catalog = JSON.parse(fs.readFileSync('data/release/catalogo.json', 'utf8'));
+          const expected = [
+            'Analista I — Atendimento e Cobrança — CRA-SP — Quadrix 2025',
+            'Assistente Administrativo — CREMAM — Quadrix 2025',
+          ];
+          for (const name of expected) {
+            const meta = catalog.materials.find(item => item.nome === name);
+            if (!meta) throw new Error(`Material ausente: ${name}`);
+            const material = JSON.parse(fs.readFileSync(meta.file.replace(/^\.\//, ''), 'utf8'));
+            if (material.questoes.length !== 50) throw new Error(`${name}: objetivas=${material.questoes.length}`);
+            if ((material.discursivas || []).length !== 1) throw new Error(`${name}: discursivas=${(material.discursivas || []).length}`);
+          }
+          if (Number(catalog.summary.discursivas_consulta) !== 2) throw new Error('Resumo sem as duas discursivas.');
+          console.log('✓ Duas provas com 50 objetivas e 1 discursiva de consulta cada.');
+          NODE
+
+      - name: Gerar recibo de preparação
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data/operations
+          SNAPSHOT_SHA=$(sha256sum data/notion/published.json | awk '{print $1}')
+          PLAN_SHA=$(sha256sum data/notion/publication-plan.json | awk '{print $1}')
+          DISC_SHA=$(sha256sum data/notion/discursive-display.json | awk '{print $1}')
+          jq -n \
+            --arg prepared_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg snapshot_sha "$SNAPSHOT_SHA" \
+            --arg plan_sha "$PLAN_SHA" \
+            --arg disc_sha "$DISC_SHA" \
+            '{schema_version:"1.0",operation:"PREPARE-QDX-CRASP-CREMAM-20260805",status:"validated",prepared_at:$prepared_at,objective_questions:100,discursive_display_items:2,materials:2,lots:["QDX-2025-CRASP-ANACOB-001-050-20260805","QDX-2025-CREMAM-ASSADM-001-050-20260805"],hashes:{notion_snapshot_sha256:$snapshot_sha,publication_plan_sha256:$plan_sha,discursive_display_sha256:$disc_sha},validation:{full_check:"success",objective_engine:"100 items",discursive_mode:"display_only"}}' \
+            > data/operations/qdx-crasp-cremam-preparation-receipt.json
+
+      - name: Versionar pacote imutável
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/notion/published.json data/notion/publication-plan.json data/notion/discursive-display.json data/operations/qdx-crasp-cremam-preparation-receipt.json
+          if git diff --cached --quiet; then
+            echo 'Pacote já estava versionado.'
+            exit 0
+          fi
+          git commit -m 'Versionar lote Quadrix com discursivas de consulta [skip ci]'
+          git push origin HEAD:agent/publish-quadrix-discursive-view-20260805
