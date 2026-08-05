@@ -1,0 +1,19 @@
+{
+  "operation": "MANUAL-DASHBOARD-CARD-DEPLOY-20260805",
+  "status": "authorized",
+  "authorized_at": "2026-08-05T11:00:00Z",
+  "target_sha": "26a235367ea204d45abec1e79f853323c4ee538b",
+  "target_branch": "manual-dashboard-card-deploy-20260805",
+  "expected": {
+    "banco_mestre": 2946,
+    "questions": 2871,
+    "awaiting_audit": 75,
+    "materials": 67
+  },
+  "constraints": {
+    "manual_only": true,
+    "other_automations_remain_suspended": true,
+    "notion_write": false,
+    "catalog_content_changed": false
+  }
+}
