@@ -1,0 +1,95 @@
+name: Validar lote Quadrix corrigido — temporário
+
+on:
+  push:
+    branches: [agent/publish-quadrix-discursive-view-20260805]
+    paths: [.github/workflows/validate-quadrix-fixed-once.yml]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: validate-quadrix-fixed-20260805
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: agent/publish-quadrix-discursive-view-20260805
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Gerar pacote incremental e insumos históricos
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: |
+          node scripts/export-quadrix-objective-additions.mjs
+          node scripts/reconcile-quadrix-incremental-snapshot.mjs
+          node scripts/export-discursive-display.mjs
+          node scripts/create-publication-plan.mjs
+          node scripts/export-editorial-platform-sync.mjs
+          node scripts/export-pedagogia-editorial-sync.mjs
+
+      - name: Validar escopo imutável
+        run: |
+          test "$(jq '.records | length' data/notion/published.json)" = 100
+          test "$(jq '.publication_scope.annulled_exceptions | length' data/notion/published.json)" = 2
+          test "$(jq '.total' data/notion/discursive-display.json)" = 2
+          test "$(jq '.total_records' data/notion/publication-plan.json)" = 100
+          test "$(jq '.totals.all' data/notion/published.json)" = 3048
+
+      - name: Executar validação integral
+        run: npm run check
+
+      - name: Validar discursivas no navegador
+        run: |
+          npm install --no-save @playwright/test@1.61.1
+          npx playwright install --with-deps chromium
+          python3 -m http.server 4173 --directory dist >/tmp/quadrix-http.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/ >/dev/null && break; sleep 1; done
+          npx playwright test tests/discursive-display.spec.js
+
+      - name: Conferir contrato final e versionar pacote
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const catalog = JSON.parse(fs.readFileSync('data/release/catalogo.json', 'utf8'));
+          const meta = JSON.parse(fs.readFileSync('dist/data/release/release-meta.json', 'utf8'));
+          const names = ['Analista I — Atendimento e Cobrança — CRA-SP — Quadrix 2025','Assistente Administrativo — CREMAM — Quadrix 2025'];
+          let objective = 0, discursive = 0, annulled = 0;
+          for (const name of names) {
+            const entry = catalog.materials.find(item => item.nome === name);
+            if (!entry) throw new Error(`Material ausente: ${name}`);
+            const material = JSON.parse(fs.readFileSync(entry.file.replace(/^\.\//, ''), 'utf8'));
+            objective += material.questoes.length;
+            discursive += (material.discursivas || []).length;
+            annulled += material.questoes.filter(item => item.anulada === true && item.gabarito === 'Anulada').length;
+          }
+          if (objective !== 100 || discursive !== 2 || annulled !== 2) throw new Error(`Escopo divergente: ${objective}/${discursive}/${annulled}`);
+          if (Number(meta.questions) !== 2971 || Number(meta.banco_mestre) !== 3048 || Number(meta.discursive_display_items) !== 2 || Number(meta.awaiting_audit) !== 75 || Number(meta.materials) !== 69) throw new Error(`Contrato divergente: ${JSON.stringify(meta)}`);
+          NODE
+          rm -f data/operations/qdx-crasp-cremam-validation-status.json data/operations/qdx-crasp-cremam-preparation-status.json
+          jq -n --arg completed_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg run_id "$GITHUB_RUN_ID" '{schema_version:"1.0",operation:"VALIDATE-QDX-CRASP-CREMAM-20260805",status:"success",completed_at:$completed_at,workflow_run_id:$run_id,objective_questions:100,annulled_objectives:2,discursive_display_items:2,questions_after_build:2971,banco_mestre:3048,materials:69,awaiting_audit:75}' > data/operations/qdx-crasp-cremam-validation-receipt.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/notion/published.json data/notion/publication-plan.json data/notion/discursive-display.json data/release data/operations/qdx-crasp-cremam-validation-receipt.json
+          git add -u data/operations || true
+          git commit -m 'Versionar pacote Quadrix validado [skip ci]'
+          git push origin HEAD:agent/publish-quadrix-discursive-view-20260805
+
+      - name: Registrar falha
+        if: failure()
+        run: |
+          jq -n --arg failed_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg run_id "$GITHUB_RUN_ID" '{operation:"VALIDATE-QDX-CRASP-CREMAM-20260805",status:"failure",failed_at:$failed_at,workflow_run_id:$run_id}' > data/operations/qdx-crasp-cremam-validation-status.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/operations/qdx-crasp-cremam-validation-status.json
+          git commit -m 'Registrar falha da validação corrigida Quadrix [skip ci]' || true
+          git push origin HEAD:agent/publish-quadrix-discursive-view-20260805 || true
