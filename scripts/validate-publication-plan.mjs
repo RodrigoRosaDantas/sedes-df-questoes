@@ -35,6 +35,31 @@ assert(fixturePlan.lots[0].expected_count === 2, 'A contagem sintética do lote 
 assert(JSON.stringify(fixturePlan.lots[0].codes) === JSON.stringify(['Q-001', 'Q-002']), 'Os códigos do plano não foram ordenados e fixados.');
 validatePublicationPlan(fixturePlan, fixtureSnapshot);
 
+const scopedSnapshot = Buffer.from(`${JSON.stringify({
+  generated_at: '2026-08-05T00:00:00.000Z',
+  publication_scope: {operation: 'TESTE-ESCOPO', codes: ['Q-NOVA-002', 'Q-NOVA-001']},
+  records: [
+    {code: 'Q-HERDADA', github_id: '', publication_lot: '', released_for_export: false},
+    {code: 'Q-NOVA-002', github_id: '', publication_lot: 'LOTE-NOVO', released_for_export: true},
+    {code: 'Q-NOVA-001', github_id: '', publication_lot: 'LOTE-NOVO', released_for_export: true},
+  ],
+}, null, 2)}\n`);
+const scopedPlan = buildPublicationPlan(scopedSnapshot);
+assert(scopedPlan.total_records === 2, 'O escopo explícito não isolou somente os novos registros.');
+assert(scopedPlan.scope?.operation === 'TESTE-ESCOPO', 'A operação do escopo não foi preservada.');
+assert(scopedPlan.lots[0].expected_count === 2, 'A contagem do escopo explícito está incorreta.');
+assert(!scopedPlan.lots[0].codes.includes('Q-HERDADA'), 'Registro herdado sem lote entrou indevidamente no plano explícito.');
+validatePublicationPlan(scopedPlan, scopedSnapshot);
+
+const missingScopeRecord = Buffer.from(JSON.stringify({
+  publication_scope: {codes: ['Q-AUSENTE']},
+  records: [{code: 'Q-HERDADA', github_id: '', publication_lot: '', released_for_export: false}],
+}));
+expectFailure(
+  () => buildPublicationPlan(missingScopeRecord),
+  'Escopo explícito incompleto não foi rejeitado.',
+);
+
 const tamperedPlan = structuredClone(fixturePlan);
 tamperedPlan.lots[0].expected_count = 3;
 expectFailure(
@@ -62,7 +87,7 @@ const expected = buildPublicationPlan(snapshotContent);
 
 if (!fs.existsSync(planPath)) {
   if (expected.total_records) {
-    throw new Error(`Há ${expected.total_records} registro(s) sem rastreabilidade, mas nenhum plano explícito foi criado.`);
+    throw new Error(`Há ${expected.total_records} registro(s) no escopo sem rastreabilidade, mas nenhum plano explícito foi criado.`);
   }
   console.log('✓ Nenhum registro real aguarda rastreabilidade; testes sintéticos do plano foram aprovados.');
 } else {
