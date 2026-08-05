@@ -1,0 +1,1334 @@
+{
+  "schema_version": "1.0",
+  "rubric_id": "SEDES-RD-1.0",
+  "title": "Rubrica editorial-pedagógica de dificuldade — SEEDF/DF Contabilidade e Eletrônica",
+  "scope": {
+    "contabilidade": 50,
+    "eletronica": 25,
+    "total": 75
+  },
+  "purpose": "Documentar de modo reproduzível a classificação de dificuldade dos 75 itens publicados.",
+  "limitation": "A rubrica é editorial e não substitui calibração psicométrica baseada em dados de resposta.",
+  "dimensions": {
+    "literalidade_integracao": {
+      "range": [
+        0,
+        2
+      ],
+      "description": "De reconhecimento direto a integração de regra, limite ou exceção."
+    },
+    "raciocinio_calculo": {
+      "range": [
+        0,
+        2
+      ],
+      "description": "De nenhuma etapa adicional a encadeamento ou cálculo multietapas."
+    },
+    "pegadinha_semantica": {
+      "range": [
+        0,
+        1
+      ],
+      "description": "Presença de inversão, absolutização ou termo restritivo relevante."
+    },
+    "especializacao_tecnica": {
+      "range": [
+        0,
+        1
+      ],
+      "description": "Necessidade de terminologia ou tratamento técnico especializado."
+    }
+  },
+  "thresholds": {
+    "Fácil": [
+      0,
+      2
+    ],
+    "Média": [
+      3,
+      4
+    ],
+    "Difícil": [
+      5,
+      6
+    ]
+  },
+  "reviewed_at": "2026-08-05",
+  "records": [
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-071",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 71,
+      "assunto": "Legislação Societária",
+      "subassunto": "Escrituração societária e separação dos critérios fiscais",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 4,
+      "classification": "Média",
+      "dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige integrar regra, limite ou exceção em Escrituração societária e separação dos critérios fiscais; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 4/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 0. Classificação editorial: Média."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-072",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 72,
+      "assunto": "Demonstrações Contábeis",
+      "subassunto": "Obrigatoriedade da DFC e dispensa para companhia fechada",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 4,
+      "classification": "Média",
+      "dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige integrar regra, limite ou exceção em Obrigatoriedade da DFC e dispensa para companhia fechada; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 4/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 0. Classificação editorial: Média."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-073",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 73,
+      "assunto": "Contabilidade Tributária",
+      "subassunto": "Neutralidade tributária de novos métodos contábeis",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 4,
+      "classification": "Média",
+      "dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige integrar regra, limite ou exceção em Neutralidade tributária de novos métodos contábeis; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 4/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 0. Classificação editorial: Média."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-074",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 74,
+      "assunto": "Normas Contábeis",
+      "subassunto": "Finalidade do CPC e convergência internacional",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Finalidade do CPC e convergência internacional; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-075",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 75,
+      "assunto": "Demonstrações Contábeis",
+      "subassunto": "Classificação do ativo por liquidez",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 2,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Classificação do ativo por liquidez; não demanda cálculo nem encadeamento adicional; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 2/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 1, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-076",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 76,
+      "assunto": "Demonstrações Contábeis",
+      "subassunto": "DMPL e DLPA",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 5,
+      "classification": "Difícil",
+      "dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "justification": "exige integrar regra, limite ou exceção em DMPL e DLPA; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 5/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 1. Classificação editorial: Difícil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-077",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 77,
+      "assunto": "Estrutura Conceitual",
+      "subassunto": "Características qualitativas fundamentais",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Características qualitativas fundamentais; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-078",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 78,
+      "assunto": "Estrutura Conceitual",
+      "subassunto": "Regime de competência",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Regime de competência; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-079",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 79,
+      "assunto": "Estrutura Conceitual",
+      "subassunto": "Definição de ativo",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Definição de ativo; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-080",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 80,
+      "assunto": "Estrutura Conceitual",
+      "subassunto": "Comparabilidade e uniformidade",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Comparabilidade e uniformidade; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-081",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 81,
+      "assunto": "CPC 01 — Redução ao Valor Recuperável",
+      "subassunto": "Reconhecimento da perda por impairment",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 5,
+      "classification": "Difícil",
+      "dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "justification": "exige integrar regra, limite ou exceção em Reconhecimento da perda por impairment; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 5/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 1. Classificação editorial: Difícil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-082",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 82,
+      "assunto": "Combinação de Negócios",
+      "subassunto": "Reconhecimento e mensuração do goodwill",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 5,
+      "classification": "Difícil",
+      "dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "justification": "exige integrar regra, limite ou exceção em Reconhecimento e mensuração do goodwill; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 5/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 1. Classificação editorial: Difícil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-083",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 83,
+      "assunto": "CPC 27 — Ativo Imobilizado",
+      "subassunto": "Vida útil e cálculo da depreciação",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 4,
+      "classification": "Média",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Vida útil e cálculo da depreciação; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 4/6: literalidade/integração 1, raciocínio/cálculo 1, pegadinha semântica 1, especialização 1. Classificação editorial: Média."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-084",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 84,
+      "assunto": "CPC 05 — Partes Relacionadas",
+      "subassunto": "Abrangência das partes e transações relacionadas",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 5,
+      "classification": "Difícil",
+      "dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "justification": "exige integrar regra, limite ou exceção em Abrangência das partes e transações relacionadas; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 5/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 1. Classificação editorial: Difícil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-085",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 85,
+      "assunto": "CPC 48 — Instrumentos Financeiros",
+      "subassunto": "Contabilidade de hedge",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 3,
+      "classification": "Média",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 1
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Contabilidade de hedge; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; requer terminologia ou tratamento técnico especializado. Pontuação 3/6: literalidade/integração 1, raciocínio/cálculo 1, pegadinha semântica 0, especialização 1. Classificação editorial: Média."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-086",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 86,
+      "assunto": "CPC 03 — Fluxos de Caixa",
+      "subassunto": "Equivalentes de caixa e prazo de vencimento",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 5,
+      "classification": "Difícil",
+      "dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "justification": "exige integrar regra, limite ou exceção em Equivalentes de caixa e prazo de vencimento; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 5/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 1. Classificação editorial: Difícil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-087",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 87,
+      "assunto": "Ajuste a Valor Presente",
+      "subassunto": "Contas a receber de longo prazo",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 5,
+      "classification": "Difícil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 2,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Contas a receber de longo prazo; demanda encadeamento técnico ou cálculo em mais de uma etapa; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 5/6: literalidade/integração 1, raciocínio/cálculo 2, pegadinha semântica 1, especialização 1. Classificação editorial: Difícil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-088",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 88,
+      "assunto": "Mensuração Contábil",
+      "subassunto": "Valor presente de ativos e passivos",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "a literalidade é direta e o foco está na operação técnica de Valor presente de ativos e passivos; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-089",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 89,
+      "assunto": "Contabilidade de Custos",
+      "subassunto": "Custeio por absorção",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 2,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "justification": "a literalidade é direta e o foco está na operação técnica de Custeio por absorção; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 2/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 1, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-090",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 90,
+      "assunto": "Contabilidade de Custos",
+      "subassunto": "Custeio variável e avaliação de estoques",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Custeio variável e avaliação de estoques; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-091",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 91,
+      "assunto": "Estoques",
+      "subassunto": "Métodos PEPS e UEPS",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 2,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Métodos PEPS e UEPS; não demanda cálculo nem encadeamento adicional; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 2/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 1, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-092",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 92,
+      "assunto": "Contabilidade de Custos",
+      "subassunto": "Custos fixos no custeio por absorção",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 2,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "justification": "a literalidade é direta e o foco está na operação técnica de Custos fixos no custeio por absorção; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 2/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 1, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-093",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 93,
+      "assunto": "Contabilidade Gerencial",
+      "subassunto": "Ponto de equilíbrio na análise custo-volume-lucro",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 2,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "justification": "a literalidade é direta e o foco está na operação técnica de Ponto de equilíbrio na análise custo-volume-lucro; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 2/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 1, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-094",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 94,
+      "assunto": "Contabilidade Aplicada ao Setor Público",
+      "subassunto": "Finalidade e usuários da informação contábil pública",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 3,
+      "classification": "Média",
+      "dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige integrar regra, limite ou exceção em Finalidade e usuários da informação contábil pública; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 3/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Média."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-095",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 95,
+      "assunto": "PCASP",
+      "subassunto": "Padronização e consolidação nacional das contas públicas",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 4,
+      "classification": "Média",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Padronização e consolidação nacional das contas públicas; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 4/6: literalidade/integração 1, raciocínio/cálculo 1, pegadinha semântica 1, especialização 1. Classificação editorial: Média."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-096",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 96,
+      "assunto": "Variações Patrimoniais",
+      "subassunto": "Variações qualitativas e resultado patrimonial",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 2,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Variações qualitativas e resultado patrimonial; não demanda cálculo nem encadeamento adicional; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 2/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 1, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-097",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 97,
+      "assunto": "Ativo Imobilizado no Setor Público",
+      "subassunto": "Depreciação de bens públicos",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 4,
+      "classification": "Média",
+      "dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige integrar regra, limite ou exceção em Depreciação de bens públicos; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 4/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 0. Classificação editorial: Média."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-098",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 98,
+      "assunto": "Demonstrações Contábeis Consolidadas",
+      "subassunto": "Eliminações e ajustes de consolidação",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 4,
+      "classification": "Média",
+      "dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige integrar regra, limite ou exceção em Eliminações e ajustes de consolidação; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 4/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 0. Classificação editorial: Média."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-099",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 99,
+      "assunto": "Receita Orçamentária",
+      "subassunto": "Estágios da receita pública",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Estágios da receita pública; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-100",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 100,
+      "assunto": "Conta Única do Tesouro Nacional",
+      "subassunto": "Custódia e centralização dos recursos federais",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 3,
+      "classification": "Média",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 1
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Custódia e centralização dos recursos federais; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; requer terminologia ou tratamento técnico especializado. Pontuação 3/6: literalidade/integração 1, raciocínio/cálculo 1, pegadinha semântica 0, especialização 1. Classificação editorial: Média."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-101",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 101,
+      "assunto": "SIAFI",
+      "subassunto": "Perfis de acesso e segregação de funções",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 3,
+      "classification": "Média",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 1
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Perfis de acesso e segregação de funções; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; requer terminologia ou tratamento técnico especializado. Pontuação 3/6: literalidade/integração 1, raciocínio/cálculo 1, pegadinha semântica 0, especialização 1. Classificação editorial: Média."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-102",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 102,
+      "assunto": "SIAFI",
+      "subassunto": "Documentos e suporte à execução da despesa",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 3,
+      "classification": "Média",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 1
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Documentos e suporte à execução da despesa; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; requer terminologia ou tratamento técnico especializado. Pontuação 3/6: literalidade/integração 1, raciocínio/cálculo 1, pegadinha semântica 0, especialização 1. Classificação editorial: Média."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-103",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 103,
+      "assunto": "Receita e Tributos sobre Vendas",
+      "subassunto": "Apresentação dos tributos incidentes sobre vendas",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 3,
+      "classification": "Média",
+      "dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige integrar regra, limite ou exceção em Apresentação dos tributos incidentes sobre vendas; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 3/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Média."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-104",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 104,
+      "assunto": "Sistema Tributário Nacional",
+      "subassunto": "Taxas e atividade estatal vinculada",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 3,
+      "classification": "Média",
+      "dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige integrar regra, limite ou exceção em Taxas e atividade estatal vinculada; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 3/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Média."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-105",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 105,
+      "assunto": "Tributação sobre Serviços",
+      "subassunto": "Competência do ISS e responsabilidade do tomador",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 3,
+      "classification": "Média",
+      "dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige integrar regra, limite ou exceção em Competência do ISS e responsabilidade do tomador; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 3/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Média."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-106",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 106,
+      "assunto": "Retenções Previdenciárias",
+      "subassunto": "Cessão de mão de obra e empreitada",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 5,
+      "classification": "Difícil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 2,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Cessão de mão de obra e empreitada; demanda encadeamento técnico ou cálculo em mais de uma etapa; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 5/6: literalidade/integração 1, raciocínio/cálculo 2, pegadinha semântica 1, especialização 1. Classificação editorial: Difícil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-107",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 107,
+      "assunto": "Retenções Tributárias Federais",
+      "subassunto": "Dispensas e entidades imunes ou isentas",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 5,
+      "classification": "Difícil",
+      "dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "justification": "exige integrar regra, limite ou exceção em Dispensas e entidades imunes ou isentas; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 5/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 1. Classificação editorial: Difícil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-108",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 108,
+      "assunto": "Obrigações Acessórias Digitais",
+      "subassunto": "Finalidade e integração do eSocial",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 2,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Finalidade e integração do eSocial; não demanda cálculo nem encadeamento adicional; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 2/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 1, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-109",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 109,
+      "assunto": "Obrigações Acessórias Digitais",
+      "subassunto": "Substituição da DIRF pelo eSocial e EFD-Reinf",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 4,
+      "classification": "Média",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Substituição da DIRF pelo eSocial e EFD-Reinf; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 4/6: literalidade/integração 1, raciocínio/cálculo 1, pegadinha semântica 1, especialização 1. Classificação editorial: Média."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-110",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 110,
+      "assunto": "Obrigações Acessórias Digitais",
+      "subassunto": "Substituição da RAIS pelo eSocial",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 4,
+      "classification": "Média",
+      "dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige integrar regra, limite ou exceção em Substituição da RAIS pelo eSocial; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 4/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 0. Classificação editorial: Média."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-111",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 111,
+      "assunto": "Ensino de Contabilidade",
+      "subassunto": "Construção de competências profissionais",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Construção de competências profissionais; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-112",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 112,
+      "assunto": "Ensino de Contabilidade",
+      "subassunto": "Situações-problema e integração teoria-prática",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Situações-problema e integração teoria-prática; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-113",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 113,
+      "assunto": "Ensino de Contabilidade",
+      "subassunto": "Limites da metodologia expositiva isolada",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Limites da metodologia expositiva isolada; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-114",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 114,
+      "assunto": "Ensino de Contabilidade",
+      "subassunto": "Metodologias ativas e protagonismo do estudante",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Metodologias ativas e protagonismo do estudante; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-115",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 115,
+      "assunto": "Educação Profissional e Tecnológica",
+      "subassunto": "Articulação entre formação integral e mundo do trabalho",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Articulação entre formação integral e mundo do trabalho; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-116",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 116,
+      "assunto": "Educação Profissional e Tecnológica",
+      "subassunto": "Contextualização regional e local da formação",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Contextualização regional e local da formação; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-117",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 117,
+      "assunto": "Educação Profissional e Tecnológica",
+      "subassunto": "Formação integral e demandas do mercado",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 5,
+      "classification": "Difícil",
+      "dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "justification": "exige integrar regra, limite ou exceção em Formação integral e demandas do mercado; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 5/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 1. Classificação editorial: Difícil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-118",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 118,
+      "assunto": "Educação Profissional e Tecnológica",
+      "subassunto": "Itinerários formativos e eixos tecnológicos",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Itinerários formativos e eixos tecnológicos; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-119",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 119,
+      "assunto": "Currículo da Educação Profissional",
+      "subassunto": "Natureza distrital do Currículo em Movimento",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Natureza distrital do Currículo em Movimento; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-CONT-A-120",
+      "material": "Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 120,
+      "assunto": "Educação Profissional e Tecnológica",
+      "subassunto": "Perfil profissional e formação cidadã",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 2,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Perfil profissional e formação cidadã; não demanda cálculo nem encadeamento adicional; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 2/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 1, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-071",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 71,
+      "assunto": "Análise de Circuitos",
+      "subassunto": "Associação de resistores em paralelo",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 2,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "justification": "a literalidade é direta e o foco está na operação técnica de Associação de resistores em paralelo; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 2/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 1, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-072",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 72,
+      "assunto": "Análise de Circuitos",
+      "subassunto": "Circuito aberto e tensão terminal",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 2,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "justification": "a literalidade é direta e o foco está na operação técnica de Circuito aberto e tensão terminal; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 2/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 1, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-073",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 73,
+      "assunto": "Análise de Circuitos",
+      "subassunto": "Teorema da máxima transferência de potência",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 5,
+      "classification": "Difícil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 2,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Teorema da máxima transferência de potência; demanda encadeamento técnico ou cálculo em mais de uma etapa; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 5/6: literalidade/integração 1, raciocínio/cálculo 2, pegadinha semântica 1, especialização 1. Classificação editorial: Difícil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-074",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 74,
+      "assunto": "Análise de Circuitos",
+      "subassunto": "Comportamento do indutor ideal",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "a literalidade é direta e o foco está na operação técnica de Comportamento do indutor ideal; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-075",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 75,
+      "assunto": "Análise de Circuitos",
+      "subassunto": "Capacitor em regime permanente de corrente contínua",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "a literalidade é direta e o foco está na operação técnica de Capacitor em regime permanente de corrente contínua; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-076",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 76,
+      "assunto": "Eletrônica Analógica",
+      "subassunto": "Amplificador operacional ideal",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "a literalidade é direta e o foco está na operação técnica de Amplificador operacional ideal; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-077",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 77,
+      "assunto": "Eletrônica Analógica",
+      "subassunto": "Polarização do diodo retificador",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 2,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "justification": "a literalidade é direta e o foco está na operação técnica de Polarização do diodo retificador; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 2/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 1, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-078",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 78,
+      "assunto": "Eletrônica de Potência",
+      "subassunto": "Retificador de onda completa com filtro capacitivo",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 5,
+      "classification": "Difícil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 2,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Retificador de onda completa com filtro capacitivo; demanda encadeamento técnico ou cálculo em mais de uma etapa; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 5/6: literalidade/integração 1, raciocínio/cálculo 2, pegadinha semântica 1, especialização 1. Classificação editorial: Difícil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-079",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 79,
+      "assunto": "Análise de Circuitos em CA",
+      "subassunto": "Reatância capacitiva e frequência",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "a literalidade é direta e o foco está na operação técnica de Reatância capacitiva e frequência; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-080",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 80,
+      "assunto": "Eletrônica Analógica",
+      "subassunto": "Regulação por diodo Zener",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "a literalidade é direta e o foco está na operação técnica de Regulação por diodo Zener; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-081",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 81,
+      "assunto": "Eletrônica Digital",
+      "subassunto": "Porta lógica AND",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 2,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Porta lógica AND; não demanda cálculo nem encadeamento adicional; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 2/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 1, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-082",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 82,
+      "assunto": "Eletrônica Digital",
+      "subassunto": "Porta lógica XOR",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Porta lógica XOR; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-083",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 83,
+      "assunto": "Eletrônica Digital",
+      "subassunto": "Flip-flop JK em modo toggle",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Flip-flop JK em modo toggle; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-084",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 84,
+      "assunto": "Eletrônica Digital",
+      "subassunto": "Multiplexadores digitais",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Multiplexadores digitais; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-085",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 85,
+      "assunto": "Eletrônica Digital",
+      "subassunto": "Universalidade da porta NAND",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Universalidade da porta NAND; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-086",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 86,
+      "assunto": "Máquinas Elétricas",
+      "subassunto": "Gerador síncrono e natureza da tensão gerada",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 3,
+      "classification": "Média",
+      "dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige integrar regra, limite ou exceção em Gerador síncrono e natureza da tensão gerada; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 3/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Média."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-087",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 87,
+      "assunto": "Máquinas Elétricas",
+      "subassunto": "Lei de Faraday e indução eletromagnética",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Lei de Faraday e indução eletromagnética; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-088",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 88,
+      "assunto": "Máquinas Elétricas",
+      "subassunto": "Reversibilidade da máquina síncrona",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Reversibilidade da máquina síncrona; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-089",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 89,
+      "assunto": "Máquinas Elétricas",
+      "subassunto": "Rendimento de máquinas elétricas",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 3,
+      "classification": "Média",
+      "dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige integrar regra, limite ou exceção em Rendimento de máquinas elétricas; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 3/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Média."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-090",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 90,
+      "assunto": "Máquinas Elétricas",
+      "subassunto": "Transformador alimentado em corrente contínua",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 3,
+      "classification": "Média",
+      "dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige integrar regra, limite ou exceção em Transformador alimentado em corrente contínua; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 3/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Média."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-091",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 91,
+      "assunto": "Proteção de Sistemas Elétricos",
+      "subassunto": "Capacidade de interrupção de disjuntores",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "a literalidade é direta e o foco está na operação técnica de Capacidade de interrupção de disjuntores; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-092",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 92,
+      "assunto": "Proteção de Sistemas Elétricos",
+      "subassunto": "Curva de disparo de disjuntores tipo B",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 1,
+      "classification": "Fácil",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Curva de disparo de disjuntores tipo B; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-093",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 93,
+      "assunto": "Proteção de Sistemas Elétricos",
+      "subassunto": "Fusíveis classe gR para semicondutores",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 4,
+      "classification": "Média",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Fusíveis classe gR para semicondutores; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 4/6: literalidade/integração 1, raciocínio/cálculo 1, pegadinha semântica 1, especialização 1. Classificação editorial: Média."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-094",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 94,
+      "assunto": "Processamento de Sinais",
+      "subassunto": "Filtro antialiasing antes da amostragem",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 5,
+      "classification": "Difícil",
+      "dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "justification": "exige integrar regra, limite ou exceção em Filtro antialiasing antes da amostragem; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 5/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 1. Classificação editorial: Difícil."
+    },
+    {
+      "codigo": "PROVA-QDX-SEEDF-2025-ELETR-A-095",
+      "material": "Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A",
+      "numero_original": 95,
+      "assunto": "Filtros Analógicos",
+      "subassunto": "Fator de qualidade e largura de banda",
+      "rubric_id": "SEDES-RD-1.0",
+      "score": 3,
+      "classification": "Média",
+      "dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 1
+      },
+      "justification": "exige aplicar ou reconhecer a regra central de Fator de qualidade e largura de banda; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; requer terminologia ou tratamento técnico especializado. Pontuação 3/6: literalidade/integração 1, raciocínio/cálculo 1, pegadinha semântica 0, especialização 1. Classificação editorial: Média."
+    }
+  ]
+}

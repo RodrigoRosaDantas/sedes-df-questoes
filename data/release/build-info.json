@@ -1,10 +1,10 @@
 {
   "version": "2.13.0",
-  "data_release_version": "2.9.1",
+  "data_release_version": "2.9.2",
   "catalog_schema_version": "5.0",
   "source_sha": "b28bbcac7f4defbbdd6256124f4701c62ca5c218",
   "builder": "copy-public-v2-13-0",
-  "cache_version": "sedes-questoes-v2-13-0-r4",
+  "cache_version": "sedes-questoes-v2-13-0-r5",
   "source_files_sha256": {
     "index_html": "e8e6facf9b221718fb8517dd3ca93818ce9f886b2f1476d06cd8e656dc549b7b",
     "app_js": "0521e8aa0a7bee21c297495922842ad27a01b076d13e7f87c244c4c42084d1cf",
@@ -22,5 +22,10 @@
   },
   "questions": 3046,
   "materials": 71,
-  "material_files": 71
+  "material_files": 71,
+  "difficulty_rubric": {
+    "id": "SEDES-RD-1.0",
+    "records": 75,
+    "documented": true
+  }
 }

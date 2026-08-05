@@ -1,6 +1,6 @@
 {
   "schema_version": "5.0",
-  "release_version": "2.9.1",
+  "release_version": "2.9.2",
   "exported_at": "2026-08-05T19:01:53.476Z",
   "source": {
     "name": "Banco Mestre — Provas e Simulados SEDES/DF",
@@ -4417,5 +4417,10 @@
     "consol-soc01-139": "sim-emilia-2026-tdas-soc01",
     "consol-soc01-140": "sim-emilia-2026-tdas-soc01"
   },
-  "manifest": "./data/release/manifest.json"
+  "manifest": "./data/release/manifest.json",
+  "generated_at": "2026-08-05T19:38:08.784Z",
+  "editorial_rubric": {
+    "id": "SEDES-RD-1.0",
+    "records": 75
+  }
 }

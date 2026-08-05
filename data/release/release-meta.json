@@ -1,11 +1,11 @@
 {
   "schema_version": "1.0",
   "app_version": "2.13.0",
-  "data_release_version": "2.9.1",
+  "data_release_version": "2.9.2",
   "catalog_schema_version": "5.0",
   "source_sha": "b28bbcac7f4defbbdd6256124f4701c62ca5c218",
   "builder": "copy-public-v2-13-0",
-  "cache_version": "sedes-questoes-v2-13-0-r4",
+  "cache_version": "sedes-questoes-v2-13-0-r5",
   "exported_at": "2026-08-05T19:01:53.476Z",
   "questions": 3046,
   "materials": 71,
@@ -41,5 +41,10 @@
     "notice": "A duração de 4 horas é conjunta para as provas objetiva e discursiva.",
     "source": "Edital SEDES/DF nº 1/2026, itens 11.1, 11.2, 11.3 e 12.4."
   },
-  "discursive_display_items": 2
+  "discursive_display_items": 2,
+  "difficulty_rubric": {
+    "id": "SEDES-RD-1.0",
+    "records": 75,
+    "documented": true
+  }
 }

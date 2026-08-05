@@ -169,7 +169,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Média"
+      "difficulty": "Média",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 4,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige integrar regra, limite ou exceção em Escrituração societária e separação dos critérios fiscais; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 4/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 0. Classificação editorial: Média."
     },
     {
       "notion_id": "3adcf5a2-6731-81ba-a18b-f18602c292de",
@@ -217,7 +226,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Média"
+      "difficulty": "Média",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 4,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige integrar regra, limite ou exceção em Obrigatoriedade da DFC e dispensa para companhia fechada; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 4/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 0. Classificação editorial: Média."
     },
     {
       "notion_id": "3adcf5a2-6731-815d-a49c-f60f8b74c26a",
@@ -265,7 +283,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Média"
+      "difficulty": "Média",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 4,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige integrar regra, limite ou exceção em Neutralidade tributária de novos métodos contábeis; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 4/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 0. Classificação editorial: Média."
     },
     {
       "notion_id": "3adcf5a2-6731-81ab-9562-c7d25a7d8503",
@@ -313,7 +340,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Finalidade do CPC e convergência internacional; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-81fc-82ff-e42ced2b197d",
@@ -361,7 +397,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 2,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Classificação do ativo por liquidez; não demanda cálculo nem encadeamento adicional; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 2/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 1, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-81e9-8870-eece6fc9e334",
@@ -409,7 +454,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Difícil"
+      "difficulty": "Difícil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 5,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "difficulty_justification": "exige integrar regra, limite ou exceção em DMPL e DLPA; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 5/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 1. Classificação editorial: Difícil."
     },
     {
       "notion_id": "3adcf5a2-6731-81c2-9449-ec7d507607a6",
@@ -457,7 +511,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Características qualitativas fundamentais; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-8127-b6de-ed33b642c01a",
@@ -505,7 +568,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Regime de competência; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-8165-b4dd-da4bd74020bd",
@@ -553,7 +625,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Definição de ativo; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-817a-a714-f80a93dc3818",
@@ -601,7 +682,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Comparabilidade e uniformidade; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-819b-8c52-d6000612725a",
@@ -649,7 +739,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Difícil"
+      "difficulty": "Difícil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 5,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "difficulty_justification": "exige integrar regra, limite ou exceção em Reconhecimento da perda por impairment; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 5/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 1. Classificação editorial: Difícil."
     },
     {
       "notion_id": "3adcf5a2-6731-81b4-8996-fa85c80aa0bf",
@@ -697,7 +796,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Difícil"
+      "difficulty": "Difícil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 5,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "difficulty_justification": "exige integrar regra, limite ou exceção em Reconhecimento e mensuração do goodwill; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 5/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 1. Classificação editorial: Difícil."
     },
     {
       "notion_id": "3adcf5a2-6731-81f6-a2bc-c62245ad2226",
@@ -745,7 +853,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Média"
+      "difficulty": "Média",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 4,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Vida útil e cálculo da depreciação; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 4/6: literalidade/integração 1, raciocínio/cálculo 1, pegadinha semântica 1, especialização 1. Classificação editorial: Média."
     },
     {
       "notion_id": "3adcf5a2-6731-8167-a579-f42fec8b6320",
@@ -793,7 +910,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Difícil"
+      "difficulty": "Difícil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 5,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "difficulty_justification": "exige integrar regra, limite ou exceção em Abrangência das partes e transações relacionadas; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 5/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 1. Classificação editorial: Difícil."
     },
     {
       "notion_id": "3adcf5a2-6731-8115-ad1f-e15ec5848d97",
@@ -841,7 +967,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Média"
+      "difficulty": "Média",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 3,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 1
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Contabilidade de hedge; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; requer terminologia ou tratamento técnico especializado. Pontuação 3/6: literalidade/integração 1, raciocínio/cálculo 1, pegadinha semântica 0, especialização 1. Classificação editorial: Média."
     },
     {
       "notion_id": "3adcf5a2-6731-81c4-9e47-e8efe2faf170",
@@ -889,7 +1024,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Difícil"
+      "difficulty": "Difícil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 5,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "difficulty_justification": "exige integrar regra, limite ou exceção em Equivalentes de caixa e prazo de vencimento; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 5/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 1. Classificação editorial: Difícil."
     },
     {
       "notion_id": "3adcf5a2-6731-8103-8099-d2505578064b",
@@ -937,7 +1081,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Difícil"
+      "difficulty": "Difícil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 5,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 2,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Contas a receber de longo prazo; demanda encadeamento técnico ou cálculo em mais de uma etapa; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 5/6: literalidade/integração 1, raciocínio/cálculo 2, pegadinha semântica 1, especialização 1. Classificação editorial: Difícil."
     },
     {
       "notion_id": "3adcf5a2-6731-81a4-bb44-c607341bd9e4",
@@ -985,7 +1138,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "a literalidade é direta e o foco está na operação técnica de Valor presente de ativos e passivos; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-8130-b7d8-d6607ee250b2",
@@ -1033,7 +1195,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 2,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "a literalidade é direta e o foco está na operação técnica de Custeio por absorção; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 2/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 1, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-8169-85b3-cb7a864299a4",
@@ -1081,7 +1252,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Custeio variável e avaliação de estoques; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-813a-8fcd-e2af29ab00f8",
@@ -1129,7 +1309,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 2,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Métodos PEPS e UEPS; não demanda cálculo nem encadeamento adicional; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 2/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 1, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-81b5-a477-deb2dbe0a5dd",
@@ -1177,7 +1366,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 2,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "a literalidade é direta e o foco está na operação técnica de Custos fixos no custeio por absorção; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 2/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 1, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-8115-afd2-d360f3d25018",
@@ -1225,7 +1423,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 2,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "a literalidade é direta e o foco está na operação técnica de Ponto de equilíbrio na análise custo-volume-lucro; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 2/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 1, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-81b0-8073-f67ca3017cd8",
@@ -1273,7 +1480,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Média"
+      "difficulty": "Média",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 3,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige integrar regra, limite ou exceção em Finalidade e usuários da informação contábil pública; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 3/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Média."
     },
     {
       "notion_id": "3adcf5a2-6731-81b6-9d23-c2cb4a1d9312",
@@ -1321,7 +1537,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Média"
+      "difficulty": "Média",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 4,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Padronização e consolidação nacional das contas públicas; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 4/6: literalidade/integração 1, raciocínio/cálculo 1, pegadinha semântica 1, especialização 1. Classificação editorial: Média."
     },
     {
       "notion_id": "3adcf5a2-6731-81a5-8ba0-ccbd163647aa",
@@ -1369,7 +1594,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 2,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Variações qualitativas e resultado patrimonial; não demanda cálculo nem encadeamento adicional; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 2/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 1, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-8133-a058-fd9485735fa1",
@@ -1417,7 +1651,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Média"
+      "difficulty": "Média",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 4,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige integrar regra, limite ou exceção em Depreciação de bens públicos; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 4/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 0. Classificação editorial: Média."
     },
     {
       "notion_id": "3adcf5a2-6731-81c9-b343-ea0ec1b23c4b",
@@ -1465,7 +1708,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Média"
+      "difficulty": "Média",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 4,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige integrar regra, limite ou exceção em Eliminações e ajustes de consolidação; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 4/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 0. Classificação editorial: Média."
     },
     {
       "notion_id": "3adcf5a2-6731-81ff-ba19-efba7f58da79",
@@ -1513,7 +1765,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Estágios da receita pública; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-81bc-b407-d5f86ba0a582",
@@ -1561,7 +1822,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Média"
+      "difficulty": "Média",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 3,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 1
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Custódia e centralização dos recursos federais; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; requer terminologia ou tratamento técnico especializado. Pontuação 3/6: literalidade/integração 1, raciocínio/cálculo 1, pegadinha semântica 0, especialização 1. Classificação editorial: Média."
     },
     {
       "notion_id": "3adcf5a2-6731-811a-abd2-f7d689bfe1a6",
@@ -1609,7 +1879,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Média"
+      "difficulty": "Média",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 3,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 1
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Perfis de acesso e segregação de funções; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; requer terminologia ou tratamento técnico especializado. Pontuação 3/6: literalidade/integração 1, raciocínio/cálculo 1, pegadinha semântica 0, especialização 1. Classificação editorial: Média."
     },
     {
       "notion_id": "3adcf5a2-6731-81f0-b5f1-d1d2b77c57c2",
@@ -1657,7 +1936,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Média"
+      "difficulty": "Média",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 3,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 1
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Documentos e suporte à execução da despesa; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; requer terminologia ou tratamento técnico especializado. Pontuação 3/6: literalidade/integração 1, raciocínio/cálculo 1, pegadinha semântica 0, especialização 1. Classificação editorial: Média."
     },
     {
       "notion_id": "3adcf5a2-6731-8199-b229-f1ed88172cb9",
@@ -1705,7 +1993,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Média"
+      "difficulty": "Média",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 3,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige integrar regra, limite ou exceção em Apresentação dos tributos incidentes sobre vendas; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 3/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Média."
     },
     {
       "notion_id": "3adcf5a2-6731-81c6-b4d1-fc4e3497e369",
@@ -1753,7 +2050,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Média"
+      "difficulty": "Média",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 3,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige integrar regra, limite ou exceção em Taxas e atividade estatal vinculada; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 3/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Média."
     },
     {
       "notion_id": "3adcf5a2-6731-81d9-8c9f-f9a7f72f9631",
@@ -1801,7 +2107,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Média"
+      "difficulty": "Média",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 3,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige integrar regra, limite ou exceção em Competência do ISS e responsabilidade do tomador; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 3/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Média."
     },
     {
       "notion_id": "3adcf5a2-6731-8120-a381-f2fb8da365bd",
@@ -1849,7 +2164,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Difícil"
+      "difficulty": "Difícil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 5,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 2,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Cessão de mão de obra e empreitada; demanda encadeamento técnico ou cálculo em mais de uma etapa; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 5/6: literalidade/integração 1, raciocínio/cálculo 2, pegadinha semântica 1, especialização 1. Classificação editorial: Difícil."
     },
     {
       "notion_id": "3adcf5a2-6731-815b-8b61-eae154f4f521",
@@ -1897,7 +2221,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Difícil"
+      "difficulty": "Difícil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 5,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "difficulty_justification": "exige integrar regra, limite ou exceção em Dispensas e entidades imunes ou isentas; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 5/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 1. Classificação editorial: Difícil."
     },
     {
       "notion_id": "3adcf5a2-6731-81a2-aa4c-c23a83921274",
@@ -1945,7 +2278,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 2,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Finalidade e integração do eSocial; não demanda cálculo nem encadeamento adicional; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 2/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 1, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-81cb-b438-c472b914442d",
@@ -1993,7 +2335,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Média"
+      "difficulty": "Média",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 4,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Substituição da DIRF pelo eSocial e EFD-Reinf; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 4/6: literalidade/integração 1, raciocínio/cálculo 1, pegadinha semântica 1, especialização 1. Classificação editorial: Média."
     },
     {
       "notion_id": "3adcf5a2-6731-8109-b79f-cd60218ab0b0",
@@ -2041,7 +2392,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Média"
+      "difficulty": "Média",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 4,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige integrar regra, limite ou exceção em Substituição da RAIS pelo eSocial; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 4/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 0. Classificação editorial: Média."
     },
     {
       "notion_id": "3adcf5a2-6731-81ac-9989-df20eac8c143",
@@ -2089,7 +2449,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Construção de competências profissionais; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-81a2-a9aa-f2e3835c9b39",
@@ -2137,7 +2506,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Situações-problema e integração teoria-prática; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-819e-bc9a-fa13c90b3ab9",
@@ -2185,7 +2563,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Limites da metodologia expositiva isolada; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-81a1-a0e8-ee7da2a2640c",
@@ -2233,7 +2620,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Metodologias ativas e protagonismo do estudante; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-8180-a87b-c742c985d733",
@@ -2281,7 +2677,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Articulação entre formação integral e mundo do trabalho; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-81c1-b91f-c85572320b76",
@@ -2329,7 +2734,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Contextualização regional e local da formação; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-818f-b638-f707fdd47f32",
@@ -2377,7 +2791,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Difícil"
+      "difficulty": "Difícil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 5,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "difficulty_justification": "exige integrar regra, limite ou exceção em Formação integral e demandas do mercado; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 5/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 1. Classificação editorial: Difícil."
     },
     {
       "notion_id": "3adcf5a2-6731-8193-94a2-d1e91a3dce43",
@@ -2425,7 +2848,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Itinerários formativos e eixos tecnológicos; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-818a-b16c-de4cc9e9dc95",
@@ -2473,7 +2905,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Natureza distrital do Currículo em Movimento; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-814a-bfba-f9f08d48ec0e",
@@ -2521,7 +2962,16 @@
       "pdf_page": "10",
       "publication_lot": "SEEDF-2025-CONTABILIDADE-A-071-120-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 2,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Perfil profissional e formação cidadã; não demanda cálculo nem encadeamento adicional; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 2/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 1, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-81f1-afa5-cef87eceba11",
@@ -2569,7 +3019,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 2,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "a literalidade é direta e o foco está na operação técnica de Associação de resistores em paralelo; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 2/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 1, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-81f4-b2ed-ebe83f5ef0a4",
@@ -2617,7 +3076,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 2,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "a literalidade é direta e o foco está na operação técnica de Circuito aberto e tensão terminal; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 2/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 1, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-816e-a08d-f02ff4407e9a",
@@ -2665,7 +3133,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Difícil"
+      "difficulty": "Difícil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 5,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 2,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Teorema da máxima transferência de potência; demanda encadeamento técnico ou cálculo em mais de uma etapa; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 5/6: literalidade/integração 1, raciocínio/cálculo 2, pegadinha semântica 1, especialização 1. Classificação editorial: Difícil."
     },
     {
       "notion_id": "3adcf5a2-6731-811d-b6b5-cb478d30ed2f",
@@ -2713,7 +3190,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "a literalidade é direta e o foco está na operação técnica de Comportamento do indutor ideal; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-81dd-9649-f4666af745f7",
@@ -2761,7 +3247,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "a literalidade é direta e o foco está na operação técnica de Capacitor em regime permanente de corrente contínua; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-8143-ad03-dab3acb3f11b",
@@ -2809,7 +3304,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "a literalidade é direta e o foco está na operação técnica de Amplificador operacional ideal; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-8143-b905-f1053f83f06c",
@@ -2857,7 +3361,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 2,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "a literalidade é direta e o foco está na operação técnica de Polarização do diodo retificador; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 2/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 1, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-8140-ba3d-f1bc29ff6577",
@@ -2905,7 +3418,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Difícil"
+      "difficulty": "Difícil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 5,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 2,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Retificador de onda completa com filtro capacitivo; demanda encadeamento técnico ou cálculo em mais de uma etapa; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 5/6: literalidade/integração 1, raciocínio/cálculo 2, pegadinha semântica 1, especialização 1. Classificação editorial: Difícil."
     },
     {
       "notion_id": "3adcf5a2-6731-8197-b2c6-cc40424183c6",
@@ -2953,7 +3475,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "a literalidade é direta e o foco está na operação técnica de Reatância capacitiva e frequência; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-810c-bae5-e08ad6b7a4b4",
@@ -3001,7 +3532,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "a literalidade é direta e o foco está na operação técnica de Regulação por diodo Zener; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-814c-9dd1-f5f6aaac9b00",
@@ -3049,7 +3589,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 2,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Porta lógica AND; não demanda cálculo nem encadeamento adicional; contém inversão, absolutização ou termo restritivo relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 2/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 1, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-812f-85af-c7149e511814",
@@ -3097,7 +3646,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Porta lógica XOR; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-8107-9db9-f1b4d8319762",
@@ -3145,7 +3703,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Flip-flop JK em modo toggle; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-81e9-a156-ce5109df2e04",
@@ -3193,7 +3760,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Multiplexadores digitais; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-8186-a85c-d42e3271fc70",
@@ -3241,7 +3817,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Universalidade da porta NAND; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-81a5-8cd8-dd82cb348247",
@@ -3289,7 +3874,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Média"
+      "difficulty": "Média",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 3,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige integrar regra, limite ou exceção em Gerador síncrono e natureza da tensão gerada; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 3/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Média."
     },
     {
       "notion_id": "3adcf5a2-6731-81a7-9f51-ee33761f5468",
@@ -3337,7 +3931,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Lei de Faraday e indução eletromagnética; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-817d-a8d1-f42dec822fad",
@@ -3385,7 +3988,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Reversibilidade da máquina síncrona; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-81f1-8ca6-df0c45ef3371",
@@ -3433,7 +4045,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Média"
+      "difficulty": "Média",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 3,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige integrar regra, limite ou exceção em Rendimento de máquinas elétricas; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 3/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Média."
     },
     {
       "notion_id": "3adcf5a2-6731-81c1-ab43-c77f31947a2e",
@@ -3481,7 +4102,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Média"
+      "difficulty": "Média",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 3,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige integrar regra, limite ou exceção em Transformador alimentado em corrente contínua; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 3/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Média."
     },
     {
       "notion_id": "3adcf5a2-6731-8167-a930-f1b9af719d5b",
@@ -3529,7 +4159,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 0,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "a literalidade é direta e o foco está na operação técnica de Capacidade de interrupção de disjuntores; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 0, raciocínio/cálculo 1, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-8129-a512-f8b76eedac11",
@@ -3577,7 +4216,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Fácil"
+      "difficulty": "Fácil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 1,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 0,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 0
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Curva de disparo de disjuntores tipo B; não demanda cálculo nem encadeamento adicional; a redação não adiciona pegadinha semântica relevante; permanece no núcleo conceitual mais recorrente da disciplina. Pontuação 1/6: literalidade/integração 1, raciocínio/cálculo 0, pegadinha semântica 0, especialização 0. Classificação editorial: Fácil."
     },
     {
       "notion_id": "3adcf5a2-6731-8177-a67f-f7fc1fd6bc03",
@@ -3625,7 +4273,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Média"
+      "difficulty": "Média",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 4,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Fusíveis classe gR para semicondutores; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 4/6: literalidade/integração 1, raciocínio/cálculo 1, pegadinha semântica 1, especialização 1. Classificação editorial: Média."
     },
     {
       "notion_id": "3adcf5a2-6731-81c9-9e07-ffd99508403b",
@@ -3673,7 +4330,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Difícil"
+      "difficulty": "Difícil",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 5,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 2,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 1,
+        "especializacao_tecnica": 1
+      },
+      "difficulty_justification": "exige integrar regra, limite ou exceção em Filtro antialiasing antes da amostragem; demanda uma etapa de aplicação, relação causal ou cálculo; contém inversão, absolutização ou termo restritivo relevante; requer terminologia ou tratamento técnico especializado. Pontuação 5/6: literalidade/integração 2, raciocínio/cálculo 1, pegadinha semântica 1, especialização 1. Classificação editorial: Difícil."
     },
     {
       "notion_id": "3adcf5a2-6731-81a4-bfaf-c6d1630e8b57",
@@ -3721,7 +4387,16 @@
       "pdf_page": "9",
       "publication_lot": "SEEDF-2025-ELETRONICA-A-071-095-20260805",
       "released_for_export": true,
-      "difficulty": "Média"
+      "difficulty": "Média",
+      "difficulty_rubric": "SEDES-RD-1.0",
+      "difficulty_score": 3,
+      "difficulty_dimensions": {
+        "literalidade_integracao": 1,
+        "raciocinio_calculo": 1,
+        "pegadinha_semantica": 0,
+        "especializacao_tecnica": 1
+      },
+      "difficulty_justification": "exige aplicar ou reconhecer a regra central de Fator de qualidade e largura de banda; demanda uma etapa de aplicação, relação causal ou cálculo; a redação não adiciona pegadinha semântica relevante; requer terminologia ou tratamento técnico especializado. Pontuação 3/6: literalidade/integração 1, raciocínio/cálculo 1, pegadinha semântica 0, especialização 1. Classificação editorial: Média."
     }
   ],
   "generated_at": "2026-08-05T18:12:14.135Z",
@@ -3732,5 +4407,11 @@
     "normalized_comments": 75,
     "reconciled_observations": 75,
     "reviewed_difficulties": 75
+  },
+  "difficulty_rubric": {
+    "id": "SEDES-RD-1.0",
+    "version": "1.0",
+    "records": 75,
+    "reviewed_at": "2026-08-05"
   }
 }

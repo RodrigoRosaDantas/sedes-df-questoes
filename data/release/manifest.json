@@ -1,7 +1,7 @@
 {
   "schema_version": "3.1",
-  "release_version": "2.9.1",
-  "generated_at": "2026-08-05T19:01:53.480Z",
+  "release_version": "2.9.2",
+  "generated_at": "2026-08-05T19:38:08.790Z",
   "summary": {
     "banco_mestre": 3048,
     "materiais": 71,
@@ -11,7 +11,7 @@
     "simulados": 35,
     "discursivas_consulta": 2
   },
-  "catalog_sha256": "80250fbb4fb2e79271c300c90d5e849edd249bf4d057eb805b96ce0d89efd94b",
+  "catalog_sha256": "248dc1cf4c764d9d3874e997ca1dd6922437cbe1e1078504ed461f973fd79818",
   "materials": [
     {
       "id": "notion-administrador-crf-df-quadrix-2026",
@@ -213,8 +213,8 @@
       "id": "notion-professor-de-educacao-basica-contabilidade-seedf-df-quadrix-2025-tipo-a",
       "file": "./data/release/materials/notion-professor-de-educacao-basica-contabilidade-seedf-df-quadrix-2025-tipo-a.json",
       "questions": 50,
-      "bytes": 155070,
-      "sha256": "777a08a901553bf3552cc19d5e0dcd9f3b6bcb63ecf7c77ce56549b8c9b62b82"
+      "bytes": 211873,
+      "sha256": "0b8e40c83f315d9f6d6e01ef34dbc5e1d35d197c9449a463022e86dbf9272400"
     },
     {
       "id": "notion-professor-de-educacao-basica-direito-seedf-df-quadrix-2025-tipo-a",
@@ -227,8 +227,8 @@
       "id": "notion-professor-de-educacao-basica-eletronica-seedf-df-quadrix-2025-tipo-a",
       "file": "./data/release/materials/notion-professor-de-educacao-basica-eletronica-seedf-df-quadrix-2025-tipo-a.json",
       "questions": 25,
-      "bytes": 71324,
-      "sha256": "c9ae876e9fcdd211de3ef0205efa3d5271e88680933dcd3d26e20170a203d857"
+      "bytes": 100032,
+      "sha256": "5376545e76339197d024c4101de8f34993604fd47e1e9105a79b9ed29c2cac18"
     },
     {
       "id": "notion-professor-de-educacao-basica-eletrotecnica-seedf-df-quadrix-2025-tipo-a",
