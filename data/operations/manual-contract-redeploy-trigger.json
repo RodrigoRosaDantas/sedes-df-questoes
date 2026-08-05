@@ -2,9 +2,9 @@
   "operation": "REDEPLOY-RECONCILED-PUBLIC-CONTRACT",
   "authorized_by": "user",
   "authorized_at": "2026-08-05T13:26:00Z",
-  "attempt": 2,
-  "previous_run_id": 31014532077,
-  "previous_failure": "missing temporary editorial exports before build",
+  "attempt": 3,
+  "previous_run_id": 31014950971,
+  "previous_failure": "current snapshot was not the immutable build base expected by the editorial synchronization",
   "expected": {
     "banco_mestre": 2946,
     "questions": 2871,
