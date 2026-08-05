@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "operation": "RECONCILE-DASHBOARD-PUBLIC-CONTRACT",
+  "status": "prepared_pending_validation",
+  "expected": {
+    "banco_mestre": 2946,
+    "questions": 2871,
+    "awaiting_audit": 75,
+    "materials": 67
+  },
+  "scope": [
+    "catalogo.json",
+    "manifest.json",
+    "release-meta.json",
+    "governance validators",
+    "deployment receipts",
+    "temporary status files"
+  ],
+  "site_changed": false,
+  "notion_changed": false,
+  "deploy_required": true
+}
