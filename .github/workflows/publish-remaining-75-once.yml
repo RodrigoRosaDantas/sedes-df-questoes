@@ -1,0 +1,205 @@
+name: Auditar e publicar 75 registros restantes — temporário
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/publish-remaining-75-once.yml]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: publish-remaining-75-20260805-corrected
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Validar scripts operacionais
+        run: |
+          node --check scripts/audit-export-remaining-75.mjs
+          node --check scripts/mark-remaining-75-published.mjs
+          node --check scripts/apply-notion-snapshot.mjs
+          node --check scripts/apply-discursive-display.mjs
+          node --check scripts/build-study-index.mjs
+          node --check scripts/build-public.mjs
+          node --check scripts/reconcile-discursive-release-meta.mjs
+          node --check scripts/reconcile-public-metadata.mjs
+
+      - name: Registrar contrato público anterior
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const catalog = JSON.parse(fs.readFileSync('data/release/catalogo.json', 'utf8'));
+          const ids = Object.keys(catalog.question_index || {}).sort();
+          if (ids.length !== 2971 || (catalog.materials || []).length !== 69 || Number(catalog.summary?.discursivas_consulta) !== 2) {
+            throw new Error(`Base pública anterior divergente: ${ids.length} questões, ${(catalog.materials || []).length} materiais.`);
+          }
+          fs.writeFileSync('/tmp/base-question-ids.json', JSON.stringify(ids));
+          NODE
+
+      - name: Auditar, completar e liberar os 75 registros no Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/audit-export-remaining-75.mjs
+
+      - name: Gerar e validar plano imutável
+        run: |
+          node scripts/create-publication-plan.mjs
+          test "$(jq -r '.schema_version' data/notion/published.json)" = '1.3'
+          test "$(jq -r '.scope_mode' data/notion/published.json)" = 'additions'
+          test "$(jq '.records | length' data/notion/published.json)" = '75'
+          test "$(jq '.publication_scope.codes | length' data/notion/published.json)" = '75'
+          test "$(jq '.publication_scope.lots | length' data/notion/published.json)" = '2'
+          test "$(jq '.totals.existing_public' data/notion/published.json)" = '2971'
+          test "$(jq '.totals.published' data/notion/published.json)" = '3046'
+          test "$(jq '.totals.display_only' data/notion/published.json)" = '2'
+          test "$(jq '.totals.pending' data/notion/published.json)" = '0'
+          test "$(jq '.total_records' data/notion/publication-plan.json)" = '75'
+          test "$(jq '.lots | length' data/notion/publication-plan.json)" = '2'
+          node <<'NODE'
+          const fs = require('fs');
+          const snapshot = JSON.parse(fs.readFileSync('data/notion/published.json', 'utf8'));
+          for (const item of snapshot.records || []) {
+            if (!item.comment || !item.foundation || !item.trap) throw new Error(`${item.code}: conteúdo editorial incompleto.`);
+            if (item.format !== 'Certo / Errado' || !['Certo', 'Errado'].includes(item.answer)) throw new Error(`${item.code}: formato ou gabarito inválido.`);
+            for (const key of ['A','B','C','D','E']) if (!item.alternative_comments?.[key]) throw new Error(`${item.code}: comentário ${key} ausente.`);
+          }
+          NODE
+
+      - name: Aplicar lote e gerar site
+        run: |
+          node scripts/apply-notion-snapshot.mjs
+          node scripts/apply-discursive-display.mjs
+          node scripts/build-study-index.mjs
+          node scripts/build-public.mjs
+          node scripts/reconcile-discursive-release-meta.mjs
+          node scripts/reconcile-public-metadata.mjs
+          rm -rf data/release
+          cp -a dist/data/release data/release
+
+      - name: Validar preservação, materiais e hashes
+        run: |
+          node scripts/validate-discursive-display.mjs
+          node scripts/validate-runtime-catalog.mjs
+          node <<'NODE'
+          const crypto = require('crypto');
+          const fs = require('fs');
+          const sha = value => crypto.createHash('sha256').update(value).digest('hex');
+          const catalog = JSON.parse(fs.readFileSync('data/release/catalogo.json', 'utf8'));
+          const manifest = JSON.parse(fs.readFileSync('data/release/manifest.json', 'utf8'));
+          const meta = JSON.parse(fs.readFileSync('data/release/release-meta.json', 'utf8'));
+          const baseIds = JSON.parse(fs.readFileSync('/tmp/base-question-ids.json', 'utf8'));
+          const finalIds = new Set(Object.keys(catalog.question_index || {}));
+          const missingBase = baseIds.filter(id => !finalIds.has(id));
+          if (missingBase.length) throw new Error(`IDs públicos anteriores perdidos: ${missingBase.slice(0, 5).join(', ')}.`);
+          if (finalIds.size !== 3046) throw new Error(`Total final divergente: ${finalIds.size}; esperado 3046.`);
+          if ((catalog.materials || []).length !== 69) throw new Error(`Materiais finais: ${(catalog.materials || []).length}; esperado 69.`);
+          if (Number(catalog.summary?.discursivas_consulta) !== 2 || Number(catalog.summary?.aguardando_auditoria) !== 0) throw new Error('Resumo final divergente.');
+          if (meta.questions !== 3046 || meta.banco_mestre !== 3048 || meta.awaiting_audit !== 0 || meta.materials !== 69 || meta.discursive_display_items !== 2) throw new Error(`Release-meta divergente: ${JSON.stringify(meta)}`);
+          const expected = new Map([
+            ['Professor de Educação Básica — Contabilidade — SEEDF/DF — Quadrix 2025 — Tipo A', 120],
+            ['Professor de Educação Básica — Eletrônica — SEEDF/DF — Quadrix 2025 — Tipo A', 95],
+          ]);
+          const publicCodes = new Set();
+          for (const metadata of catalog.materials || []) {
+            const material = JSON.parse(fs.readFileSync(metadata.file.replace(/^\.\//, ''), 'utf8'));
+            for (const question of material.questoes || []) {
+              publicCodes.add(question.codigo);
+              if (question.codigo_fonte) publicCodes.add(question.codigo_fonte);
+            }
+            if (expected.has(material.nome) && Number(material.quantidade_questoes) !== expected.get(material.nome)) throw new Error(`${material.nome}: ${material.quantidade_questoes}; esperado ${expected.get(material.nome)}.`);
+          }
+          const snapshot = JSON.parse(fs.readFileSync('data/notion/published.json', 'utf8'));
+          for (const record of snapshot.records || []) if (!publicCodes.has(record.code)) throw new Error(`${record.code}: ausente do catálogo final.`);
+          const catalogBytes = fs.readFileSync('data/release/catalogo.json');
+          if (manifest.catalog_sha256 !== sha(catalogBytes)) throw new Error('Hash do catálogo divergente no manifesto.');
+          for (const entry of manifest.materials || []) {
+            const bytes = fs.readFileSync(entry.file.replace(/^\.\//, ''));
+            if (entry.sha256 !== sha(bytes) || entry.bytes !== bytes.length) throw new Error(`Manifesto divergente: ${entry.id}.`);
+          }
+          NODE
+
+      - name: Versionar pacote validado
+        id: version
+        run: |
+          mkdir -p data/operations
+          jq -n \
+            --arg completed_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg run_id "$GITHUB_RUN_ID" \
+            --arg snapshot_sha "$(sha256sum data/notion/published.json | awk '{print $1}')" \
+            --arg plan_sha "$(sha256sum data/notion/publication-plan.json | awk '{print $1}')" \
+            --arg catalog_sha "$(sha256sum data/release/catalogo.json | awk '{print $1}')" \
+            '{schema_version:"1.0",operation:"PUBLISH-SEEDF-CONTABILIDADE-ELETRONICA-75-20260805",status:"validated_for_deploy",completed_at:$completed_at,workflow_run_id:$run_id,base_questions_preserved:2971,objective_questions_added:75,questions:3046,discursive_display_items:2,banco_mestre:3048,awaiting_audit:0,materials:69,lots:["SEEDF-2025-CONTABILIDADE-A-071-120-20260805","SEEDF-2025-ELETRONICA-A-071-095-20260805"],audit:{reviewed:75,format:"Certo / Errado",all_required_fields_complete:true},hashes:{snapshot_sha256:$snapshot_sha,publication_plan_sha256:$plan_sha,catalog_sha256:$catalog_sha},validation:{base_ids_preserved:true,sequences_complete:true,manifest_hashes:true}}' \
+            > data/operations/remaining-75-publication-receipt.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/notion/published.json data/notion/publication-plan.json data/release data/operations/remaining-75-publication-receipt.json
+          if ! git diff --cached --quiet; then git commit -m 'Versionar lote final de 75 registros auditados [skip ci]'; fi
+          CONTENT_SHA="$(git rev-parse HEAD)"
+          git push origin HEAD:main
+          echo "sha=$CONTENT_SHA" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+
+      - name: Publicar no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Confirmar site público
+        run: |
+          URL='https://rodrigorosadantas.github.io/sedes-df-questoes'
+          for i in $(seq 1 30); do
+            curl -fsS "$URL/data/release/release-meta.json?run=$GITHUB_RUN_ID-$i" -o /tmp/release-meta.json || true
+            if jq -e '.questions == 3046 and .banco_mestre == 3048 and .discursive_display_items == 2 and .awaiting_audit == 0 and .materials == 69' /tmp/release-meta.json >/dev/null 2>&1; then break; fi
+            sleep 10
+          done
+          jq -e '.questions == 3046 and .banco_mestre == 3048 and .discursive_display_items == 2 and .awaiting_audit == 0 and .materials == 69' /tmp/release-meta.json
+          curl -fsS "$URL/data/release/catalogo.json?run=$GITHUB_RUN_ID" -o /tmp/catalogo.json
+          test "$(jq '.question_index | length' /tmp/catalogo.json)" = '3046'
+          test "$(jq '.summary.aguardando_auditoria' /tmp/catalogo.json)" = '0'
+          test "$(jq '.summary.discursivas_consulta' /tmp/catalogo.json)" = '2'
+
+      - name: Fechar rastreabilidade no Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          RELEASE_COMMIT: ${{ steps.version.outputs.sha }}
+        run: node scripts/mark-remaining-75-published.mjs
+
+      - name: Registrar deploy e limpar operação temporária
+        env:
+          CONTENT_SHA: ${{ steps.version.outputs.sha }}
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          jq -n \
+            --arg confirmed_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg run_id "$GITHUB_RUN_ID" \
+            --arg source_sha "$CONTENT_SHA" \
+            --arg public_url "$PAGE_URL" \
+            '{schema_version:"1.0",operation:"PUBLISH-SEEDF-CONTABILIDADE-ELETRONICA-75-20260805",status:"success",confirmed_at:$confirmed_at,workflow_run_id:$run_id,source_sha:$source_sha,public_url:$public_url,base_questions_preserved:2971,objective_questions_added:75,questions:3046,discursive_display_items:2,banco_mestre:3048,awaiting_audit:0,materials:69,notion_traceability:"success",public_validation:"success"}' \
+            > data/operations/remaining-75-deployment-receipt.json
+          rm -f .github/workflows/publish-remaining-75-once.yml
+          rm -f scripts/audit-export-remaining-75.mjs scripts/mark-remaining-75-published.mjs
+          git add data/operations/remaining-75-deployment-receipt.json .github/workflows/publish-remaining-75-once.yml scripts/audit-export-remaining-75.mjs scripts/mark-remaining-75-published.mjs
+          if ! git diff --cached --quiet; then git commit -m 'Registrar publicação dos 75 registros e remover rotinas temporárias [skip ci]'; fi
+          git push origin HEAD:main
