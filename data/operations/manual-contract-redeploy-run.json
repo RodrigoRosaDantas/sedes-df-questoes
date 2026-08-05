@@ -1,12 +1,12 @@
 {
-  "queried_at": "2026-08-05T14:20:41Z",
+  "queried_at": "2026-08-05T14:24:48Z",
   "run": {
-    "id": 31014532077,
+    "id": 31014950971,
     "status": "completed",
     "conclusion": "failure",
-    "head_sha": "43d3b91a761abd0714e0cc16dd4a40a847952387",
-    "created_at": "2026-08-05T14:18:35Z",
-    "updated_at": "2026-08-05T14:19:00Z",
-    "html_url": "https://github.com/RodrigoRosaDantas/sedes-df-questoes/actions/runs/31014532077"
+    "head_sha": "5e7fcc536c08efa31bef77c38d226c364851cce8",
+    "created_at": "2026-08-05T14:23:31Z",
+    "updated_at": "2026-08-05T14:24:20Z",
+    "html_url": "https://github.com/RodrigoRosaDantas/sedes-df-questoes/actions/runs/31014950971"
   }
 }
