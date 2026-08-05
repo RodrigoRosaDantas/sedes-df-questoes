@@ -1,56 +1,14 @@
-name: Validar integração do Banco Mestre
+name: Validar integração do Banco Mestre — SUSPENSO
 
 on:
-  pull_request:
-    branches: [main]
-    types: [opened, synchronize, reopened]
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  compare:
-    if: github.event.pull_request.head.ref == 'integration/notion-bank-master-v2'
+  suspended:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
     steps:
-      - uses: actions/checkout@v6
-        with:
-          ref: integration/notion-bank-master-v2
-          fetch-depth: 0
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 22
-          package-manager-cache: false
-      - name: Gerar release pública atual
-        run: npm run build
-      - name: Comparar Banco Mestre com a release
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        run: node scripts/compare-notion-release.mjs
-      - name: Gerar snapshot autorizado do Notion
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        run: node scripts/export-notion-snapshot.mjs
-      - name: Validar plataforma completa com o snapshot
-        run: npm run check
-      - name: Consolidar snapshot na branch isolada
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'sedes-df-notion-sync[bot]'
-          git config user.email 'sedes-df-notion-sync[bot]@users.noreply.github.com'
-          git add data/notion/published.json
-          if git diff --cached --quiet; then
-            echo 'Snapshot já está atualizado.'
-            exit 0
-          fi
-          git commit -m 'Atualizar snapshot público do Banco Mestre'
-          git push origin HEAD:integration/notion-bank-master-v2
-      - name: Guardar relatório comparativo
-        if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: notion-release-comparison
-          path: /tmp/notion-release-comparison.json
-          retention-days: 7
+      - name: Informar suspensão
+        run: echo "Workflow suspenso. Nenhuma comparação ou validação automática será executada."
