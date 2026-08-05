@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "operation": "REFRESH-BANCO-MESTRE-DASHBOARD-20260804-R5",
+  "status": "success",
+  "confirmed_at": "2026-08-05T02:43:41.939Z",
+  "public_url": "https://rodrigorosadantas.github.io/sedes-df-questoes/",
+  "source_sha": "a3aba2a3f03a80248e94495d0645d098f8864842",
+  "pages_run_id": 30970039410,
+  "deployment_receipt_run_id": 30970175341,
+  "validated_artifact": {
+    "id": 8916182742,
+    "name": "validated-dist-a3aba2a3f03a80248e94495d0645d098f8864842",
+    "sha256": "c5ad3fa71f02cb3adc43404b3145fd83941cdaeb425a46e5fc8565192645b005"
+  },
+  "public_release_meta": {
+    "app_version": "2.13.0",
+    "cache_version": "sedes-questoes-v2-13-0",
+    "banco_mestre": 2946,
+    "questions": 2871,
+    "awaiting_audit": 75,
+    "materials": 67
+  },
+  "verification": {
+    "build_and_unit_checks": "success",
+    "immutable_publication_packages": "success",
+    "static_deployment": "success",
+    "public_browser_tests": "success",
+    "public_metadata_refetched": "success",
+    "independent_deployment_receipt": "success",
+    "temporary_workflows_removed": true,
+    "temporary_triggers_removed": true
+  }
+}
