@@ -1,0 +1,145 @@
+name: Atualizar painel do Banco Mestre
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/editorial/refresh-banco-mestre-dashboard-trigger.json'
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: refresh-banco-mestre-dashboard
+  cancel-in-progress: false
+
+env:
+  PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes
+  TRIGGER_PATH: data/editorial/refresh-banco-mestre-dashboard-trigger.json
+  WORKFLOW_PATH: .github/workflows/refresh-banco-mestre-dashboard.yml
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Baixar a main atual
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Preparar autoria técnica
+        run: |
+          git config user.name 'sedes-df-dashboard-refresh[bot]'
+          git config user.email 'sedes-df-dashboard-refresh[bot]@users.noreply.github.com'
+
+      - name: Atualizar snapshot pelo Banco Mestre ativo
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: |
+          set -euo pipefail
+          node scripts/export-notion-snapshot.mjs
+          node scripts/create-publication-plan.mjs
+          node scripts/validate-notion-snapshot.mjs
+          node scripts/validate-publication-plan.mjs
+
+      - name: Validar a reconciliação autorizada
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const snapshot = JSON.parse(fs.readFileSync('data/notion/published.json', 'utf8'));
+          const expected = 2946;
+          if (Number(snapshot.totals?.all) !== expected) {
+            throw new Error(`Banco Mestre ativo: ${snapshot.totals?.all}; esperado: ${expected}.`);
+          }
+          console.log(JSON.stringify({
+            active_records: snapshot.totals.all,
+            snapshot_publicable: snapshot.totals.published,
+            snapshot_pending: snapshot.totals.pending,
+            expected_public_site: 2871,
+            expected_editorial_audit: 75,
+          }, null, 2));
+          NODE
+
+      - name: Versionar snapshot e retirar o mecanismo temporário
+        id: publish
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add data/notion/published.json data/notion/publication-plan.json
+          git rm --ignore-unmatch "${WORKFLOW_PATH}" "${TRIGGER_PATH}"
+          if git diff --cached --quiet; then
+            echo 'Nenhuma alteração foi produzida.'
+            exit 1
+          fi
+          git commit -m 'Atualizar painel para o Banco Mestre ativo'
+          git fetch origin main
+          if ! git merge-base --is-ancestor origin/main HEAD; then
+            git rebase origin/main
+          fi
+          git push origin HEAD:main
+          echo "source_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Aguardar o workflow oficial de publicação
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_SHA: ${{ steps.publish.outputs.source_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          RUN_ID=''
+          for attempt in $(seq 1 90); do
+            gh api "repos/${GITHUB_REPOSITORY}/actions/runs?branch=main&per_page=50" > /tmp/runs.json
+            RUN_ID=$(jq -r --arg sha "${SOURCE_SHA}" '
+              .workflow_runs[]
+              | select(.head_sha == $sha)
+              | select(.name == "Validar e publicar GitHub Pages")
+              | select(.event == "push")
+              | .id
+            ' /tmp/runs.json | head -n1)
+            if [ -n "${RUN_ID}" ]; then break; fi
+            echo "Aguardando a execução de Pages para ${SOURCE_SHA} (${attempt}/90)."
+            sleep 5
+          done
+          if [ -z "${RUN_ID}" ]; then
+            echo 'O workflow oficial de Pages não foi localizado.'
+            exit 1
+          fi
+          echo "Execução oficial localizada: ${RUN_ID}."
+          gh run watch "${RUN_ID}" --exit-status --interval 10
+
+      - name: Confirmar os números no endereço público
+        env:
+          SOURCE_SHA: ${{ steps.publish.outputs.source_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 60); do
+            URL="${PUBLIC_BASE_URL}/data/release/release-meta.json?refresh=${GITHUB_RUN_ID}-${attempt}"
+            if curl -fsS -H 'cache-control: no-cache, no-store' "$URL" > /tmp/release-meta.json; then
+              if jq -e --arg sha "${SOURCE_SHA}" '
+                .source_sha == $sha
+                and .questions == 2871
+                and .materials == 67
+                and .banco_mestre == 2946
+                and .awaiting_audit == 75
+              ' /tmp/release-meta.json >/dev/null; then
+                cat /tmp/release-meta.json
+                echo '✓ Site público confirmado: 2.946 registros ativos, 2.871 publicados e 75 em auditoria editorial.'
+                exit 0
+              fi
+            fi
+            echo "Aguardando metadados públicos atualizados (${attempt}/60)."
+            sleep 10
+          done
+          echo 'Os metadados públicos não atingiram a reconciliação esperada.'
+          cat /tmp/release-meta.json || true
+          exit 1
