@@ -1,11 +1,11 @@
 {
   "schema_version": "5.0",
-  "release_version": "2.9.0",
-  "exported_at": "2026-08-05T18:12:14.424Z",
+  "release_version": "2.9.1",
+  "exported_at": "2026-08-05T19:01:53.476Z",
   "source": {
     "name": "Banco Mestre — Provas e Simulados SEDES/DF",
     "notion_url": "https://app.notion.com/p/a1d5fc8f8e434105861faba90dc156d9?v=85b47b4a2e17461e9d3482724b13fab8",
-    "criteria": "3046 registros atualmente liberados pelo Notion foram mesclados à release existente; alternativas A–E vazias são tratadas como Certo/Errado."
+    "criteria": "3.046 questões públicas preservadas; hotfix editorial restaurou textos-base e normalizou metadados das 75 questões de Contabilidade e Eletrônica."
   },
   "summary": {
     "banco_mestre": 3048,
