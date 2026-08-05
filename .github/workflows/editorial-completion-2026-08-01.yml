@@ -1,92 +1,14 @@
-name: Saneamento editorial das questões publicadas
+name: Saneamento editorial das questões publicadas — SUSPENSO
 
 on:
-  push:
-    branches:
-      - agent/editorial-pedagogia-seedf-2025
-    paths:
-      - data/editorial/pedagogia-seedf-2025.json.gz.b64
-      - scripts/apply-editorial-completion.mjs
-  pull_request:
-    branches: [main]
-    paths:
-      - data/editorial/pedagogia-seedf-2025.json.gz.b64
-      - scripts/apply-editorial-completion.mjs
+  workflow_dispatch:
 
 permissions:
-  contents: write
-
-concurrency:
-  group: sedes-df-editorial-completion
-  cancel-in-progress: false
-
-env:
-  EDITORIAL_COMPRESSED_PATH: data/editorial/pedagogia-seedf-2025.json.gz.b64
-  EDITORIAL_OPERATION_PATH: data/editorial/pedagogia-seedf-2025.json
-  EDITORIAL_RECEIPT_PATH: data/operations/pedagogia-seedf-2025-receipt.json
+  contents: read
 
 jobs:
-  sanitize-notion:
+  suspended:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
     steps:
-      - name: Baixar o lote editorial isolado
-        uses: actions/checkout@v6
-        with:
-          ref: agent/editorial-pedagogia-seedf-2025
-
-      - name: Preparar Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 22
-          package-manager-cache: false
-
-      - name: Restaurar e validar o lote editorial
-        shell: bash
-        run: |
-          set -euo pipefail
-          base64 --decode "${EDITORIAL_COMPRESSED_PATH}" | gzip --decompress > "${EDITORIAL_OPERATION_PATH}"
-          node --check scripts/apply-editorial-completion.mjs
-          jq -e '.operation_id == "EDT-2026-08-02-SEEDF-PEDAGOGIA-72" and .expected_records == 72 and (.records | length) == 72' "${EDITORIAL_OPERATION_PATH}" >/dev/null
-
-      - name: Aplicar correções com preflight e verificação integral
-        id: editorial
-        continue-on-error: true
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          EDITORIAL_OPERATION_PATH: ${{ env.EDITORIAL_OPERATION_PATH }}
-          EDITORIAL_RECEIPT_PATH: ${{ env.EDITORIAL_RECEIPT_PATH }}
-        run: node scripts/apply-editorial-completion.mjs
-
-      - name: Registrar recibo auditável no branch de saneamento
-        if: always()
-        shell: bash
-        env:
-          EDITORIAL_OUTCOME: ${{ steps.editorial.outcome }}
-        run: |
-          set -euo pipefail
-          rm -f "${EDITORIAL_OPERATION_PATH}"
-          if [ ! -f "${EDITORIAL_RECEIPT_PATH}" ]; then
-            mkdir -p "$(dirname "${EDITORIAL_RECEIPT_PATH}")"
-            jq -n \
-              --arg operation_id 'EDT-2026-08-02-SEEDF-PEDAGOGIA-72' \
-              --arg status 'failure' \
-              --arg stage 'execution' \
-              --arg editorial_outcome "${EDITORIAL_OUTCOME:-unknown}" \
-              --arg finished_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-              '{schema_version:"1.2",operation_id:$operation_id,status:$status,stage:$stage,editorial_outcome:$editorial_outcome,expected_records:72,updated_records:0,finished_at:$finished_at,site_deployed:false,publication_queue_reopened:false}' \
-              > "${EDITORIAL_RECEIPT_PATH}"
-          fi
-          git config user.name 'sedes-df-editorial-sanitizer[bot]'
-          git config user.email 'sedes-df-editorial-sanitizer[bot]@users.noreply.github.com'
-          git add "${EDITORIAL_RECEIPT_PATH}"
-          if ! git diff --cached --quiet; then
-            git commit -m 'Registrar saneamento editorial da prova de Pedagogia'
-            git push origin HEAD:agent/editorial-pedagogia-seedf-2025
-          fi
-
-      - name: Reprovar lote não concluído
-        if: steps.editorial.outcome != 'success'
-        run: |
-          echo 'O saneamento foi interrompido; consulte o recibo persistido no branch.'
-          exit 1
+      - name: Informar suspensão
+        run: echo "Workflow suspenso. Nenhum saneamento editorial automático será executado."
