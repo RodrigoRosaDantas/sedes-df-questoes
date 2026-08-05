@@ -26,14 +26,15 @@ const TARGETS = [
 
 const EXPORT_PROPERTIES = [
   'Alternativa A', 'Alternativa B', 'Alternativa C', 'Alternativa D', 'Alternativa E',
-  'Ano', 'Anulada', 'Assunto', 'Bloco', 'Bloqueio manual de publicação', 'Cargo',
+  'Ano', 'Anulada', 'Assunto', 'Auditoria de conteúdo', 'Bloco', 'Bloqueio manual de publicação', 'Cargo',
   'Comentário A', 'Comentário B', 'Comentário C', 'Comentário D', 'Comentário E',
   'Comentário geral', 'Código', 'Código GitHub', 'Código do cargo', 'Descrição da imagem',
   'Disciplina', 'Duplicada', 'Enunciado', 'Fonte / Banca', 'Formato da questão',
-  'Fundamento legal', 'Gabarito', 'Liberada para exportação', 'Lote de publicação',
-  'Nome do material', 'Número original', 'Observações', 'Órgão', 'Página do PDF',
-  'Pegadinha', 'Pode publicar', 'Possui imagem', 'Questão', 'Subassunto',
-  'Texto-base', 'Tipo de material', 'Transcrição conferida', 'URL da fonte',
+  'Fundamento legal', 'Gabarito', 'Gabarito conferido — registro manual anterior',
+  'Liberada para exportação', 'Lote de publicação', 'Nome do material', 'Número original',
+  'Observações', 'Órgão', 'Página do PDF', 'Pegadinha', 'Pode publicar', 'Possui imagem',
+  'Questão', 'Status editorial — registro manual anterior', 'Subassunto', 'Texto-base',
+  'Tipo de material', 'Transcrição conferida', 'URL da fonte',
 ];
 const queryParameters = new URLSearchParams();
 for (const property of EXPORT_PROPERTIES) queryParameters.append('filter_properties[]', property);
@@ -177,11 +178,27 @@ function targetFor(row) {
   return TARGETS.find(target => code.startsWith(target.prefix)) || null;
 }
 
+function validateAnnulledException(row, code) {
+  if (row['Anulada'] !== true || clean(row['Gabarito']) !== 'Anulada') {
+    throw new Error(`${code}: exceção de anulação sem marcação e gabarito compatíveis.`);
+  }
+  if (!['Aprovada', 'Ajustada'].includes(clean(row['Auditoria de conteúdo']))) {
+    throw new Error(`${code}: questão anulada sem auditoria editorial concluída.`);
+  }
+  if (row['Gabarito conferido — registro manual anterior'] !== true) {
+    throw new Error(`${code}: questão anulada sem conferência manual do gabarito definitivo.`);
+  }
+  if (!['Pronta para publicar', 'Revisada'].includes(clean(row['Status editorial — registro manual anterior']))) {
+    throw new Error(`${code}: questão anulada sem status editorial compatível com publicação.`);
+  }
+}
+
 const all = await readAll();
 const selectedRows = all.filter(row => targetFor(row));
 if (selectedRows.length !== 100) throw new Error(`Esperadas 100 objetivas dos dois lotes; encontradas ${selectedRows.length}.`);
 
 const selectedCodes = new Set();
+let annulledExceptions = 0;
 for (const target of TARGETS) {
   const rows = selectedRows.filter(row => targetFor(row)?.prefix === target.prefix);
   if (rows.length !== 50) throw new Error(`${target.prefix}: esperadas 50 objetivas; encontradas ${rows.length}.`);
@@ -189,17 +206,24 @@ for (const target of TARGETS) {
   if (numbers.some((number, index) => number !== index + 1)) throw new Error(`${target.prefix}: numeração original não fecha em 001–050.`);
   for (const row of rows) {
     const code = clean(row['Código']);
+    const annulled = row['Anulada'] === true || clean(row['Gabarito']) === 'Anulada';
     if (selectedCodes.has(key(code))) throw new Error(`Código repetido no escopo: ${code}.`);
     selectedCodes.add(key(code));
     if (clean(row['Nome do material']) !== target.material) throw new Error(`${code}: material divergente.`);
     if (clean(row['Lote de publicação']) !== target.lot) throw new Error(`${code}: lote divergente.`);
-    if (row['Pode publicar'] !== true) throw new Error(`${code}: Pode publicar não estava verdadeiro no snapshot.`);
+    if (annulled) {
+      validateAnnulledException(row, code);
+      annulledExceptions += 1;
+    } else if (row['Pode publicar'] !== true) {
+      throw new Error(`${code}: Pode publicar não estava verdadeiro no snapshot.`);
+    }
     if (row['Liberada para exportação'] !== true) throw new Error(`${code}: não estava liberada para exportação.`);
     if (row['Duplicada'] === true || row['Bloqueio manual de publicação'] === true) throw new Error(`${code}: bloqueio editorial presente.`);
     if (clean(row['Código GitHub'])) throw new Error(`${code}: já possui recibo GitHub e não pode entrar como adição nova.`);
     if (clean(row['Formato da questão']) !== 'Múltipla escolha A–E') throw new Error(`${code}: formato objetivo divergente.`);
   }
 }
+if (annulledExceptions !== 2) throw new Error(`Esperadas exatamente 2 exceções anuladas; encontradas ${annulledExceptions}.`);
 
 const records = selectedRows
   .map(record)
@@ -232,12 +256,13 @@ const payload = {
     name: 'Banco Mestre — Provas e Simulados SEDES/DF',
     database_url: DATABASE_URL,
     data_source_id: SOURCE,
-    publication_rule: 'Adição imutável restrita aos dois lotes Quadrix; release pública existente preservada integralmente',
+    publication_rule: 'Adição imutável restrita aos dois lotes Quadrix; release pública existente preservada integralmente; duas anuladas exportadas por exceção editorial explícita',
   },
   publication_scope: {
     operation: 'QDX-CRASP-CREMAM-100-20260805',
     codes: sortedCodes,
     lots: TARGETS.map(target => target.lot),
+    annulled_exceptions: records.filter(item => item.annulled).map(item => item.code),
   },
   totals: {
     all: all.length,
@@ -255,4 +280,4 @@ const payload = {
 
 await fs.mkdir(path.dirname(output), {recursive: true});
 await fs.writeFile(output, `${JSON.stringify(payload, null, 2)}\n`);
-console.log(`✓ Snapshot incremental: ${existingPublic} questões preservadas + ${records.length} novas objetivas + ${DISPLAY_ONLY_COUNT} discursivas de consulta + ${pending} em auditoria = ${all.length}.`);
+console.log(`✓ Snapshot incremental: ${existingPublic} questões preservadas + ${records.length} novas objetivas (${annulledExceptions} anuladas) + ${DISPLAY_ONLY_COUNT} discursivas de consulta + ${pending} em auditoria = ${all.length}.`);
