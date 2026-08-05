@@ -40,11 +40,31 @@ console.log(\`✓ \${suspendedWorkflowFiles.length} workflows confirmados em mod
 }
 
 if (!manualOnly) {
+  await importFresh(path.join(scriptsDirectory, "validate-intelligence-v2-9.mjs"));
   await importFresh(path.join(scriptsDirectory, "validate-build-v2-11.mjs"));
   await importFresh(path.join(scriptsDirectory, "validate-workflows.mjs"));
 } else {
   const temporaryFiles = [];
   try {
+    const intelligenceSourcePath = path.join(scriptsDirectory, "validate-intelligence-v2-9.mjs");
+    const intelligenceSource = fs.readFileSync(intelligenceSourcePath, "utf8");
+    const intelligenceStart = 'const workflow = read(".github/workflows/pages.yml");';
+    const intelligenceEnd = 'if (workflow.includes("export-notion-snapshot.mjs")) fail("O workflow de Pages não pode substituir o snapshot versionado por leitura ao vivo do Notion.");';
+    const intelligenceReplacement = `const workflow = read(".github/workflows/pages.yml");
+if (!workflow.includes("workflow_dispatch:")) fail("Workflow de Pages suspenso sem acionamento manual.");
+if (/^  (push|pull_request|schedule):/m.test(workflow)) fail("Workflow de Pages suspenso contém gatilho automático.");`;
+    const intelligenceAdapted = replaceRange(
+      intelligenceSource,
+      intelligenceStart,
+      intelligenceEnd,
+      intelligenceReplacement,
+      "validate-intelligence-v2-9.mjs",
+    );
+    const intelligenceTemporary = path.join(scriptsDirectory, ".validate-intelligence-v2-9-suspended.tmp.mjs");
+    fs.writeFileSync(intelligenceTemporary, intelligenceAdapted);
+    temporaryFiles.push(intelligenceTemporary);
+    await importFresh(intelligenceTemporary);
+
     const buildSourcePath = path.join(scriptsDirectory, "validate-build-v2-11.mjs");
     const buildSource = fs.readFileSync(buildSourcePath, "utf8");
     const buildStart = 'const pagesWorkflow = read(".github/workflows/pages.yml");';
