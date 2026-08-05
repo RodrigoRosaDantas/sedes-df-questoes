@@ -1,8 +1,9 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "operation": "REDEPLOY-RECONCILED-PUBLIC-CONTRACT",
   "status": "success",
   "confirmed_at": "2026-08-05T14:36:02Z",
+  "cleanup_confirmed_at": "2026-08-05T14:40:00Z",
   "public_url": "https://rodrigorosadantas.github.io/sedes-df-questoes",
   "source_sha": "42dff9230f3656fde4229b0e59fbf0dda32829d1",
   "workflow_run_id": 31015812783,
@@ -38,7 +39,10 @@
     "static_deployment": "success",
     "public_metadata_requests": "success",
     "public_browser_suite": "success",
-    "independent_artifact_audit": "success"
+    "independent_artifact_audit": "success",
+    "temporary_workflows_removed": "success",
+    "temporary_markers_removed": "success",
+    "temporary_status_removed": "success"
   },
   "controls": {
     "notion_write": false,
