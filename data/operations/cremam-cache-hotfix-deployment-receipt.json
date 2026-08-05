@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "operation": "HOTFIX-CREMAM-CACHE-20260805",
+  "status": "success",
+  "confirmed_at": "2026-08-05T17:39:51Z",
+  "workflow_run_id": "31031040998",
+  "source_sha": "5f1351f41f7cb57ae2ec659b2c511300d0fd23a9",
+  "public_url": "https://rodrigorosadantas.github.io/sedes-df-questoes/",
+  "cache_version": "sedes-questoes-v2-13-0-r2",
+  "app_asset": "app-v4.js?v=10",
+  "catalog_release_key": "3048-2971-69-r2",
+  "cra_sp_questions": 50,
+  "cremam_questions": 50,
+  "public_questions": 2971,
+  "validation": "success"
+}
