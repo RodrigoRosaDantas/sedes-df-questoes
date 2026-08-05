@@ -73,10 +73,36 @@ if (Number(catalog.summary?.questoes) !== questionCount) throw new Error(`Catál
 if (Number(catalog.summary?.materiais) !== materialCount) throw new Error(`Catálogo divergente: summary.materiais=${catalog.summary?.materiais}, lista=${materialCount}.`);
 if (materialFiles !== materialCount) throw new Error(`Arquivos de material divergentes: ${materialFiles} arquivos para ${materialCount} materiais.`);
 
+let activeBancoMestre = Number(catalog.summary?.banco_mestre || questionCount);
+const cleanupReceiptPath = path.join(root, "data/editorial/notion-trash-classified-20260804-execution-receipt.json");
+if (fs.existsSync(cleanupReceiptPath)) {
+  const cleanupReceipt = JSON.parse(fs.readFileSync(cleanupReceiptPath, "utf8"));
+  const cleanupFinishedAt = Date.parse(cleanupReceipt.finished_at || "");
+  const catalogExportedAt = Date.parse(catalog.exported_at || "");
+  const cleanupIsNewer = Number.isFinite(cleanupFinishedAt)
+    && (!Number.isFinite(catalogExportedAt) || cleanupFinishedAt > catalogExportedAt);
+  if (cleanupIsNewer) {
+    const reconciledActive = Number(cleanupReceipt.active_after);
+    const completePublic = Number(cleanupReceipt.after_counts?.complete_public_records);
+    if (cleanupReceipt.status !== "success"
+      || Number(cleanupReceipt.target_count) !== 2088
+      || Number(cleanupReceipt.remaining_active_count) !== 0
+      || !Array.isArray(cleanupReceipt.failures)
+      || cleanupReceipt.failures.length !== 0
+      || completePublic !== questionCount
+      || !Number.isInteger(reconciledActive)
+      || reconciledActive < questionCount) {
+      throw new Error("O recibo da limpeza do Notion não permite reconciliar o painel público com segurança.");
+    }
+    activeBancoMestre = reconciledActive;
+  }
+}
+const awaitingAudit = Math.max(0, activeBancoMestre - questionCount);
+
 const sourceHashes = Object.fromEntries(Object.entries(sources).map(([key, content]) => [key, sha256(content)]));
 const sourceSha = process.env.GITHUB_SHA || "local";
 const buildInfo = {version: packageData.version, data_release_version: catalog.release_version || null, catalog_schema_version: catalog.schema_version || null, source_sha: sourceSha, builder: expectedBuilder, cache_version: expectedCacheVersion, source_files_sha256: sourceHashes, questions: questionCount, materials: materialCount, material_files: materialFiles};
 fs.writeFileSync(path.join(dist, "data/release/build-info.json"), `${JSON.stringify(buildInfo, null, 2)}\n`);
-const releaseMeta = {schema_version: "1.0", app_version: packageData.version, data_release_version: catalog.release_version || null, catalog_schema_version: catalog.schema_version || null, source_sha: sourceSha, builder: expectedBuilder, cache_version: expectedCacheVersion, exported_at: catalog.exported_at || null, questions: questionCount, materials: materialCount, proofs: proofCount, simulations: simulationCount, banco_mestre: Number(catalog.summary?.banco_mestre || questionCount), awaiting_audit: Number(catalog.summary?.aguardando_auditoria || 0), source_files_sha256: sourceHashes, official_exam: {objective_questions: 60, general_questions: 20, general_weight: 1, specific_questions: 40, specific_weight: 2, total_points: 100, joint_duration_minutes: 240, general_minimum_points: 10, specific_minimum_points: 40, notice: "A duração de 4 horas é conjunta para as provas objetiva e discursiva.", source: "Edital SEDES/DF nº 1/2026, itens 11.1, 11.2, 11.3 e 12.4."}};
+const releaseMeta = {schema_version: "1.0", app_version: packageData.version, data_release_version: catalog.release_version || null, catalog_schema_version: catalog.schema_version || null, source_sha: sourceSha, builder: expectedBuilder, cache_version: expectedCacheVersion, exported_at: catalog.exported_at || null, questions: questionCount, materials: materialCount, proofs: proofCount, simulations: simulationCount, banco_mestre: activeBancoMestre, awaiting_audit: awaitingAudit, source_files_sha256: sourceHashes, official_exam: {objective_questions: 60, general_questions: 20, general_weight: 1, specific_questions: 40, specific_weight: 2, total_points: 100, joint_duration_minutes: 240, general_minimum_points: 10, specific_minimum_points: 40, notice: "A duração de 4 horas é conjunta para as provas objetiva e discursiva.", source: "Edital SEDES/DF nº 1/2026, itens 11.1, 11.2, 11.3 e 12.4."}};
 fs.writeFileSync(path.join(dist, "data/release/release-meta.json"), `${JSON.stringify(releaseMeta, null, 2)}\n`);
 console.log(`✓ Build público canônico ${packageData.version}: cache ${expectedCacheVersion}, ${questionCount} questões, ${materialCount} materiais e release-meta unificado.`);
