@@ -1,0 +1,12 @@
+{
+  "operation": "REFRESH-BANCO-MESTRE-DASHBOARD-20260804-R3",
+  "requested_at": "2026-08-05T02:27:00Z",
+  "expected": {
+    "banco_mestre": 2946,
+    "questions": 2871,
+    "awaiting_audit": 75,
+    "materials": 67
+  },
+  "source_fix": "ec00ad87d2e1e2c461d5b0e6ed9f3972ee20e446",
+  "purpose": "Disparar o workflow oficial de Pages para publicar a reconciliação do painel após a limpeza do Notion."
+}
