@@ -1,0 +1,38 @@
+name: Inspecionar execução dos 75 registros — temporário
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/inspect-remaining-75-run-once.yml]
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Consultar execução do workflow principal
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p data/operations
+          gh api \
+            -H 'Accept: application/vnd.github+json' \
+            '/repos/RodrigoRosaDantas/sedes-df-questoes/actions/workflows/publish-remaining-75-once.yml/runs?per_page=5' \
+            --jq '{checked_at: now|todate, total_count, runs:[.workflow_runs[]|{id,name,status,conclusion,event,head_sha,created_at,updated_at,html_url,run_attempt}]}' \
+            > data/operations/remaining-75-run-status.json
+      - name: Registrar diagnóstico e remover rotina temporária
+        run: |
+          rm -f .github/workflows/inspect-remaining-75-run-once.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/operations/remaining-75-run-status.json .github/workflows/inspect-remaining-75-run-once.yml
+          git commit -m 'Registrar estado da execução dos 75 registros [skip ci]'
+          git push origin HEAD:main
