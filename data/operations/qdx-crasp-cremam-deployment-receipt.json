@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "operation": "PUBLISH-QDX-CRASP-CREMAM-20260805",
+  "status": "success",
+  "confirmed_at": "2026-08-05T17:03:10Z",
+  "workflow_run_id": "31027997171",
+  "source_sha": "cea348b101194a726f912c3997fdd261872d3deb",
+  "public_url": "https://rodrigorosadantas.github.io/sedes-df-questoes/",
+  "base_questions_preserved": 2871,
+  "objective_questions_added": 100,
+  "annulled_objectives": 2,
+  "questions": 2971,
+  "discursive_display_items": 2,
+  "banco_mestre": 3048,
+  "awaiting_audit": 75,
+  "materials": 69,
+  "notion_traceability": "success",
+  "public_validation": "success"
+}
