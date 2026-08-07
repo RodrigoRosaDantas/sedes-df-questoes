@@ -1,7 +1,6 @@
 import {ensureData, state, observeApp} from "./shared-v2-13.js?v=1";
 
-// Compatibilidade documental: o antigo card "Integridade da publicação" (data-release-health)
-// foi removido da Home; os dados agora vivem em Configurações → Plataforma.
+// Metadados técnicos permanecem no rodapé e em Configurações → Plataforma.
 function enhanceReleaseMetadata() {
   if (!state.release) return;
   const footer = document.querySelector(".footer");
