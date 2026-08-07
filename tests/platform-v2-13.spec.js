@@ -4,7 +4,11 @@ test("expõe release unificada, prova real, reporte e proteção do progresso", 
   await page.goto("/#/inicio", {waitUntil: "domcontentloaded"});
   await page.evaluate(() => localStorage.clear());
   await page.reload({waitUntil: "domcontentloaded"});
-  await expect(page.locator("[data-release-health]")).toBeVisible({timeout: 30000});
+  await expect(page.locator("[data-release-health]")).toBeHidden({timeout: 30000});
+  await expect(page.locator("[data-ux-tech-status]")).toBeVisible({timeout: 30000});
+  await page.locator("[data-ux-tech-status]").click();
+  await expect(page.locator(".ux-tech-dialog")).toContainText("Publicação da plataforma");
+  await page.locator("[data-close-tech]").click();
   await expect(page.locator("[data-official-exam-card]")).toContainText("60 questões");
   await expect(page.locator("[data-adaptive-review]")).toBeVisible();
   await page.locator("[data-start-official-exam]").click();
