@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "CFO-CRMVGO-TECADM-237-PUBLICATION-20260807",
+  "status": "success",
+  "release_sha": "c10f6b2d8e341e2b1c5be549ca95541baf1b80b6",
+  "release_code": "release-2.13.0:c10f6b2d8e341e2b1c5be549ca95541baf1b80b6",
+  "public_url": "https://rodrigorosadantas.github.io/sedes-df-questoes/",
+  "confirmed_at": "2026-08-07T18:13:21Z",
+  "baseline_questions": 3210,
+  "published_records": 237,
+  "cfo_records": 118,
+  "crmvgo_records": 119,
+  "public_questions": 3447,
+  "public_materials": 75,
+  "master_bank": 3449,
+  "awaiting_audit": 0,
+  "discursive_display_items": 2,
+  "excluded": {
+    "cfo": [
+      45,
+      104
+    ],
+    "crmvgo": [
+      94
+    ]
+  },
+  "snapshot_sha256": "f303d4e682558b5a3897cee4ae5c6d58957cd482d4ff4a09401ef9fdd8df7616",
+  "plan_sha256": "974a62e93c0e6db01f0f1f1714788cd69daa4b15e3a926b7cc9e984714e7d96c",
+  "public_cache_version": "sedes-questoes-v2-13-0-r5",
+  "public_validation": true,
+  "notion_closed": true,
+  "recovery": {
+    "reason": "legacy verify-deployment expected cache without -r5",
+    "original_target_run": 31204687134
+  },
+  "permanent_automations_restored": false
+}
