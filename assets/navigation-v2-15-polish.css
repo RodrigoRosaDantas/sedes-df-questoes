@@ -1,3 +1,4 @@
+html.ux15-clean-home #app>:not([data-ux15-home]):not(.loading):not(.error-state){display:none!important}
 .ux15-sync-age{display:inline-flex;align-items:center;gap:5px;margin-left:6px;font-style:normal;font-size:9px;font-weight:800;white-space:nowrap}.ux15-sync-age:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}.ux15-sync-age.fresh{color:var(--green)}.ux15-sync-age.attention{color:var(--yellow)}.ux15-sync-age.stale{color:var(--red)}
 .ux15-breadcrumb{display:flex;align-items:center;gap:7px;margin:2px 3px 8px;color:var(--muted);font-size:9px;font-weight:800}.ux15-breadcrumb a{color:var(--muted);text-decoration:none}.ux15-breadcrumb a:hover{color:var(--text)}.ux15-breadcrumb strong{color:var(--text)}
 @media(max-width:720px){.ux15-breadcrumb{margin:0 0 8px;font-size:8px}.ux15-sync-age{display:block;margin:4px 0 0}}
