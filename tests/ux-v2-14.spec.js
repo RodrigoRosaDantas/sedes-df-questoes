@@ -25,6 +25,17 @@ test("estudar oferece atalhos, filtros avançados e busca textual", async ({page
   const payload = await response.json();
   expect(payload.questions).toBeGreaterThan(3000);
   expect(payload.items.length).toBe(payload.questions);
+
+  const token = (payload.items || []).flatMap(item => String(item.search || "").split(/\s+/)).find(value => value.length >= 8);
+  expect(token).toBeTruthy();
+  await page.locator("[data-ux-question-search]").fill(token);
+  await page.locator("[data-ux-run-search]").click();
+  const open = page.locator("[data-ux15-open-question]").first();
+  await expect(open).toBeVisible({timeout: 30000});
+  await open.click();
+  await expect(page.locator(".question-card")).toBeVisible({timeout: 30000});
+  const ids = await page.evaluate(() => JSON.parse(localStorage.getItem("sedes.questoes.rodrigo.session.v3") || "null")?.questionIds || []);
+  expect(ids).toHaveLength(1);
 });
 
 test("filtro por disciplina inclui questões de provas multidisciplinares", async ({page, request}) => {
