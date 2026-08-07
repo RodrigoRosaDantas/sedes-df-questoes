@@ -1,0 +1,24 @@
+Release SHA: caa32228a9522f44983b62e20bfaccee58f60551
+
+> sedes-df-questoes@2.13.0 check
+> npm run build && node --check assets/progress-migration-v2-3.js && node --check assets/question-images-v2-5.js && node --check assets/learning-v2-9.js && node --check assets/pwa-v2-9.js && node --check assets/reports-v2-10.js && node --check assets/material-downloads-v1.js && node --check assets/shared-v2-13.js && node --check assets/release-v2-13.js && node --check assets/vault-v2-13.js && node --check assets/report-v2-13.js && node --check assets/official-exam-v2-13.js && node --check assets/adaptive-review-v2-13.js && node --check assets/discursive-display-v2-13.js && node --check service-worker.js && node --check scripts/build-release.mjs && node --check scripts/build-release-v2-4.mjs && node --check scripts/export-notion-snapshot.mjs && node --check scripts/export-quadrix-objective-additions.mjs && node --check scripts/export-discursive-display.mjs && node --check scripts/export-exceptional-proofs.mjs && node --check scripts/export-editorial-platform-sync.mjs && node --check scripts/export-pedagogia-editorial-sync.mjs && node --check scripts/publication-plan.mjs && node --check scripts/create-publication-plan.mjs && node --check scripts/validate-publication-plan.mjs && node --check scripts/apply-notion-snapshot.mjs && node --check scripts/apply-discursive-display.mjs && node --check scripts/apply-editorial-platform-sync.mjs && node --check scripts/apply-pedagogia-editorial-sync.mjs && node --check scripts/apply-gppgadm-site-correction.mjs && node --check scripts/apply-visual-overrides.mjs && node --check scripts/audit-release-visuals.mjs && node --check scripts/validate-notion-snapshot.mjs && node --check scripts/validate-discursive-display.mjs && node --check scripts/build-study-index.mjs && node --check scripts/build-public.mjs && node --check scripts/reconcile-discursive-release-meta.mjs && node --check scripts/reconcile-public-metadata.mjs && node --check scripts/validate-public-metadata-consistency.mjs && node --check scripts/validate-governance-mode.mjs && node --check scripts/fixed-build-time.mjs && node --check scripts/verify-deployment.mjs && node --check scripts/write-deployment-receipt.mjs && node --check scripts/rollback-deployment.mjs && node --check scripts/mark-notion-published.mjs && node --check scripts/mark-quadrix-objectives-published.mjs && node --check scripts/mark-discursive-display-published.mjs && node --check scripts/validate-runtime-catalog.mjs && node --check scripts/validate-study-navigation-v2-6.mjs && node --check scripts/validate-intelligence-v2-9.mjs && node --check scripts/validate-material-downloads.mjs && node --check scripts/validate-platform-v2-13.mjs && node --check scripts/validate-dist-v2-10.mjs && node --check scripts/validate-build-v2-11.mjs && node --check scripts/validate-workflows.mjs && node --check scripts/validate-reproducible-build.mjs && node scripts/validate-runtime-catalog.mjs && npm test && node scripts/validate-reproducible-build.mjs
+
+
+> sedes-df-questoes@2.13.0 build
+> node --import=./scripts/fixed-build-time.mjs scripts/build-release-v2-4.mjs && node --import=./scripts/fixed-build-time.mjs scripts/apply-notion-snapshot.mjs && node --import=./scripts/fixed-build-time.mjs scripts/apply-editorial-platform-sync.mjs && node --import=./scripts/fixed-build-time.mjs scripts/apply-pedagogia-editorial-sync.mjs && node --import=./scripts/fixed-build-time.mjs scripts/apply-gppgadm-site-correction.mjs && node --import=./scripts/fixed-build-time.mjs scripts/apply-visual-overrides.mjs && node --import=./scripts/fixed-build-time.mjs scripts/apply-discursive-display.mjs && node --import=./scripts/fixed-build-time.mjs scripts/build-study-index.mjs && node scripts/build-public.mjs && node scripts/reconcile-discursive-release-meta.mjs && node scripts/reconcile-public-metadata.mjs
+
+✓ Release 2.9.0 gerada: 35 materiais, 570 questões e 1869 em auditoria.
+✓ Release híbrida gerada: 36 materiais e 690 questões (1 material e 120 questões adicionadas).
+✓ Snapshot do Notion aplicado: 805 questões em 37 materiais; IDs públicos preservados quando já existentes e recibos de release mantidos apenas como rastreabilidade.
+file:///home/runner/work/sedes-df-questoes/sedes-df-questoes/scripts/apply-editorial-platform-sync.mjs:17
+  throw new Error('Arquivo temporário do saneamento editorial não foi gerado antes do build.');
+        ^
+
+Error: Arquivo temporário do saneamento editorial não foi gerado antes do build.
+    at file:///home/runner/work/sedes-df-questoes/sedes-df-questoes/scripts/apply-editorial-platform-sync.mjs:17:9
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.23.1
+FALHA EM npm run check; status 1.
