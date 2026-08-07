@@ -73,36 +73,6 @@ jobs:
           SNAPSHOT_SHA=$(sha256sum "${SNAPSHOT_PATH}" | awk '{print $1}')
           PLAN_SHA=$(sha256sum "${PLAN_COPY_PATH}" | awk '{print $1}')
           SOURCE_SHA=$(git rev-parse HEAD)
-          node --input-type=module - <<'NODE'
-          import fs from 'node:fs';
-          const receipt = {
-            schema_version: '1.0',
-            operation_id: process.env.OPERATION_ID,
-            status: 'prepared_not_published',
-            expected_additions: 115,
-            expected_public_total_before: 3046,
-            expected_public_total_after: 3161,
-            blocked_original_numbers: [5, 48, 54, 102, 104],
-            snapshot_sha256: process.env.SNAPSHOT_SHA,
-            plan_sha256: process.env.PLAN_SHA,
-            prepared_from_sha: process.env.SOURCE_SHA,
-            publication_started: false,
-            notion_traceability_closed: false,
-          };
-          fs.writeFileSync(process.env.RECEIPT_PATH, `${JSON.stringify(receipt, null, 2)}\n`);
-          NODE
-        env:
-          SNAPSHOT_SHA: ${{ env.SNAPSHOT_SHA }}
-          PLAN_SHA: ${{ env.PLAN_SHA }}
-          SOURCE_SHA: ${{ env.SOURCE_SHA }}
-
-      - name: Corrigir variáveis do recibo e validar hashes
-        shell: bash
-        run: |
-          set -euo pipefail
-          SNAPSHOT_SHA=$(sha256sum "${SNAPSHOT_PATH}" | awk '{print $1}')
-          PLAN_SHA=$(sha256sum "${PLAN_COPY_PATH}" | awk '{print $1}')
-          SOURCE_SHA=$(git rev-parse HEAD)
           node --input-type=module - "$SNAPSHOT_SHA" "$PLAN_SHA" "$SOURCE_SHA" <<'NODE'
           import fs from 'node:fs';
           const [, , snapshotSha, planSha, sourceSha] = process.argv;
