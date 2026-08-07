@@ -1,0 +1,228 @@
+name: Finalizar publicação CRFa-1 — release f17d
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/finalize-crfa1-f17d-once.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: finalize-crfa1-f17d
+  cancel-in-progress: false
+
+env:
+  RELEASE_SHA: f17d56240a058e203e6d7bd6c7d4364d3782c5f1
+  PUBLIC_URL: https://rodrigorosadantas.github.io/sedes-df-questoes/
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    environment:
+      name: github-pages
+      url: https://rodrigorosadantas.github.io/sedes-df-questoes/
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Recuperar validador e fechamento auditados
+        shell: bash
+        run: |
+          set -euo pipefail
+          git show a20b65612f867d4f6b09ea952589cdb4a29f2340:scripts/validate-crfa1-analista-115-deploy.mjs > /tmp/validate-crfa1-analista-115-deploy.mjs
+          git show a20b65612f867d4f6b09ea952589cdb4a29f2340:scripts/close-crfa1-analista-115-after-deploy.mjs > /tmp/close-crfa1-analista-115-after-deploy.mjs
+          test -s /tmp/validate-crfa1-analista-115-deploy.mjs
+          test -s /tmp/close-crfa1-analista-115-after-deploy.mjs
+
+      - name: Confirmar fonte cumulativa 3161/72 e pacote imutável
+        run: |
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          import crypto from 'node:crypto';
+          const clean = value => String(value ?? '').trim();
+          const sha = value => crypto.createHash('sha256').update(value).digest('hex');
+          const catalog = JSON.parse(fs.readFileSync('data/release/catalogo.json', 'utf8'));
+          const meta = JSON.parse(fs.readFileSync('data/release/release-meta.json', 'utf8'));
+          const snapshotBytes = fs.readFileSync('data/notion/publication-additions/crfa1-analista-115.json');
+          const planBytes = fs.readFileSync('data/notion/publication-additions/crfa1-analista-115-plan.json');
+          if (Number(catalog.summary?.questoes) !== 3161 || Number(catalog.summary?.materiais) !== 72) throw new Error('Fonte cumulativa não fecha em 3161/72.');
+          if (Number(catalog.summary?.banco_mestre) !== 3212 || Number(catalog.summary?.aguardando_auditoria) !== 49 || Number(catalog.summary?.discursivas_consulta) !== 2) throw new Error('Resumo cumulativo 3212/49/2 divergente.');
+          if (Number(meta.questions) !== 3161 || Number(meta.materials) !== 72 || Number(meta.banco_mestre) !== 3212 || Number(meta.awaiting_audit) !== 49) throw new Error('release-meta cumulativo divergente.');
+          if (sha(snapshotBytes) !== 'd1aa0e165dd0b2fb83e78ba75bda550d57f1f23f1ee5366f6fbab9c80c4e4b3d') throw new Error('Snapshot imutável divergente.');
+          if (sha(planBytes) !== '2b49c85b2654a1094258385117648a5036f82bd2467279a25a5284a28628ed24') throw new Error('Plano imutável divergente.');
+          const target = (catalog.materials || []).find(item => clean(item.nome) === 'Analista Administrativo — CRFa-1 — Quadrix 2026');
+          if (!target || Number(target.quantidade_questoes) !== 115) throw new Error('Material CRFa-1 não fecha em 115 na fonte cumulativa.');
+          console.log('✓ Fonte cumulativa confirmada: 3161/72, Banco 3212, 49 pendentes e pacote CRFa-1 115.');
+          NODE
+
+      - name: Regerar e validar dist exatamente para f17d
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf dist
+          GITHUB_SHA="${RELEASE_SHA}" node scripts/build-public.mjs
+          node scripts/reconcile-discursive-release-meta.mjs
+          node scripts/reconcile-public-metadata.mjs
+          CRFA_ROOT="${GITHUB_WORKSPACE}" node /tmp/validate-crfa1-analista-115-deploy.mjs dist "${RELEASE_SHA}"
+          node scripts/validate-runtime-catalog.mjs
+          node scripts/validate-public-metadata-consistency.mjs
+          echo "✓ Dist de ${RELEASE_SHA} reproduzido e validado antes do diagnóstico público."
+
+      - name: Diagnosticar se f17d já está público
+        id: probe
+        shell: bash
+        run: |
+          set +e
+          STAMP="${GITHUB_RUN_ID}-$(date +%s)"
+          curl -fsS --retry 2 --retry-delay 2 "${PUBLIC_URL}data/release/build-info.json?probe=${STAMP}" -o /tmp/public-build.json
+          BUILD_STATUS=$?
+          curl -fsS --retry 2 --retry-delay 2 "${PUBLIC_URL}data/release/catalogo.json?probe=${STAMP}" -o /tmp/public-catalog.json
+          CATALOG_STATUS=$?
+          set -e
+          if [ "${BUILD_STATUS}" -eq 0 ] && [ "${CATALOG_STATUS}" -eq 0 ] \
+            && jq -e --arg sha "${RELEASE_SHA}" '.source_sha == $sha and .questions == 3161 and .materials == 72' /tmp/public-build.json >/dev/null 2>&1 \
+            && jq -e '.summary.questoes == 3161 and .summary.materiais == 72' /tmp/public-catalog.json >/dev/null 2>&1; then
+            echo 'already_public=true' >> "$GITHUB_OUTPUT"
+            echo "✓ Release ${RELEASE_SHA} já está pública; redeploy será omitido."
+          else
+            echo 'already_public=false' >> "$GITHUB_OUTPUT"
+            echo '↻ Release pública ainda não corresponde a f17d; será publicado o dist já validado.'
+          fi
+
+      - name: Preparar GitHub Pages
+        if: steps.probe.outputs.already_public != 'true'
+        uses: actions/configure-pages@v6
+
+      - name: Empacotar dist validado
+        if: steps.probe.outputs.already_public != 'true'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+      - name: Publicar f17d
+        if: steps.probe.outputs.already_public != 'true'
+        id: deployment
+        uses: actions/deploy-pages@v5
+
+      - name: Confirmar publicação pública final
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module - <<'NODE'
+          const base = new URL(process.env.PUBLIC_URL);
+          const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+          const clean = value => String(value ?? '').trim();
+          const blocked = [5,48,54,102,104];
+          const prefix = 'PROVA-QDX-CRFA1-2026-ANALISTA-ADMINISTRATIVO-400-';
+          let lastError;
+          for (let attempt = 1; attempt <= 36; attempt += 1) {
+            try {
+              const stamp = `${Date.now()}-${attempt}`;
+              const [buildResponse, catalogResponse] = await Promise.all([
+                fetch(new URL(`data/release/build-info.json?final=${stamp}`, base), {cache: 'no-store'}),
+                fetch(new URL(`data/release/catalogo.json?final=${stamp}`, base), {cache: 'no-store'}),
+              ]);
+              if (!buildResponse.ok || !catalogResponse.ok) throw new Error(`HTTP ${buildResponse.status}/${catalogResponse.status}`);
+              const build = await buildResponse.json();
+              const catalog = await catalogResponse.json();
+              if (clean(build.source_sha) !== process.env.RELEASE_SHA) throw new Error(`source_sha=${build.source_sha}`);
+              if (Number(build.questions) !== 3161 || Number(build.materials) !== 72) throw new Error(`build=${build.questions}/${build.materials}`);
+              if (Number(catalog.summary?.questoes) !== 3161 || Number(catalog.summary?.materiais) !== 72) throw new Error(`catalog=${catalog.summary?.questoes}/${catalog.summary?.materiais}`);
+              if (Number(catalog.summary?.banco_mestre) !== 3212 || Number(catalog.summary?.aguardando_auditoria) !== 49) throw new Error('Resumo público Banco/pendências divergente.');
+              const meta = (catalog.materials || []).find(item => clean(item.nome) === 'Analista Administrativo — CRFa-1 — Quadrix 2026');
+              if (!meta || Number(meta.quantidade_questoes) !== 115) throw new Error('CRFa-1 público ausente ou incompleto.');
+              const materialUrl = new URL(String(meta.file).replace(/^\.\//, ''), base);
+              materialUrl.searchParams.set('final', stamp);
+              const materialResponse = await fetch(materialUrl, {cache: 'no-store'});
+              if (!materialResponse.ok) throw new Error(`material HTTP ${materialResponse.status}`);
+              const material = await materialResponse.json();
+              const questions = material.questoes || [];
+              if (questions.length !== 115) throw new Error(`CRFa-1 público contém ${questions.length}.`);
+              const codes = new Set(questions.map(item => clean(item.codigo)));
+              for (const number of blocked) if (codes.has(`${prefix}${String(number).padStart(3,'0')}`)) throw new Error(`bloqueio ${number} publicado`);
+              const answers = new Map(questions.map(item => [Number(item.numero_original ?? item.numero), clean(item.gabarito)]));
+              for (const [number, answer] of [[47,'Certo'],[52,'Errado'],[57,'Errado'],[107,'Errado'],[108,'Errado']]) if (answers.get(number) !== answer) throw new Error(`gabarito ${number}=${answers.get(number)}`);
+              console.log(`✓ Público confirmado: release-2.13.0:${process.env.RELEASE_SHA}; 3161/72; CRFa-1 115/115.`);
+              process.exit(0);
+            } catch (error) {
+              lastError = error;
+              console.log(`Tentativa pública ${attempt}/36: ${error.message}`);
+              await sleep(5000);
+            }
+          }
+          throw lastError || new Error('Publicação pública não convergiu.');
+          NODE
+
+      - name: Fechar 115/115 no Notion pelo pacote imutável
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          CRFA_ROOT: ${{ github.workspace }}
+        run: node /tmp/close-crfa1-analista-115-after-deploy.mjs
+
+      - name: Auto-remover finalizador e registrar recibo de sucesso
+        shell: bash
+        env:
+          WAS_ALREADY_PUBLIC: ${{ steps.probe.outputs.already_public }}
+        run: |
+          set -euo pipefail
+          git reset --hard HEAD
+          git clean -fd
+          git config user.name 'sedes-df-publish[bot]'
+          git config user.email 'sedes-df-publish[bot]@users.noreply.github.com'
+          git rm .github/workflows/finalize-crfa1-f17d-once.yml
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const receipt = {
+            schema_version: '1.1',
+            operation_id: 'CRFA1-2026-ANALISTA-400-115-20260807',
+            status: 'success',
+            release_code: `release-2.13.0:${process.env.RELEASE_SHA}`,
+            release_sha: process.env.RELEASE_SHA,
+            public_url: process.env.PUBLIC_URL,
+            public_questions: 3161,
+            public_materials: 72,
+            master_bank: 3212,
+            awaiting_audit: 49,
+            discursive_display_items: 2,
+            published_records: 115,
+            blocked_original_numbers: [5,48,54,102,104],
+            snapshot_sha256: 'd1aa0e165dd0b2fb83e78ba75bda550d57f1f23f1ee5366f6fbab9c80c4e4b3d',
+            plan_sha256: '2b49c85b2654a1094258385117648a5036f82bd2467279a25a5284a28628ed24',
+            notion_closed: true,
+            public_validation: true,
+            redeployed_by_finalizer: process.env.WAS_ALREADY_PUBLIC !== 'true',
+            permanent_automations_restored: false,
+            supersedes_ingress_receipt_sha256: 'c7e2a96bfbfb2540e9db5b784d6a28b8fec17534702ff993f70531e35ddf777b',
+            corrected_ingress_gap: [59,60,61,62,63],
+            failed_predeploy_candidates: [
+              'caa32228a9522f44983b62e20bfaccee58f60551',
+              'a74ef3a3a189547d3017ead65f4beeb0b61c1c30'
+            ]
+          };
+          fs.writeFileSync('data/operations/crfa1-analista-115-deployment-receipt.json', `${JSON.stringify(receipt, null, 2)}\n`);
+          NODE
+          git add data/operations/crfa1-analista-115-deployment-receipt.json
+          git commit -m 'Registrar publicação confirmada do CRFa-1 [skip ci]'
+          git fetch origin main
+          if ! git merge-base --is-ancestor origin/main HEAD; then git rebase origin/main; fi
+          git push origin HEAD:main
+
+      - name: Resumo
+        run: |
+          echo "✓ Finalizado: release-2.13.0:${RELEASE_SHA}"
+          echo '✓ 3161 questões públicas; 72 materiais; CRFa-1 115/115; Notion 115/115; bloqueios preservados.'
