@@ -97,10 +97,15 @@ function focusSearchWhenReady() {
   requestAnimationFrame(attempt);
 }
 
-function bindSearchNavigation() {
+function bindNavigationShortcuts() {
   document.addEventListener("click", event => {
-    if (!event.target.closest("[data-ux15-search]")) return;
-    focusSearchWhenReady();
+    if (event.target.closest("[data-ux15-settings], [data-ux-tech-status]")) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      location.hash = "#/perfil/configuracoes";
+      return;
+    }
+    if (event.target.closest("[data-ux15-search]")) focusSearchWhenReady();
   }, true);
   document.addEventListener("keydown", event => {
     const target = event.target;
@@ -120,5 +125,5 @@ function enhance() {
   pruneLegacyHome();
 }
 
-bindSearchNavigation();
+bindNavigationShortcuts();
 ensureData().then(() => observeApp(enhance)).catch(error => console.error("Falha ao iniciar polimento de navegação v2.15:", error));
