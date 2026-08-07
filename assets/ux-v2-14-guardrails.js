@@ -60,6 +60,13 @@ function reconcileErrorMastery() {
   if (changed) saveJSON(ERRORS_KEY(), book);
 }
 
+function alignReviewCopy() {
+  if (currentRoute() !== "revisar") return;
+  const hint = document.querySelector(".review-summary .metric:first-child span");
+  const expected = "saem da fila após 3 acertos consecutivos";
+  if (hint && hint.textContent !== expected) hint.textContent = expected;
+}
+
 function criteriaFrom(root) {
   const value = name => root.querySelector(`[data-ux-filter-${name}]`)?.value || "";
   return {
@@ -141,5 +148,8 @@ document.addEventListener("click", closeMasteredByStreak, true);
 
 observeApp(() => {
   document.documentElement.classList.toggle("ux-student-home", currentRoute() === "inicio");
-  queueMicrotask(reconcileErrorMastery);
+  queueMicrotask(() => {
+    reconcileErrorMastery();
+    alignReviewCopy();
+  });
 });
