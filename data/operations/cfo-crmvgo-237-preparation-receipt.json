@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "CFO-CRMVGO-TECADM-237-PUBLICATION-20260807",
+  "status": "prepared_not_published",
+  "prepared_at": "2026-08-07T17:59:20Z",
+  "baseline_questions": 3210,
+  "baseline_materials": 73,
+  "master_bank": 3449,
+  "expected_additions": 237,
+  "target_questions": 3447,
+  "target_materials": 75,
+  "cfo_records": 118,
+  "crmvgo_records": 119,
+  "excluded": {
+    "cfo": [
+      45,
+      104
+    ],
+    "crmvgo": [
+      94
+    ]
+  },
+  "snapshot_sha256": "f303d4e682558b5a3897cee4ae5c6d58957cd482d4ff4a09401ef9fdd8df7616",
+  "plan_sha256": "974a62e93c0e6db01f0f1f1714788cd69daa4b15e3a926b7cc9e984714e7d96c",
+  "codes_sha256": "3435895c42c1aed99296182d0c850975ebcfb098916184cf0ad91661252739e6",
+  "publication_started": false,
+  "notion_traceability_closed": false
+}

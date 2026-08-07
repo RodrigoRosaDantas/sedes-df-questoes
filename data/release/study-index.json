@@ -1,16 +1,16 @@
 {
   "schema_version": "1.0",
   "release_version": "2.9.2",
-  "generated_at": "2026-08-07T13:33:39.234Z",
+  "generated_at": "2026-08-07T17:59:21.199Z",
   "summary": {
-    "disciplines": 164,
-    "topics": 1364,
-    "questions": 3210
+    "disciplines": 166,
+    "topics": 1395,
+    "questions": 3447
   },
   "disciplines": [
     {
       "name": "Língua Portuguesa",
-      "question_count": 419,
+      "question_count": 452,
       "question_ids": [
         "prova-qdx-cremam-2025-administrador-400-001",
         "prova-qdx-cremam-2025-administrador-400-002",
@@ -430,9 +430,42 @@
         "consol-pt16-67",
         "consol-pt16-68",
         "consol-pt16-69",
-        "consol-pt16-70"
+        "consol-pt16-70",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-001",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-002",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-003",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-004",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-005",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-006",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-007",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-008",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-009",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-010",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-011",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-012",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-013",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-001",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-002",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-003",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-004",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-005",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-006",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-007",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-008",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-009",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-010",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-011",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-012",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-013",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-014",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-015",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-016",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-017",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-018",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-019",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-020"
       ],
-      "material_count": 37,
+      "material_count": 39,
       "material_ids": [
         "notion-administrador-cremam-quadrix-2025",
         "notion-administrador-crf-df-quadrix-2026",
@@ -470,7 +503,9 @@
         "sim-emilia-2026-tdas-pt13",
         "sim-emilia-2026-tdas-pt14",
         "sim-emilia-2026-tdas-pt15",
-        "sim-emilia-2026-tdas-pt16"
+        "sim-emilia-2026-tdas-pt16",
+        "notion-tecnico-administrativo-cfo-quadrix-2025",
+        "notion-tecnico-administrativo-crmv-go-quadrix-2025"
       ],
       "topics": [
         {
@@ -520,6 +555,45 @@
             "prova-qdx-seedf-2025-profadm-a-007",
             "prova-qdx-seedf-2025-profadm-a-008",
             "prova-qdx-seedf-2025-profadm-a-009"
+          ]
+        },
+        {
+          "name": "Interpretação e gramática",
+          "question_count": 33,
+          "question_ids": [
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-001",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-002",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-003",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-004",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-005",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-006",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-007",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-008",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-009",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-010",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-011",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-012",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-013",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-001",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-002",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-003",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-004",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-005",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-006",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-007",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-008",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-009",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-010",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-011",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-012",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-013",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-014",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-015",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-016",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-017",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-018",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-019",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-020"
           ]
         },
         {
@@ -3006,7 +3080,7 @@
     },
     {
       "name": "Direito Administrativo",
-      "question_count": 165,
+      "question_count": 197,
       "question_ids": [
         "prova-qdx-cremam-2025-administrador-400-021",
         "prova-qdx-cremam-2025-administrador-400-022",
@@ -3172,9 +3246,41 @@
         "sim-emilia-2026-tdas-adm01-367",
         "sim-emilia-2026-tdas-adm01-368",
         "sim-emilia-2026-tdas-adm01-369",
-        "sim-emilia-2026-tdas-adm01-370"
+        "sim-emilia-2026-tdas-adm01-370",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-044",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-046",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-047",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-048",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-049",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-050",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-051",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-052",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-084",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-085",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-086",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-087",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-088",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-089",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-090",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-091",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-092",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-056",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-057",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-058",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-059",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-060",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-061",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-062",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-063",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-064",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-065",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-066",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-067",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-068",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-069",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-070"
       ],
-      "material_count": 14,
+      "material_count": 16,
       "material_ids": [
         "notion-administrador-cremam-quadrix-2025",
         "notion-advogado-crefito-17-quadrix-2026",
@@ -3189,12 +3295,14 @@
         "notion-auxiliar-administrativo-crbm-6-quadrix-2026",
         "notion-auxiliar-administrativo-crtr-12-ms-mt-quadrix-2026-campo-grande",
         "notion-contador-crbm-6-quadrix-2026",
-        "sim-emilia-2026-tdas-adm01"
+        "sim-emilia-2026-tdas-adm01",
+        "notion-tecnico-administrativo-cfo-quadrix-2025",
+        "notion-tecnico-administrativo-crmv-go-quadrix-2025"
       ],
       "topics": [
         {
           "name": "Improbidade administrativa",
-          "question_count": 22,
+          "question_count": 24,
           "question_ids": [
             "prova-qdx-cremam-2025-administrador-400-023",
             "prova-qdx-cremam-2025-administrador-400-024",
@@ -3217,7 +3325,9 @@
             "prova-qdx-crfdf-2026-assistente-i-200-058",
             "prova-qdx-crfdf-2026-assistente-i-200-059",
             "prova-qdx-crfdf-2026-assistente-i-200-060",
-            "prova-qdx-crfdf-2026-assistente-i-200-061"
+            "prova-qdx-crfdf-2026-assistente-i-200-061",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-044",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-046"
           ]
         },
         {
@@ -3247,6 +3357,35 @@
           ]
         },
         {
+          "name": "Organização e atuação administrativa",
+          "question_count": 9,
+          "question_ids": [
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-084",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-085",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-086",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-087",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-088",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-089",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-090",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-091",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-092"
+          ]
+        },
+        {
+          "name": "Organização administrativa",
+          "question_count": 8,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-agente-administrativo-401-101",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-056",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-057",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-058",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-059",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-060",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-061",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-062"
+          ]
+        },
+        {
           "name": "Processo administrativo — Lei nº 9.784/1999",
           "question_count": 7,
           "question_ids": [
@@ -3257,6 +3396,18 @@
             "prova-qdx-crfa1-2026-analista-administrativo-400-059",
             "prova-qdx-crfa1-2026-analista-administrativo-400-060",
             "prova-qdx-crfa1-2026-analista-administrativo-400-061"
+          ]
+        },
+        {
+          "name": "Acesso à informação",
+          "question_count": 6,
+          "question_ids": [
+            "prova-qdx-crasp-2025-anacob-400-028",
+            "prova-qdx-cremam-2025-assadm-200-024",
+            "prova-qdx-cremam-2025-assadm-200-025",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-050",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-051",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-052"
           ]
         },
         {
@@ -3284,6 +3435,17 @@
           ]
         },
         {
+          "name": "Atos e poderes administrativos",
+          "question_count": 5,
+          "question_ids": [
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-063",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-064",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-065",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-066",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-067"
+          ]
+        },
+        {
           "name": "Lei de Acesso à Informação e LINDB",
           "question_count": 5,
           "question_ids": [
@@ -3303,6 +3465,17 @@
             "prova-qdx-crfdf-2026-assistente-i-200-048",
             "prova-qdx-crfdf-2026-assistente-i-200-050",
             "prova-qdx-crfdf-2026-assistente-i-200-052"
+          ]
+        },
+        {
+          "name": "Processo administrativo federal",
+          "question_count": 5,
+          "question_ids": [
+            "prova-qdx-cremam-2025-administrador-400-021",
+            "prova-qdx-cremam-2025-administrador-400-022",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-047",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-048",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-049"
           ]
         },
         {
@@ -3336,12 +3509,12 @@
           ]
         },
         {
-          "name": "Acesso à informação",
+          "name": "Contratações e responsabilidade estatal",
           "question_count": 3,
           "question_ids": [
-            "prova-qdx-crasp-2025-anacob-400-028",
-            "prova-qdx-cremam-2025-assadm-200-024",
-            "prova-qdx-cremam-2025-assadm-200-025"
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-068",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-069",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-070"
           ]
         },
         {
@@ -3449,14 +3622,6 @@
           "question_ids": [
             "prova-qdx-crefito17-2026-advogado-400-049",
             "prova-qdx-crefito17-2026-agente-fiscal-401-049"
-          ]
-        },
-        {
-          "name": "Processo administrativo federal",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-cremam-2025-administrador-400-021",
-            "prova-qdx-cremam-2025-administrador-400-022"
           ]
         },
         {
@@ -3668,13 +3833,6 @@
           "question_count": 1,
           "question_ids": [
             "prova-qdx-crtr12-2026-agente-fiscal-300-053"
-          ]
-        },
-        {
-          "name": "Organização administrativa",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-agente-administrativo-401-101"
           ]
         },
         {
@@ -4664,6 +4822,425 @@
       ]
     },
     {
+      "name": "Informática",
+      "question_count": 85,
+      "question_ids": [
+        "prova-qdx-cremam-2025-administrador-400-012",
+        "prova-qdx-cremam-2025-administrador-400-013",
+        "prova-qdx-cremam-2025-administrador-400-014",
+        "prova-qdx-cremam-2025-administrador-400-015",
+        "prova-qdx-crefito17-2026-advogado-400-029",
+        "prova-qdx-crefito17-2026-advogado-400-030",
+        "prova-qdx-crefito17-2026-advogado-400-031",
+        "prova-qdx-crefito17-2026-advogado-400-032",
+        "prova-qdx-crefito17-2026-advogado-400-033",
+        "prova-qdx-crefito17-2026-advogado-400-034",
+        "prova-qdx-crefito17-2026-advogado-400-035",
+        "prova-qdx-crefito17-2026-advogado-400-036",
+        "prova-qdx-crefito17-2026-advogado-400-037",
+        "prova-qdx-crefito17-2026-advogado-400-038",
+        "prova-qdx-crefito17-2026-advogado-400-039",
+        "prova-qdx-crefito17-2026-advogado-400-040",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-031",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-032",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-033",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-034",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-035",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-036",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-037",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-038",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-039",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-040",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-029",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-030",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-031",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-032",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-033",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-034",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-035",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-036",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-037",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-038",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-039",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-040",
+        "prova-qdx-crfa1-2026-analista-administrativo-400-029",
+        "prova-qdx-crfa1-2026-analista-administrativo-400-030",
+        "prova-qdx-crfa1-2026-analista-administrativo-400-031",
+        "prova-qdx-crfa1-2026-analista-administrativo-400-032",
+        "prova-qdx-crfa1-2026-analista-administrativo-400-033",
+        "prova-qdx-crfa1-2026-analista-administrativo-400-034",
+        "prova-qdx-crfa1-2026-analista-administrativo-400-035",
+        "prova-qdx-crfa1-2026-analista-administrativo-400-036",
+        "prova-qdx-crfa1-2026-analista-administrativo-400-037",
+        "prova-qdx-crfa1-2026-analista-administrativo-400-038",
+        "prova-qdx-crfa1-2026-analista-administrativo-400-039",
+        "prova-qdx-crfa1-2026-analista-administrativo-400-040",
+        "prova-qdx-crasp-2025-anacob-400-017",
+        "prova-qdx-crasp-2025-anacob-400-018",
+        "prova-qdx-crasp-2025-anacob-400-019",
+        "prova-qdx-cremam-2025-assadm-200-012",
+        "prova-qdx-cremam-2025-assadm-200-013",
+        "prova-qdx-cremam-2025-assadm-200-014",
+        "prova-qdx-cremam-2025-assadm-200-015",
+        "qdx-seedf-2022-gppgadm-a-016",
+        "qdx-seedf-2022-gppgadm-a-017",
+        "qdx-seedf-2022-gppgadm-a-018",
+        "qdx-seedf-2022-gppgadm-a-019",
+        "qdx-seedf-2022-gppgadm-a-020",
+        "qdx-seedf-2022-gppgadm-a-021",
+        "qdx-seedf-2022-gppgadm-a-022",
+        "qdx-seedf-2022-gppgadm-a-023",
+        "qdx-seedf-2022-gppgadm-a-024",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-032",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-033",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-034",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-035",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-036",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-037",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-038",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-039",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-040",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-031",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-032",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-033",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-034",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-035",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-036",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-037",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-038",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-039",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-040"
+      ],
+      "material_count": 10,
+      "material_ids": [
+        "notion-administrador-cremam-quadrix-2025",
+        "notion-advogado-crefito-17-quadrix-2026",
+        "notion-agente-administrativo-crmv-rn-quadrix-2026",
+        "notion-agente-fiscal-crefito-17-quadrix-2026",
+        "notion-analista-administrativo-crfa-1-quadrix-2026",
+        "notion-analista-i-atendimento-e-cobranca-cra-sp-quadrix-2025",
+        "notion-assistente-administrativo-cremam-quadrix-2025",
+        "prova-qdx-seedf-2022-gppgadm-a",
+        "notion-tecnico-administrativo-cfo-quadrix-2025",
+        "notion-tecnico-administrativo-crmv-go-quadrix-2025"
+      ],
+      "topics": [
+        {
+          "name": "Sistemas, redes e IA",
+          "question_count": 10,
+          "question_ids": [
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-031",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-032",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-033",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-034",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-035",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-036",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-037",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-038",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-039",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-040"
+          ]
+        },
+        {
+          "name": "Sistemas operacionais e aplicativos",
+          "question_count": 9,
+          "question_ids": [
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-032",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-033",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-034",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-035",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-036",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-037",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-038",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-039",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-040"
+          ]
+        },
+        {
+          "name": "Informática: backup e Google Workspace",
+          "question_count": 5,
+          "question_ids": [
+            "qdx-seedf-2022-gppgadm-a-016",
+            "qdx-seedf-2022-gppgadm-a-017",
+            "qdx-seedf-2022-gppgadm-a-018",
+            "qdx-seedf-2022-gppgadm-a-019",
+            "qdx-seedf-2022-gppgadm-a-020"
+          ]
+        },
+        {
+          "name": "Segurança da informação",
+          "question_count": 5,
+          "question_ids": [
+            "prova-qdx-cremam-2025-administrador-400-015",
+            "prova-qdx-crfa1-2026-analista-administrativo-400-029",
+            "prova-qdx-crfa1-2026-analista-administrativo-400-030",
+            "prova-qdx-crfa1-2026-analista-administrativo-400-031",
+            "prova-qdx-crfa1-2026-analista-administrativo-400-032"
+          ]
+        },
+        {
+          "name": "Computação em nuvem e virtualização",
+          "question_count": 4,
+          "question_ids": [
+            "prova-qdx-crfa1-2026-analista-administrativo-400-033",
+            "prova-qdx-crfa1-2026-analista-administrativo-400-034",
+            "prova-qdx-crfa1-2026-analista-administrativo-400-035",
+            "prova-qdx-crfa1-2026-analista-administrativo-400-036"
+          ]
+        },
+        {
+          "name": "Hardware, Web e Internet",
+          "question_count": 4,
+          "question_ids": [
+            "prova-qdx-crfa1-2026-analista-administrativo-400-037",
+            "prova-qdx-crfa1-2026-analista-administrativo-400-038",
+            "prova-qdx-crfa1-2026-analista-administrativo-400-039",
+            "prova-qdx-crfa1-2026-analista-administrativo-400-040"
+          ]
+        },
+        {
+          "name": "Direito Administrativo",
+          "question_count": 3,
+          "question_ids": [
+            "qdx-seedf-2022-gppgadm-a-021",
+            "qdx-seedf-2022-gppgadm-a-022",
+            "qdx-seedf-2022-gppgadm-a-024"
+          ]
+        },
+        {
+          "name": "Hardware e software",
+          "question_count": 3,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-037",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-037",
+            "prova-qdx-cremam-2025-assadm-200-012"
+          ]
+        },
+        {
+          "name": "Backup e segurança",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-031",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-031"
+          ]
+        },
+        {
+          "name": "Computação em nuvem",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-036",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-036"
+          ]
+        },
+        {
+          "name": "Editores de texto",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-033",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-033"
+          ]
+        },
+        {
+          "name": "Estratégia de backup",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-035",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-035"
+          ]
+        },
+        {
+          "name": "Ferramentas colaborativas",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-crasp-2025-anacob-400-019",
+            "prova-qdx-cremam-2025-assadm-200-013"
+          ]
+        },
+        {
+          "name": "Firewall",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-039",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-039"
+          ]
+        },
+        {
+          "name": "Internet e arquitetura de redes",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-030",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-030"
+          ]
+        },
+        {
+          "name": "Intranet",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-038",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-038"
+          ]
+        },
+        {
+          "name": "Navegadores e protocolos",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-034",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-034"
+          ]
+        },
+        {
+          "name": "Protocolos de comunicação",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-040",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-040"
+          ]
+        },
+        {
+          "name": "Protocolos web",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-032",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-032"
+          ]
+        },
+        {
+          "name": "Sistemas operacionais móveis",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-029",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-029"
+          ]
+        },
+        {
+          "name": "Android — arquivo AndroidManifest.xml",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-034"
+          ]
+        },
+        {
+          "name": "Android — sandbox e permissões",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-035"
+          ]
+        },
+        {
+          "name": "Correio eletrônico",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-cremam-2025-assadm-200-015"
+          ]
+        },
+        {
+          "name": "Google Meet",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-cremam-2025-administrador-400-013"
+          ]
+        },
+        {
+          "name": "Hardware",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-cremam-2025-administrador-400-012"
+          ]
+        },
+        {
+          "name": "Hardware — memória cache",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-031"
+          ]
+        },
+        {
+          "name": "Inteligência artificial — aprendizado supervisionado",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-039"
+          ]
+        },
+        {
+          "name": "Inteligência artificial — deep learning",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-040"
+          ]
+        },
+        {
+          "name": "Microsoft Excel 2016 — Análise Rápida",
+          "question_count": 1,
+          "question_ids": [
+            "qdx-seedf-2022-gppgadm-a-023"
+          ]
+        },
+        {
+          "name": "Microsoft Teams — edição e exclusão de mensagens",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-032"
+          ]
+        },
+        {
+          "name": "Microsoft Teams — gravação de reuniões",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-033"
+          ]
+        },
+        {
+          "name": "Planilhas eletrônicas",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crasp-2025-anacob-400-018"
+          ]
+        },
+        {
+          "name": "Redes — protocolo IP",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-036"
+          ]
+        },
+        {
+          "name": "Redes de computadores",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-cremam-2025-assadm-200-014"
+          ]
+        },
+        {
+          "name": "Segurança da informação — antivírus",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-038"
+          ]
+        },
+        {
+          "name": "Segurança de redes — firewalls",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-037"
+          ]
+        },
+        {
+          "name": "Sistemas operacionais",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crasp-2025-anacob-400-017"
+          ]
+        },
+        {
+          "name": "Windows 10",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-cremam-2025-administrador-400-014"
+          ]
+        }
+      ]
+    },
+    {
       "name": "Conhecimentos Complementares e Legislação",
       "question_count": 83,
       "question_ids": [
@@ -5342,6 +5919,352 @@
       ]
     },
     {
+      "name": "Direito Constitucional",
+      "question_count": 74,
+      "question_ids": [
+        "prova-qdx-crefito17-2026-advogado-400-071",
+        "prova-qdx-crefito17-2026-advogado-400-072",
+        "prova-qdx-crefito17-2026-advogado-400-073",
+        "prova-qdx-crefito17-2026-advogado-400-074",
+        "prova-qdx-crefito17-2026-advogado-400-075",
+        "prova-qdx-crefito17-2026-advogado-400-076",
+        "prova-qdx-crefito17-2026-advogado-400-077",
+        "prova-qdx-crefito17-2026-advogado-400-078",
+        "prova-qdx-crefito17-2026-advogado-400-079",
+        "prova-qdx-crefito17-2026-advogado-400-080",
+        "prova-qdx-crefito17-2026-advogado-400-081",
+        "prova-qdx-crefito17-2026-advogado-400-082",
+        "prova-qdx-crefito17-2026-advogado-400-083",
+        "prova-qdx-crefito17-2026-advogado-400-084",
+        "prova-qdx-crefito17-2026-advogado-400-085",
+        "prova-qdx-crefito17-2026-advogado-400-086",
+        "prova-qdx-crefito17-2026-advogado-400-087",
+        "prova-qdx-crefito17-2026-advogado-400-088",
+        "prova-qdx-crefito17-2026-advogado-400-089",
+        "prova-qdx-crefito17-2026-advogado-400-090",
+        "prova-qdx-crefito17-2026-advogado-400-093",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-071",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-072",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-073",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-074",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-075",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-076",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-077",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-078",
+        "prova-qdx-crbm6-2026-contador-402-071",
+        "prova-qdx-crbm6-2026-contador-402-072",
+        "prova-qdx-crbm6-2026-contador-402-080",
+        "prova-qdx-altoparaiso-go-2023-orientador-social-202-031",
+        "sim-emilia-2026-tdas-const01-331",
+        "sim-emilia-2026-tdas-const01-332",
+        "sim-emilia-2026-tdas-const01-333",
+        "sim-emilia-2026-tdas-const01-334",
+        "sim-emilia-2026-tdas-const01-335",
+        "sim-emilia-2026-tdas-const01-336",
+        "sim-emilia-2026-tdas-const01-337",
+        "sim-emilia-2026-tdas-const01-338",
+        "sim-emilia-2026-tdas-const01-339",
+        "sim-emilia-2026-tdas-const01-340",
+        "sim-emilia-2026-tdas-const01-341",
+        "sim-emilia-2026-tdas-const01-342",
+        "sim-emilia-2026-tdas-const01-343",
+        "sim-emilia-2026-tdas-const01-344",
+        "sim-emilia-2026-tdas-const01-345",
+        "sim-emilia-2026-tdas-const01-346",
+        "sim-emilia-2026-tdas-const01-347",
+        "sim-emilia-2026-tdas-const01-348",
+        "sim-emilia-2026-tdas-const01-349",
+        "sim-emilia-2026-tdas-const01-350",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-071",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-072",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-073",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-074",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-075",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-076",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-077",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-078",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-079",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-080",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-081",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-082",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-083",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-041",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-042",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-043",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-044",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-045",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-046",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-047",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-048"
+      ],
+      "material_count": 7,
+      "material_ids": [
+        "notion-advogado-crefito-17-quadrix-2026",
+        "notion-agente-fiscal-crefito-17-quadrix-2026",
+        "notion-contador-crbm-6-quadrix-2026",
+        "notion-orientador-social-prefeitura-de-alto-paraiso-de-goias-go-quadrix-2023",
+        "sim-emilia-2026-tdas-const01",
+        "notion-tecnico-administrativo-cfo-quadrix-2025",
+        "notion-tecnico-administrativo-crmv-go-quadrix-2025"
+      ],
+      "topics": [
+        {
+          "name": "Noções de Direito Constitucional",
+          "question_count": 20,
+          "question_ids": [
+            "sim-emilia-2026-tdas-const01-331",
+            "sim-emilia-2026-tdas-const01-332",
+            "sim-emilia-2026-tdas-const01-333",
+            "sim-emilia-2026-tdas-const01-334",
+            "sim-emilia-2026-tdas-const01-335",
+            "sim-emilia-2026-tdas-const01-336",
+            "sim-emilia-2026-tdas-const01-337",
+            "sim-emilia-2026-tdas-const01-338",
+            "sim-emilia-2026-tdas-const01-339",
+            "sim-emilia-2026-tdas-const01-340",
+            "sim-emilia-2026-tdas-const01-341",
+            "sim-emilia-2026-tdas-const01-342",
+            "sim-emilia-2026-tdas-const01-343",
+            "sim-emilia-2026-tdas-const01-344",
+            "sim-emilia-2026-tdas-const01-345",
+            "sim-emilia-2026-tdas-const01-346",
+            "sim-emilia-2026-tdas-const01-347",
+            "sim-emilia-2026-tdas-const01-348",
+            "sim-emilia-2026-tdas-const01-349",
+            "sim-emilia-2026-tdas-const01-350"
+          ]
+        },
+        {
+          "name": "Constituição Federal",
+          "question_count": 13,
+          "question_ids": [
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-071",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-072",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-073",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-074",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-075",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-076",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-077",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-078",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-079",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-080",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-081",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-082",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-083"
+          ]
+        },
+        {
+          "name": "Direitos fundamentais e Administração Pública",
+          "question_count": 8,
+          "question_ids": [
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-041",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-042",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-043",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-044",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-045",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-046",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-047",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-048"
+          ]
+        },
+        {
+          "name": "Direitos e garantias fundamentais e organização do Estado",
+          "question_count": 4,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-agente-fiscal-401-071",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-072",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-073",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-074"
+          ]
+        },
+        {
+          "name": "Organização dos Poderes e ordem social",
+          "question_count": 4,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-agente-fiscal-401-075",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-076",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-077",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-078"
+          ]
+        },
+        {
+          "name": "Alteração territorial dos estados",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-086"
+          ]
+        },
+        {
+          "name": "Cabimento de habeas corpus após extinção da pena",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-081"
+          ]
+        },
+        {
+          "name": "Classificação das constituições quanto ao conteúdo",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-071"
+          ]
+        },
+        {
+          "name": "Competência legislativa sobre trânsito e transporte",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-088"
+          ]
+        },
+        {
+          "name": "Constituição dirigente e Constituição-garantia",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-074"
+          ]
+        },
+        {
+          "name": "Controle da Administração Pública",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-contador-402-072"
+          ]
+        },
+        {
+          "name": "Controle interno",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-contador-402-080"
+          ]
+        },
+        {
+          "name": "Criação de municípios",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-087"
+          ]
+        },
+        {
+          "name": "Dimensão objetiva do direito à vida",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-078"
+          ]
+        },
+        {
+          "name": "Direitos fundamentais de primeira geração",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-076"
+          ]
+        },
+        {
+          "name": "Direitos sociais",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-altoparaiso-go-2023-orientador-social-202-031"
+          ]
+        },
+        {
+          "name": "Habeas corpus contra ato de particular",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-080"
+          ]
+        },
+        {
+          "name": "Habeas data",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-084"
+          ]
+        },
+        {
+          "name": "Indisponibilidade dos direitos fundamentais",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-075"
+          ]
+        },
+        {
+          "name": "Interpretação histórica dos direitos fundamentais",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-077"
+          ]
+        },
+        {
+          "name": "Mandado de segurança entre órgãos públicos",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-083"
+          ]
+        },
+        {
+          "name": "Mandado de segurança individual e coletivo",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-082"
+          ]
+        },
+        {
+          "name": "Operações financeiras externas dos municípios",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-089"
+          ]
+        },
+        {
+          "name": "Organização política do Distrito Federal",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-090"
+          ]
+        },
+        {
+          "name": "Origem e modo de elaboração da Constituição",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-073"
+          ]
+        },
+        {
+          "name": "Personalidade judiciária do Poder Legislativo",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-093"
+          ]
+        },
+        {
+          "name": "Princípios da Administração Pública",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-contador-402-071"
+          ]
+        },
+        {
+          "name": "Rigidez constitucional",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-072"
+          ]
+        },
+        {
+          "name": "Titularidade de direitos fundamentais por pessoas jurídicas",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-079"
+          ]
+        },
+        {
+          "name": "Tribunal do Júri",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-085"
+          ]
+        }
+      ]
+    },
+    {
       "name": "Agente Fiscal",
       "question_count": 72,
       "question_ids": [
@@ -5506,373 +6429,6 @@
           "question_ids": [
             "prova-qdx-crmvrn-2026-agente-fiscal-201-071",
             "prova-qdx-crmvrn-2026-agente-fiscal-201-080"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Informática",
-      "question_count": 66,
-      "question_ids": [
-        "prova-qdx-cremam-2025-administrador-400-012",
-        "prova-qdx-cremam-2025-administrador-400-013",
-        "prova-qdx-cremam-2025-administrador-400-014",
-        "prova-qdx-cremam-2025-administrador-400-015",
-        "prova-qdx-crefito17-2026-advogado-400-029",
-        "prova-qdx-crefito17-2026-advogado-400-030",
-        "prova-qdx-crefito17-2026-advogado-400-031",
-        "prova-qdx-crefito17-2026-advogado-400-032",
-        "prova-qdx-crefito17-2026-advogado-400-033",
-        "prova-qdx-crefito17-2026-advogado-400-034",
-        "prova-qdx-crefito17-2026-advogado-400-035",
-        "prova-qdx-crefito17-2026-advogado-400-036",
-        "prova-qdx-crefito17-2026-advogado-400-037",
-        "prova-qdx-crefito17-2026-advogado-400-038",
-        "prova-qdx-crefito17-2026-advogado-400-039",
-        "prova-qdx-crefito17-2026-advogado-400-040",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-031",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-032",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-033",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-034",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-035",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-036",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-037",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-038",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-039",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-040",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-029",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-030",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-031",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-032",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-033",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-034",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-035",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-036",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-037",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-038",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-039",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-040",
-        "prova-qdx-crfa1-2026-analista-administrativo-400-029",
-        "prova-qdx-crfa1-2026-analista-administrativo-400-030",
-        "prova-qdx-crfa1-2026-analista-administrativo-400-031",
-        "prova-qdx-crfa1-2026-analista-administrativo-400-032",
-        "prova-qdx-crfa1-2026-analista-administrativo-400-033",
-        "prova-qdx-crfa1-2026-analista-administrativo-400-034",
-        "prova-qdx-crfa1-2026-analista-administrativo-400-035",
-        "prova-qdx-crfa1-2026-analista-administrativo-400-036",
-        "prova-qdx-crfa1-2026-analista-administrativo-400-037",
-        "prova-qdx-crfa1-2026-analista-administrativo-400-038",
-        "prova-qdx-crfa1-2026-analista-administrativo-400-039",
-        "prova-qdx-crfa1-2026-analista-administrativo-400-040",
-        "prova-qdx-crasp-2025-anacob-400-017",
-        "prova-qdx-crasp-2025-anacob-400-018",
-        "prova-qdx-crasp-2025-anacob-400-019",
-        "prova-qdx-cremam-2025-assadm-200-012",
-        "prova-qdx-cremam-2025-assadm-200-013",
-        "prova-qdx-cremam-2025-assadm-200-014",
-        "prova-qdx-cremam-2025-assadm-200-015",
-        "qdx-seedf-2022-gppgadm-a-016",
-        "qdx-seedf-2022-gppgadm-a-017",
-        "qdx-seedf-2022-gppgadm-a-018",
-        "qdx-seedf-2022-gppgadm-a-019",
-        "qdx-seedf-2022-gppgadm-a-020",
-        "qdx-seedf-2022-gppgadm-a-021",
-        "qdx-seedf-2022-gppgadm-a-022",
-        "qdx-seedf-2022-gppgadm-a-023",
-        "qdx-seedf-2022-gppgadm-a-024"
-      ],
-      "material_count": 8,
-      "material_ids": [
-        "notion-administrador-cremam-quadrix-2025",
-        "notion-advogado-crefito-17-quadrix-2026",
-        "notion-agente-administrativo-crmv-rn-quadrix-2026",
-        "notion-agente-fiscal-crefito-17-quadrix-2026",
-        "notion-analista-administrativo-crfa-1-quadrix-2026",
-        "notion-analista-i-atendimento-e-cobranca-cra-sp-quadrix-2025",
-        "notion-assistente-administrativo-cremam-quadrix-2025",
-        "prova-qdx-seedf-2022-gppgadm-a"
-      ],
-      "topics": [
-        {
-          "name": "Informática: backup e Google Workspace",
-          "question_count": 5,
-          "question_ids": [
-            "qdx-seedf-2022-gppgadm-a-016",
-            "qdx-seedf-2022-gppgadm-a-017",
-            "qdx-seedf-2022-gppgadm-a-018",
-            "qdx-seedf-2022-gppgadm-a-019",
-            "qdx-seedf-2022-gppgadm-a-020"
-          ]
-        },
-        {
-          "name": "Segurança da informação",
-          "question_count": 5,
-          "question_ids": [
-            "prova-qdx-cremam-2025-administrador-400-015",
-            "prova-qdx-crfa1-2026-analista-administrativo-400-029",
-            "prova-qdx-crfa1-2026-analista-administrativo-400-030",
-            "prova-qdx-crfa1-2026-analista-administrativo-400-031",
-            "prova-qdx-crfa1-2026-analista-administrativo-400-032"
-          ]
-        },
-        {
-          "name": "Computação em nuvem e virtualização",
-          "question_count": 4,
-          "question_ids": [
-            "prova-qdx-crfa1-2026-analista-administrativo-400-033",
-            "prova-qdx-crfa1-2026-analista-administrativo-400-034",
-            "prova-qdx-crfa1-2026-analista-administrativo-400-035",
-            "prova-qdx-crfa1-2026-analista-administrativo-400-036"
-          ]
-        },
-        {
-          "name": "Hardware, Web e Internet",
-          "question_count": 4,
-          "question_ids": [
-            "prova-qdx-crfa1-2026-analista-administrativo-400-037",
-            "prova-qdx-crfa1-2026-analista-administrativo-400-038",
-            "prova-qdx-crfa1-2026-analista-administrativo-400-039",
-            "prova-qdx-crfa1-2026-analista-administrativo-400-040"
-          ]
-        },
-        {
-          "name": "Direito Administrativo",
-          "question_count": 3,
-          "question_ids": [
-            "qdx-seedf-2022-gppgadm-a-021",
-            "qdx-seedf-2022-gppgadm-a-022",
-            "qdx-seedf-2022-gppgadm-a-024"
-          ]
-        },
-        {
-          "name": "Hardware e software",
-          "question_count": 3,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-037",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-037",
-            "prova-qdx-cremam-2025-assadm-200-012"
-          ]
-        },
-        {
-          "name": "Backup e segurança",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-031",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-031"
-          ]
-        },
-        {
-          "name": "Computação em nuvem",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-036",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-036"
-          ]
-        },
-        {
-          "name": "Editores de texto",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-033",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-033"
-          ]
-        },
-        {
-          "name": "Estratégia de backup",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-035",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-035"
-          ]
-        },
-        {
-          "name": "Ferramentas colaborativas",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crasp-2025-anacob-400-019",
-            "prova-qdx-cremam-2025-assadm-200-013"
-          ]
-        },
-        {
-          "name": "Firewall",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-039",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-039"
-          ]
-        },
-        {
-          "name": "Internet e arquitetura de redes",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-030",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-030"
-          ]
-        },
-        {
-          "name": "Intranet",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-038",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-038"
-          ]
-        },
-        {
-          "name": "Navegadores e protocolos",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-034",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-034"
-          ]
-        },
-        {
-          "name": "Protocolos de comunicação",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-040",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-040"
-          ]
-        },
-        {
-          "name": "Protocolos web",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-032",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-032"
-          ]
-        },
-        {
-          "name": "Sistemas operacionais móveis",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-029",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-029"
-          ]
-        },
-        {
-          "name": "Android — arquivo AndroidManifest.xml",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-034"
-          ]
-        },
-        {
-          "name": "Android — sandbox e permissões",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-035"
-          ]
-        },
-        {
-          "name": "Correio eletrônico",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-cremam-2025-assadm-200-015"
-          ]
-        },
-        {
-          "name": "Google Meet",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-cremam-2025-administrador-400-013"
-          ]
-        },
-        {
-          "name": "Hardware",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-cremam-2025-administrador-400-012"
-          ]
-        },
-        {
-          "name": "Hardware — memória cache",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-031"
-          ]
-        },
-        {
-          "name": "Inteligência artificial — aprendizado supervisionado",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-039"
-          ]
-        },
-        {
-          "name": "Inteligência artificial — deep learning",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-040"
-          ]
-        },
-        {
-          "name": "Microsoft Excel 2016 — Análise Rápida",
-          "question_count": 1,
-          "question_ids": [
-            "qdx-seedf-2022-gppgadm-a-023"
-          ]
-        },
-        {
-          "name": "Microsoft Teams — edição e exclusão de mensagens",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-032"
-          ]
-        },
-        {
-          "name": "Microsoft Teams — gravação de reuniões",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-033"
-          ]
-        },
-        {
-          "name": "Planilhas eletrônicas",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crasp-2025-anacob-400-018"
-          ]
-        },
-        {
-          "name": "Redes — protocolo IP",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-036"
-          ]
-        },
-        {
-          "name": "Redes de computadores",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-cremam-2025-assadm-200-014"
-          ]
-        },
-        {
-          "name": "Segurança da informação — antivírus",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-038"
-          ]
-        },
-        {
-          "name": "Segurança de redes — firewalls",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-037"
-          ]
-        },
-        {
-          "name": "Sistemas operacionais",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crasp-2025-anacob-400-017"
-          ]
-        },
-        {
-          "name": "Windows 10",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-cremam-2025-administrador-400-014"
           ]
         }
       ]
@@ -6344,7 +6900,7 @@
     },
     {
       "name": "Raciocínio Lógico e Matemático",
-      "question_count": 56,
+      "question_count": 59,
       "question_ids": [
         "prova-qdx-cremam-2025-administrador-400-008",
         "prova-qdx-cremam-2025-administrador-400-009",
@@ -6401,9 +6957,12 @@
         "prova-qdx-altoparaiso-go-2023-orientador-social-202-020",
         "prova-qdx-altoparaiso-go-2023-orientador-social-202-021",
         "prova-qdx-altoparaiso-go-2023-orientador-social-202-022",
-        "prova-qdx-altoparaiso-go-2023-orientador-social-202-023"
+        "prova-qdx-altoparaiso-go-2023-orientador-social-202-023",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-017",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-018",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-019"
       ],
-      "material_count": 7,
+      "material_count": 8,
       "material_ids": [
         "notion-administrador-cremam-quadrix-2025",
         "notion-advogado-crefito-17-quadrix-2026",
@@ -6411,9 +6970,21 @@
         "notion-agente-fiscal-crefito-17-quadrix-2026",
         "notion-analista-administrativo-crfa-1-quadrix-2026",
         "notion-assistente-i-crf-df-quadrix-2026",
-        "notion-orientador-social-prefeitura-de-alto-paraiso-de-goias-go-quadrix-2023"
+        "notion-orientador-social-prefeitura-de-alto-paraiso-de-goias-go-quadrix-2023",
+        "notion-tecnico-administrativo-cfo-quadrix-2025"
       ],
       "topics": [
+        {
+          "name": "Análise combinatória",
+          "question_count": 5,
+          "question_ids": [
+            "prova-qdx-cremam-2025-administrador-400-009",
+            "prova-qdx-altoparaiso-go-2023-orientador-social-202-021",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-017",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-018",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-019"
+          ]
+        },
         {
           "name": "Lógica proposicional",
           "question_count": 4,
@@ -6477,14 +7048,6 @@
             "prova-qdx-crefito17-2026-advogado-400-027",
             "prova-qdx-crefito17-2026-agente-fiscal-401-027",
             "prova-qdx-altoparaiso-go-2023-orientador-social-202-022"
-          ]
-        },
-        {
-          "name": "Análise combinatória",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-cremam-2025-administrador-400-009",
-            "prova-qdx-altoparaiso-go-2023-orientador-social-202-021"
           ]
         },
         {
@@ -6666,296 +7229,6 @@
           "question_count": 1,
           "question_ids": [
             "prova-qdx-crfdf-2026-assistente-i-200-015"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Direito Constitucional",
-      "question_count": 53,
-      "question_ids": [
-        "prova-qdx-crefito17-2026-advogado-400-071",
-        "prova-qdx-crefito17-2026-advogado-400-072",
-        "prova-qdx-crefito17-2026-advogado-400-073",
-        "prova-qdx-crefito17-2026-advogado-400-074",
-        "prova-qdx-crefito17-2026-advogado-400-075",
-        "prova-qdx-crefito17-2026-advogado-400-076",
-        "prova-qdx-crefito17-2026-advogado-400-077",
-        "prova-qdx-crefito17-2026-advogado-400-078",
-        "prova-qdx-crefito17-2026-advogado-400-079",
-        "prova-qdx-crefito17-2026-advogado-400-080",
-        "prova-qdx-crefito17-2026-advogado-400-081",
-        "prova-qdx-crefito17-2026-advogado-400-082",
-        "prova-qdx-crefito17-2026-advogado-400-083",
-        "prova-qdx-crefito17-2026-advogado-400-084",
-        "prova-qdx-crefito17-2026-advogado-400-085",
-        "prova-qdx-crefito17-2026-advogado-400-086",
-        "prova-qdx-crefito17-2026-advogado-400-087",
-        "prova-qdx-crefito17-2026-advogado-400-088",
-        "prova-qdx-crefito17-2026-advogado-400-089",
-        "prova-qdx-crefito17-2026-advogado-400-090",
-        "prova-qdx-crefito17-2026-advogado-400-093",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-071",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-072",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-073",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-074",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-075",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-076",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-077",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-078",
-        "prova-qdx-crbm6-2026-contador-402-071",
-        "prova-qdx-crbm6-2026-contador-402-072",
-        "prova-qdx-crbm6-2026-contador-402-080",
-        "prova-qdx-altoparaiso-go-2023-orientador-social-202-031",
-        "sim-emilia-2026-tdas-const01-331",
-        "sim-emilia-2026-tdas-const01-332",
-        "sim-emilia-2026-tdas-const01-333",
-        "sim-emilia-2026-tdas-const01-334",
-        "sim-emilia-2026-tdas-const01-335",
-        "sim-emilia-2026-tdas-const01-336",
-        "sim-emilia-2026-tdas-const01-337",
-        "sim-emilia-2026-tdas-const01-338",
-        "sim-emilia-2026-tdas-const01-339",
-        "sim-emilia-2026-tdas-const01-340",
-        "sim-emilia-2026-tdas-const01-341",
-        "sim-emilia-2026-tdas-const01-342",
-        "sim-emilia-2026-tdas-const01-343",
-        "sim-emilia-2026-tdas-const01-344",
-        "sim-emilia-2026-tdas-const01-345",
-        "sim-emilia-2026-tdas-const01-346",
-        "sim-emilia-2026-tdas-const01-347",
-        "sim-emilia-2026-tdas-const01-348",
-        "sim-emilia-2026-tdas-const01-349",
-        "sim-emilia-2026-tdas-const01-350"
-      ],
-      "material_count": 5,
-      "material_ids": [
-        "notion-advogado-crefito-17-quadrix-2026",
-        "notion-agente-fiscal-crefito-17-quadrix-2026",
-        "notion-contador-crbm-6-quadrix-2026",
-        "notion-orientador-social-prefeitura-de-alto-paraiso-de-goias-go-quadrix-2023",
-        "sim-emilia-2026-tdas-const01"
-      ],
-      "topics": [
-        {
-          "name": "Noções de Direito Constitucional",
-          "question_count": 20,
-          "question_ids": [
-            "sim-emilia-2026-tdas-const01-331",
-            "sim-emilia-2026-tdas-const01-332",
-            "sim-emilia-2026-tdas-const01-333",
-            "sim-emilia-2026-tdas-const01-334",
-            "sim-emilia-2026-tdas-const01-335",
-            "sim-emilia-2026-tdas-const01-336",
-            "sim-emilia-2026-tdas-const01-337",
-            "sim-emilia-2026-tdas-const01-338",
-            "sim-emilia-2026-tdas-const01-339",
-            "sim-emilia-2026-tdas-const01-340",
-            "sim-emilia-2026-tdas-const01-341",
-            "sim-emilia-2026-tdas-const01-342",
-            "sim-emilia-2026-tdas-const01-343",
-            "sim-emilia-2026-tdas-const01-344",
-            "sim-emilia-2026-tdas-const01-345",
-            "sim-emilia-2026-tdas-const01-346",
-            "sim-emilia-2026-tdas-const01-347",
-            "sim-emilia-2026-tdas-const01-348",
-            "sim-emilia-2026-tdas-const01-349",
-            "sim-emilia-2026-tdas-const01-350"
-          ]
-        },
-        {
-          "name": "Direitos e garantias fundamentais e organização do Estado",
-          "question_count": 4,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-agente-fiscal-401-071",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-072",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-073",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-074"
-          ]
-        },
-        {
-          "name": "Organização dos Poderes e ordem social",
-          "question_count": 4,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-agente-fiscal-401-075",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-076",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-077",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-078"
-          ]
-        },
-        {
-          "name": "Alteração territorial dos estados",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-086"
-          ]
-        },
-        {
-          "name": "Cabimento de habeas corpus após extinção da pena",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-081"
-          ]
-        },
-        {
-          "name": "Classificação das constituições quanto ao conteúdo",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-071"
-          ]
-        },
-        {
-          "name": "Competência legislativa sobre trânsito e transporte",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-088"
-          ]
-        },
-        {
-          "name": "Constituição dirigente e Constituição-garantia",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-074"
-          ]
-        },
-        {
-          "name": "Controle da Administração Pública",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-contador-402-072"
-          ]
-        },
-        {
-          "name": "Controle interno",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-contador-402-080"
-          ]
-        },
-        {
-          "name": "Criação de municípios",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-087"
-          ]
-        },
-        {
-          "name": "Dimensão objetiva do direito à vida",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-078"
-          ]
-        },
-        {
-          "name": "Direitos fundamentais de primeira geração",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-076"
-          ]
-        },
-        {
-          "name": "Direitos sociais",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-altoparaiso-go-2023-orientador-social-202-031"
-          ]
-        },
-        {
-          "name": "Habeas corpus contra ato de particular",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-080"
-          ]
-        },
-        {
-          "name": "Habeas data",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-084"
-          ]
-        },
-        {
-          "name": "Indisponibilidade dos direitos fundamentais",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-075"
-          ]
-        },
-        {
-          "name": "Interpretação histórica dos direitos fundamentais",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-077"
-          ]
-        },
-        {
-          "name": "Mandado de segurança entre órgãos públicos",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-083"
-          ]
-        },
-        {
-          "name": "Mandado de segurança individual e coletivo",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-082"
-          ]
-        },
-        {
-          "name": "Operações financeiras externas dos municípios",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-089"
-          ]
-        },
-        {
-          "name": "Organização política do Distrito Federal",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-090"
-          ]
-        },
-        {
-          "name": "Origem e modo de elaboração da Constituição",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-073"
-          ]
-        },
-        {
-          "name": "Personalidade judiciária do Poder Legislativo",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-093"
-          ]
-        },
-        {
-          "name": "Princípios da Administração Pública",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-contador-402-071"
-          ]
-        },
-        {
-          "name": "Rigidez constitucional",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-072"
-          ]
-        },
-        {
-          "name": "Titularidade de direitos fundamentais por pessoas jurídicas",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-079"
-          ]
-        },
-        {
-          "name": "Tribunal do Júri",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-085"
           ]
         }
       ]
@@ -9711,6 +9984,229 @@
       ]
     },
     {
+      "name": "Arquivologia",
+      "question_count": 48,
+      "question_ids": [
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-106",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-107",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-108",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-109",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-110",
+        "prova-qdx-cremam-2025-assadm-200-031",
+        "prova-qdx-cremam-2025-assadm-200-032",
+        "prova-qdx-cremam-2025-assadm-200-033",
+        "prova-qdx-cremam-2025-assadm-200-034",
+        "prova-qdx-cremam-2025-assadm-200-035",
+        "prova-qdx-crfdf-2026-assistente-i-200-113",
+        "prova-qdx-crfdf-2026-assistente-i-200-114",
+        "prova-qdx-crfdf-2026-assistente-i-200-115",
+        "prova-qdx-crfdf-2026-assistente-i-200-116",
+        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-114",
+        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-115",
+        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-116",
+        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-117",
+        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-118",
+        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-119",
+        "sim-emilia-2026-tdas-arq01-371",
+        "sim-emilia-2026-tdas-arq01-372",
+        "sim-emilia-2026-tdas-arq01-373",
+        "sim-emilia-2026-tdas-arq01-374",
+        "sim-emilia-2026-tdas-arq01-375",
+        "sim-emilia-2026-tdas-arq01-376",
+        "sim-emilia-2026-tdas-arq01-377",
+        "sim-emilia-2026-tdas-arq01-378",
+        "sim-emilia-2026-tdas-arq01-379",
+        "sim-emilia-2026-tdas-arq01-380",
+        "sim-emilia-2026-tdas-arq01-381",
+        "sim-emilia-2026-tdas-arq01-382",
+        "sim-emilia-2026-tdas-arq01-383",
+        "sim-emilia-2026-tdas-arq01-384",
+        "sim-emilia-2026-tdas-arq01-385",
+        "sim-emilia-2026-tdas-arq01-386",
+        "sim-emilia-2026-tdas-arq01-387",
+        "sim-emilia-2026-tdas-arq01-388",
+        "sim-emilia-2026-tdas-arq01-389",
+        "sim-emilia-2026-tdas-arq01-390",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-101",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-102",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-103",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-105",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-095",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-096",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-097",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-098"
+      ],
+      "material_count": 8,
+      "material_ids": [
+        "notion-agente-administrativo-crmv-rn-quadrix-2026",
+        "notion-assistente-administrativo-cremam-quadrix-2025",
+        "notion-assistente-i-crf-df-quadrix-2026",
+        "notion-auxiliar-administrativo-crbm-6-quadrix-2026",
+        "notion-auxiliar-administrativo-crtr-12-ms-mt-quadrix-2026-campo-grande",
+        "sim-emilia-2026-tdas-arq01",
+        "notion-tecnico-administrativo-cfo-quadrix-2025",
+        "notion-tecnico-administrativo-crmv-go-quadrix-2025"
+      ],
+      "topics": [
+        {
+          "name": "Noções de Arquivologia",
+          "question_count": 18,
+          "question_ids": [
+            "sim-emilia-2026-tdas-arq01-371",
+            "sim-emilia-2026-tdas-arq01-372",
+            "sim-emilia-2026-tdas-arq01-373",
+            "sim-emilia-2026-tdas-arq01-374",
+            "sim-emilia-2026-tdas-arq01-375",
+            "sim-emilia-2026-tdas-arq01-376",
+            "sim-emilia-2026-tdas-arq01-377",
+            "sim-emilia-2026-tdas-arq01-380",
+            "sim-emilia-2026-tdas-arq01-381",
+            "sim-emilia-2026-tdas-arq01-382",
+            "sim-emilia-2026-tdas-arq01-383",
+            "sim-emilia-2026-tdas-arq01-384",
+            "sim-emilia-2026-tdas-arq01-385",
+            "sim-emilia-2026-tdas-arq01-386",
+            "sim-emilia-2026-tdas-arq01-387",
+            "sim-emilia-2026-tdas-arq01-388",
+            "sim-emilia-2026-tdas-arq01-389",
+            "sim-emilia-2026-tdas-arq01-390"
+          ]
+        },
+        {
+          "name": "Métodos de arquivamento",
+          "question_count": 5,
+          "question_ids": [
+            "prova-qdx-cremam-2025-assadm-200-031",
+            "prova-qdx-cremam-2025-assadm-200-032",
+            "prova-qdx-cremam-2025-assadm-200-033",
+            "prova-qdx-crfdf-2026-assistente-i-200-116",
+            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-119"
+          ]
+        },
+        {
+          "name": "Arquivamento e GED",
+          "question_count": 4,
+          "question_ids": [
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-095",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-096",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-097",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-098"
+          ]
+        },
+        {
+          "name": "Gestão documental",
+          "question_count": 4,
+          "question_ids": [
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-101",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-102",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-103",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-105"
+          ]
+        },
+        {
+          "name": "Atendimento, comunicação oficial e arquivologia",
+          "question_count": 2,
+          "question_ids": [
+            "sim-emilia-2026-tdas-arq01-378",
+            "sim-emilia-2026-tdas-arq01-379"
+          ]
+        },
+        {
+          "name": "Método numérico simples",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-108",
+            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-116"
+          ]
+        },
+        {
+          "name": "Teoria das três idades",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-cremam-2025-assadm-200-034",
+            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-118"
+          ]
+        },
+        {
+          "name": "Acondicionamento de plantas",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-117"
+          ]
+        },
+        {
+          "name": "Arquivo permanente",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-cremam-2025-assadm-200-035"
+          ]
+        },
+        {
+          "name": "Ciclo de vida dos documentos",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crfdf-2026-assistente-i-200-115"
+          ]
+        },
+        {
+          "name": "Digitalização e documentos permanentes",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-110"
+          ]
+        },
+        {
+          "name": "Elementos dos documentos",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crfdf-2026-assistente-i-200-113"
+          ]
+        },
+        {
+          "name": "GED e tabela de temporalidade",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-109"
+          ]
+        },
+        {
+          "name": "Método de arquivamento geográfico",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-107"
+          ]
+        },
+        {
+          "name": "Princípio da proveniência",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-114"
+          ]
+        },
+        {
+          "name": "Princípios arquivísticos",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crfdf-2026-assistente-i-200-114"
+          ]
+        },
+        {
+          "name": "Valor secundário",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-115"
+          ]
+        },
+        {
+          "name": "Valores documentais",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-106"
+          ]
+        }
+      ]
+    },
+    {
       "name": "Pedagogia",
       "question_count": 48,
       "question_ids": [
@@ -10110,199 +10606,6 @@
       ]
     },
     {
-      "name": "Arquivologia",
-      "question_count": 40,
-      "question_ids": [
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-106",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-107",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-108",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-109",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-110",
-        "prova-qdx-cremam-2025-assadm-200-031",
-        "prova-qdx-cremam-2025-assadm-200-032",
-        "prova-qdx-cremam-2025-assadm-200-033",
-        "prova-qdx-cremam-2025-assadm-200-034",
-        "prova-qdx-cremam-2025-assadm-200-035",
-        "prova-qdx-crfdf-2026-assistente-i-200-113",
-        "prova-qdx-crfdf-2026-assistente-i-200-114",
-        "prova-qdx-crfdf-2026-assistente-i-200-115",
-        "prova-qdx-crfdf-2026-assistente-i-200-116",
-        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-114",
-        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-115",
-        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-116",
-        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-117",
-        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-118",
-        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-119",
-        "sim-emilia-2026-tdas-arq01-371",
-        "sim-emilia-2026-tdas-arq01-372",
-        "sim-emilia-2026-tdas-arq01-373",
-        "sim-emilia-2026-tdas-arq01-374",
-        "sim-emilia-2026-tdas-arq01-375",
-        "sim-emilia-2026-tdas-arq01-376",
-        "sim-emilia-2026-tdas-arq01-377",
-        "sim-emilia-2026-tdas-arq01-378",
-        "sim-emilia-2026-tdas-arq01-379",
-        "sim-emilia-2026-tdas-arq01-380",
-        "sim-emilia-2026-tdas-arq01-381",
-        "sim-emilia-2026-tdas-arq01-382",
-        "sim-emilia-2026-tdas-arq01-383",
-        "sim-emilia-2026-tdas-arq01-384",
-        "sim-emilia-2026-tdas-arq01-385",
-        "sim-emilia-2026-tdas-arq01-386",
-        "sim-emilia-2026-tdas-arq01-387",
-        "sim-emilia-2026-tdas-arq01-388",
-        "sim-emilia-2026-tdas-arq01-389",
-        "sim-emilia-2026-tdas-arq01-390"
-      ],
-      "material_count": 6,
-      "material_ids": [
-        "notion-agente-administrativo-crmv-rn-quadrix-2026",
-        "notion-assistente-administrativo-cremam-quadrix-2025",
-        "notion-assistente-i-crf-df-quadrix-2026",
-        "notion-auxiliar-administrativo-crbm-6-quadrix-2026",
-        "notion-auxiliar-administrativo-crtr-12-ms-mt-quadrix-2026-campo-grande",
-        "sim-emilia-2026-tdas-arq01"
-      ],
-      "topics": [
-        {
-          "name": "Noções de Arquivologia",
-          "question_count": 18,
-          "question_ids": [
-            "sim-emilia-2026-tdas-arq01-371",
-            "sim-emilia-2026-tdas-arq01-372",
-            "sim-emilia-2026-tdas-arq01-373",
-            "sim-emilia-2026-tdas-arq01-374",
-            "sim-emilia-2026-tdas-arq01-375",
-            "sim-emilia-2026-tdas-arq01-376",
-            "sim-emilia-2026-tdas-arq01-377",
-            "sim-emilia-2026-tdas-arq01-380",
-            "sim-emilia-2026-tdas-arq01-381",
-            "sim-emilia-2026-tdas-arq01-382",
-            "sim-emilia-2026-tdas-arq01-383",
-            "sim-emilia-2026-tdas-arq01-384",
-            "sim-emilia-2026-tdas-arq01-385",
-            "sim-emilia-2026-tdas-arq01-386",
-            "sim-emilia-2026-tdas-arq01-387",
-            "sim-emilia-2026-tdas-arq01-388",
-            "sim-emilia-2026-tdas-arq01-389",
-            "sim-emilia-2026-tdas-arq01-390"
-          ]
-        },
-        {
-          "name": "Métodos de arquivamento",
-          "question_count": 5,
-          "question_ids": [
-            "prova-qdx-cremam-2025-assadm-200-031",
-            "prova-qdx-cremam-2025-assadm-200-032",
-            "prova-qdx-cremam-2025-assadm-200-033",
-            "prova-qdx-crfdf-2026-assistente-i-200-116",
-            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-119"
-          ]
-        },
-        {
-          "name": "Atendimento, comunicação oficial e arquivologia",
-          "question_count": 2,
-          "question_ids": [
-            "sim-emilia-2026-tdas-arq01-378",
-            "sim-emilia-2026-tdas-arq01-379"
-          ]
-        },
-        {
-          "name": "Método numérico simples",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-108",
-            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-116"
-          ]
-        },
-        {
-          "name": "Teoria das três idades",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-cremam-2025-assadm-200-034",
-            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-118"
-          ]
-        },
-        {
-          "name": "Acondicionamento de plantas",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-117"
-          ]
-        },
-        {
-          "name": "Arquivo permanente",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-cremam-2025-assadm-200-035"
-          ]
-        },
-        {
-          "name": "Ciclo de vida dos documentos",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crfdf-2026-assistente-i-200-115"
-          ]
-        },
-        {
-          "name": "Digitalização e documentos permanentes",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-110"
-          ]
-        },
-        {
-          "name": "Elementos dos documentos",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crfdf-2026-assistente-i-200-113"
-          ]
-        },
-        {
-          "name": "GED e tabela de temporalidade",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-109"
-          ]
-        },
-        {
-          "name": "Método de arquivamento geográfico",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-107"
-          ]
-        },
-        {
-          "name": "Princípio da proveniência",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-114"
-          ]
-        },
-        {
-          "name": "Princípios arquivísticos",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crfdf-2026-assistente-i-200-114"
-          ]
-        },
-        {
-          "name": "Valor secundário",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-115"
-          ]
-        },
-        {
-          "name": "Valores documentais",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-106"
-          ]
-        }
-      ]
-    },
-    {
       "name": "Eletrotécnica",
       "question_count": 38,
       "question_ids": [
@@ -10541,6 +10844,405 @@
       ]
     },
     {
+      "name": "Atendimento ao Público",
+      "question_count": 36,
+      "question_ids": [
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-096",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-097",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-098",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-099",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-100",
+        "prova-qdx-crasp-2025-anacob-400-037",
+        "prova-qdx-crasp-2025-anacob-400-038",
+        "prova-qdx-crfdf-2026-assistente-i-200-097",
+        "prova-qdx-crfdf-2026-assistente-i-200-098",
+        "prova-qdx-crfdf-2026-assistente-i-200-099",
+        "prova-qdx-crfdf-2026-assistente-i-200-100",
+        "prova-qdx-crfdf-2026-assistente-i-200-101",
+        "prova-qdx-crfdf-2026-assistente-i-200-102",
+        "prova-qdx-crfdf-2026-assistente-i-200-103",
+        "prova-qdx-crfdf-2026-assistente-i-200-104",
+        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-099",
+        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-100",
+        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-101",
+        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-102",
+        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-103",
+        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-113",
+        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-107",
+        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-108",
+        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-109",
+        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-110",
+        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-111",
+        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-112",
+        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-113",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-086",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-087",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-088",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-089",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-090",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-091",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-092",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-093"
+      ],
+      "material_count": 6,
+      "material_ids": [
+        "notion-agente-administrativo-crmv-rn-quadrix-2026",
+        "notion-analista-i-atendimento-e-cobranca-cra-sp-quadrix-2025",
+        "notion-assistente-i-crf-df-quadrix-2026",
+        "notion-auxiliar-administrativo-crbm-6-quadrix-2026",
+        "notion-auxiliar-administrativo-crtr-12-ms-mt-quadrix-2026-campo-grande",
+        "notion-tecnico-administrativo-crmv-go-quadrix-2025"
+      ],
+      "topics": [
+        {
+          "name": "Atendimento e relações interpessoais",
+          "question_count": 8,
+          "question_ids": [
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-086",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-087",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-088",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-089",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-090",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-091",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-092",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-093"
+          ]
+        },
+        {
+          "name": "Qualidade no atendimento",
+          "question_count": 6,
+          "question_ids": [
+            "prova-qdx-crasp-2025-anacob-400-037",
+            "prova-qdx-crfdf-2026-assistente-i-200-097",
+            "prova-qdx-crfdf-2026-assistente-i-200-098",
+            "prova-qdx-crfdf-2026-assistente-i-200-099",
+            "prova-qdx-crfdf-2026-assistente-i-200-100",
+            "prova-qdx-crfdf-2026-assistente-i-200-101"
+          ]
+        },
+        {
+          "name": "Atendimento telefônico",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-crfdf-2026-assistente-i-200-102",
+            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-112"
+          ]
+        },
+        {
+          "name": "Atendimento digital",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crasp-2025-anacob-400-038"
+          ]
+        },
+        {
+          "name": "Atendimento interno e eficiência",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-100"
+          ]
+        },
+        {
+          "name": "Atendimento telefônico — objetividade e empatia",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-099"
+          ]
+        },
+        {
+          "name": "Cortesia e tolerância",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-103"
+          ]
+        },
+        {
+          "name": "Discrição e empatia",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-096"
+          ]
+        },
+        {
+          "name": "Empatia, impessoalidade e controle emocional",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-110"
+          ]
+        },
+        {
+          "name": "Encaminhamento da demanda",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-101"
+          ]
+        },
+        {
+          "name": "Escuta ativa",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-113"
+          ]
+        },
+        {
+          "name": "Impessoalidade e postura profissional",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-098"
+          ]
+        },
+        {
+          "name": "Legalidade e simplificação",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-102"
+          ]
+        },
+        {
+          "name": "Linguagem no atendimento",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-099"
+          ]
+        },
+        {
+          "name": "Modalidades de atendimento",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crfdf-2026-assistente-i-200-103"
+          ]
+        },
+        {
+          "name": "Objetividade e cordialidade",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-109"
+          ]
+        },
+        {
+          "name": "Postura profissional e valores institucionais",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-108"
+          ]
+        },
+        {
+          "name": "Presteza",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-100"
+          ]
+        },
+        {
+          "name": "Presteza e proatividade",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-097"
+          ]
+        },
+        {
+          "name": "Público interno e externo",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crfdf-2026-assistente-i-200-104"
+          ]
+        },
+        {
+          "name": "Público interno e qualidade do atendimento",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-113"
+          ]
+        },
+        {
+          "name": "Qualidade percebida e imagem institucional",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-107"
+          ]
+        },
+        {
+          "name": "Qualidade, rapidez e confiabilidade",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-111"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Administração Geral",
+      "question_count": 35,
+      "question_ids": [
+        "prova-qdx-crbm6-2026-agente-administrativo-401-071",
+        "prova-qdx-crbm6-2026-agente-administrativo-401-075",
+        "prova-qdx-crbm6-2026-agente-administrativo-401-079",
+        "prova-qdx-crasp-2025-anacob-400-031",
+        "prova-qdx-crasp-2025-anacob-400-032",
+        "prova-qdx-crfdf-2026-assistente-i-200-071",
+        "prova-qdx-crfdf-2026-assistente-i-200-072",
+        "prova-qdx-crfdf-2026-assistente-i-200-081",
+        "prova-qdx-crfdf-2026-assistente-i-200-082",
+        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-071",
+        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-072",
+        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-071",
+        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-072",
+        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-073",
+        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-074",
+        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-075",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-096",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-097",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-098",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-099",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-100",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-106",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-107",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-108",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-109",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-071",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-072",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-073",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-074",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-075",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-076",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-077",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-078",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-079",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-080"
+      ],
+      "material_count": 7,
+      "material_ids": [
+        "notion-agente-administrativo-crbm-6-quadrix-2026",
+        "notion-analista-i-atendimento-e-cobranca-cra-sp-quadrix-2025",
+        "notion-assistente-i-crf-df-quadrix-2026",
+        "notion-auxiliar-administrativo-crbm-6-quadrix-2026",
+        "notion-auxiliar-administrativo-crtr-12-ms-mt-quadrix-2026-campo-grande",
+        "notion-tecnico-administrativo-cfo-quadrix-2025",
+        "notion-tecnico-administrativo-crmv-go-quadrix-2025"
+      ],
+      "topics": [
+        {
+          "name": "Organizações e funções administrativas",
+          "question_count": 10,
+          "question_ids": [
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-071",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-072",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-073",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-074",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-075",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-076",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-077",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-078",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-079",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-080"
+          ]
+        },
+        {
+          "name": "Estruturas organizacionais",
+          "question_count": 7,
+          "question_ids": [
+            "prova-qdx-crfdf-2026-assistente-i-200-081",
+            "prova-qdx-crfdf-2026-assistente-i-200-082",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-096",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-097",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-098",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-099",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-100"
+          ]
+        },
+        {
+          "name": "Funções administrativas",
+          "question_count": 6,
+          "question_ids": [
+            "prova-qdx-crfdf-2026-assistente-i-200-071",
+            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-071",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-106",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-107",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-108",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-109"
+          ]
+        },
+        {
+          "name": "Departamentalização",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-agente-administrativo-401-075",
+            "prova-qdx-crbm6-2026-agente-administrativo-401-079"
+          ]
+        },
+        {
+          "name": "Função controle",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-075"
+          ]
+        },
+        {
+          "name": "Função direção e integração gerencial",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-074"
+          ]
+        },
+        {
+          "name": "Função organização",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-073"
+          ]
+        },
+        {
+          "name": "Funções administrativas — integração",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-071"
+          ]
+        },
+        {
+          "name": "Gestão de processos e qualidade",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crasp-2025-anacob-400-032"
+          ]
+        },
+        {
+          "name": "Planejamento e projetos",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crasp-2025-anacob-400-031"
+          ]
+        },
+        {
+          "name": "Planejamento estratégico — revisão",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-072"
+          ]
+        },
+        {
+          "name": "Planejamento operacional",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-072"
+          ]
+        },
+        {
+          "name": "Planejamento organizacional",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crfdf-2026-assistente-i-200-072"
+          ]
+        },
+        {
+          "name": "Teorias da Administração",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-agente-administrativo-401-071"
+          ]
+        }
+      ]
+    },
+    {
       "name": "Educação Especial e Políticas Educacionais",
       "question_count": 33,
       "question_ids": [
@@ -10752,205 +11454,109 @@
       ]
     },
     {
-      "name": "Atendimento ao Público",
+      "name": "Legislação Institucional",
       "question_count": 28,
       "question_ids": [
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-096",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-097",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-098",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-099",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-100",
-        "prova-qdx-crasp-2025-anacob-400-037",
-        "prova-qdx-crasp-2025-anacob-400-038",
-        "prova-qdx-crfdf-2026-assistente-i-200-097",
-        "prova-qdx-crfdf-2026-assistente-i-200-098",
-        "prova-qdx-crfdf-2026-assistente-i-200-099",
-        "prova-qdx-crfdf-2026-assistente-i-200-100",
-        "prova-qdx-crfdf-2026-assistente-i-200-101",
-        "prova-qdx-crfdf-2026-assistente-i-200-102",
-        "prova-qdx-crfdf-2026-assistente-i-200-103",
-        "prova-qdx-crfdf-2026-assistente-i-200-104",
-        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-099",
-        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-100",
-        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-101",
-        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-102",
-        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-103",
-        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-113",
-        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-107",
-        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-108",
-        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-109",
-        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-110",
-        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-111",
-        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-112",
-        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-113"
+        "prova-qdx-cremam-2025-administrador-400-016",
+        "prova-qdx-cremam-2025-administrador-400-017",
+        "prova-qdx-cremam-2025-administrador-400-018",
+        "prova-qdx-cremam-2025-administrador-400-019",
+        "prova-qdx-cremam-2025-administrador-400-020",
+        "prova-qdx-cremam-2025-administrador-400-025",
+        "prova-qdx-crasp-2025-anacob-400-029",
+        "prova-qdx-cremam-2025-assadm-200-022",
+        "prova-qdx-cremam-2025-assadm-200-023",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-056",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-057",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-058",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-059",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-060",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-061",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-062",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-106",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-107",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-108",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-109",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-110",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-111",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-112",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-113",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-114",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-115",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-116",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-117"
       ],
       "material_count": 5,
       "material_ids": [
-        "notion-agente-administrativo-crmv-rn-quadrix-2026",
+        "notion-administrador-cremam-quadrix-2025",
         "notion-analista-i-atendimento-e-cobranca-cra-sp-quadrix-2025",
-        "notion-assistente-i-crf-df-quadrix-2026",
-        "notion-auxiliar-administrativo-crbm-6-quadrix-2026",
-        "notion-auxiliar-administrativo-crtr-12-ms-mt-quadrix-2026-campo-grande"
+        "notion-assistente-administrativo-cremam-quadrix-2025",
+        "notion-tecnico-administrativo-cfo-quadrix-2025",
+        "notion-tecnico-administrativo-crmv-go-quadrix-2025"
       ],
       "topics": [
         {
-          "name": "Qualidade no atendimento",
-          "question_count": 6,
+          "name": "Sistema CFMV/CRMVs",
+          "question_count": 12,
           "question_ids": [
-            "prova-qdx-crasp-2025-anacob-400-037",
-            "prova-qdx-crfdf-2026-assistente-i-200-097",
-            "prova-qdx-crfdf-2026-assistente-i-200-098",
-            "prova-qdx-crfdf-2026-assistente-i-200-099",
-            "prova-qdx-crfdf-2026-assistente-i-200-100",
-            "prova-qdx-crfdf-2026-assistente-i-200-101"
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-106",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-107",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-108",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-109",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-110",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-111",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-112",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-113",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-114",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-115",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-116",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-117"
           ]
         },
         {
-          "name": "Atendimento telefônico",
+          "name": "Conselhos de Odontologia",
+          "question_count": 7,
+          "question_ids": [
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-056",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-057",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-058",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-059",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-060",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-061",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-062"
+          ]
+        },
+        {
+          "name": "Regimento Interno do CREMAM",
+          "question_count": 4,
+          "question_ids": [
+            "prova-qdx-cremam-2025-administrador-400-020",
+            "prova-qdx-cremam-2025-administrador-400-025",
+            "prova-qdx-cremam-2025-assadm-200-022",
+            "prova-qdx-cremam-2025-assadm-200-023"
+          ]
+        },
+        {
+          "name": "Acesso à informação",
           "question_count": 2,
           "question_ids": [
-            "prova-qdx-crfdf-2026-assistente-i-200-102",
-            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-112"
+            "prova-qdx-cremam-2025-administrador-400-016",
+            "prova-qdx-cremam-2025-administrador-400-017"
           ]
         },
         {
-          "name": "Atendimento digital",
-          "question_count": 1,
+          "name": "Proteção de dados pessoais",
+          "question_count": 2,
           "question_ids": [
-            "prova-qdx-crasp-2025-anacob-400-038"
+            "prova-qdx-cremam-2025-administrador-400-018",
+            "prova-qdx-cremam-2025-administrador-400-019"
           ]
         },
         {
-          "name": "Atendimento interno e eficiência",
+          "name": "Regimento Interno do CRA-SP",
           "question_count": 1,
           "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-100"
-          ]
-        },
-        {
-          "name": "Atendimento telefônico — objetividade e empatia",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-099"
-          ]
-        },
-        {
-          "name": "Cortesia e tolerância",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-103"
-          ]
-        },
-        {
-          "name": "Discrição e empatia",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-096"
-          ]
-        },
-        {
-          "name": "Empatia, impessoalidade e controle emocional",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-110"
-          ]
-        },
-        {
-          "name": "Encaminhamento da demanda",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-101"
-          ]
-        },
-        {
-          "name": "Escuta ativa",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-113"
-          ]
-        },
-        {
-          "name": "Impessoalidade e postura profissional",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-098"
-          ]
-        },
-        {
-          "name": "Legalidade e simplificação",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-102"
-          ]
-        },
-        {
-          "name": "Linguagem no atendimento",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-099"
-          ]
-        },
-        {
-          "name": "Modalidades de atendimento",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crfdf-2026-assistente-i-200-103"
-          ]
-        },
-        {
-          "name": "Objetividade e cordialidade",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-109"
-          ]
-        },
-        {
-          "name": "Postura profissional e valores institucionais",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-108"
-          ]
-        },
-        {
-          "name": "Presteza",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-100"
-          ]
-        },
-        {
-          "name": "Presteza e proatividade",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-097"
-          ]
-        },
-        {
-          "name": "Público interno e externo",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crfdf-2026-assistente-i-200-104"
-          ]
-        },
-        {
-          "name": "Público interno e qualidade do atendimento",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-113"
-          ]
-        },
-        {
-          "name": "Qualidade percebida e imagem institucional",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-107"
-          ]
-        },
-        {
-          "name": "Qualidade, rapidez e confiabilidade",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-111"
+            "prova-qdx-crasp-2025-anacob-400-029"
           ]
         }
       ]
@@ -11072,6 +11678,135 @@
       ]
     },
     {
+      "name": "Atualidades",
+      "question_count": 24,
+      "question_ids": [
+        "prova-qdx-crasp-2025-anacob-400-013",
+        "prova-qdx-crasp-2025-anacob-400-014",
+        "prova-qdx-crasp-2025-anacob-400-015",
+        "prova-qdx-crasp-2025-anacob-400-016",
+        "prova-qdx-crfdf-2026-assistente-i-200-035",
+        "prova-qdx-crfdf-2026-assistente-i-200-036",
+        "prova-qdx-crfdf-2026-assistente-i-200-037",
+        "prova-qdx-crfdf-2026-assistente-i-200-038",
+        "prova-qdx-crfdf-2026-assistente-i-200-039",
+        "prova-qdx-crfdf-2026-assistente-i-200-040",
+        "prova-qdx-fabc-2025-as-026",
+        "prova-qdx-fabc-2025-as-027",
+        "prova-qdx-fabc-2025-as-028",
+        "prova-qdx-fabc-2025-as-029",
+        "prova-qdx-fabc-2025-as-030",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-023",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-024",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-025",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-026",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-027",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-028",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-029",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-030",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-031"
+      ],
+      "material_count": 4,
+      "material_ids": [
+        "notion-analista-i-atendimento-e-cobranca-cra-sp-quadrix-2025",
+        "notion-assistente-i-crf-df-quadrix-2026",
+        "notion-assistente-social-fundacao-do-abc-quadrix-2025",
+        "notion-tecnico-administrativo-cfo-quadrix-2025"
+      ],
+      "topics": [
+        {
+          "name": "Meio ambiente",
+          "question_count": 5,
+          "question_ids": [
+            "prova-qdx-crasp-2025-anacob-400-013",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-023",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-024",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-025",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-026"
+          ]
+        },
+        {
+          "name": "Outros tópicos",
+          "question_count": 5,
+          "question_ids": [
+            "prova-qdx-fabc-2025-as-026",
+            "prova-qdx-fabc-2025-as-027",
+            "prova-qdx-fabc-2025-as-028",
+            "prova-qdx-fabc-2025-as-029",
+            "prova-qdx-fabc-2025-as-030"
+          ]
+        },
+        {
+          "name": "Política nacional e internacional",
+          "question_count": 5,
+          "question_ids": [
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-027",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-028",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-029",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-030",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-031"
+          ]
+        },
+        {
+          "name": "Mudanças climáticas",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-crfdf-2026-assistente-i-200-038",
+            "prova-qdx-crfdf-2026-assistente-i-200-039"
+          ]
+        },
+        {
+          "name": "Economia venezuelana",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crfdf-2026-assistente-i-200-037"
+          ]
+        },
+        {
+          "name": "Energia e meio ambiente",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crasp-2025-anacob-400-014"
+          ]
+        },
+        {
+          "name": "Geopolítica",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crasp-2025-anacob-400-016"
+          ]
+        },
+        {
+          "name": "Geopolítica do Ártico",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crfdf-2026-assistente-i-200-040"
+          ]
+        },
+        {
+          "name": "Migrações internacionais",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crfdf-2026-assistente-i-200-036"
+          ]
+        },
+        {
+          "name": "Sociedade",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crasp-2025-anacob-400-015"
+          ]
+        },
+        {
+          "name": "Venezuela",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crfdf-2026-assistente-i-200-035"
+          ]
+        }
+      ]
+    },
+    {
       "name": "Políticas para as Mulheres",
       "question_count": 22,
       "question_ids": [
@@ -11130,6 +11865,168 @@
             "consol-mul01-38",
             "consol-mul01-39",
             "consol-mul01-40"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Gestão de Pessoas",
+      "question_count": 21,
+      "question_ids": [
+        "prova-qdx-crbm6-2026-agente-administrativo-401-090",
+        "prova-qdx-crbm6-2026-agente-administrativo-401-091",
+        "prova-qdx-crbm6-2026-agente-administrativo-401-092",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-074",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-083",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-101",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-102",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-103",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-104",
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-105",
+        "prova-qdx-crasp-2025-anacob-400-041",
+        "prova-qdx-crasp-2025-anacob-400-042",
+        "prova-qdx-crfdf-2026-assistente-i-200-075",
+        "prova-qdx-crfdf-2026-assistente-i-200-076",
+        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-075",
+        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-085",
+        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-078",
+        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-079",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-103",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-104",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-105"
+      ],
+      "material_count": 7,
+      "material_ids": [
+        "notion-agente-administrativo-crbm-6-quadrix-2026",
+        "notion-agente-administrativo-crmv-rn-quadrix-2026",
+        "notion-analista-i-atendimento-e-cobranca-cra-sp-quadrix-2025",
+        "notion-assistente-i-crf-df-quadrix-2026",
+        "notion-auxiliar-administrativo-crbm-6-quadrix-2026",
+        "notion-auxiliar-administrativo-crtr-12-ms-mt-quadrix-2026-campo-grande",
+        "notion-tecnico-administrativo-crmv-go-quadrix-2025"
+      ],
+      "topics": [
+        {
+          "name": "Desenvolvimento de equipes",
+          "question_count": 3,
+          "question_ids": [
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-103",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-104",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-105"
+          ]
+        },
+        {
+          "name": "Avaliação de desempenho",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-agente-administrativo-401-092",
+            "prova-qdx-crasp-2025-anacob-400-041"
+          ]
+        },
+        {
+          "name": "Gestão por competências",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-agente-administrativo-401-091",
+            "prova-qdx-crfdf-2026-assistente-i-200-075"
+          ]
+        },
+        {
+          "name": "Avaliação de desempenho 360 graus",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-074"
+          ]
+        },
+        {
+          "name": "Comportamento defensivo e transparência",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-104"
+          ]
+        },
+        {
+          "name": "Comportamento interpessoal e persuasão",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-102"
+          ]
+        },
+        {
+          "name": "Confiança interpessoal e custos de controle",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-103"
+          ]
+        },
+        {
+          "name": "Desenvolvimento de pessoas",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crfdf-2026-assistente-i-200-076"
+          ]
+        },
+        {
+          "name": "Empatia cognitiva",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-105"
+          ]
+        },
+        {
+          "name": "Equipes autogerenciadas",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-083"
+          ]
+        },
+        {
+          "name": "Feedback construtivo",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-085"
+          ]
+        },
+        {
+          "name": "Liderança e equipes",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crasp-2025-anacob-400-042"
+          ]
+        },
+        {
+          "name": "Motivação",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-075"
+          ]
+        },
+        {
+          "name": "Motivação e desenvolvimento profissional",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-078"
+          ]
+        },
+        {
+          "name": "Personalidade e liderança — amabilidade",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-101"
+          ]
+        },
+        {
+          "name": "Planejamento da força de trabalho",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-agente-administrativo-401-090"
+          ]
+        },
+        {
+          "name": "Treinamento e desenvolvimento",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-079"
           ]
         }
       ]
@@ -11489,6 +12386,104 @@
       ]
     },
     {
+      "name": "Matemática",
+      "question_count": 20,
+      "question_ids": [
+        "prova-qdx-crasp-2025-anacob-400-008",
+        "prova-qdx-crasp-2025-anacob-400-009",
+        "prova-qdx-crasp-2025-anacob-400-011",
+        "prova-qdx-cremam-2025-assadm-200-008",
+        "prova-qdx-cremam-2025-assadm-200-011",
+        "prova-qdx-fabc-2025-as-021",
+        "prova-qdx-fabc-2025-as-022",
+        "prova-qdx-fabc-2025-as-023",
+        "prova-qdx-fabc-2025-as-024",
+        "prova-qdx-fabc-2025-as-025",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-020",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-021",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-022",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-021",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-022",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-023",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-024",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-025",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-026",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-027"
+      ],
+      "material_count": 5,
+      "material_ids": [
+        "notion-analista-i-atendimento-e-cobranca-cra-sp-quadrix-2025",
+        "notion-assistente-administrativo-cremam-quadrix-2025",
+        "notion-assistente-social-fundacao-do-abc-quadrix-2025",
+        "notion-tecnico-administrativo-cfo-quadrix-2025",
+        "notion-tecnico-administrativo-crmv-go-quadrix-2025"
+      ],
+      "topics": [
+        {
+          "name": "Aritmética e porcentagem",
+          "question_count": 7,
+          "question_ids": [
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-021",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-022",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-023",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-024",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-025",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-026",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-027"
+          ]
+        },
+        {
+          "name": "Outros tópicos",
+          "question_count": 5,
+          "question_ids": [
+            "prova-qdx-fabc-2025-as-021",
+            "prova-qdx-fabc-2025-as-022",
+            "prova-qdx-fabc-2025-as-023",
+            "prova-qdx-fabc-2025-as-024",
+            "prova-qdx-fabc-2025-as-025"
+          ]
+        },
+        {
+          "name": "Geometria espacial e porcentagem",
+          "question_count": 3,
+          "question_ids": [
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-020",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-021",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-022"
+          ]
+        },
+        {
+          "name": "Estatística básica",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-crasp-2025-anacob-400-008",
+            "prova-qdx-cremam-2025-assadm-200-011"
+          ]
+        },
+        {
+          "name": "Análise combinatória",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-cremam-2025-assadm-200-008"
+          ]
+        },
+        {
+          "name": "Equações",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crasp-2025-anacob-400-009"
+          ]
+        },
+        {
+          "name": "Probabilidade",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crasp-2025-anacob-400-011"
+          ]
+        }
+      ]
+    },
+    {
       "name": "Primeiros Socorros",
       "question_count": 20,
       "question_ids": [
@@ -11785,6 +12780,196 @@
       ]
     },
     {
+      "name": "Ética no Serviço Público",
+      "question_count": 19,
+      "question_ids": [
+        "prova-qdx-crfa1-2026-analista-administrativo-400-041",
+        "prova-qdx-crfa1-2026-analista-administrativo-400-042",
+        "prova-qdx-crfa1-2026-analista-administrativo-400-043",
+        "prova-qdx-crfa1-2026-analista-administrativo-400-044",
+        "prova-qdx-crfa1-2026-analista-administrativo-400-045",
+        "prova-qdx-crasp-2025-anacob-400-021",
+        "prova-qdx-crfdf-2026-assistente-i-200-041",
+        "prova-qdx-crfdf-2026-assistente-i-200-042",
+        "prova-qdx-crfdf-2026-assistente-i-200-043",
+        "prova-qdx-crfdf-2026-assistente-i-200-044",
+        "prova-qdx-crfdf-2026-assistente-i-200-045",
+        "prova-qdx-crfdf-2026-assistente-i-200-046",
+        "prova-qdx-crfdf-2026-assistente-i-200-047",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-041",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-042",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-043",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-118",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-119",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-120"
+      ],
+      "material_count": 5,
+      "material_ids": [
+        "notion-analista-administrativo-crfa-1-quadrix-2026",
+        "notion-analista-i-atendimento-e-cobranca-cra-sp-quadrix-2025",
+        "notion-assistente-i-crf-df-quadrix-2026",
+        "notion-tecnico-administrativo-cfo-quadrix-2025",
+        "notion-tecnico-administrativo-crmv-go-quadrix-2025"
+      ],
+      "topics": [
+        {
+          "name": "Ética, moralidade, probidade e princípios",
+          "question_count": 5,
+          "question_ids": [
+            "prova-qdx-crfa1-2026-analista-administrativo-400-041",
+            "prova-qdx-crfa1-2026-analista-administrativo-400-042",
+            "prova-qdx-crfa1-2026-analista-administrativo-400-043",
+            "prova-qdx-crfa1-2026-analista-administrativo-400-044",
+            "prova-qdx-crfa1-2026-analista-administrativo-400-045"
+          ]
+        },
+        {
+          "name": "Ética e conflito de interesses",
+          "question_count": 3,
+          "question_ids": [
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-118",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-119",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-120"
+          ]
+        },
+        {
+          "name": "Ética pública",
+          "question_count": 3,
+          "question_ids": [
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-041",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-042",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-043"
+          ]
+        },
+        {
+          "name": "Código de Ética do Servidor",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-crfdf-2026-assistente-i-200-044",
+            "prova-qdx-crfdf-2026-assistente-i-200-045"
+          ]
+        },
+        {
+          "name": "Fundamentos da ética",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-crfdf-2026-assistente-i-200-041",
+            "prova-qdx-crfdf-2026-assistente-i-200-042"
+          ]
+        },
+        {
+          "name": "Conduta ética do agente público",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crfdf-2026-assistente-i-200-046"
+          ]
+        },
+        {
+          "name": "Conflito de interesses",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crfdf-2026-assistente-i-200-047"
+          ]
+        },
+        {
+          "name": "Ética e integridade",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crasp-2025-anacob-400-021"
+          ]
+        },
+        {
+          "name": "Ética, política e direito",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crfdf-2026-assistente-i-200-043"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Legislação Profissional",
+      "question_count": 19,
+      "question_ids": [
+        "prova-qdx-crefito17-2026-agente-fiscal-401-103",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-104",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-105",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-106",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-107",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-108",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-109",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-110",
+        "prova-qdx-crasp-2025-anacob-400-047",
+        "prova-qdx-crasp-2025-anacob-400-048",
+        "prova-qdx-crasp-2025-anacob-400-049",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-063",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-064",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-065",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-066",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-067",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-068",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-069",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-070"
+      ],
+      "material_count": 3,
+      "material_ids": [
+        "notion-agente-fiscal-crefito-17-quadrix-2026",
+        "notion-analista-i-atendimento-e-cobranca-cra-sp-quadrix-2025",
+        "notion-tecnico-administrativo-cfo-quadrix-2025"
+      ],
+      "topics": [
+        {
+          "name": "Exercício da odontologia",
+          "question_count": 8,
+          "question_ids": [
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-063",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-064",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-065",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-066",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-067",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-068",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-069",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-070"
+          ]
+        },
+        {
+          "name": "Atos privativos e registro profissional",
+          "question_count": 4,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-agente-fiscal-401-103",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-104",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-105",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-106"
+          ]
+        },
+        {
+          "name": "Responsabilidade técnica e identificação profissional",
+          "question_count": 4,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-agente-fiscal-401-107",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-108",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-109",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-110"
+          ]
+        },
+        {
+          "name": "Registro profissional",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-crasp-2025-anacob-400-047",
+            "prova-qdx-crasp-2025-anacob-400-048"
+          ]
+        },
+        {
+          "name": "Anuidades",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crasp-2025-anacob-400-049"
+          ]
+        }
+      ]
+    },
+    {
       "name": "Administração Financeira e Orçamentária",
       "question_count": 18,
       "question_ids": [
@@ -11915,150 +13100,92 @@
       ]
     },
     {
-      "name": "Gestão de Pessoas",
-      "question_count": 18,
+      "name": "Proteção de Dados",
+      "question_count": 17,
       "question_ids": [
-        "prova-qdx-crbm6-2026-agente-administrativo-401-090",
-        "prova-qdx-crbm6-2026-agente-administrativo-401-091",
-        "prova-qdx-crbm6-2026-agente-administrativo-401-092",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-074",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-083",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-101",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-102",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-103",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-104",
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-105",
-        "prova-qdx-crasp-2025-anacob-400-041",
-        "prova-qdx-crasp-2025-anacob-400-042",
-        "prova-qdx-crfdf-2026-assistente-i-200-075",
-        "prova-qdx-crfdf-2026-assistente-i-200-076",
-        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-075",
-        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-085",
-        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-078",
-        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-079"
+        "prova-qdx-crefito17-2026-advogado-400-061",
+        "prova-qdx-crefito17-2026-advogado-400-062",
+        "prova-qdx-crefito17-2026-advogado-400-063",
+        "prova-qdx-crefito17-2026-advogado-400-064",
+        "prova-qdx-crefito17-2026-advogado-400-065",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-061",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-062",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-063",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-064",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-065",
+        "prova-qdx-crfa1-2026-analista-administrativo-400-067",
+        "prova-qdx-crfa1-2026-analista-administrativo-400-068",
+        "prova-qdx-crfa1-2026-analista-administrativo-400-069",
+        "prova-qdx-crfa1-2026-analista-administrativo-400-070",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-053",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-054",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-055"
       ],
-      "material_count": 6,
+      "material_count": 4,
       "material_ids": [
-        "notion-agente-administrativo-crbm-6-quadrix-2026",
-        "notion-agente-administrativo-crmv-rn-quadrix-2026",
-        "notion-analista-i-atendimento-e-cobranca-cra-sp-quadrix-2025",
-        "notion-assistente-i-crf-df-quadrix-2026",
-        "notion-auxiliar-administrativo-crbm-6-quadrix-2026",
-        "notion-auxiliar-administrativo-crtr-12-ms-mt-quadrix-2026-campo-grande"
+        "notion-advogado-crefito-17-quadrix-2026",
+        "notion-agente-fiscal-crefito-17-quadrix-2026",
+        "notion-analista-administrativo-crfa-1-quadrix-2026",
+        "notion-tecnico-administrativo-cfo-quadrix-2025"
       ],
       "topics": [
         {
-          "name": "Avaliação de desempenho",
+          "name": "LGPD e atuação do Poder Público",
+          "question_count": 4,
+          "question_ids": [
+            "prova-qdx-crfa1-2026-analista-administrativo-400-067",
+            "prova-qdx-crfa1-2026-analista-administrativo-400-068",
+            "prova-qdx-crfa1-2026-analista-administrativo-400-069",
+            "prova-qdx-crfa1-2026-analista-administrativo-400-070"
+          ]
+        },
+        {
+          "name": "LGPD",
+          "question_count": 3,
+          "question_ids": [
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-053",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-054",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-055"
+          ]
+        },
+        {
+          "name": "Bases legais no setor público",
           "question_count": 2,
           "question_ids": [
-            "prova-qdx-crbm6-2026-agente-administrativo-401-092",
-            "prova-qdx-crasp-2025-anacob-400-041"
+            "prova-qdx-crefito17-2026-advogado-400-063",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-063"
           ]
         },
         {
-          "name": "Gestão por competências",
+          "name": "Conceito de dado pessoal",
           "question_count": 2,
           "question_ids": [
-            "prova-qdx-crbm6-2026-agente-administrativo-401-091",
-            "prova-qdx-crfdf-2026-assistente-i-200-075"
+            "prova-qdx-crefito17-2026-advogado-400-064",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-064"
           ]
         },
         {
-          "name": "Avaliação de desempenho 360 graus",
-          "question_count": 1,
+          "name": "Encarregado de dados no Poder Público",
+          "question_count": 2,
           "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-074"
+            "prova-qdx-crefito17-2026-advogado-400-065",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-065"
           ]
         },
         {
-          "name": "Comportamento defensivo e transparência",
-          "question_count": 1,
+          "name": "LGPD e LAI",
+          "question_count": 2,
           "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-104"
+            "prova-qdx-crefito17-2026-advogado-400-061",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-061"
           ]
         },
         {
-          "name": "Comportamento interpessoal e persuasão",
-          "question_count": 1,
+          "name": "Tratamento de dados pelo Poder Público",
+          "question_count": 2,
           "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-102"
-          ]
-        },
-        {
-          "name": "Confiança interpessoal e custos de controle",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-103"
-          ]
-        },
-        {
-          "name": "Desenvolvimento de pessoas",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crfdf-2026-assistente-i-200-076"
-          ]
-        },
-        {
-          "name": "Empatia cognitiva",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-105"
-          ]
-        },
-        {
-          "name": "Equipes autogerenciadas",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-083"
-          ]
-        },
-        {
-          "name": "Feedback construtivo",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-085"
-          ]
-        },
-        {
-          "name": "Liderança e equipes",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crasp-2025-anacob-400-042"
-          ]
-        },
-        {
-          "name": "Motivação",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-075"
-          ]
-        },
-        {
-          "name": "Motivação e desenvolvimento profissional",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-078"
-          ]
-        },
-        {
-          "name": "Personalidade e liderança — amabilidade",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-101"
-          ]
-        },
-        {
-          "name": "Planejamento da força de trabalho",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-agente-administrativo-401-090"
-          ]
-        },
-        {
-          "name": "Treinamento e desenvolvimento",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-079"
+            "prova-qdx-crefito17-2026-advogado-400-062",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-062"
           ]
         }
       ]
@@ -12203,132 +13330,6 @@
       ]
     },
     {
-      "name": "Administração Geral",
-      "question_count": 16,
-      "question_ids": [
-        "prova-qdx-crbm6-2026-agente-administrativo-401-071",
-        "prova-qdx-crbm6-2026-agente-administrativo-401-075",
-        "prova-qdx-crbm6-2026-agente-administrativo-401-079",
-        "prova-qdx-crasp-2025-anacob-400-031",
-        "prova-qdx-crasp-2025-anacob-400-032",
-        "prova-qdx-crfdf-2026-assistente-i-200-071",
-        "prova-qdx-crfdf-2026-assistente-i-200-072",
-        "prova-qdx-crfdf-2026-assistente-i-200-081",
-        "prova-qdx-crfdf-2026-assistente-i-200-082",
-        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-071",
-        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-072",
-        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-071",
-        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-072",
-        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-073",
-        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-074",
-        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-075"
-      ],
-      "material_count": 5,
-      "material_ids": [
-        "notion-agente-administrativo-crbm-6-quadrix-2026",
-        "notion-analista-i-atendimento-e-cobranca-cra-sp-quadrix-2025",
-        "notion-assistente-i-crf-df-quadrix-2026",
-        "notion-auxiliar-administrativo-crbm-6-quadrix-2026",
-        "notion-auxiliar-administrativo-crtr-12-ms-mt-quadrix-2026-campo-grande"
-      ],
-      "topics": [
-        {
-          "name": "Departamentalização",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-agente-administrativo-401-075",
-            "prova-qdx-crbm6-2026-agente-administrativo-401-079"
-          ]
-        },
-        {
-          "name": "Estruturas organizacionais",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crfdf-2026-assistente-i-200-081",
-            "prova-qdx-crfdf-2026-assistente-i-200-082"
-          ]
-        },
-        {
-          "name": "Funções administrativas",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crfdf-2026-assistente-i-200-071",
-            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-071"
-          ]
-        },
-        {
-          "name": "Função controle",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-075"
-          ]
-        },
-        {
-          "name": "Função direção e integração gerencial",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-074"
-          ]
-        },
-        {
-          "name": "Função organização",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-073"
-          ]
-        },
-        {
-          "name": "Funções administrativas — integração",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-071"
-          ]
-        },
-        {
-          "name": "Gestão de processos e qualidade",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crasp-2025-anacob-400-032"
-          ]
-        },
-        {
-          "name": "Planejamento e projetos",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crasp-2025-anacob-400-031"
-          ]
-        },
-        {
-          "name": "Planejamento estratégico — revisão",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-072"
-          ]
-        },
-        {
-          "name": "Planejamento operacional",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-072"
-          ]
-        },
-        {
-          "name": "Planejamento organizacional",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crfdf-2026-assistente-i-200-072"
-          ]
-        },
-        {
-          "name": "Teorias da Administração",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-agente-administrativo-401-071"
-          ]
-        }
-      ]
-    },
-    {
       "name": "Comunicação Organizacional",
       "question_count": 16,
       "question_ids": [
@@ -12449,105 +13450,72 @@
       ]
     },
     {
-      "name": "Atualidades",
+      "name": "Raciocínio Lógico",
       "question_count": 15,
       "question_ids": [
-        "prova-qdx-crasp-2025-anacob-400-013",
-        "prova-qdx-crasp-2025-anacob-400-014",
-        "prova-qdx-crasp-2025-anacob-400-015",
-        "prova-qdx-crasp-2025-anacob-400-016",
-        "prova-qdx-crfdf-2026-assistente-i-200-035",
-        "prova-qdx-crfdf-2026-assistente-i-200-036",
-        "prova-qdx-crfdf-2026-assistente-i-200-037",
-        "prova-qdx-crfdf-2026-assistente-i-200-038",
-        "prova-qdx-crfdf-2026-assistente-i-200-039",
-        "prova-qdx-crfdf-2026-assistente-i-200-040",
-        "prova-qdx-fabc-2025-as-026",
-        "prova-qdx-fabc-2025-as-027",
-        "prova-qdx-fabc-2025-as-028",
-        "prova-qdx-fabc-2025-as-029",
-        "prova-qdx-fabc-2025-as-030"
+        "prova-qdx-crefito17-2026-advogado-400-023",
+        "prova-qdx-crefito17-2026-advogado-400-024",
+        "prova-qdx-crefito17-2026-advogado-400-025",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-023",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-024",
+        "prova-qdx-crefito17-2026-agente-fiscal-401-025",
+        "prova-qdx-crasp-2025-anacob-400-007",
+        "prova-qdx-crasp-2025-anacob-400-010",
+        "prova-qdx-cremam-2025-assadm-200-010",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-014",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-015",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-016",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-028",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-029",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-030"
       ],
-      "material_count": 3,
+      "material_count": 6,
       "material_ids": [
+        "notion-advogado-crefito-17-quadrix-2026",
+        "notion-agente-fiscal-crefito-17-quadrix-2026",
         "notion-analista-i-atendimento-e-cobranca-cra-sp-quadrix-2025",
-        "notion-assistente-i-crf-df-quadrix-2026",
-        "notion-assistente-social-fundacao-do-abc-quadrix-2025"
+        "notion-assistente-administrativo-cremam-quadrix-2025",
+        "notion-tecnico-administrativo-cfo-quadrix-2025",
+        "notion-tecnico-administrativo-crmv-go-quadrix-2025"
       ],
       "topics": [
         {
-          "name": "Outros tópicos",
-          "question_count": 5,
+          "name": "Lógica de declarações",
+          "question_count": 6,
           "question_ids": [
-            "prova-qdx-fabc-2025-as-026",
-            "prova-qdx-fabc-2025-as-027",
-            "prova-qdx-fabc-2025-as-028",
-            "prova-qdx-fabc-2025-as-029",
-            "prova-qdx-fabc-2025-as-030"
+            "prova-qdx-crefito17-2026-advogado-400-023",
+            "prova-qdx-crefito17-2026-advogado-400-024",
+            "prova-qdx-crefito17-2026-advogado-400-025",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-023",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-024",
+            "prova-qdx-crefito17-2026-agente-fiscal-401-025"
           ]
         },
         {
-          "name": "Mudanças climáticas",
-          "question_count": 2,
+          "name": "Lógica de predicados",
+          "question_count": 4,
           "question_ids": [
-            "prova-qdx-crfdf-2026-assistente-i-200-038",
-            "prova-qdx-crfdf-2026-assistente-i-200-039"
+            "prova-qdx-cremam-2025-assadm-200-010",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-014",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-015",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-016"
           ]
         },
         {
-          "name": "Economia venezuelana",
+          "name": "Lógica proposicional",
+          "question_count": 4,
+          "question_ids": [
+            "prova-qdx-crasp-2025-anacob-400-007",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-028",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-029",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-030"
+          ]
+        },
+        {
+          "name": "Princípios de contagem",
           "question_count": 1,
           "question_ids": [
-            "prova-qdx-crfdf-2026-assistente-i-200-037"
-          ]
-        },
-        {
-          "name": "Energia e meio ambiente",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crasp-2025-anacob-400-014"
-          ]
-        },
-        {
-          "name": "Geopolítica",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crasp-2025-anacob-400-016"
-          ]
-        },
-        {
-          "name": "Geopolítica do Ártico",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crfdf-2026-assistente-i-200-040"
-          ]
-        },
-        {
-          "name": "Meio ambiente",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crasp-2025-anacob-400-013"
-          ]
-        },
-        {
-          "name": "Migrações internacionais",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crfdf-2026-assistente-i-200-036"
-          ]
-        },
-        {
-          "name": "Sociedade",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crasp-2025-anacob-400-015"
-          ]
-        },
-        {
-          "name": "Venezuela",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crfdf-2026-assistente-i-200-035"
+            "prova-qdx-crasp-2025-anacob-400-010"
           ]
         }
       ]
@@ -12721,84 +13689,6 @@
       ]
     },
     {
-      "name": "Proteção de Dados",
-      "question_count": 14,
-      "question_ids": [
-        "prova-qdx-crefito17-2026-advogado-400-061",
-        "prova-qdx-crefito17-2026-advogado-400-062",
-        "prova-qdx-crefito17-2026-advogado-400-063",
-        "prova-qdx-crefito17-2026-advogado-400-064",
-        "prova-qdx-crefito17-2026-advogado-400-065",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-061",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-062",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-063",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-064",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-065",
-        "prova-qdx-crfa1-2026-analista-administrativo-400-067",
-        "prova-qdx-crfa1-2026-analista-administrativo-400-068",
-        "prova-qdx-crfa1-2026-analista-administrativo-400-069",
-        "prova-qdx-crfa1-2026-analista-administrativo-400-070"
-      ],
-      "material_count": 3,
-      "material_ids": [
-        "notion-advogado-crefito-17-quadrix-2026",
-        "notion-agente-fiscal-crefito-17-quadrix-2026",
-        "notion-analista-administrativo-crfa-1-quadrix-2026"
-      ],
-      "topics": [
-        {
-          "name": "LGPD e atuação do Poder Público",
-          "question_count": 4,
-          "question_ids": [
-            "prova-qdx-crfa1-2026-analista-administrativo-400-067",
-            "prova-qdx-crfa1-2026-analista-administrativo-400-068",
-            "prova-qdx-crfa1-2026-analista-administrativo-400-069",
-            "prova-qdx-crfa1-2026-analista-administrativo-400-070"
-          ]
-        },
-        {
-          "name": "Bases legais no setor público",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-063",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-063"
-          ]
-        },
-        {
-          "name": "Conceito de dado pessoal",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-064",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-064"
-          ]
-        },
-        {
-          "name": "Encarregado de dados no Poder Público",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-065",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-065"
-          ]
-        },
-        {
-          "name": "LGPD e LAI",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-061",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-061"
-          ]
-        },
-        {
-          "name": "Tratamento de dados pelo Poder Público",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-062",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-062"
-          ]
-        }
-      ]
-    },
-    {
       "name": "Administração de Materiais",
       "question_count": 13,
       "question_ids": [
@@ -12912,83 +13802,106 @@
       ]
     },
     {
-      "name": "Ética no Serviço Público",
+      "name": "Licitações e Contratos",
       "question_count": 13,
       "question_ids": [
-        "prova-qdx-crfa1-2026-analista-administrativo-400-041",
-        "prova-qdx-crfa1-2026-analista-administrativo-400-042",
-        "prova-qdx-crfa1-2026-analista-administrativo-400-043",
-        "prova-qdx-crfa1-2026-analista-administrativo-400-044",
-        "prova-qdx-crfa1-2026-analista-administrativo-400-045",
-        "prova-qdx-crasp-2025-anacob-400-021",
-        "prova-qdx-crfdf-2026-assistente-i-200-041",
-        "prova-qdx-crfdf-2026-assistente-i-200-042",
-        "prova-qdx-crfdf-2026-assistente-i-200-043",
-        "prova-qdx-crfdf-2026-assistente-i-200-044",
-        "prova-qdx-crfdf-2026-assistente-i-200-045",
-        "prova-qdx-crfdf-2026-assistente-i-200-046",
-        "prova-qdx-crfdf-2026-assistente-i-200-047"
+        "prova-qdx-crefito17-2026-advogado-400-097",
+        "prova-qdx-crefito17-2026-advogado-400-098",
+        "prova-qdx-crefito17-2026-advogado-400-099",
+        "prova-qdx-crefito17-2026-advogado-400-100",
+        "prova-qdx-crefito17-2026-advogado-400-101",
+        "prova-qdx-crefito17-2026-advogado-400-102",
+        "prova-qdx-crefito17-2026-advogado-400-103",
+        "prova-qdx-crefito17-2026-advogado-400-104",
+        "prova-qdx-crefito17-2026-advogado-400-105",
+        "prova-qdx-crefito17-2026-advogado-400-110",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-093",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-094",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-095"
       ],
-      "material_count": 3,
+      "material_count": 2,
       "material_ids": [
-        "notion-analista-administrativo-crfa-1-quadrix-2026",
-        "notion-analista-i-atendimento-e-cobranca-cra-sp-quadrix-2025",
-        "notion-assistente-i-crf-df-quadrix-2026"
+        "notion-advogado-crefito-17-quadrix-2026",
+        "notion-tecnico-administrativo-cfo-quadrix-2025"
       ],
       "topics": [
         {
-          "name": "Ética, moralidade, probidade e princípios",
-          "question_count": 5,
+          "name": "Lei nº 14.133/2021",
+          "question_count": 3,
           "question_ids": [
-            "prova-qdx-crfa1-2026-analista-administrativo-400-041",
-            "prova-qdx-crfa1-2026-analista-administrativo-400-042",
-            "prova-qdx-crfa1-2026-analista-administrativo-400-043",
-            "prova-qdx-crfa1-2026-analista-administrativo-400-044",
-            "prova-qdx-crfa1-2026-analista-administrativo-400-045"
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-093",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-094",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-095"
           ]
         },
         {
-          "name": "Código de Ética do Servidor",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crfdf-2026-assistente-i-200-044",
-            "prova-qdx-crfdf-2026-assistente-i-200-045"
-          ]
-        },
-        {
-          "name": "Fundamentos da ética",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crfdf-2026-assistente-i-200-041",
-            "prova-qdx-crfdf-2026-assistente-i-200-042"
-          ]
-        },
-        {
-          "name": "Conduta ética do agente público",
+          "name": "Alienação de bens móveis públicos",
           "question_count": 1,
           "question_ids": [
-            "prova-qdx-crfdf-2026-assistente-i-200-046"
+            "prova-qdx-crefito17-2026-advogado-400-110"
           ]
         },
         {
-          "name": "Conflito de interesses",
+          "name": "Alteração unilateral quantitativa",
           "question_count": 1,
           "question_ids": [
-            "prova-qdx-crfdf-2026-assistente-i-200-047"
+            "prova-qdx-crefito17-2026-advogado-400-101"
           ]
         },
         {
-          "name": "Ética e integridade",
+          "name": "Aquisição de veículos por conselho profissional",
           "question_count": 1,
           "question_ids": [
-            "prova-qdx-crasp-2025-anacob-400-021"
+            "prova-qdx-crefito17-2026-advogado-400-099"
           ]
         },
         {
-          "name": "Ética, política e direito",
+          "name": "Declaração de inidoneidade",
           "question_count": 1,
           "question_ids": [
-            "prova-qdx-crfdf-2026-assistente-i-200-043"
+            "prova-qdx-crefito17-2026-advogado-400-105"
+          ]
+        },
+        {
+          "name": "Dispensa de licitação por valor",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-100"
+          ]
+        },
+        {
+          "name": "Impedimento e declaração de inidoneidade",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-104"
+          ]
+        },
+        {
+          "name": "Planejamento da contratação e ciclo de vida",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-098"
+          ]
+        },
+        {
+          "name": "Regime licitatório dos conselhos profissionais",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-097"
+          ]
+        },
+        {
+          "name": "Sanção de advertência",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-102"
+          ]
+        },
+        {
+          "name": "Sanção de multa",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crefito17-2026-advogado-400-103"
           ]
         }
       ]
@@ -13225,65 +14138,6 @@
       ]
     },
     {
-      "name": "Legislação Profissional",
-      "question_count": 11,
-      "question_ids": [
-        "prova-qdx-crefito17-2026-agente-fiscal-401-103",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-104",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-105",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-106",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-107",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-108",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-109",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-110",
-        "prova-qdx-crasp-2025-anacob-400-047",
-        "prova-qdx-crasp-2025-anacob-400-048",
-        "prova-qdx-crasp-2025-anacob-400-049"
-      ],
-      "material_count": 2,
-      "material_ids": [
-        "notion-agente-fiscal-crefito-17-quadrix-2026",
-        "notion-analista-i-atendimento-e-cobranca-cra-sp-quadrix-2025"
-      ],
-      "topics": [
-        {
-          "name": "Atos privativos e registro profissional",
-          "question_count": 4,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-agente-fiscal-401-103",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-104",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-105",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-106"
-          ]
-        },
-        {
-          "name": "Responsabilidade técnica e identificação profissional",
-          "question_count": 4,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-agente-fiscal-401-107",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-108",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-109",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-110"
-          ]
-        },
-        {
-          "name": "Registro profissional",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crasp-2025-anacob-400-047",
-            "prova-qdx-crasp-2025-anacob-400-048"
-          ]
-        },
-        {
-          "name": "Anuidades",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crasp-2025-anacob-400-049"
-          ]
-        }
-      ]
-    },
-    {
       "name": "Organização, Sistemas e Métodos",
       "question_count": 11,
       "question_ids": [
@@ -13437,162 +14291,6 @@
       ]
     },
     {
-      "name": "Licitações e Contratos",
-      "question_count": 10,
-      "question_ids": [
-        "prova-qdx-crefito17-2026-advogado-400-097",
-        "prova-qdx-crefito17-2026-advogado-400-098",
-        "prova-qdx-crefito17-2026-advogado-400-099",
-        "prova-qdx-crefito17-2026-advogado-400-100",
-        "prova-qdx-crefito17-2026-advogado-400-101",
-        "prova-qdx-crefito17-2026-advogado-400-102",
-        "prova-qdx-crefito17-2026-advogado-400-103",
-        "prova-qdx-crefito17-2026-advogado-400-104",
-        "prova-qdx-crefito17-2026-advogado-400-105",
-        "prova-qdx-crefito17-2026-advogado-400-110"
-      ],
-      "material_count": 1,
-      "material_ids": [
-        "notion-advogado-crefito-17-quadrix-2026"
-      ],
-      "topics": [
-        {
-          "name": "Alienação de bens móveis públicos",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-110"
-          ]
-        },
-        {
-          "name": "Alteração unilateral quantitativa",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-101"
-          ]
-        },
-        {
-          "name": "Aquisição de veículos por conselho profissional",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-099"
-          ]
-        },
-        {
-          "name": "Declaração de inidoneidade",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-105"
-          ]
-        },
-        {
-          "name": "Dispensa de licitação por valor",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-100"
-          ]
-        },
-        {
-          "name": "Impedimento e declaração de inidoneidade",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-104"
-          ]
-        },
-        {
-          "name": "Planejamento da contratação e ciclo de vida",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-098"
-          ]
-        },
-        {
-          "name": "Regime licitatório dos conselhos profissionais",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-097"
-          ]
-        },
-        {
-          "name": "Sanção de advertência",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-102"
-          ]
-        },
-        {
-          "name": "Sanção de multa",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-103"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Matemática",
-      "question_count": 10,
-      "question_ids": [
-        "prova-qdx-crasp-2025-anacob-400-008",
-        "prova-qdx-crasp-2025-anacob-400-009",
-        "prova-qdx-crasp-2025-anacob-400-011",
-        "prova-qdx-cremam-2025-assadm-200-008",
-        "prova-qdx-cremam-2025-assadm-200-011",
-        "prova-qdx-fabc-2025-as-021",
-        "prova-qdx-fabc-2025-as-022",
-        "prova-qdx-fabc-2025-as-023",
-        "prova-qdx-fabc-2025-as-024",
-        "prova-qdx-fabc-2025-as-025"
-      ],
-      "material_count": 3,
-      "material_ids": [
-        "notion-analista-i-atendimento-e-cobranca-cra-sp-quadrix-2025",
-        "notion-assistente-administrativo-cremam-quadrix-2025",
-        "notion-assistente-social-fundacao-do-abc-quadrix-2025"
-      ],
-      "topics": [
-        {
-          "name": "Outros tópicos",
-          "question_count": 5,
-          "question_ids": [
-            "prova-qdx-fabc-2025-as-021",
-            "prova-qdx-fabc-2025-as-022",
-            "prova-qdx-fabc-2025-as-023",
-            "prova-qdx-fabc-2025-as-024",
-            "prova-qdx-fabc-2025-as-025"
-          ]
-        },
-        {
-          "name": "Estatística básica",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-crasp-2025-anacob-400-008",
-            "prova-qdx-cremam-2025-assadm-200-011"
-          ]
-        },
-        {
-          "name": "Análise combinatória",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-cremam-2025-assadm-200-008"
-          ]
-        },
-        {
-          "name": "Equações",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crasp-2025-anacob-400-009"
-          ]
-        },
-        {
-          "name": "Probabilidade",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crasp-2025-anacob-400-011"
-          ]
-        }
-      ]
-    },
-    {
       "name": "Protocolo e Gestão Documental",
       "question_count": 10,
       "question_ids": [
@@ -13722,62 +14420,6 @@
       ]
     },
     {
-      "name": "Legislação Institucional",
-      "question_count": 9,
-      "question_ids": [
-        "prova-qdx-cremam-2025-administrador-400-016",
-        "prova-qdx-cremam-2025-administrador-400-017",
-        "prova-qdx-cremam-2025-administrador-400-018",
-        "prova-qdx-cremam-2025-administrador-400-019",
-        "prova-qdx-cremam-2025-administrador-400-020",
-        "prova-qdx-cremam-2025-administrador-400-025",
-        "prova-qdx-crasp-2025-anacob-400-029",
-        "prova-qdx-cremam-2025-assadm-200-022",
-        "prova-qdx-cremam-2025-assadm-200-023"
-      ],
-      "material_count": 3,
-      "material_ids": [
-        "notion-administrador-cremam-quadrix-2025",
-        "notion-analista-i-atendimento-e-cobranca-cra-sp-quadrix-2025",
-        "notion-assistente-administrativo-cremam-quadrix-2025"
-      ],
-      "topics": [
-        {
-          "name": "Regimento Interno do CREMAM",
-          "question_count": 4,
-          "question_ids": [
-            "prova-qdx-cremam-2025-administrador-400-020",
-            "prova-qdx-cremam-2025-administrador-400-025",
-            "prova-qdx-cremam-2025-assadm-200-022",
-            "prova-qdx-cremam-2025-assadm-200-023"
-          ]
-        },
-        {
-          "name": "Acesso à informação",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-cremam-2025-administrador-400-016",
-            "prova-qdx-cremam-2025-administrador-400-017"
-          ]
-        },
-        {
-          "name": "Proteção de dados pessoais",
-          "question_count": 2,
-          "question_ids": [
-            "prova-qdx-cremam-2025-administrador-400-018",
-            "prova-qdx-cremam-2025-administrador-400-019"
-          ]
-        },
-        {
-          "name": "Regimento Interno do CRA-SP",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crasp-2025-anacob-400-029"
-          ]
-        }
-      ]
-    },
-    {
       "name": "Políticas públicas educacionais",
       "question_count": 9,
       "question_ids": [
@@ -13814,58 +14456,66 @@
       ]
     },
     {
-      "name": "Raciocínio Lógico",
-      "question_count": 9,
+      "name": "Gestão de Projetos",
+      "question_count": 8,
       "question_ids": [
-        "prova-qdx-crefito17-2026-advogado-400-023",
-        "prova-qdx-crefito17-2026-advogado-400-024",
-        "prova-qdx-crefito17-2026-advogado-400-025",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-023",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-024",
-        "prova-qdx-crefito17-2026-agente-fiscal-401-025",
-        "prova-qdx-crasp-2025-anacob-400-007",
-        "prova-qdx-crasp-2025-anacob-400-010",
-        "prova-qdx-cremam-2025-assadm-200-010"
+        "prova-qdx-crbm6-2026-agente-administrativo-401-085",
+        "prova-qdx-crbm6-2026-agente-administrativo-401-086",
+        "prova-qdx-crbm6-2026-agente-administrativo-401-087",
+        "prova-qdx-crbm6-2026-agente-administrativo-401-088",
+        "prova-qdx-crbm6-2026-agente-administrativo-401-089",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-113",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-114",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-115"
       ],
-      "material_count": 4,
+      "material_count": 2,
       "material_ids": [
-        "notion-advogado-crefito-17-quadrix-2026",
-        "notion-agente-fiscal-crefito-17-quadrix-2026",
-        "notion-analista-i-atendimento-e-cobranca-cra-sp-quadrix-2025",
-        "notion-assistente-administrativo-cremam-quadrix-2025"
+        "notion-agente-administrativo-crbm-6-quadrix-2026",
+        "notion-tecnico-administrativo-cfo-quadrix-2025"
       ],
       "topics": [
         {
-          "name": "Lógica de declarações",
-          "question_count": 6,
+          "name": "PMBOK e gerenciamento de projetos",
+          "question_count": 3,
           "question_ids": [
-            "prova-qdx-crefito17-2026-advogado-400-023",
-            "prova-qdx-crefito17-2026-advogado-400-024",
-            "prova-qdx-crefito17-2026-advogado-400-025",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-023",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-024",
-            "prova-qdx-crefito17-2026-agente-fiscal-401-025"
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-113",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-114",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-115"
           ]
         },
         {
-          "name": "Lógica de predicados",
+          "name": "Ciclo de vida de projetos",
           "question_count": 1,
           "question_ids": [
-            "prova-qdx-cremam-2025-assadm-200-010"
+            "prova-qdx-crbm6-2026-agente-administrativo-401-086"
           ]
         },
         {
-          "name": "Lógica proposicional",
+          "name": "Fundamentos de projetos",
           "question_count": 1,
           "question_ids": [
-            "prova-qdx-crasp-2025-anacob-400-007"
+            "prova-qdx-crbm6-2026-agente-administrativo-401-085"
           ]
         },
         {
-          "name": "Princípios de contagem",
+          "name": "Gerenciamento da qualidade",
           "question_count": 1,
           "question_ids": [
-            "prova-qdx-crasp-2025-anacob-400-010"
+            "prova-qdx-crbm6-2026-agente-administrativo-401-088"
+          ]
+        },
+        {
+          "name": "Gerenciamento de riscos",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-agente-administrativo-401-087"
+          ]
+        },
+        {
+          "name": "Papéis e responsabilidades",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-agente-administrativo-401-089"
           ]
         }
       ]
@@ -13933,6 +14583,44 @@
       ]
     },
     {
+      "name": "Direitos Humanos",
+      "question_count": 7,
+      "question_ids": [
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-049",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-050",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-051",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-052",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-053",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-054",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-055"
+      ],
+      "material_count": 1,
+      "material_ids": [
+        "notion-tecnico-administrativo-crmv-go-quadrix-2025"
+      ],
+      "topics": [
+        {
+          "name": "Sistema Interamericano de Direitos Humanos",
+          "question_count": 4,
+          "question_ids": [
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-052",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-053",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-054",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-055"
+          ]
+        },
+        {
+          "name": "Declaração Universal dos Direitos Humanos",
+          "question_count": 3,
+          "question_ids": [
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-049",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-050",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-051"
+          ]
+        }
+      ]
+    },
+    {
       "name": "Gestão Patrimonial",
       "question_count": 7,
       "question_ids": [
@@ -13972,6 +14660,59 @@
           "question_count": 1,
           "question_ids": [
             "prova-qdx-cremam-2025-assadm-200-044"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Relações Públicas",
+      "question_count": 7,
+      "question_ids": [
+        "prova-qdx-crmvrn-2026-agente-administrativo-200-084",
+        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-089",
+        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-097",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-099",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-100",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-101",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-102"
+      ],
+      "material_count": 4,
+      "material_ids": [
+        "notion-agente-administrativo-crmv-rn-quadrix-2026",
+        "notion-auxiliar-administrativo-crbm-6-quadrix-2026",
+        "notion-auxiliar-administrativo-crtr-12-ms-mt-quadrix-2026-campo-grande",
+        "notion-tecnico-administrativo-crmv-go-quadrix-2025"
+      ],
+      "topics": [
+        {
+          "name": "Cidadania e relações públicas",
+          "question_count": 4,
+          "question_ids": [
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-099",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-100",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-101",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-102"
+          ]
+        },
+        {
+          "name": "Comunicação em conflitos",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-089"
+          ]
+        },
+        {
+          "name": "Comunicação pública e participação social",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-097"
+          ]
+        },
+        {
+          "name": "Responsabilidade social corporativa",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crmvrn-2026-agente-administrativo-200-084"
           ]
         }
       ]
@@ -14131,6 +14872,110 @@
           "question_ids": [
             "prova-qdx-crefito17-2026-agente-fiscal-401-119",
             "prova-qdx-crefito17-2026-agente-fiscal-401-120"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Gestão da Qualidade",
+      "question_count": 6,
+      "question_ids": [
+        "prova-qdx-crbm6-2026-agente-administrativo-401-095",
+        "prova-qdx-crbm6-2026-agente-administrativo-401-096",
+        "prova-qdx-crbm6-2026-agente-administrativo-401-097",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-110",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-111",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-112"
+      ],
+      "material_count": 2,
+      "material_ids": [
+        "notion-agente-administrativo-crbm-6-quadrix-2026",
+        "notion-tecnico-administrativo-cfo-quadrix-2025"
+      ],
+      "topics": [
+        {
+          "name": "Qualidade e melhoria contínua",
+          "question_count": 3,
+          "question_ids": [
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-110",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-111",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-112"
+          ]
+        },
+        {
+          "name": "Melhoria contínua",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-agente-administrativo-401-095"
+          ]
+        },
+        {
+          "name": "Modelos de excelência em gestão",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-agente-administrativo-401-097"
+          ]
+        },
+        {
+          "name": "Qualidade em serviços",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-agente-administrativo-401-096"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Gestão de Processos",
+      "question_count": 6,
+      "question_ids": [
+        "prova-qdx-crbm6-2026-agente-administrativo-401-080",
+        "prova-qdx-crbm6-2026-agente-administrativo-401-081",
+        "prova-qdx-crbm6-2026-agente-administrativo-401-082",
+        "prova-qdx-crbm6-2026-agente-administrativo-401-083",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-116",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-117"
+      ],
+      "material_count": 2,
+      "material_ids": [
+        "notion-agente-administrativo-crbm-6-quadrix-2026",
+        "notion-tecnico-administrativo-cfo-quadrix-2025"
+      ],
+      "topics": [
+        {
+          "name": "BPM",
+          "question_count": 2,
+          "question_ids": [
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-116",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-117"
+          ]
+        },
+        {
+          "name": "Automação de processos",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-agente-administrativo-401-083"
+          ]
+        },
+        {
+          "name": "Gestão por processos",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-agente-administrativo-401-080"
+          ]
+        },
+        {
+          "name": "Mapeamento de processos",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-agente-administrativo-401-081"
+          ]
+        },
+        {
+          "name": "Modelagem de processos",
+          "question_count": 1,
+          "question_ids": [
+            "prova-qdx-crbm6-2026-agente-administrativo-401-082"
           ]
         }
       ]
@@ -14319,6 +15164,34 @@
       ]
     },
     {
+      "name": "Administração e Comunicação",
+      "question_count": 5,
+      "question_ids": [
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-081",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-082",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-083",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-084",
+        "prova-qdx-crmvgo-2025-tecnico-administrativo-200-085"
+      ],
+      "material_count": 1,
+      "material_ids": [
+        "notion-tecnico-administrativo-crmv-go-quadrix-2025"
+      ],
+      "topics": [
+        {
+          "name": "Protocolo e comunicação organizacional",
+          "question_count": 5,
+          "question_ids": [
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-081",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-082",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-083",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-084",
+            "prova-qdx-crmvgo-2025-tecnico-administrativo-200-085"
+          ]
+        }
+      ]
+    },
+    {
       "name": "Comportamento Organizacional",
       "question_count": 5,
       "question_ids": [
@@ -14413,58 +15286,6 @@
           "question_count": 1,
           "question_ids": [
             "prova-qdx-seedf-2025-eletrot-a-118"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Gestão de Projetos",
-      "question_count": 5,
-      "question_ids": [
-        "prova-qdx-crbm6-2026-agente-administrativo-401-085",
-        "prova-qdx-crbm6-2026-agente-administrativo-401-086",
-        "prova-qdx-crbm6-2026-agente-administrativo-401-087",
-        "prova-qdx-crbm6-2026-agente-administrativo-401-088",
-        "prova-qdx-crbm6-2026-agente-administrativo-401-089"
-      ],
-      "material_count": 1,
-      "material_ids": [
-        "notion-agente-administrativo-crbm-6-quadrix-2026"
-      ],
-      "topics": [
-        {
-          "name": "Ciclo de vida de projetos",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-agente-administrativo-401-086"
-          ]
-        },
-        {
-          "name": "Fundamentos de projetos",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-agente-administrativo-401-085"
-          ]
-        },
-        {
-          "name": "Gerenciamento da qualidade",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-agente-administrativo-401-088"
-          ]
-        },
-        {
-          "name": "Gerenciamento de riscos",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-agente-administrativo-401-087"
-          ]
-        },
-        {
-          "name": "Papéis e responsabilidades",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-agente-administrativo-401-089"
           ]
         }
       ]
@@ -14838,45 +15659,34 @@
       ]
     },
     {
-      "name": "Gestão de Processos",
+      "name": "Gestão Pública",
       "question_count": 4,
       "question_ids": [
-        "prova-qdx-crbm6-2026-agente-administrativo-401-080",
-        "prova-qdx-crbm6-2026-agente-administrativo-401-081",
-        "prova-qdx-crbm6-2026-agente-administrativo-401-082",
-        "prova-qdx-crbm6-2026-agente-administrativo-401-083"
+        "prova-qdx-crbm6-2026-agente-administrativo-401-118",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-118",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-119",
+        "prova-qdx-cfo-2025-tecnico-administrativo-201-120"
       ],
-      "material_count": 1,
+      "material_count": 2,
       "material_ids": [
-        "notion-agente-administrativo-crbm-6-quadrix-2026"
+        "notion-agente-administrativo-crbm-6-quadrix-2026",
+        "notion-tecnico-administrativo-cfo-quadrix-2025"
       ],
       "topics": [
         {
-          "name": "Automação de processos",
-          "question_count": 1,
+          "name": "Excelência e administração pública",
+          "question_count": 3,
           "question_ids": [
-            "prova-qdx-crbm6-2026-agente-administrativo-401-083"
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-118",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-119",
+            "prova-qdx-cfo-2025-tecnico-administrativo-201-120"
           ]
         },
         {
-          "name": "Gestão por processos",
+          "name": "Gestão por resultados",
           "question_count": 1,
           "question_ids": [
-            "prova-qdx-crbm6-2026-agente-administrativo-401-080"
-          ]
-        },
-        {
-          "name": "Mapeamento de processos",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-agente-administrativo-401-081"
-          ]
-        },
-        {
-          "name": "Modelagem de processos",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-agente-administrativo-401-082"
+            "prova-qdx-crbm6-2026-agente-administrativo-401-118"
           ]
         }
       ]
@@ -15131,42 +15941,6 @@
           "question_count": 1,
           "question_ids": [
             "prova-qdx-crbm6-2026-auxiliar-administrativo-200-043"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Gestão da Qualidade",
-      "question_count": 3,
-      "question_ids": [
-        "prova-qdx-crbm6-2026-agente-administrativo-401-095",
-        "prova-qdx-crbm6-2026-agente-administrativo-401-096",
-        "prova-qdx-crbm6-2026-agente-administrativo-401-097"
-      ],
-      "material_count": 1,
-      "material_ids": [
-        "notion-agente-administrativo-crbm-6-quadrix-2026"
-      ],
-      "topics": [
-        {
-          "name": "Melhoria contínua",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-agente-administrativo-401-095"
-          ]
-        },
-        {
-          "name": "Modelos de excelência em gestão",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-agente-administrativo-401-097"
-          ]
-        },
-        {
-          "name": "Qualidade em serviços",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-agente-administrativo-401-096"
           ]
         }
       ]
@@ -15493,44 +16267,6 @@
           "question_count": 1,
           "question_ids": [
             "prova-qdx-crtr12-2026-auxiliar-administrativo-200-116"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Relações Públicas",
-      "question_count": 3,
-      "question_ids": [
-        "prova-qdx-crmvrn-2026-agente-administrativo-200-084",
-        "prova-qdx-crbm6-2026-auxiliar-administrativo-200-089",
-        "prova-qdx-crtr12-2026-auxiliar-administrativo-200-097"
-      ],
-      "material_count": 3,
-      "material_ids": [
-        "notion-agente-administrativo-crmv-rn-quadrix-2026",
-        "notion-auxiliar-administrativo-crbm-6-quadrix-2026",
-        "notion-auxiliar-administrativo-crtr-12-ms-mt-quadrix-2026-campo-grande"
-      ],
-      "topics": [
-        {
-          "name": "Comunicação em conflitos",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-auxiliar-administrativo-200-089"
-          ]
-        },
-        {
-          "name": "Comunicação pública e participação social",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crtr12-2026-auxiliar-administrativo-200-097"
-          ]
-        },
-        {
-          "name": "Responsabilidade social corporativa",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crmvrn-2026-agente-administrativo-200-084"
           ]
         }
       ]
@@ -16416,26 +17152,6 @@
           "question_count": 1,
           "question_ids": [
             "prova-qdx-crbm6-2026-auxiliar-administrativo-200-076"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Gestão Pública",
-      "question_count": 1,
-      "question_ids": [
-        "prova-qdx-crbm6-2026-agente-administrativo-401-118"
-      ],
-      "material_count": 1,
-      "material_ids": [
-        "notion-agente-administrativo-crbm-6-quadrix-2026"
-      ],
-      "topics": [
-        {
-          "name": "Gestão por resultados",
-          "question_count": 1,
-          "question_ids": [
-            "prova-qdx-crbm6-2026-agente-administrativo-401-118"
           ]
         }
       ]
