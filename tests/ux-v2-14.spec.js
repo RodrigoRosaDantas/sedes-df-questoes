@@ -6,10 +6,10 @@ test.beforeEach(async ({page}) => {
   await page.reload({waitUntil: "domcontentloaded"});
 });
 
-test("home prioriza o estudo de hoje e mantém status técnico acessível", async ({page}) => {
-  await expect(page.locator("[data-ux-today]")).toBeVisible({timeout: 30000});
+test("home prioriza o estudo de hoje e mantém configurações acessíveis", async ({page}) => {
+  await expect(page.locator("[data-ux-today]").first()).toBeVisible({timeout: 30000});
   await expect(page.locator("[data-release-health]")).toBeHidden();
-  await expect(page.locator("[data-ux-start-today]")).toBeVisible();
+  await expect(page.locator("[data-ux-start-today]").first()).toBeVisible();
   await expect(page.locator("[data-ux-tech-status]")).toBeVisible();
 });
 
@@ -48,7 +48,7 @@ test("filtro por disciplina inclui questões de provas multidisciplinares", asyn
 });
 
 test("caderno mantém erro aberto até três acertos consecutivos", async ({page}) => {
-  await expect(page.locator("[data-ux-today]")).toBeVisible({timeout: 30000});
+  await expect(page.locator("[data-ux-today]").first()).toBeVisible({timeout: 30000});
   const id = "teste-politica-dominio";
   await page.evaluate(questionId => {
     const policyKey = "sedes.questoes.rodrigo.errorMasteryPolicy.v1";
