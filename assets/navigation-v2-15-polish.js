@@ -183,6 +183,39 @@ function injectRoleTemplatesInStudy() {
   }));
 }
 
+function enhanceSearchResultActions() {
+  if (currentRoute() !== "estudar") return;
+  const root = document.querySelector("[data-ux-search-results]");
+  if (!root?.dataset.uxResultIds) return;
+  let ids = [];
+  try { ids = JSON.parse(root.dataset.uxResultIds); }
+  catch { return; }
+  [...root.querySelectorAll(".ux-search-list article")].forEach((article, index) => {
+    if (article.querySelector("[data-ux15-open-question]")) return;
+    const id = ids[index];
+    if (!id) return;
+    article.dataset.ux15QuestionId = id;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "btn compact";
+    button.dataset.ux15OpenQuestion = id;
+    button.textContent = "Abrir questão";
+    button.setAttribute("aria-label", `Abrir questão ${id}`);
+    button.addEventListener("click", () => {
+      createCompatibleSession({
+        id: `busca-${id}`,
+        name: `Questão encontrada — ${id}`,
+        questionIds: [id],
+        mode: "treino",
+        minutes: 2,
+        discipline: "Resultado da busca",
+        source: "Busca textual do Banco Mestre",
+      });
+    });
+    article.append(button);
+  });
+}
+
 function enhanceSettingsAccessibility() {
   const page = document.querySelector("[data-ux15-settings-page]");
   if (!page) {
@@ -256,6 +289,7 @@ function enhance() {
   enhanceSyncStatus();
   enhanceBreadcrumb();
   injectRoleTemplatesInStudy();
+  enhanceSearchResultActions();
   enhanceSettingsAccessibility();
   reconcileHomeReviewTotal();
   pruneLegacyHome();
