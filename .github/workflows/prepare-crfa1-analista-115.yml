@@ -1,0 +1,114 @@
+name: Preparar lote CRFa-1 Analista — 115 itens
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/prepare-crfa1-analista-115.yml
+      - data/operations/prepare-crfa1-analista-115.json
+      - scripts/release-crfa1-analista-115.mjs
+      - scripts/filter-crfa1-analista-115-snapshot.mjs
+      - scripts/validate-crfa1-analista-115-operation.mjs
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: prepare-crfa1-analista-115
+  cancel-in-progress: false
+
+env:
+  OPERATION_ID: CRFA1-2026-ANALISTA-400-115-20260807
+  SNAPSHOT_PATH: data/notion/publication-additions/crfa1-analista-115.json
+  PLAN_COPY_PATH: data/notion/publication-additions/crfa1-analista-115-plan.json
+  RECEIPT_PATH: data/operations/crfa1-analista-115-prepare-receipt.json
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Liberar somente os 115 registros autorizados no Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/release-crfa1-analista-115.mjs
+
+      - name: Consultar a fonte editorial viva
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/export-notion-snapshot.mjs
+
+      - name: Isolar somente o lote CRFa-1 autorizado
+        run: node scripts/filter-crfa1-analista-115-snapshot.mjs
+
+      - name: Gerar e validar o plano restrito
+        run: |
+          node scripts/create-publication-plan.mjs
+          node scripts/validate-notion-snapshot.mjs
+          node scripts/validate-publication-plan.mjs
+          node scripts/validate-crfa1-analista-115-operation.mjs
+
+      - name: Criar pacote e recibo imutáveis
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data/notion/publication-additions data/operations
+          cp data/notion/published.json "${SNAPSHOT_PATH}"
+          cp data/notion/publication-plan.json "${PLAN_COPY_PATH}"
+          cmp --silent data/notion/published.json "${SNAPSHOT_PATH}"
+          cmp --silent data/notion/publication-plan.json "${PLAN_COPY_PATH}"
+          SNAPSHOT_SHA=$(sha256sum "${SNAPSHOT_PATH}" | awk '{print $1}')
+          PLAN_SHA=$(sha256sum "${PLAN_COPY_PATH}" | awk '{print $1}')
+          SOURCE_SHA=$(git rev-parse HEAD)
+          node --input-type=module - "$SNAPSHOT_SHA" "$PLAN_SHA" "$SOURCE_SHA" <<'NODE'
+          import fs from 'node:fs';
+          const [, , snapshotSha, planSha, sourceSha] = process.argv;
+          const receipt = {
+            schema_version: '1.0',
+            operation_id: process.env.OPERATION_ID,
+            status: 'prepared_not_published',
+            expected_additions: 115,
+            expected_public_total_before: 3046,
+            expected_public_total_after: 3161,
+            blocked_original_numbers: [5, 48, 54, 102, 104],
+            snapshot_sha256: snapshotSha,
+            plan_sha256: planSha,
+            prepared_from_sha: sourceSha,
+            publication_started: false,
+            notion_traceability_closed: false,
+          };
+          fs.writeFileSync(process.env.RECEIPT_PATH, `${JSON.stringify(receipt, null, 2)}\n`);
+          NODE
+          test "$(sha256sum "${SNAPSHOT_PATH}" | awk '{print $1}')" = "$SNAPSHOT_SHA"
+          test "$(sha256sum "${PLAN_COPY_PATH}" | awk '{print $1}')" = "$PLAN_SHA"
+
+      - name: Versionar somente o pacote validado e auto-remover o preparador
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'sedes-df-publish[bot]'
+          git config user.email 'sedes-df-publish[bot]@users.noreply.github.com'
+          git rm .github/workflows/prepare-crfa1-analista-115.yml
+          git rm scripts/release-crfa1-analista-115.mjs
+          git rm scripts/filter-crfa1-analista-115-snapshot.mjs
+          git rm scripts/validate-crfa1-analista-115-operation.mjs
+          git rm data/operations/prepare-crfa1-analista-115.json
+          git add data/notion/published.json data/notion/publication-plan.json
+          git add "${SNAPSHOT_PATH}" "${PLAN_COPY_PATH}" "${RECEIPT_PATH}"
+          git commit -m 'Preparar publicação de 115 questões do CRFa-1 [skip ci]'
+          git fetch origin main
+          if ! git merge-base --is-ancestor origin/main HEAD; then git rebase origin/main; fi
+          git push origin HEAD:main
