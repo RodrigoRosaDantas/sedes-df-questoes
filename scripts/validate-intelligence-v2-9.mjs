@@ -64,8 +64,17 @@ for (const discipline of study.disciplines || []) {
 if (indexedIds.size !== questionCount) fail(`Cobertura inteligente divergente: ${indexedIds.size}/${questionCount}.`);
 
 const workflow = read(".github/workflows/pages.yml");
-for (const marker of ["path: dist", "playwright", "verify-deployment.mjs", "playwright.public.config.js", "rollback-deployment.mjs", "PUBLICATION_PLAN_PATH", "source_sha:", "steps.traceability.outcome == 'failure'"]) {
-  if (!workflow.includes(marker)) fail(`Workflow incompleto: ${marker}`);
+const suspensionPath = path.join(root, "data", "operations", "site-automations-suspended.json");
+const suspension = fs.existsSync(suspensionPath) ? JSON.parse(fs.readFileSync(suspensionPath, "utf8")) : null;
+const manualOnly = suspension?.mode === "manual_only";
+if (manualOnly) {
+  if (!workflow.includes("workflow_dispatch:")) fail("Workflow de Pages suspenso sem acionamento manual.");
+  if (/^  (push|pull_request|schedule):/m.test(workflow)) fail("Workflow de Pages suspenso contém gatilho automático.");
+  if (!workflow.includes("SUSPENSO")) fail("Workflow permanente não registra explicitamente a suspensão.");
+} else {
+  for (const marker of ["path: dist", "playwright", "verify-deployment.mjs", "playwright.public.config.js", "rollback-deployment.mjs", "PUBLICATION_PLAN_PATH", "source_sha:", "steps.traceability.outcome == 'failure'"]) {
+    if (!workflow.includes(marker)) fail(`Workflow incompleto: ${marker}`);
+  }
+  if (workflow.includes("export-notion-snapshot.mjs")) fail("O workflow de Pages não pode substituir o snapshot versionado por leitura ao vivo do Notion.");
 }
-if (workflow.includes("export-notion-snapshot.mjs")) fail("O workflow de Pages não pode substituir o snapshot versionado por leitura ao vivo do Notion.");
-console.log(`✓ Plataforma inteligente validada: ${questionCount} questões, ${materialCount} materiais, ${study.summary.disciplines} matérias, ${study.summary.topics} tópicos, cache ${expectedCacheVersion}, Home v2.15 sem montagem legada e auditoria pública.`);
+console.log(`✓ Plataforma inteligente validada: ${questionCount} questões, ${materialCount} materiais, ${study.summary.disciplines} matérias, ${study.summary.topics} tópicos, cache ${expectedCacheVersion}, Home v2.15 sem montagem legada e governança ${manualOnly ? "manual" : "automática"}.`);
