@@ -7,24 +7,37 @@ const read = relative => fs.readFileSync(path.join(root, relative), "utf8");
 const exists = relative => fs.existsSync(path.join(root, relative));
 const fail = message => { throw new Error(message); };
 const packageData = JSON.parse(read("package.json"));
-const expectedCacheVersion = `sedes-questoes-v${String(packageData.version || "").replace(/\./g, "-")}`;
+const expectedCacheVersion = `sedes-questoes-v${String(packageData.version || "").replace(/\./g, "-")}-r5`;
 
 for (const file of [
   "dist/index.html", "dist/manifest.webmanifest", "dist/service-worker.js",
   "dist/assets/learning-v2-9.js", "dist/assets/pwa-v2-9.js", "dist/assets/intelligence-v2-9.css",
+  "dist/assets/ux-v2-14.js", "dist/assets/ux-v2-14-guardrails.js",
+  "dist/assets/navigation-v2-15.js", "dist/assets/navigation-v2-15-polish.js",
   "dist/data/release/catalogo.json", "dist/data/release/study-index.json",
 ]) if (!exists(file)) fail(`Arquivo da plataforma inteligente ausente: ${file}`);
 
 const index = read("dist/index.html");
-for (const feature of ["manifest.webmanifest", "intelligence-v2-9.css", "app-v4.js?v=9", "learning-v2-9.js", "pwa-v2-9.js"]) {
+for (const feature of [
+  "manifest.webmanifest", "intelligence-v2-9.css", "app-v4.js?v=13", "learning-v2-9.js", "pwa-v2-9.js",
+  "ux-v2-14.js?v=1", "ux-v2-14-guardrails.js?v=1", "navigation-v2-15.js?v=1", "navigation-v2-15-polish.js?v=1",
+]) {
   if (!index.includes(feature)) fail(`Integração ausente no HTML: ${feature}`);
 }
 const learning = read("dist/assets/learning-v2-9.js");
 for (const feature of ["reviewSchedule", "D0/D7/D20", "data-smart-today", "Por que eu errei?", "Exportar para Anki", "Simulado por cargo", "Selecionar pontos fracos", "Minha anotação"]) {
   if (!learning.includes(feature)) fail(`Recurso inteligente ausente: ${feature}`);
 }
+const navigation = read("dist/assets/navigation-v2-15.js");
+for (const feature of ["Seu estudo, sem ruído.", "#/perfil/configuracoes", "Última sincronização do catálogo"]) {
+  if (!navigation.includes(feature)) fail(`Navegação v2.15 ausente: ${feature}`);
+}
+const polish = read("dist/assets/navigation-v2-15-polish.js");
+for (const feature of ["injectRoleTemplatesInStudy", "enhanceSearchResultActions", "data-ux15-open-question"]) {
+  if (!polish.includes(feature)) fail(`Polimento v2.15 ausente: ${feature}`);
+}
 const serviceWorker = read("dist/service-worker.js");
-for (const feature of ["data/release/catalogo.json", "CACHE_VERSION", "networkFirst", expectedCacheVersion]) {
+for (const feature of ["data/release/catalogo.json", "CACHE_VERSION", "networkFirst", expectedCacheVersion, "navigation-v2-15-polish.js?v=1"]) {
   if (!serviceWorker.includes(feature)) fail(`Cache offline incompleto: ${feature}`);
 }
 if (!/release\\\/materials/.test(serviceWorker)) fail("Cache offline dos materiais não está ativo.");
@@ -52,4 +65,4 @@ for (const marker of ["path: dist", "playwright", "verify-deployment.mjs", "play
   if (!workflow.includes(marker)) fail(`Workflow incompleto: ${marker}`);
 }
 if (workflow.includes("export-notion-snapshot.mjs")) fail("O workflow de Pages não pode substituir o snapshot versionado por leitura ao vivo do Notion.");
-console.log(`✓ Plataforma inteligente validada: ${questionCount} questões, ${materialCount} materiais, ${study.summary.disciplines} matérias, ${study.summary.topics} tópicos, cache ${expectedCacheVersion}, PWA e auditoria pública com plano restrito e rollback.`);
+console.log(`✓ Plataforma inteligente validada: ${questionCount} questões, ${materialCount} materiais, ${study.summary.disciplines} matérias, ${study.summary.topics} tópicos, cache ${expectedCacheVersion}, UX v2.15 e auditoria pública.`);
