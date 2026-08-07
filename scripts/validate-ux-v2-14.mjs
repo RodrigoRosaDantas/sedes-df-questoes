@@ -29,7 +29,7 @@ requireMarkers(css, [
 ], "CSS UX v2.14");
 requireMarkers(js, [
   "progressive enhancement only",
-  "data.uxRoute",
+  "dataset.uxRoute",
   "enhancePlatformStatus",
   "enhanceExam",
   "ux-focus-mode",
