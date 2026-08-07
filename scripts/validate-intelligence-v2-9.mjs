@@ -36,7 +36,7 @@ for (const feature of ["Seu estudo, sem ruído.", "#/perfil/configuracoes", "Úl
   if (!navigation.includes(feature)) fail(`Navegação v2.15 ausente: ${feature}`);
 }
 const polish = read("dist/assets/navigation-v2-15-polish.js");
-for (const feature of ["injectRoleTemplatesInStudy", "enhanceSearchResultActions", "data-ux15-open-question", 'aria-current="page"', "aria-controls", "role\", \"tabpanel"]) {
+for (const feature of ["injectRoleTemplatesInStudy", "enhanceSearchResultActions", "data-ux15-open-question", 'aria-current="page"', "aria-controls", "tabpanel", "aria-labelledby"]) {
   if (!polish.includes(feature)) fail(`Polimento v2.15 ausente: ${feature}`);
 }
 const serviceWorker = read("dist/service-worker.js");
