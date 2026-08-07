@@ -7,10 +7,15 @@ test("expõe release unificada, prova real, reporte e proteção do progresso", 
   await expect(page.locator("[data-release-health]")).toBeHidden({timeout: 30000});
   await expect(page.locator("[data-ux-tech-status]")).toBeVisible({timeout: 30000});
   await page.locator("[data-ux-tech-status]").click();
-  await expect(page.locator(".ux-tech-dialog")).toContainText("Publicação da plataforma");
-  await page.locator("[data-close-tech]").click();
-  await expect(page.locator("[data-official-exam-card]")).toContainText("60 questões");
-  await expect(page.locator("[data-adaptive-review]")).toBeVisible();
+  await expect(page.locator("[data-ux15-settings-page]")).toBeVisible({timeout: 30000});
+  await page.locator("[data-ux15-settings-tab=plataforma]").click();
+  await expect(page.getByRole("heading", {name: "Dados do projeto"})).toBeVisible();
+
+  await page.goto("/#/revisar", {waitUntil: "domcontentloaded"});
+  await expect(page.locator("[data-adaptive-review]")).toBeVisible({timeout: 30000});
+
+  await page.goto("/#/estudar", {waitUntil: "domcontentloaded"});
+  await expect(page.locator("[data-official-exam-card]")).toContainText("60 questões", {timeout: 30000});
   await page.locator("[data-start-official-exam]").click();
   await expect(page.locator(".question-card")).toBeVisible({timeout: 30000});
   await expect.poll(async () => {
