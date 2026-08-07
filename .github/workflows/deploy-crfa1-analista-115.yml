@@ -95,23 +95,39 @@ jobs:
         env:
           RELEASE_SHA: ${{ steps.release_source.outputs.release_sha }}
         run: |
-          set -uo pipefail
-          {
-            echo "Release SHA: ${RELEASE_SHA}"
-            GITHUB_SHA="${RELEASE_SHA}" npm run check
-            CRFA_ROOT="${GITHUB_WORKSPACE}" node /tmp/validate-crfa1-analista-115-deploy.mjs dist "${RELEASE_SHA}"
-          } 2>&1 | tee /tmp/crfa1-deploy-check.log
-          STATUS=${PIPESTATUS[0]}
-          if [ "${STATUS}" -ne 0 ]; then
-            set -e
-            cp /tmp/crfa1-deploy-check.log data/operations/crfa1-analista-115-deploy-failure.log
+          set -u
+          LOG=/tmp/crfa1-deploy-check.log
+          echo "Release SHA: ${RELEASE_SHA}" | tee "${LOG}"
+
+          persist_failure() {
+            local status="$1"
+            local stage="$2"
+            echo "FALHA EM ${stage}; status ${status}." | tee -a "${LOG}"
+            cp "${LOG}" /tmp/crfa1-deploy-check-preserved.log
+            git reset --hard HEAD
+            git clean -fd
+            mkdir -p data/operations
+            cp /tmp/crfa1-deploy-check-preserved.log data/operations/crfa1-analista-115-deploy-failure.log
             git add data/operations/crfa1-analista-115-deploy-failure.log
             git commit -m 'Registrar falha de validação do deploy CRFa-1 [skip ci]'
             git fetch origin main
             if ! git merge-base --is-ancestor origin/main HEAD; then git rebase origin/main; fi
             git push origin HEAD:main
-            exit "${STATUS}"
-          fi
+            exit "${status}"
+          }
+
+          set +e
+          GITHUB_SHA="${RELEASE_SHA}" npm run check 2>&1 | tee -a "${LOG}"
+          CHECK_STATUS=${PIPESTATUS[0]}
+          set -e
+          if [ "${CHECK_STATUS}" -ne 0 ]; then persist_failure "${CHECK_STATUS}" 'npm run check'; fi
+
+          set +e
+          CRFA_ROOT="${GITHUB_WORKSPACE}" node /tmp/validate-crfa1-analista-115-deploy.mjs dist "${RELEASE_SHA}" 2>&1 | tee -a "${LOG}"
+          DIST_STATUS=${PIPESTATUS[0]}
+          set -e
+          if [ "${DIST_STATUS}" -ne 0 ]; then persist_failure "${DIST_STATUS}" 'gate dist CRFa-1'; fi
+          echo '✓ Build e gate dist concluídos sem falha.' | tee -a "${LOG}"
 
       - name: Preparar GitHub Pages
         uses: actions/configure-pages@v6
