@@ -1,18 +1,26 @@
 {
   "schema_version": "3.1",
   "release_version": "2.9.2",
-  "generated_at": "2026-08-07T12:50:48.274Z",
+  "generated_at": "2026-08-07T13:33:39.108Z",
   "summary": {
     "banco_mestre": 3212,
-    "materiais": 72,
-    "questoes": 3161,
-    "aguardando_auditoria": 49,
-    "provas": 37,
+    "materiais": 73,
+    "questoes": 3210,
+    "aguardando_auditoria": 0,
+    "provas": 38,
     "simulados": 35,
     "discursivas_consulta": 2
   },
-  "catalog_sha256": "85f1ff737f477d875dee33ff40742b66ba42d17938b571141cf0f6c7830c5c19",
+  "catalog_sha256": "298fe13416ec020192ba9dab39b72172a68216cc17505dad4af1296fec58a044",
   "materials": [
+    {
+      "id": "notion-administrador-cremam-quadrix-2025",
+      "file": "./data/release/materials/notion-administrador-cremam-quadrix-2025.json",
+      "questions": 49,
+      "bytes": 165731,
+      "sha256": "f6d25a3456dd8ea8e65a1422b21ca8780c592431cec1c9367bad57c45c6f2a67",
+      "display_items": 0
+    },
     {
       "id": "notion-administrador-crf-df-quadrix-2026",
       "file": "./data/release/materials/notion-administrador-crf-df-quadrix-2026.json",
@@ -82,7 +90,7 @@
       "file": "./data/release/materials/notion-analista-administrativo-crfa-1-quadrix-2026.json",
       "questions": 115,
       "bytes": 294601,
-      "sha256": "882cdcb5d955e5d6296f19567c6d0cba97668682ee76b755a5da6f57fd7ce037",
+      "sha256": "eee455ba87bc10baa8a451f45f869372120b8a06cee24d6037ae27e22ca79e9c",
       "display_items": 0
     },
     {

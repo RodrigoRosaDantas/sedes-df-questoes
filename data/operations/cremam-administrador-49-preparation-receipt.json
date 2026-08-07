@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "CREMAM-2025-ADMINISTRADOR-400-49-20260807",
+  "status": "prepared",
+  "prepared_at": "2026-08-07T13:33:38.846Z",
+  "records": 49,
+  "excluded_original_numbers": [
+    3
+  ],
+  "baseline_questions": 3161,
+  "target_questions": 3210,
+  "snapshot_sha256": "864aa2b13aebb15cbd648a8a116e07fff9e6617a4b7a71ef5aff9cf51b2bdd71",
+  "codes_sha256": "3abfe5301201c8785b81d6cb248430e8faa116787f5257be75f24307c1e9cadb",
+  "deduplication": {
+    "code_collisions": 0,
+    "exact_content_collisions": 0
+  },
+  "plan_sha256": "29bc5211d043647546908bdeb13123395c3080589bc00c54195926208248875a"
+}
