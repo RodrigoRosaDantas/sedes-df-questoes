@@ -51,4 +51,8 @@ function injectCard() {
   target.insertAdjacentElement("beforebegin", card);
   card.querySelector("[data-start-adaptive]").addEventListener("click", startReview);
 }
-observeApp(injectCard);
+function enhanceAdaptive() {
+  syncModel();
+  injectCard();
+}
+observeApp(enhanceAdaptive);
