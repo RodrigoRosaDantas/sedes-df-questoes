@@ -1,0 +1,19 @@
+{
+  "operation_id": "CRFA1-2026-ANALISTA-400-115-20260807",
+  "action": "publish_prepared_package",
+  "authorized": true,
+  "authorized_by": "Rodrigo Rosa Dantas",
+  "requested_at": "2026-08-07T09:20:00-03:00",
+  "prepare_commit": "87204420e1cff32a8fa45926cf342e0161067795",
+  "snapshot_sha256": "d1aa0e165dd0b2fb83e78ba75bda550d57f1f23f1ee5366f6fbab9c80c4e4b3d",
+  "plan_sha256": "2b49c85b2654a1094258385117648a5036f82bd2467279a25a5284a28628ed24",
+  "expected_additions": 115,
+  "expected_public_total_before": 3046,
+  "expected_public_total_after": 3161,
+  "expected_materials_after": 72,
+  "expected_banco_mestre_after": 3212,
+  "expected_awaiting_audit_after": 49,
+  "blocked_original_numbers": [5, 48, 54, 102, 104],
+  "close_notion_only_after_public_verification": true,
+  "restore_permanent_automations": false
+}
