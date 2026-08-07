@@ -6,7 +6,14 @@ const baseURL = `${configuredURL.replace(/\/+$/, "")}/`;
 
 export default defineConfig({
   testDir: "./tests-public",
-  testMatch: ["release-contract.spec.js", "dashboard-card.spec.js"],
+  testMatch: [
+    "release-contract.spec.js",
+    "dashboard-card.spec.js",
+    "material-downloads.spec.js",
+    "platform-v2-13.spec.js",
+    "ux-v2-14.spec.js",
+    "navigation-v2-15.spec.js",
+  ],
   timeout: 240000,
   retries: 1,
   workers: 1,
