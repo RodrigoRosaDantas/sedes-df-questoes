@@ -18,6 +18,11 @@ const polishCss = read("assets/navigation-v2-15-polish.css");
 const builder = read("scripts/build-public.mjs");
 const publicPlaywright = read("playwright.public.config.js");
 const packageData = read("package.json");
+const publicReleaseContract = read("tests-public/release-contract.spec.js");
+const publicDashboard = read("tests-public/dashboard-card.spec.js");
+const publicNavigation = read("tests-public/navigation-v2-15.spec.js");
+const publicUx = read("tests-public/ux-v2-14.spec.js");
+const publicPlatform = read("tests-public/platform-v2-13.spec.js");
 
 requireMarkers(index, ["navigation-v2-15.css?v=1", "navigation-v2-15.js?v=1", "navigation-v2-15-polish.css?v=1", "navigation-v2-15-polish.js?v=1", "data-ux-tech-status>Configurações"], "HTML");
 requireMarkers(worker, ["navigation-v2-15.css?v=1", "navigation-v2-15.js?v=1", "navigation-v2-15-polish.css?v=1", "navigation-v2-15-polish.js?v=1"], "Service worker");
@@ -51,8 +56,24 @@ requireMarkers(navigationPolish, [
 requireMarkers(css, ["ux15-home-active", "ux15-home-grid", "ux15-settings-page", "ux15-sync-card", "ux15-facts-grid"], "CSS v2.15");
 requireMarkers(polishCss, ["ux15-clean-home", "ux15-settings-route", "ux15-sync-age", "ux15-breadcrumb", "ux15-role-templates", "fresh", "attention", "stale"], "CSS de polimento v2.15");
 requireMarkers(builder, ["platform_navigation_js", "platform_navigation_css", "platform_navigation_polish_js", "platform_navigation_polish_css", "navigation-v2-15-polish.js", "navigation-v2-15-polish.css"], "Build público");
-requireMarkers(publicPlaywright, ["material-downloads.spec.js", "platform-v2-13.spec.js", "ux-v2-14.spec.js", "navigation-v2-15.spec.js"], "Playwright público");
+requireMarkers(publicPlaywright, ["release-contract.spec.js", "dashboard-card.spec.js", "material-downloads.spec.js", "platform-v2-13.spec.js", "ux-v2-14.spec.js", "navigation-v2-15.spec.js"], "Playwright público");
 requireMarkers(packageData, ["node --check playwright.config.js", "node --check playwright.public.config.js"], "npm check");
+requireMarkers(publicReleaseContract, ["arquitetura v2.15", "perfil/configuracoes", "[data-ux15-home]", "[data-official-exam-card]", "[data-adaptive-review]"], "Contrato público da release");
+requireMarkers(publicDashboard, ["Configurações usa o release-meta reconciliado", "Banco Mestre", "navigation-v2-15.js?v=1"], "Smoke público do painel");
+
+for (const [name, content] of Object.entries({
+  "release-contract": publicReleaseContract,
+  "dashboard-card": publicDashboard,
+  "navigation-v2-15": publicNavigation,
+  "ux-v2-14": publicUx,
+  "platform-v2-13": publicPlatform,
+})) {
+  if (content.includes('page.goto("/#/')) throw new Error(`${name}: rota pública absoluta ignora o subdiretório do GitHub Pages.`);
+  if (content.includes('request.get("/data/')) throw new Error(`${name}: dado público absoluto ignora o subdiretório do GitHub Pages.`);
+}
+for (const forbidden of ["2946", "2871", 'app-v4.js?v=9']) {
+  if (publicDashboard.includes(forbidden)) throw new Error(`dashboard-card ainda contém marcador histórico congelado: ${forbidden}`);
+}
 
 if (exists("dist")) {
   for (const required of ["dist/assets/navigation-v2-15.js", "dist/assets/navigation-v2-15.css", "dist/assets/navigation-v2-15-polish.js", "dist/assets/navigation-v2-15-polish.css", "dist/data/release/build-info.json", "dist/data/release/release-meta.json"]) {
@@ -68,4 +89,4 @@ if (exists("dist")) {
   }
 }
 
-console.log("✓ Navegação v2.15 validada: Home limpa, DOM enxuto, Brasília, Configurações sem flash, simulados por cargo, breadcrumbs, busca rápida e smoke público.");
+console.log("✓ Navegação v2.15 validada: Home limpa, DOM enxuto, Brasília, Configurações sem flash, simulados por cargo, breadcrumbs, busca rápida e contrato público atual.");
