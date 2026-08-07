@@ -8,6 +8,7 @@ export const OFFICIAL_MATERIAL_ID = "prova-real-sedes-2026";
 export const DAY = 86400000;
 
 export const state = {release: null, catalog: null, studyIndex: null, exam: null};
+let dataPromise = null;
 export const safeParse = (value, fallback) => {
   try { return JSON.parse(value ?? JSON.stringify(fallback)); }
   catch { return fallback; }
@@ -80,13 +81,22 @@ export const createCompatibleSession = ({id, name, questionIds, questions = null
 };
 export async function ensureData() {
   if (state.release && state.catalog && state.studyIndex && state.exam) return state;
-  const responses = await Promise.all([
-    fetch(RELEASE_META_URL, {cache: "no-store"}), fetch(CATALOG_URL, {cache: "no-store"}),
-    fetch(STUDY_INDEX_URL, {cache: "no-store"}), fetch(EXAM_URL, {cache: "no-store"}),
-  ]);
-  if (!responses.every(response => response.ok)) throw new Error("Metadados da plataforma indisponíveis.");
-  [state.release, state.catalog, state.studyIndex, state.exam] = await Promise.all(responses.map(response => response.json()));
-  return state;
+  if (dataPromise) return dataPromise;
+  dataPromise = (async () => {
+    const responses = await Promise.all([
+      fetch(RELEASE_META_URL, {cache: "no-store"}), fetch(CATALOG_URL, {cache: "no-store"}),
+      fetch(STUDY_INDEX_URL, {cache: "no-store"}), fetch(EXAM_URL, {cache: "no-store"}),
+    ]);
+    if (!responses.every(response => response.ok)) throw new Error("Metadados da plataforma indisponíveis.");
+    [state.release, state.catalog, state.studyIndex, state.exam] = await Promise.all(responses.map(response => response.json()));
+    return state;
+  })();
+  try {
+    return await dataPromise;
+  } catch (error) {
+    dataPromise = null;
+    throw error;
+  }
 }
 export const observeApp = callback => {
   let scheduled = false;
