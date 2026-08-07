@@ -5,13 +5,17 @@ import {
   esc,
   materialIdFromIndex,
   observeApp,
+  profileKey,
   profileRoles,
+  readJSON,
   shuffle,
   state,
 } from "./shared-v2-13.js?v=1";
 
 const BRASILIA = "America/Sao_Paulo";
 let focusToken = 0;
+let pendingSettingsTabFocus = null;
+let settingsHeadingFocusKey = null;
 
 function primeRouteClass() {
   document.documentElement.classList.toggle("ux15-clean-home", currentRoute() === "inicio");
@@ -98,6 +102,22 @@ function pruneLegacyHome() {
   for (const child of [...app.children]) if (child !== home) child.remove();
 }
 
+function reconcileHomeReviewTotal() {
+  if (currentRoute() !== "inicio") return;
+  const card = document.querySelector("[data-ux15-review]")?.closest("article");
+  if (!card) return;
+  const now = Date.now();
+  const recurrent = Object.values(readJSON(profileKey("errors.v3"), {}))
+    .filter(item => item?.open && Number(item.count || 0) > 1)
+    .map(item => item.id);
+  const due = Object.values(readJSON(profileKey("adaptiveReview.v1"), {}))
+    .filter(item => Number(item.dueAt || 0) <= now || Number(item.mastery || 0) < 45)
+    .map(item => item.id);
+  const total = new Set([...recurrent, ...due].filter(Boolean)).size;
+  const heading = card.querySelector("h3");
+  if (heading) heading.textContent = `${total} prioridade${total === 1 ? "" : "s"}`;
+}
+
 function availableIdsForRole(role) {
   const materialIds = new Set((state.catalog?.materials || [])
     .filter(item => String(item.codigo_cargo) === String(role) || String(item.codigo_cargo) === "multicargo")
@@ -131,15 +151,15 @@ function injectRoleTemplatesInStudy() {
   if (!target) return;
   const roles = profileRoles();
   if (!roles.length) return;
-  const section = document.createElement("section");
-  section.className = "role-templates section";
-  section.dataset.roleTemplates = "";
-  section.innerHTML = `<div class="section-head"><div><p class="eyebrow">Simulado por cargo</p><h2>Treino equilibrado por perfil</h2><p>Organiza 30 questões entre as matérias disponíveis do cargo. Não substitui a distribuição oficial do edital.</p></div></div><div class="role-template-grid">${roles.map(role => {
+  const details = document.createElement("details");
+  details.className = "role-templates section card ux15-role-templates";
+  details.dataset.roleTemplates = "";
+  details.innerHTML = `<summary><span><small>Simulados por cargo</small><strong>Treino equilibrado por perfil</strong></span><b>${roles.length} cargo${roles.length === 1 ? "" : "s"}</b></summary><div class="ux15-role-content"><p>Organiza 30 questões entre as matérias disponíveis do cargo. Não substitui a distribuição oficial do edital.</p><div class="role-template-grid">${roles.map(role => {
     const total = availableIdsForRole(role).length;
     return `<article class="card role-template"><span class="type-badge">Cargo ${esc(role)}</span><h3>${esc(role)}</h3><p>${total.toLocaleString("pt-BR")} questões correlatas disponíveis.</p><button class="btn primary full" data-ux15-role-sim="${esc(role)}" ${total ? "" : "disabled"}>Iniciar 30 questões</button></article>`;
-  }).join("")}</div>`;
-  target.insertAdjacentElement("afterend", section);
-  section.querySelectorAll("[data-ux15-role-sim]").forEach(button => button.addEventListener("click", () => {
+  }).join("")}</div></div>`;
+  target.insertAdjacentElement("afterend", details);
+  details.querySelectorAll("[data-ux15-role-sim]").forEach(button => button.addEventListener("click", () => {
     const role = button.dataset.ux15RoleSim;
     const ids = balancedRoleSample(role, 30);
     if (!ids.length) return;
@@ -154,6 +174,34 @@ function injectRoleTemplatesInStudy() {
       cargo: role,
     });
   }));
+}
+
+function enhanceSettingsAccessibility() {
+  const page = document.querySelector("[data-ux15-settings-page]");
+  if (!page) {
+    settingsHeadingFocusKey = null;
+    return;
+  }
+  const tabs = page.querySelector(".ux15-settings-tabs");
+  if (tabs) tabs.setAttribute("role", "tablist");
+  page.querySelectorAll("[data-ux15-settings-tab]").forEach(button => {
+    button.setAttribute("role", "tab");
+    button.setAttribute("aria-selected", String(button.classList.contains("active")));
+  });
+  document.querySelector("#theme-toggle")?.setAttribute("aria-pressed", String(document.documentElement.dataset.theme === "dark"));
+  if (pendingSettingsTabFocus) {
+    const wanted = pendingSettingsTabFocus;
+    pendingSettingsTabFocus = null;
+    requestAnimationFrame(() => page.querySelector(`[data-ux15-settings-tab="${CSS.escape(wanted)}"]`)?.focus({preventScroll: true}));
+    return;
+  }
+  const focusKey = location.hash || "#/perfil/configuracoes";
+  if (settingsHeadingFocusKey === focusKey) return;
+  const heading = page.querySelector("h1");
+  if (!heading) return;
+  settingsHeadingFocusKey = focusKey;
+  heading.tabIndex = -1;
+  requestAnimationFrame(() => heading.focus({preventScroll: true}));
 }
 
 function focusSearchWhenReady() {
@@ -174,7 +222,9 @@ function focusSearchWhenReady() {
 
 function bindNavigationShortcuts() {
   document.addEventListener("click", event => {
-    if (event.target.closest("[data-ux15-settings], [data-ux-tech-status]")) {
+    const settingsTab = event.target.closest("[data-ux15-settings-tab]");
+    if (settingsTab) pendingSettingsTabFocus = settingsTab.dataset.ux15SettingsTab;
+    if (event.target.closest("[data-ux15-settings], [data-ux-tech-status], #profile-button")) {
       event.preventDefault();
       event.stopImmediatePropagation();
       location.hash = "#/perfil/configuracoes";
@@ -199,6 +249,8 @@ function enhance() {
   enhanceSyncStatus();
   enhanceBreadcrumb();
   injectRoleTemplatesInStudy();
+  enhanceSettingsAccessibility();
+  reconcileHomeReviewTotal();
   pruneLegacyHome();
 }
 
