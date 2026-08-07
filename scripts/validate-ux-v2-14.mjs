@@ -27,12 +27,17 @@ if (exists(generated)) {
   const expected = Object.keys(catalog.question_index || {}).length;
   if (search.schema_version !== "1.0" || search.questions !== expected || search.items?.length !== expected) throw new Error("Índice textual gerado diverge do catálogo.");
   if (exists("dist")) {
-    for (const required of ["dist/assets/ux-v2-14.js", "dist/assets/ux-v2-14.css", "dist/data/release/question-search-index.json"]) {
+    for (const required of ["dist/assets/ux-v2-14.js", "dist/assets/ux-v2-14.css", "dist/data/release/question-search-index.json", "dist/data/release/build-info.json", "dist/data/release/release-meta.json"]) {
       if (!exists(required)) throw new Error(`Pacote público sem recurso da UX v2.14: ${required}`);
     }
     if (read("assets/ux-v2-14.js") !== read("dist/assets/ux-v2-14.js") || read("assets/ux-v2-14.css") !== read("dist/assets/ux-v2-14.css")) throw new Error("O dist diverge das fontes da UX v2.14.");
     const publicSearch = JSON.parse(read("dist/data/release/question-search-index.json"));
     if (publicSearch.questions !== expected || publicSearch.items?.length !== expected) throw new Error("Índice textual público diverge do catálogo.");
+    const buildInfo = JSON.parse(read("dist/data/release/build-info.json"));
+    const releaseMeta = JSON.parse(read("dist/data/release/release-meta.json"));
+    for (const key of ["platform_ux_js", "platform_ux_css"]) {
+      if (!buildInfo.source_files_sha256?.[key] || !releaseMeta.source_files_sha256?.[key]) throw new Error(`Proveniência da UX v2.14 ausente: ${key}`);
+    }
   }
 }
 console.log("✓ UX v2.14 validada: estudo diário, filtros, busca, foco mobile, diagnóstico e revisão.");
