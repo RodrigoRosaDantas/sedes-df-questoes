@@ -16,6 +16,7 @@ const navigationPolish = read("assets/navigation-v2-15-polish.js");
 const css = read("assets/navigation-v2-15.css");
 const polishCss = read("assets/navigation-v2-15-polish.css");
 const builder = read("scripts/build-public.mjs");
+const publicPlaywright = read("playwright.public.config.js");
 
 requireMarkers(index, ["navigation-v2-15.css?v=1", "navigation-v2-15.js?v=1", "navigation-v2-15-polish.css?v=1", "navigation-v2-15-polish.js?v=1", "data-ux-tech-status>Configurações"], "HTML");
 requireMarkers(worker, ["navigation-v2-15.css?v=1", "navigation-v2-15.js?v=1", "navigation-v2-15-polish.css?v=1", "navigation-v2-15-polish.js?v=1"], "Service worker");
@@ -47,6 +48,7 @@ requireMarkers(navigationPolish, [
 requireMarkers(css, ["ux15-home-active", "ux15-home-grid", "ux15-settings-page", "ux15-sync-card", "ux15-facts-grid"], "CSS v2.15");
 requireMarkers(polishCss, ["ux15-clean-home", "ux15-sync-age", "ux15-breadcrumb", "ux15-role-templates", "fresh", "attention", "stale"], "CSS de polimento v2.15");
 requireMarkers(builder, ["platform_navigation_js", "platform_navigation_css", "platform_navigation_polish_js", "platform_navigation_polish_css", "navigation-v2-15-polish.js", "navigation-v2-15-polish.css"], "Build público");
+requireMarkers(publicPlaywright, ["material-downloads.spec.js", "platform-v2-13.spec.js", "ux-v2-14.spec.js", "navigation-v2-15.spec.js"], "Playwright público");
 
 if (exists("dist")) {
   for (const required of ["dist/assets/navigation-v2-15.js", "dist/assets/navigation-v2-15.css", "dist/assets/navigation-v2-15-polish.js", "dist/assets/navigation-v2-15-polish.css", "dist/data/release/build-info.json", "dist/data/release/release-meta.json"]) {
@@ -62,4 +64,4 @@ if (exists("dist")) {
   }
 }
 
-console.log("✓ Navegação v2.15 validada: Home limpa, DOM enxuto, Brasília, Configurações acessíveis, simulados por cargo, breadcrumbs e busca rápida.");
+console.log("✓ Navegação v2.15 validada: Home limpa, DOM enxuto, Brasília, Configurações acessíveis, simulados por cargo, breadcrumbs, busca rápida e smoke público.");
