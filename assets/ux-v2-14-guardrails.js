@@ -1,5 +1,6 @@
 import {
   activeHistory,
+  activeSession,
   createCompatibleSession,
   currentRoute,
   observeApp,
@@ -15,6 +16,28 @@ const ERRORS_KEY = () => profileKey("errors.v3");
 const MARKED_KEY = () => profileKey("marked.v3");
 const ADAPTIVE_KEY = () => profileKey("adaptiveReview.v1");
 const POLICY_KEY = () => profileKey("errorMasteryPolicy.v1");
+const ERROR_REASONS_KEY = () => profileKey("errorReasons.v1");
+
+const REASON_CANONICAL = {
+  "nao-sabia": "Não sabia o conteúdo",
+  "Não sabia": "Não sabia o conteúdo",
+  desatencao: "Distração",
+  "Desatenção": "Distração",
+  confundi: "Confundi a regra ou a lei",
+  "Confundi conceitos": "Confundi a regra ou a lei",
+  interpretacao: "Erro de interpretação",
+  "Interpretação": "Erro de interpretação",
+  chute: "Chute",
+  tempo: "Falta de tempo",
+};
+const CANONICAL_TO_SLUG = {
+  "Não sabia o conteúdo": "nao-sabia",
+  "Distração": "desatencao",
+  "Confundi a regra ou a lei": "confundi",
+  "Erro de interpretação": "interpretacao",
+  "Chute": "chute",
+  "Falta de tempo": "tempo",
+};
 
 const normalize = value => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("pt-BR");
 const stableScore = (id, salt) => {
@@ -28,6 +51,32 @@ const answeredIds = () => new Set(activeHistory().flatMap(attempt => {
   if (attempt?.answers && typeof attempt.answers === "object") return Object.entries(attempt.answers).filter(([, answer]) => Boolean(answer)).map(([id]) => id);
   return Array.isArray(attempt?.questionIds) ? attempt.questionIds : [];
 }));
+
+function normalizeErrorReasons() {
+  const reasons = readJSON(ERROR_REASONS_KEY(), {});
+  let changed = false;
+  for (const item of Object.values(reasons)) {
+    if (!item?.reason) continue;
+    const canonical = REASON_CANONICAL[item.reason] || item.reason;
+    if (canonical !== item.reason) {
+      item.reason = canonical;
+      changed = true;
+    }
+  }
+  if (changed) saveJSON(ERROR_REASONS_KEY(), reasons);
+  return reasons;
+}
+
+function alignReasonButtons(reasons = readJSON(ERROR_REASONS_KEY(), {})) {
+  const session = activeSession();
+  const id = session?.questionIds?.[Number(session.current || 0)] || session?.questions?.[Number(session.current || 0)]?.id || null;
+  if (!id) return;
+  const stored = reasons[id]?.reason || "";
+  const slug = CANONICAL_TO_SLUG[stored] || stored;
+  document.querySelectorAll("[data-ux-error-reason]").forEach(button => {
+    button.classList.toggle("active", button.dataset.uxErrorReason === slug);
+  });
+}
 
 function ensurePolicyActivation() {
   const key = POLICY_KEY();
@@ -143,12 +192,20 @@ function closeMasteredByStreak(event) {
   location.reload();
 }
 
+function normalizeReasonAfterUxClick(event) {
+  if (!event.target.closest("[data-ux-error-reason]")) return;
+  queueMicrotask(() => alignReasonButtons(normalizeErrorReasons()));
+}
+
 document.addEventListener("click", startCorrectedFilter, true);
 document.addEventListener("click", closeMasteredByStreak, true);
+document.addEventListener("click", normalizeReasonAfterUxClick);
 
 observeApp(() => {
   document.documentElement.classList.toggle("ux-student-home", currentRoute() === "inicio");
   queueMicrotask(() => {
+    const reasons = normalizeErrorReasons();
+    alignReasonButtons(reasons);
     reconcileErrorMastery();
     alignReviewCopy();
   });
