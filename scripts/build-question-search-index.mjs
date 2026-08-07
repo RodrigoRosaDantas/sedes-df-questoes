@@ -15,7 +15,9 @@ for (const meta of catalog.materials || []) {
   const relative = String(meta.file || "").replace(/^\.\//, "");
   if (!relative) throw new Error(`Material sem arquivo: ${meta.id || meta.nome || "desconhecido"}`);
   const file = path.resolve(root, relative);
-  if (!file.startsWith(root) || !fs.existsSync(file)) throw new Error(`Arquivo de material inválido: ${relative}`);
+  const relativeToRoot = path.relative(root, file);
+  const outsideRoot = relativeToRoot.startsWith(`..${path.sep}`) || relativeToRoot === ".." || path.isAbsolute(relativeToRoot);
+  if (outsideRoot || !fs.existsSync(file)) throw new Error(`Arquivo de material inválido: ${relative}`);
   const material = JSON.parse(fs.readFileSync(file, "utf8"));
   for (const question of material.questoes || []) {
     if (!question.id || seen.has(question.id)) throw new Error(`ID de questão ausente ou duplicado: ${question.id || "sem-id"}`);
@@ -42,8 +44,12 @@ for (const meta of catalog.materials || []) {
   }
 }
 
-const expected = Object.keys(catalog.question_index || {}).length;
-if (!expected || items.length !== expected) throw new Error(`Índice textual divergente: ${items.length} itens para ${expected} questões catalogadas.`);
+const expectedIds = new Set(Object.keys(catalog.question_index || {}));
+const missing = [...expectedIds].filter(id => !seen.has(id));
+const unexpected = [...seen].filter(id => !expectedIds.has(id));
+if (!expectedIds.size || items.length !== expectedIds.size || missing.length || unexpected.length) {
+  throw new Error(`Índice textual divergente: ${items.length}/${expectedIds.size} itens; ausentes=${missing.length}; inesperados=${unexpected.length}.`);
+}
 const payload = {
   schema_version: "1.0",
   release_version: catalog.release_version || null,
@@ -52,4 +58,4 @@ const payload = {
   items,
 };
 fs.writeFileSync(outputPath, `${JSON.stringify(payload)}\n`);
-console.log(`✓ Índice textual: ${items.length} questões.`);
+console.log(`✓ Índice textual: ${items.length} questões, identidade 1:1 com o catálogo.`);
