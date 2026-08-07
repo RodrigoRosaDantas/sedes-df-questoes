@@ -25,7 +25,10 @@ for (const feature of [
   if (!index.includes(feature)) fail(`Integração ausente no HTML: ${feature}`);
 }
 const learning = read("dist/assets/learning-v2-9.js");
-for (const feature of ["reviewSchedule", "D0/D7/D20", "data-smart-today", "Por que eu errei?", "Exportar para Anki", "Simulado por cargo", "Selecionar pontos fracos", "Minha anotação"]) {
+for (const feature of [
+  "reviewSchedule", "D0/D7/D20", "data-smart-today", "Por que eu errei?", "Exportar para Anki", "Simulado por cargo", "Selecionar pontos fracos", "Minha anotação",
+  "cleanHomeLayerEnabled", 'script[src*="navigation-v2-15.js"]', "if (cleanHomeLayerEnabled()) return;",
+]) {
   if (!learning.includes(feature)) fail(`Recurso inteligente ausente: ${feature}`);
 }
 const navigation = read("dist/assets/navigation-v2-15.js");
@@ -33,7 +36,7 @@ for (const feature of ["Seu estudo, sem ruído.", "#/perfil/configuracoes", "Úl
   if (!navigation.includes(feature)) fail(`Navegação v2.15 ausente: ${feature}`);
 }
 const polish = read("dist/assets/navigation-v2-15-polish.js");
-for (const feature of ["injectRoleTemplatesInStudy", "enhanceSearchResultActions", "data-ux15-open-question"]) {
+for (const feature of ["injectRoleTemplatesInStudy", "enhanceSearchResultActions", "data-ux15-open-question", 'aria-current="page"', "aria-controls", "role\", \"tabpanel"]) {
   if (!polish.includes(feature)) fail(`Polimento v2.15 ausente: ${feature}`);
 }
 const serviceWorker = read("dist/service-worker.js");
@@ -65,4 +68,4 @@ for (const marker of ["path: dist", "playwright", "verify-deployment.mjs", "play
   if (!workflow.includes(marker)) fail(`Workflow incompleto: ${marker}`);
 }
 if (workflow.includes("export-notion-snapshot.mjs")) fail("O workflow de Pages não pode substituir o snapshot versionado por leitura ao vivo do Notion.");
-console.log(`✓ Plataforma inteligente validada: ${questionCount} questões, ${materialCount} materiais, ${study.summary.disciplines} matérias, ${study.summary.topics} tópicos, cache ${expectedCacheVersion}, UX v2.15 e auditoria pública.`);
+console.log(`✓ Plataforma inteligente validada: ${questionCount} questões, ${materialCount} materiais, ${study.summary.disciplines} matérias, ${study.summary.topics} tópicos, cache ${expectedCacheVersion}, Home v2.15 sem montagem legada e auditoria pública.`);
