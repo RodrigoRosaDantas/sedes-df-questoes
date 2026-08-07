@@ -100,3 +100,13 @@ test("mobile mantém quatro destinos principais e configurações no topo", asyn
   await expect(page).toHaveURL(/#\/perfil\/configuracoes$/);
   await expect(page.locator(".ux15-settings-tabs")).toBeVisible({timeout: 30000});
 });
+
+test("topo mobile não estoura com instalação PWA disponível", async ({page}) => {
+  await page.setViewportSize({width: 360, height: 800});
+  await page.goto("/#/inicio", {waitUntil: "domcontentloaded"});
+  await expect(page.locator("#install-app")).toHaveCount(1);
+  await page.locator("#install-app").evaluate(button => { button.hidden = false; });
+  await expect(page.locator("#install-app")).toBeVisible();
+  await expect(page.locator(".brand strong")).toBeHidden();
+  await expect.poll(() => page.locator(".topbar").evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
+});
