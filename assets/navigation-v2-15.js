@@ -145,15 +145,21 @@ function startReview() {
   createCompatibleSession({id: "revisao-prioritaria-home", name: "Revisão prioritária", questionIds: ids, mode: "treino", minutes: ids.length * 2, discipline: "Revisão", source: "Caderno de erros + revisão adaptativa"});
 }
 
+function setNodeText(node, value) {
+  if (!node || node.textContent === value) return;
+  if (node.childNodes.length === 1 && node.firstChild?.nodeType === Node.TEXT_NODE) node.firstChild.nodeValue = value;
+  else node.textContent = value;
+}
+
 function updateClockNodes() {
   const {dateText, timeText} = brasiliaNowParts();
-  document.querySelectorAll("[data-ux15-current-date]").forEach(node => node.textContent = dateText);
-  document.querySelectorAll("[data-ux15-current-time]").forEach(node => node.textContent = timeText);
+  document.querySelectorAll("[data-ux15-current-date]").forEach(node => setNodeText(node, dateText));
+  document.querySelectorAll("[data-ux15-current-time]").forEach(node => setNodeText(node, timeText));
   const sync = formatBrasiliaTimestamp(syncTimestamp());
-  document.querySelectorAll("[data-ux15-sync-time]").forEach(node => node.textContent = sync);
+  document.querySelectorAll("[data-ux15-sync-time]").forEach(node => setNodeText(node, sync));
   const shell = document.querySelector("#sync-label");
   if (shell) {
-    shell.textContent = `${timeText.slice(0, 5)} · Brasília`;
+    setNodeText(shell, `${timeText.slice(0, 5)} · Brasília`);
     shell.title = `Última sincronização do catálogo: ${sync}`;
   }
 }
