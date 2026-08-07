@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.1",
+  "operation_id": "CREMAM-2025-ADMINISTRADOR-400-49-20260807",
+  "status": "success",
+  "release_sha": "fe1dba912a1d841697c3befff70e6dd813258be1",
+  "release_code": "release-2.13.0:fe1dba912a1d841697c3befff70e6dd813258be1",
+  "public_url": "https://rodrigorosadantas.github.io/sedes-df-questoes/",
+  "confirmed_at": "2026-08-07T13:41:55Z",
+  "baseline_questions": 3161,
+  "published_records": 49,
+  "public_questions": 3210,
+  "public_materials": 73,
+  "master_bank": 3212,
+  "awaiting_audit": 0,
+  "discursive_display_items": 2,
+  "excluded_original_numbers": [
+    3
+  ],
+  "snapshot_sha256": "864aa2b13aebb15cbd648a8a116e07fff9e6617a4b7a71ef5aff9cf51b2bdd71",
+  "plan_sha256": "29bc5211d043647546908bdeb13123395c3080589bc00c54195926208248875a",
+  "notion_closed": true,
+  "public_validation": true,
+  "live_publish_formula_rechecked_after_deploy": false,
+  "redeployed_by_finalizer": false,
+  "permanent_automations_restored": false
+}
