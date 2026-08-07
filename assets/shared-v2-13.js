@@ -89,7 +89,15 @@ export async function ensureData() {
   return state;
 }
 export const observeApp = callback => {
-  const run = () => requestAnimationFrame(() => Promise.resolve(callback()).catch(console.error));
+  let scheduled = false;
+  const run = () => {
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(() => {
+      scheduled = false;
+      Promise.resolve(callback()).catch(console.error);
+    });
+  };
   new MutationObserver(run).observe(document.querySelector("#app") || document.body, {childList: true, subtree: true});
   window.addEventListener("hashchange", run);
   run();
