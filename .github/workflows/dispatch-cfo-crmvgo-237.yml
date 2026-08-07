@@ -1,0 +1,58 @@
+name: Disparar publicação CFO e CRMV-GO 237
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/dispatch-cfo-crmvgo-237.yml
+
+permissions:
+  actions: write
+  contents: write
+
+concurrency:
+  group: dispatch-cfo-crmvgo-237-20260807
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 160
+    steps:
+      - name: Validar workflow one-shot instalado na main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow view publish-cfo-crmvgo-237-once.yml --repo "$GITHUB_REPOSITORY" >/dev/null
+
+      - name: Disparar workflow e acompanhar até a conclusão
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          BEFORE=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow publish-cfo-crmvgo-237-once.yml --event workflow_dispatch --limit 1 --json databaseId --jq '.[0].databaseId // 0')
+          gh workflow run publish-cfo-crmvgo-237-once.yml --repo "$GITHUB_REPOSITORY" --ref main
+          RUN_ID=''
+          for attempt in $(seq 1 30); do
+            CANDIDATE=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow publish-cfo-crmvgo-237-once.yml --event workflow_dispatch --limit 1 --json databaseId --jq '.[0].databaseId // 0')
+            if [ "$CANDIDATE" != '0' ] && [ "$CANDIDATE" != "$BEFORE" ]; then RUN_ID="$CANDIDATE"; break; fi
+            sleep 2
+          done
+          test -n "$RUN_ID"
+          echo "Workflow alvo: $RUN_ID"
+          gh run watch "$RUN_ID" --repo "$GITHUB_REPOSITORY" --exit-status
+          gh run view "$RUN_ID" --repo "$GITHUB_REPOSITORY" --json status,conclusion,url,headSha,displayTitle
+
+      - name: Remover dispatcher temporário da main
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          FILE='.github/workflows/dispatch-cfo-crmvgo-237.yml'
+          SHA=$(gh api "repos/$GITHUB_REPOSITORY/contents/$FILE?ref=main" --jq .sha)
+          gh api -X DELETE "repos/$GITHUB_REPOSITORY/contents/$FILE" \
+            -f message='Remover dispatcher temporário CFO/CRMV-GO 237 [skip ci]' \
+            -f sha="$SHA" \
+            -f branch=main >/dev/null
