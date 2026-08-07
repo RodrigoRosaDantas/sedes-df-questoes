@@ -37,7 +37,7 @@ if (exists(generated)) {
     if (publicSearch.questions !== expected || publicSearch.items?.length !== expected) throw new Error("Índice textual público diverge do catálogo.");
     const buildInfo = JSON.parse(read("dist/data/release/build-info.json"));
     const releaseMeta = JSON.parse(read("dist/data/release/release-meta.json"));
-    for (const key of ["platform_ux_js", "platform_ux_css"]) {
+    for (const key of ["platform_ux_js", "platform_ux_guardrails_js", "platform_ux_css"]) {
       if (!buildInfo.source_files_sha256?.[key] || !releaseMeta.source_files_sha256?.[key]) throw new Error(`Proveniência da UX v2.14 ausente: ${key}`);
     }
   }
