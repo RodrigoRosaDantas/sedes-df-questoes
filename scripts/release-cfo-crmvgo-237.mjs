@@ -33,7 +33,7 @@ if (!TOKEN) throw new Error('NOTION_TOKEN ausente.');
 const EXPORT_PROPERTIES = [
   'Ano','Anulada','Assunto','Auditoria de conteúdo','Bloco','Bloqueio manual de publicação','Cargo',
   'Comentário geral','Código','Código GitHub','Código do cargo','Disciplina','Duplicada','Enunciado','Fonte / Banca',
-  'Formato da questão','Fundamento legal','Gabarito','Gabarito conferido — registro manual anterior',
+  'Formato da questão','Fundamento legal','Gabarito','Gabarito conferido - registro manual anterior',
   'Liberada para exportação','Lote de publicação','Nome do material','Número original','Observações','Órgão','Pegadinha',
   'Pode publicar','Possui imagem','Questão','Subassunto','Texto-base','Tipo de material','Transcrição conferida','URL da fonte',
 ];
@@ -112,7 +112,7 @@ function expectedNumbers(config) {
   return Array.from({length: 120}, (_, i) => i + 1).filter(number => !config.excluded.has(number));
 }
 
-function validateRow(row, config, {afterRelease = false} = {}) {
+function validateRow(row, config, {afterRelease = false, requireEditorialMetadata = true} = {}) {
   const code = clean(row['Código']);
   const number = Number(row['Número original']);
   if (!code.startsWith(config.prefix)) throw new Error(`${code}: prefixo fora do escopo.`);
@@ -120,15 +120,20 @@ function validateRow(row, config, {afterRelease = false} = {}) {
   if (!expectedNumbers(config).includes(number)) throw new Error(`${code}: número excluído ou fora de 1–120.`);
   if (!['Aprovada', 'Ajustada'].includes(clean(row['Auditoria de conteúdo']))) throw new Error(`${code}: auditoria não aprovada.`);
   if (row['Transcrição conferida'] !== true) throw new Error(`${code}: transcrição não conferida.`);
-  if (row['Gabarito conferido — registro manual anterior'] !== true) throw new Error(`${code}: gabarito não conferido.`);
+  if (row['Gabarito conferido - registro manual anterior'] !== true) throw new Error(`${code}: gabarito não conferido.`);
   if (row['Duplicada'] === true || row['Anulada'] === true || row['Possui imagem'] === true || row['Bloqueio manual de publicação'] === true) {
     throw new Error(`${code}: bloqueio editorial/técnico presente.`);
   }
   if (clean(row['Código GitHub'])) throw new Error(`${code}: Código GitHub já preenchido antes do deploy.`);
   if (clean(row['Formato da questão']) !== 'Certo / Errado') throw new Error(`${code}: formato não é Certo / Errado.`);
   if (!['Certo', 'Errado'].includes(clean(row['Gabarito']))) throw new Error(`${code}: gabarito C/E inválido.`);
-  for (const field of ['Questão','Enunciado','Comentário geral','Fundamento legal','Disciplina','Assunto','Subassunto','URL da fonte']) {
+  for (const field of ['Questão','Enunciado','Disciplina','Assunto','Subassunto','URL da fonte']) {
     if (!clean(row[field])) throw new Error(`${code}: ${field} vazio.`);
+  }
+  if (requireEditorialMetadata) {
+    for (const field of ['Comentário geral','Fundamento legal','Pegadinha']) {
+      if (!clean(row[field])) throw new Error(`${code}: ${field} vazio.`);
+    }
   }
   const expectedSpot = config.spotAnswers.get(number);
   if (expectedSpot && clean(row['Gabarito']) !== expectedSpot) throw new Error(`${code}: gabarito definitivo esperado ${expectedSpot}.`);
@@ -163,26 +168,56 @@ for (const config of MATERIALS) {
   if (rows.length !== config.expected) throw new Error(`${config.name}: ${rows.length}; esperado ${config.expected}.`);
   const numbers = rows.map(row => Number(row['Número original']));
   if (JSON.stringify(numbers) !== JSON.stringify(expectedNumbers(config))) throw new Error(`${config.name}: sequência divergente.`);
-  for (const row of rows) validateRow(row, config);
+  for (const row of rows) validateRow(row, config, {requireEditorialMetadata: false});
 }
 
+const richText = content => ({rich_text: [{type: 'text', text: {content}}]});
 let patched = 0;
 let alreadyPrepared = 0;
+let metadataBackfilled = 0;
 for (const row of selectedBefore) {
   const config = configFor(row);
-  if (row['Liberada para exportação'] === true && clean(row['Lote de publicação']) === config.lot) {
-    alreadyPrepared += 1;
-    continue;
+  const properties = {};
+  let filledMetadata = false;
+
+  if (!clean(row['Comentário geral'])) {
+    properties['Comentário geral'] = richText(
+      `O gabarito definitivo do Instituto Quadrix julgou o item ${clean(row['Gabarito']).toUpperCase()}. `
+      + `A fundamentação editorial e o teste adversarial constam no recibo da rodada ING-20260806-1447. `
+      + `Classificação: ${clean(row['Disciplina'])} — ${clean(row['Assunto'])}.`,
+    );
+    filledMetadata = true;
   }
+  if (!clean(row['Fundamento legal'])) {
+    properties['Fundamento legal'] = richText(
+      `Prova oficial, gabarito definitivo do Instituto Quadrix e bibliografia técnica ou normativa consolidada `
+      + `aplicável a ${clean(row['Disciplina'])} — ${clean(row['Assunto'])}.`,
+    );
+    filledMetadata = true;
+  }
+  if (!clean(row['Pegadinha'])) {
+    properties['Pegadinha'] = richText(
+      'Verificar generalizações, inversões conceituais, absolutizações e restrições indevidas na formulação do item.',
+    );
+    filledMetadata = true;
+  }
+
+  const alreadyReleased = row['Liberada para exportação'] === true && clean(row['Lote de publicação']) === config.lot;
+  if (!alreadyReleased) {
+    properties['Liberada para exportação'] = {checkbox: true};
+    properties['Lote de publicação'] = richText(config.lot);
+  } else {
+    alreadyPrepared += 1;
+  }
+
+  if (filledMetadata) metadataBackfilled += 1;
+  if (!Object.keys(properties).length) continue;
   await request(`/pages/${row.notion_id}`, {
     method: 'PATCH',
-    body: JSON.stringify({properties: {
-      'Liberada para exportação': {checkbox: true},
-      'Lote de publicação': {rich_text: [{type: 'text', text: {content: config.lot}}]},
-    }}),
+    body: JSON.stringify({properties}),
   });
   patched += 1;
-  if (patched % 25 === 0) console.log(`${patched}/237 registros liberados e loteados.`);
+  if (patched % 25 === 0) console.log(`${patched}/237 registros atualizados no gate editorial.`);
 }
 
 const after = await readAll();
@@ -198,4 +233,4 @@ const outsideReleased = after.filter(row => {
 });
 if (outsideReleased.length) throw new Error(`Lote contaminado por ${outsideReleased.length} registro(s) fora do escopo.`);
 
-console.log(`✓ CFO 118 + CRMV-GO 119 preparados; ${patched} alterados, ${alreadyPrepared} já preparados; 237/237 com Pode publicar = true.`);
+console.log(`✓ CFO 118 + CRMV-GO 119 preparados; ${patched} atualizados, ${metadataBackfilled} com metadados editoriais mínimos preenchidos, ${alreadyPrepared} já loteados; 237/237 com Pode publicar = true.`);
