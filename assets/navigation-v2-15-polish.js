@@ -230,13 +230,13 @@ function enhanceSettingsAccessibility() {
     button.id = `ux15-tab-${value}`;
     button.setAttribute("role", "tab");
     button.setAttribute("aria-selected", String(active));
-    button.setAttribute("aria-controls", `ux15-panel-${value}`);
+    button.setAttribute("aria-controls", "ux15-settings-panel");
     button.tabIndex = active ? 0 : -1;
   });
   const activeTab = page.dataset.ux15Tab || "geral";
   const panel = page.querySelector(".ux15-settings-panel");
   if (panel) {
-    panel.id = `ux15-panel-${activeTab}`;
+    panel.id = "ux15-settings-panel";
     panel.setAttribute("role", "tabpanel");
     panel.setAttribute("aria-labelledby", `ux15-tab-${activeTab}`);
   }
