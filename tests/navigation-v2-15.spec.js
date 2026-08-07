@@ -20,13 +20,25 @@ test("home exibe apenas o essencial e horário de Brasília", async ({page}) => 
   await expect(page.locator("[data-ux-start-today]").first()).toBeVisible();
 });
 
-test("configurações concentram dados do projeto em URL própria e preservam foco", async ({page}) => {
+test("configurações concentram dados do projeto e suportam teclado", async ({page}) => {
   await page.locator("[data-ux15-settings]").click();
   await expect(page).toHaveURL(/#\/perfil\/configuracoes$/);
   await expect(page.locator("[data-ux15-settings-page]")).toBeVisible({timeout: 30000});
   await expect(page.locator(".ux15-settings-tabs")).toHaveAttribute("role", "tablist");
-  await expect(page.locator("[data-ux15-settings-tab=geral]")).toHaveAttribute("aria-selected", "true");
-  await expect(page.locator("[data-ux15-settings-tab=plataforma]")).toHaveAttribute("aria-selected", "false");
+  const geral = page.locator("[data-ux15-settings-tab=geral]");
+  await expect(geral).toHaveAttribute("aria-selected", "true");
+  await expect(geral).toHaveAttribute("tabindex", "0");
+  await geral.focus();
+  await page.keyboard.press("ArrowRight");
+  const estudo = page.locator("[data-ux15-settings-tab=estudo]");
+  await expect(estudo).toHaveAttribute("aria-selected", "true");
+  await expect(estudo).toBeFocused();
+  await page.keyboard.press("End");
+  const dados = page.locator("[data-ux15-settings-tab=dados]");
+  await expect(dados).toHaveAttribute("aria-selected", "true");
+  await expect(dados).toBeFocused();
+  await page.keyboard.press("Home");
+  await expect(page.locator("[data-ux15-settings-tab=geral]")).toBeFocused();
   await page.locator("[data-ux15-settings-tab=plataforma]").click();
   await expect(page.locator("[data-ux15-settings-page]")).toHaveAttribute("data-ux15-tab", "plataforma");
   await expect(page.locator("[data-ux15-settings-tab=plataforma]")).toHaveAttribute("aria-selected", "true");
