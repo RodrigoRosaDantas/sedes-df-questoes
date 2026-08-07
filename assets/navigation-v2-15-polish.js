@@ -94,7 +94,7 @@ function enhanceBreadcrumb() {
   nav.className = "ux15-breadcrumb";
   nav.dataset.ux15Breadcrumb = route;
   nav.setAttribute("aria-label", "Caminho da página");
-  nav.innerHTML = `<a href="#/inicio">Início</a><span aria-hidden="true">›</span><strong>${ROUTES[route]}</strong>`;
+  nav.innerHTML = `<a href="#/inicio">Início</a><span aria-hidden="true">›</span><strong aria-current="page">${ROUTES[route]}</strong>`;
   heading.insertAdjacentElement("beforebegin", nav);
 }
 
@@ -225,11 +225,21 @@ function enhanceSettingsAccessibility() {
   const tabs = page.querySelector(".ux15-settings-tabs");
   if (tabs) tabs.setAttribute("role", "tablist");
   page.querySelectorAll("[data-ux15-settings-tab]").forEach(button => {
+    const value = button.dataset.ux15SettingsTab;
     const active = button.classList.contains("active");
+    button.id = `ux15-tab-${value}`;
     button.setAttribute("role", "tab");
     button.setAttribute("aria-selected", String(active));
+    button.setAttribute("aria-controls", `ux15-panel-${value}`);
     button.tabIndex = active ? 0 : -1;
   });
+  const activeTab = page.dataset.ux15Tab || "geral";
+  const panel = page.querySelector(".ux15-settings-panel");
+  if (panel) {
+    panel.id = `ux15-panel-${activeTab}`;
+    panel.setAttribute("role", "tabpanel");
+    panel.setAttribute("aria-labelledby", `ux15-tab-${activeTab}`);
+  }
   document.querySelector("#theme-toggle")?.setAttribute("aria-pressed", String(document.documentElement.dataset.theme === "dark"));
   if (pendingSettingsTabFocus) {
     const wanted = pendingSettingsTabFocus;
