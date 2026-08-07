@@ -18,6 +18,8 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    env:
+      NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,6 +33,11 @@ jobs:
         run: |
           npm install --no-save @playwright/test
           npx playwright install --with-deps chromium
+
+      - name: Preparar runtime editorial do build
+        run: |
+          node scripts/export-editorial-platform-sync.mjs
+          node scripts/export-pedagogia-editorial-sync.mjs
 
       - name: Gate completo do projeto
         run: npm run check
@@ -48,6 +55,16 @@ jobs:
 
       - name: Playwright local
         run: npx playwright test --config=playwright.config.js
+
+      - name: Configurar Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/configure-pages@v5
+
+      - name: Enviar artefato validado para Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
 
       - name: Upload relatório em falha
         if: failure()
@@ -67,7 +84,11 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Checkout
+      - name: Publicar GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Checkout para validação pública
         uses: actions/checkout@v4
 
       - name: Setup Node
@@ -79,21 +100,6 @@ jobs:
         run: |
           npm install --no-save @playwright/test
           npx playwright install --with-deps chromium
-
-      - name: Reconstruir pacote público
-        run: npm run build
-
-      - name: Configurar Pages
-        uses: actions/configure-pages@v5
-
-      - name: Enviar artefato Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-
-      - name: Publicar GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
 
       - name: Validar site público
         env:
