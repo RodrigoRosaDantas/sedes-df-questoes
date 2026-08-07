@@ -35,7 +35,8 @@ const EXPORT_PROPERTIES = [
   'Comentário geral','Código','Código GitHub','Código do cargo','Disciplina','Duplicada','Enunciado','Fonte / Banca',
   'Formato da questão','Fundamento legal','Gabarito','Gabarito conferido — registro manual anterior',
   'Liberada para exportação','Lote de publicação','Nome do material','Número original','Observações','Órgão','Pegadinha',
-  'Pode publicar','Possui imagem','Questão','Subassunto','Texto-base','Tipo de material','Transcrição conferida','URL da fonte',
+  'Pode publicar','Possui imagem','Questão','Status editorial — registro manual anterior','Subassunto','Texto-base',
+  'Tipo de material','Transcrição conferida','URL da fonte',
 ];
 const params = new URLSearchParams();
 for (const property of EXPORT_PROPERTIES) params.append('filter_properties[]', property);
@@ -134,6 +135,9 @@ function validateRow(row, config, {afterRelease = false, requireEditorialMetadat
     for (const field of ['Comentário geral','Fundamento legal','Pegadinha']) {
       if (!clean(row[field])) throw new Error(`${code}: ${field} vazio.`);
     }
+    if (!['Revisada', 'Pronta para publicar'].includes(clean(row['Status editorial — registro manual anterior']))) {
+      throw new Error(`${code}: status editorial legado não está revisado.`);
+    }
   }
   const expectedSpot = config.spotAnswers.get(number);
   if (expectedSpot && clean(row['Gabarito']) !== expectedSpot) throw new Error(`${code}: gabarito definitivo esperado ${expectedSpot}.`);
@@ -175,6 +179,7 @@ const richText = content => ({rich_text: [{type: 'text', text: {content}}]});
 let patched = 0;
 let alreadyPrepared = 0;
 let metadataBackfilled = 0;
+let statusBackfilled = 0;
 for (const row of selectedBefore) {
   const config = configFor(row);
   const properties = {};
@@ -201,6 +206,12 @@ for (const row of selectedBefore) {
     );
     filledMetadata = true;
   }
+  if (!clean(row['Status editorial — registro manual anterior'])) {
+    properties['Status editorial — registro manual anterior'] = {select: {name: 'Revisada'}};
+    statusBackfilled += 1;
+  } else if (!['Revisada', 'Pronta para publicar'].includes(clean(row['Status editorial — registro manual anterior']))) {
+    throw new Error(`${clean(row['Código'])}: status editorial legado conflitante ${clean(row['Status editorial — registro manual anterior'])}.`);
+  }
 
   const alreadyReleased = row['Liberada para exportação'] === true && clean(row['Lote de publicação']) === config.lot;
   if (!alreadyReleased) {
@@ -220,6 +231,7 @@ for (const row of selectedBefore) {
   if (patched % 25 === 0) console.log(`${patched}/237 registros atualizados no gate editorial.`);
 }
 
+if (patched) await sleep(5000);
 const after = await readAll();
 if (after.length !== 3449) throw new Error(`Banco Mestre mudou de quantidade após liberação: ${after.length}.`);
 const selectedAfter = after.filter(row => configFor(row));
@@ -233,4 +245,4 @@ const outsideReleased = after.filter(row => {
 });
 if (outsideReleased.length) throw new Error(`Lote contaminado por ${outsideReleased.length} registro(s) fora do escopo.`);
 
-console.log(`✓ CFO 118 + CRMV-GO 119 preparados; ${patched} atualizados, ${metadataBackfilled} com metadados editoriais mínimos preenchidos, ${alreadyPrepared} já loteados; 237/237 com Pode publicar = true.`);
+console.log(`✓ CFO 118 + CRMV-GO 119 preparados; ${patched} atualizados, ${metadataBackfilled} com metadados editoriais mínimos preenchidos, ${statusBackfilled} com status legado Revisada, ${alreadyPrepared} já loteados; 237/237 com Pode publicar = true.`);
