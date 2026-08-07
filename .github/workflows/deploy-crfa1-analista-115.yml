@@ -50,25 +50,42 @@ jobs:
           cp scripts/validate-crfa1-analista-115-deploy.mjs /tmp/validate-crfa1-analista-115-deploy.mjs
           cp scripts/close-crfa1-analista-115-after-deploy.mjs /tmp/close-crfa1-analista-115-after-deploy.mjs
 
-      - name: Reconciliar o validador canônico com o hotfix de cache r5
+      - name: Reconciliar validadores canônicos com o hotfix r5 e v13
         shell: bash
         run: |
           set -euo pipefail
           node --input-type=module - <<'NODE'
           import fs from 'node:fs';
-          const file = 'scripts/build-public.mjs';
-          let text = fs.readFileSync(file, 'utf8');
-          const replacements = [
-            ['const expectedCacheVersion = `sedes-questoes-v${versionToken}-r3`;', 'const expectedCacheVersion = `sedes-questoes-v${versionToken}-r5`;'],
-            ['"app-v4.js?v=11"', '"app-v4.js?v=13"'],
-            ['const STUDY_INDEX_URL = "./data/release/study-index.json?release=3048-3046-71-r3";', 'const STUDY_INDEX_URL = "./data/release/study-index.json?release=3048-3046-71-r5";'],
-          ];
-          for (const [before, after] of replacements) {
-            if (!text.includes(before)) throw new Error(`Marcador legado ausente em build-public.mjs: ${before}`);
-            text = text.replace(before, after);
+
+          function patch(file, replacements) {
+            let text = fs.readFileSync(file, 'utf8');
+            for (const {before, after, all = false} of replacements) {
+              if (!text.includes(before)) throw new Error(`${file}: marcador legado ausente: ${before}`);
+              text = all ? text.split(before).join(after) : text.replace(before, after);
+            }
+            fs.writeFileSync(file, text);
+            console.log(`✓ ${file} reconciliado.`);
           }
-          fs.writeFileSync(file, text);
-          console.log('✓ build-public.mjs reconciliado com os arquivos canônicos r5/v13 já presentes na main.');
+
+          patch('scripts/build-public.mjs', [
+            {before: 'const expectedCacheVersion = `sedes-questoes-v${versionToken}-r3`;', after: 'const expectedCacheVersion = `sedes-questoes-v${versionToken}-r5`;'},
+            {before: '"app-v4.js?v=11"', after: '"app-v4.js?v=13"'},
+            {before: 'const STUDY_INDEX_URL = "./data/release/study-index.json?release=3048-3046-71-r3";', after: 'const STUDY_INDEX_URL = "./data/release/study-index.json?release=3048-3046-71-r5";'},
+          ]);
+
+          patch('scripts/validate-release-v2-4.mjs', [
+            {before: 'if (!app.includes(\'const CATALOG_URL = "./data/release/catalogo.json"\')) fail("Aplicativo não referencia o catálogo estático final.");', after: 'if (!app.includes(\'const CATALOG_URL = "./data/release/catalogo.json?release=3048-3046-71-r5"\')) fail("Aplicativo não referencia o catálogo estático final versionado.");'},
+          ]);
+
+          patch('scripts/validate-dist-v2-10.mjs', [
+            {before: '"app-v4.js?v=9"', after: '"app-v4.js?v=13"', all: true},
+            {before: 'const expectedCacheVersion = `sedes-questoes-v${versionToken}`;', after: 'const expectedCacheVersion = `sedes-questoes-v${versionToken}-r5`;'},
+          ]);
+
+          patch('scripts/validate-build-v2-11.mjs', [
+            {before: 'const expectedCacheVersion = `sedes-questoes-v${versionToken}`;', after: 'const expectedCacheVersion = `sedes-questoes-v${versionToken}-r5`;'},
+            {before: '"app-v4.js?v=9"', after: '"app-v4.js?v=13"', all: true},
+          ]);
           NODE
 
       - name: Criar commit limpo da release e auto-remover o deploy temporário
@@ -81,7 +98,12 @@ jobs:
           git rm .github/workflows/deploy-crfa1-analista-115.yml
           git rm scripts/validate-crfa1-analista-115-deploy.mjs
           git rm scripts/close-crfa1-analista-115-after-deploy.mjs
-          git add scripts/build-public.mjs data/operations/publish-crfa1-analista-115.json
+          git add \
+            scripts/build-public.mjs \
+            scripts/validate-release-v2-4.mjs \
+            scripts/validate-dist-v2-10.mjs \
+            scripts/validate-build-v2-11.mjs \
+            data/operations/publish-crfa1-analista-115.json
           git commit -m 'Publicar 115 questões do CRFa-1 [skip ci]'
           git fetch origin main
           if ! git merge-base --is-ancestor origin/main HEAD; then git rebase origin/main; fi
