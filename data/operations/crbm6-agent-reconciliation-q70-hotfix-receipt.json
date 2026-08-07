@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "CRBM6-AGENTE-RECONCILIATION-Q70-HOTFIX-20260807",
+  "status": "success",
+  "release_sha": "6e037c7448ff486512c13c618cfa3caab9c75771",
+  "public_url": "https://rodrigorosadantas.github.io/sedes-df-questoes/",
+  "confirmed_at": "2026-08-07T14:01:11Z",
+  "change": {
+    "canonical_code": "PROVA-QDX-CRBM6-2026-ADVOGADO-400-070",
+    "removed_page_artifact": "RASCUNHO",
+    "answer_preserved": "Errado",
+    "material_sha256": "998171d96128a6554c038fa8a903560edc285057ea3cb0e225809905529908b3"
+  },
+  "reconciliation": {
+    "agent_items_1_70": "common_duplicates_canonical_advogado",
+    "agent_items_71_120": "already_public",
+    "new_master_rows": 0,
+    "new_public_questions": 0
+  },
+  "totals": {
+    "public_questions": 3210,
+    "public_materials": 73,
+    "master_bank": 3212,
+    "awaiting_audit": 0,
+    "discursive_display_items": 2
+  },
+  "notion_publication_receipt_preserved": true,
+  "permanent_automations_restored": false,
+  "public_validation": true
+}
