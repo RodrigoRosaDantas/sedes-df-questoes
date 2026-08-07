@@ -22,4 +22,10 @@ test("publica a experiência de estudo v2.14 com índice textual íntegro", asyn
   expect(payload.items.length).toBe(payload.questions);
   expect(payload.questions).toBe(expectedIds.length);
   expect(indexedIds).toEqual(expectedIds);
+
+  const token = (payload.items || []).flatMap(item => String(item.search || "").split(/\s+/)).find(value => value.length >= 8);
+  expect(token).toBeTruthy();
+  await page.locator("[data-ux-question-search]").fill(token);
+  await page.locator("[data-ux-run-search]").click();
+  await expect(page.locator("[data-ux15-open-question]").first()).toBeVisible({timeout: 30000});
 });
