@@ -28,14 +28,19 @@ test("configurações concentram dados do projeto e suportam teclado", async ({p
   const geral = page.locator("[data-ux15-settings-tab=geral]");
   await expect(geral).toHaveAttribute("aria-selected", "true");
   await expect(geral).toHaveAttribute("tabindex", "0");
-  await expect(geral).toHaveAttribute("aria-controls", "ux15-panel-geral");
-  await expect(page.locator("#ux15-panel-geral")).toHaveAttribute("role", "tabpanel");
-  await expect(page.locator("#ux15-panel-geral")).toHaveAttribute("aria-labelledby", "ux15-tab-geral");
+  await expect(geral).toHaveAttribute("aria-controls", "ux15-settings-panel");
+  const panel = page.locator("#ux15-settings-panel");
+  await expect(panel).toHaveAttribute("role", "tabpanel");
+  await expect(panel).toHaveAttribute("aria-labelledby", "ux15-tab-geral");
+  for (const tab of ["geral", "estudo", "plataforma", "dados"]) {
+    await expect(page.locator(`[data-ux15-settings-tab=${tab}]`)).toHaveAttribute("aria-controls", "ux15-settings-panel");
+  }
   await geral.focus();
   await page.keyboard.press("ArrowRight");
   const estudo = page.locator("[data-ux15-settings-tab=estudo]");
   await expect(estudo).toHaveAttribute("aria-selected", "true");
   await expect(estudo).toBeFocused();
+  await expect(page.locator("#ux15-settings-panel")).toHaveAttribute("aria-labelledby", "ux15-tab-estudo");
   await page.keyboard.press("End");
   const dados = page.locator("[data-ux15-settings-tab=dados]");
   await expect(dados).toHaveAttribute("aria-selected", "true");
@@ -46,10 +51,10 @@ test("configurações concentram dados do projeto e suportam teclado", async ({p
   await expect(page.locator("[data-ux15-settings-page]")).toHaveAttribute("data-ux15-tab", "plataforma");
   const plataforma = page.locator("[data-ux15-settings-tab=plataforma]");
   await expect(plataforma).toHaveAttribute("aria-selected", "true");
-  await expect(plataforma).toHaveAttribute("aria-controls", "ux15-panel-plataforma");
+  await expect(plataforma).toHaveAttribute("aria-controls", "ux15-settings-panel");
   await expect(plataforma).toBeFocused();
-  await expect(page.locator("#ux15-panel-plataforma")).toHaveAttribute("role", "tabpanel");
-  await expect(page.locator("#ux15-panel-plataforma")).toHaveAttribute("aria-labelledby", "ux15-tab-plataforma");
+  await expect(page.locator("#ux15-settings-panel")).toHaveAttribute("role", "tabpanel");
+  await expect(page.locator("#ux15-settings-panel")).toHaveAttribute("aria-labelledby", "ux15-tab-plataforma");
   await expect(page.getByRole("heading", {name: "Dados do projeto"})).toBeVisible();
   await expect(page.getByText("Questões publicadas")).toBeVisible();
   await expect(page.getByText("Banco Mestre")).toBeVisible();
