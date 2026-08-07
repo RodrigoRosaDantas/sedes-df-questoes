@@ -34,7 +34,7 @@ const EXPORT_PROPERTIES = [
   'Ano','Anulada','Assunto','Auditoria de conteúdo','Bloco','Bloqueio manual de publicação','Cargo',
   'Comentário geral','Código','Código GitHub','Código do cargo','Disciplina','Duplicada','Enunciado','Fonte / Banca',
   'Formato da questão','Fundamento legal','Gabarito','Gabarito conferido — registro manual anterior',
-  'Liberada para exportação','Lote de publicação','Nome do material','Número original','Observações','Órgão','Pegadinha',
+  'Liberada para exportação','Lote de publicação','Nome do material','Número original','Observações','Órgão','Página do PDF','Pegadinha',
   'Pode publicar','Possui imagem','Questão','Status editorial — registro manual anterior','Subassunto','Texto-base',
   'Tipo de material','Transcrição conferida','URL da fonte',
 ];
@@ -114,6 +114,14 @@ function expectedNumbers(config) {
   return Array.from({length: 120}, (_, i) => i + 1).filter(number => !config.excluded.has(number));
 }
 
+function officialCfoPage(number) {
+  if (number >= 41 && number <= 57) return '4';
+  if (number >= 58 && number <= 70) return '5';
+  if (number >= 71 && number <= 95) return '6';
+  if (number >= 96 && number <= 120) return '7';
+  return null;
+}
+
 function validateRow(row, config, {afterRelease = false, requireEditorialMetadata = true} = {}) {
   const code = clean(row['Código']);
   const number = Number(row['Número original']);
@@ -138,6 +146,12 @@ function validateRow(row, config, {afterRelease = false, requireEditorialMetadat
     }
     if (!['Revisada', 'Pronta para publicar'].includes(clean(row['Status editorial — registro manual anterior']))) {
       throw new Error(`${code}: status editorial legado não está revisado.`);
+    }
+  }
+  if (config.prefix.startsWith('PROVA-QDX-CFO-')) {
+    const expectedPage = officialCfoPage(number);
+    if (expectedPage && clean(row['Página do PDF']) !== expectedPage) {
+      throw new Error(`${code}: página oficial esperada ${expectedPage}, encontrada ${clean(row['Página do PDF']) || '(vazia)'}.`);
     }
   }
   const expectedSpot = config.spotAnswers.get(number);
@@ -173,7 +187,10 @@ for (const config of MATERIALS) {
   if (rows.length !== config.expected) throw new Error(`${config.name}: ${rows.length}; esperado ${config.expected}.`);
   const numbers = rows.map(row => Number(row['Número original']));
   if (JSON.stringify(numbers) !== JSON.stringify(expectedNumbers(config))) throw new Error(`${config.name}: sequência divergente.`);
-  for (const row of rows) validateRow(row, config, {requireEditorialMetadata: false});
+  for (const row of rows) {
+    const isCfoPageToBackfill = config.prefix.startsWith('PROVA-QDX-CFO-') && officialCfoPage(Number(row['Número original'])) && !clean(row['Página do PDF']);
+    if (!isCfoPageToBackfill) validateRow(row, config, {requireEditorialMetadata: false});
+  }
 }
 
 const richText = content => ({rich_text: [{type: 'text', text: {content}}]});
@@ -181,6 +198,7 @@ let patched = 0;
 let alreadyPrepared = 0;
 let metadataBackfilled = 0;
 let statusBackfilled = 0;
+let pageBackfilled = 0;
 for (const row of selectedBefore) {
   const config = configFor(row);
   const properties = {};
@@ -212,6 +230,20 @@ for (const row of selectedBefore) {
     statusBackfilled += 1;
   } else if (!['Revisada', 'Pronta para publicar'].includes(clean(row['Status editorial — registro manual anterior']))) {
     throw new Error(`${clean(row['Código'])}: status editorial legado conflitante ${clean(row['Status editorial — registro manual anterior'])}.`);
+  }
+
+  if (config.prefix.startsWith('PROVA-QDX-CFO-')) {
+    const number = Number(row['Número original']);
+    const expectedPage = officialCfoPage(number);
+    if (expectedPage) {
+      const currentPage = clean(row['Página do PDF']);
+      if (!currentPage) {
+        properties['Página do PDF'] = richText(expectedPage);
+        pageBackfilled += 1;
+      } else if (currentPage !== expectedPage) {
+        throw new Error(`${clean(row['Código'])}: página existente ${currentPage} conflita com a prova oficial (${expectedPage}).`);
+      }
+    }
   }
 
   const alreadyReleased = row['Liberada para exportação'] === true && clean(row['Lote de publicação']) === config.lot;
@@ -246,4 +278,4 @@ const outsideReleased = after.filter(row => {
 });
 if (outsideReleased.length) throw new Error(`Lote contaminado por ${outsideReleased.length} registro(s) fora do escopo.`);
 
-console.log(`✓ CFO 118 + CRMV-GO 119 preparados; ${patched} atualizados, ${metadataBackfilled} com metadados editoriais mínimos preenchidos, ${statusBackfilled} com status legado Revisada, ${alreadyPrepared} já loteados; 237/237 com Pode publicar = true.`);
+console.log(`✓ CFO 118 + CRMV-GO 119 preparados; ${patched} atualizados, ${metadataBackfilled} com metadados editoriais mínimos preenchidos, ${statusBackfilled} com status legado Revisada, ${pageBackfilled} páginas CFO restauradas da prova aplicada, ${alreadyPrepared} já loteados; 237/237 com Pode publicar = true.`);
