@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "operation": "AUDIT-PERMANENT-AUTOMATIONS-REACTIVATION",
+  "date": "2026-08-07",
+  "status": "closed_keep_suspended",
+  "governance": "manual_publication_requires_explicit_authorization",
+  "current_state": {
+    "mode": "manual_only",
+    "automatic_triggers_removed": [
+      "push",
+      "pull_request",
+      "schedule"
+    ],
+    "functional_workflows": "disabled_stubs"
+  },
+  "audit": {
+    "historical_pages_workflow_commit": "0a2cf580375c9105e5b838c2a5768672fc4ef19e",
+    "historical_pages_workflow_findings": [
+      "automatic push trigger on main",
+      "automatic GitHub Pages deployment",
+      "automatic public verification",
+      "automatic rollback on verification failure",
+      "optional Notion traceability closure"
+    ],
+    "suspension_receipt": "data/operations/site-automations-suspended.json",
+    "publication_receipt": "data/operations/cfo-crmvgo-237-deployment-receipt.json"
+  },
+  "decision": {
+    "restore_permanent_automations": false,
+    "reason": "The historical permanent workflow set can publish or mutate operational state from automatic repository events. Restoring it as-is would violate the current manual, explicitly authorized publication gate.",
+    "future_reactivation_condition": "Reactivate only after redesigning permanent workflows so automatic events are read-only and any deploy, rollback, Notion write, publication or traceability closure requires an explicit manual authorization gate."
+  },
+  "traceability_fix": {
+    "pull_request": 172,
+    "merge_commit": "33d19fcf8769d10393261cdd743e0de5257bf8d6",
+    "release_source_sha": "c10f6b2d8e341e2b1c5be549ca95541baf1b80b6",
+    "files_aligned": [
+      "data/release/build-info.json",
+      "data/release/release-meta.json"
+    ]
+  },
+  "publication_state_changed": false,
+  "notion_state_changed": false,
+  "site_deployed_by_this_audit": false
+}
