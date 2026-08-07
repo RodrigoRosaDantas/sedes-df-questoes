@@ -20,7 +20,7 @@ const guardrails = read("assets/ux-v2-14-guardrails.js");
 const css = read("assets/ux-v2-14.css");
 const builder = read("scripts/build-question-search-index.mjs");
 requireMarkers(index, ["ux-v2-14.css?v=1", "ux-v2-14.js?v=1", "ux-v2-14-guardrails.js?v=1"], "HTML");
-requireMarkers(worker, ["ux-v2-14.css?v=1", "ux-v2-14.js?v=1", "ux-v2-14-guardrails.js?v=1", "question-search-index.json"], "Service worker");
+requireMarkers(worker, ["ux-v2-14.css?v=1", "ux-v2-14.js?v=1", "ux-v2-14-guardrails.js?v=1", "question-search-index"], "Service worker");
 requireMarkers(ux, ["Estudo de hoje", "Busca inteligente", "Treino personalizado", "Por que você errou?", "Mapa de domínio por matéria", "Encerrar dominadas"], "UX");
 requireMarkers(guardrails, ["closeAfterConsecutiveCorrect: 3", "correctedFilteredIds", "data-ux-run-filter", "data-ux-close-mastered", "REASON_CANONICAL", "normalizeErrorReasons", "Confundi a regra ou a lei"], "Guardrails UX");
 requireMarkers(css, ["ux-focus-mode", "ux-today", "ux-start-grid", "ux-mastery-grid", "ux-error-reasons"], "CSS UX");
