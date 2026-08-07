@@ -3,7 +3,8 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const scriptRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const root = path.resolve(process.env.CRFA_ROOT || scriptRoot);
 const mode = process.argv[2] || 'source';
 const expectedSourceSha = process.argv[3] || process.env.RELEASE_SHA || '';
 const operation = JSON.parse(fs.readFileSync(path.join(root, 'data/operations/publish-crfa1-analista-115.json'), 'utf8'));
