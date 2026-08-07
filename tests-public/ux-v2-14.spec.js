@@ -2,7 +2,7 @@ import {test, expect} from "@playwright/test";
 
 test("publica a experiência de estudo v2.14", async ({page, request}) => {
   await page.goto("/#/inicio", {waitUntil: "domcontentloaded"});
-  await expect(page.locator("[data-ux-today]")).toBeVisible({timeout: 30000});
+  await expect(page.locator("[data-ux-today]").first()).toBeVisible({timeout: 30000});
   await expect(page.locator("[data-ux-tech-status]")).toBeVisible();
   await page.goto("/#/estudar", {waitUntil: "domcontentloaded"});
   await expect(page.locator("[data-ux-study-launcher]")).toBeVisible({timeout: 30000});
