@@ -36,6 +36,7 @@ requireMarkers(navigation, [
   "data-ux15-settings-tab",
   "dataset.ux15Settings",
   "#/perfil/configuracoes",
+  "setNodeText",
 ], "Navegação v2.15");
 if (navigation.includes('location.hash = "#/perfil";')) throw new Error("Navegação v2.15 voltou a depender da rota legada #/perfil.");
 requireMarkers(navigationPolish, [
@@ -56,9 +57,13 @@ requireMarkers(navigationPolish, [
   "reconcileHomeReviewTotal",
   "aria-selected",
   "pendingSettingsTabFocus",
+  "moveSettingsTabFocus",
+  'event.key === "ArrowRight"',
+  'event.key === "Home"',
+  "button.tabIndex = active ? 0 : -1",
 ], "Polimento da navegação v2.15");
 requireMarkers(css, ["ux15-home-active", "ux15-home-grid", "ux15-settings-page", "ux15-sync-card", "ux15-facts-grid"], "CSS v2.15");
-requireMarkers(polishCss, ["ux15-clean-home", "ux15-settings-route", "ux15-sync-age", "ux15-breadcrumb", "ux15-role-templates", "fresh", "attention", "stale"], "CSS de polimento v2.15");
+requireMarkers(polishCss, ["ux15-clean-home", "ux15-settings-route", "ux15-sync-age", "ux15-breadcrumb", "ux15-role-templates", "data-ux15-open-question", "fresh", "attention", "stale"], "CSS de polimento v2.15");
 requireMarkers(builder, ["platform_navigation_js", "platform_navigation_css", "platform_navigation_polish_js", "platform_navigation_polish_css", "navigation-v2-15-polish.js", "navigation-v2-15-polish.css"], "Build público");
 requireMarkers(publicPlaywright, ["release-contract.spec.js", "dashboard-card.spec.js", "material-downloads.spec.js", "platform-v2-13.spec.js", "ux-v2-14.spec.js", "navigation-v2-15.spec.js"], "Playwright público");
 requireMarkers(packageData, ["node --check playwright.config.js", "node --check playwright.public.config.js"], "npm check");
@@ -94,4 +99,4 @@ if (exists("dist")) {
   }
 }
 
-console.log("✓ Navegação v2.15 validada: Home limpa, Configurações canônicas, simulados por cargo, busca com abertura individual e contrato público atual.");
+console.log("✓ Navegação v2.15 validada: Home limpa, Configurações canônicas e acessíveis, simulados por cargo, busca individual e contrato público atual.");
