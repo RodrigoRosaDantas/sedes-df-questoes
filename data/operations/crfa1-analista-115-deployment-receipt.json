@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.1",
+  "operation_id": "CRFA1-2026-ANALISTA-400-115-20260807",
+  "status": "success",
+  "release_code": "release-2.13.0:f17d56240a058e203e6d7bd6c7d4364d3782c5f1",
+  "release_sha": "f17d56240a058e203e6d7bd6c7d4364d3782c5f1",
+  "public_url": "https://rodrigorosadantas.github.io/sedes-df-questoes/",
+  "public_questions": 3161,
+  "public_materials": 72,
+  "master_bank": 3212,
+  "awaiting_audit": 49,
+  "discursive_display_items": 2,
+  "published_records": 115,
+  "blocked_original_numbers": [
+    5,
+    48,
+    54,
+    102,
+    104
+  ],
+  "snapshot_sha256": "d1aa0e165dd0b2fb83e78ba75bda550d57f1f23f1ee5366f6fbab9c80c4e4b3d",
+  "plan_sha256": "2b49c85b2654a1094258385117648a5036f82bd2467279a25a5284a28628ed24",
+  "notion_closed": true,
+  "public_validation": true,
+  "redeployed_by_finalizer": false,
+  "permanent_automations_restored": false,
+  "supersedes_ingress_receipt_sha256": "c7e2a96bfbfb2540e9db5b784d6a28b8fec17534702ff993f70531e35ddf777b",
+  "corrected_ingress_gap": [
+    59,
+    60,
+    61,
+    62,
+    63
+  ],
+  "failed_predeploy_candidates": [
+    "caa32228a9522f44983b62e20bfaccee58f60551",
+    "a74ef3a3a189547d3017ead65f4beeb0b61c1c30"
+  ]
+}
