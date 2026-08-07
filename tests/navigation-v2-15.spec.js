@@ -20,19 +20,34 @@ test("home exibe apenas o essencial e horário de Brasília", async ({page}) => 
   await expect(page.locator("[data-ux-start-today]").first()).toBeVisible();
 });
 
-test("configurações concentram dados do projeto em URL própria", async ({page}) => {
+test("configurações concentram dados do projeto em URL própria e preservam foco", async ({page}) => {
   await page.locator("[data-ux15-settings]").click();
   await expect(page).toHaveURL(/#\/perfil\/configuracoes$/);
   await expect(page.locator("[data-ux15-settings-page]")).toBeVisible({timeout: 30000});
-  await expect(page.locator("[data-ux15-settings-tab=plataforma]")).toBeVisible();
+  await expect(page.locator(".ux15-settings-tabs")).toHaveAttribute("role", "tablist");
+  await expect(page.locator("[data-ux15-settings-tab=geral]")).toHaveAttribute("aria-selected", "true");
+  await expect(page.locator("[data-ux15-settings-tab=plataforma]")).toHaveAttribute("aria-selected", "false");
   await page.locator("[data-ux15-settings-tab=plataforma]").click();
   await expect(page.locator("[data-ux15-settings-page]")).toHaveAttribute("data-ux15-tab", "plataforma");
+  await expect(page.locator("[data-ux15-settings-tab=plataforma]")).toHaveAttribute("aria-selected", "true");
+  await expect(page.locator("[data-ux15-settings-tab=plataforma]")).toBeFocused();
   await expect(page.getByRole("heading", {name: "Dados do projeto"})).toBeVisible();
   await expect(page.getByText("Questões publicadas")).toBeVisible();
   await expect(page.getByText("Banco Mestre")).toBeVisible();
   await expect(page.getByText("Última sincronização do catálogo")).toBeVisible();
   await expect(page.locator("[data-ux15-current-time]")).toHaveText(/^\d{2}:\d{2}:\d{2}$/);
   await expect(page.locator("[data-ux15-sync-age]")).toContainText(/sincroniz/);
+});
+
+test("estudar preserva simulados por cargo sem poluir a tela", async ({page}) => {
+  await page.goto("/#/estudar", {waitUntil: "domcontentloaded"});
+  const templates = page.locator("[data-role-templates]");
+  await expect(templates).toBeVisible({timeout: 30000});
+  await expect(templates).not.toHaveAttribute("open", "");
+  await templates.locator("summary").click();
+  await expect(templates).toHaveAttribute("open", "");
+  await expect(templates.locator("[data-ux15-role-sim]")).toHaveCount(2);
+  await expect(page.locator("[data-official-exam-card]")).toBeVisible({timeout: 30000});
 });
 
 test("navegação contextual orienta sem aumentar o menu principal", async ({page}) => {
