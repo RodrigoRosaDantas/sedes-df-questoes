@@ -43,6 +43,7 @@ for (const property of EXPORT_PROPERTIES) params.append('filter_properties[]', p
 const QUERY_ENDPOINT = `/data_sources/${SOURCE}/query?${params.toString()}`;
 
 const clean = value => String(value ?? '').replace(/\r/g, '').replace(/[ \t]+/g, ' ').replace(/ *\n */g, '\n').trim();
+const isTrue = value => value === true || clean(value).toLowerCase() === 'true';
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 async function request(endpoint, options = {}, attempt = 1) {
@@ -144,7 +145,7 @@ function validateRow(row, config, {afterRelease = false, requireEditorialMetadat
   if (afterRelease) {
     if (row['Liberada para exportação'] !== true) throw new Error(`${code}: liberação não persistiu.`);
     if (clean(row['Lote de publicação']) !== config.lot) throw new Error(`${code}: lote não persistiu.`);
-    if (row['Pode publicar'] !== true) throw new Error(`${code}: fórmula Pode publicar não ficou verdadeira após lote/liberação.`);
+    if (!isTrue(row['Pode publicar'])) throw new Error(`${code}: fórmula Pode publicar não ficou verdadeira após lote/liberação; valor=${JSON.stringify(row['Pode publicar'])}.`);
   } else {
     const released = row['Liberada para exportação'] === true;
     const lot = clean(row['Lote de publicação']);
