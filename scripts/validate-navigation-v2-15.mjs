@@ -35,7 +35,9 @@ requireMarkers(navigation, [
   "data-ux15-current-time",
   "data-ux15-settings-tab",
   "dataset.ux15Settings",
+  "#/perfil/configuracoes",
 ], "Navegação v2.15");
+if (navigation.includes('location.hash = "#/perfil";')) throw new Error("Navegação v2.15 voltou a depender da rota legada #/perfil.");
 requireMarkers(navigationPolish, [
   "relativeSync",
   "sincronizado há",
@@ -49,6 +51,8 @@ requireMarkers(navigationPolish, [
   'event.key === "/"',
   "primeRouteClass",
   "injectRoleTemplatesInStudy",
+  "enhanceSearchResultActions",
+  "data-ux15-open-question",
   "reconcileHomeReviewTotal",
   "aria-selected",
   "pendingSettingsTabFocus",
@@ -60,6 +64,7 @@ requireMarkers(publicPlaywright, ["release-contract.spec.js", "dashboard-card.sp
 requireMarkers(packageData, ["node --check playwright.config.js", "node --check playwright.public.config.js"], "npm check");
 requireMarkers(publicReleaseContract, ["arquitetura v2.15", "perfil/configuracoes", "[data-ux15-home]", "[data-official-exam-card]", "[data-adaptive-review]"], "Contrato público da release");
 requireMarkers(publicDashboard, ["Configurações usa o release-meta reconciliado", "Banco Mestre", "navigation-v2-15.js?v=1"], "Smoke público do painel");
+requireMarkers(publicUx, ["[data-ux15-open-question]", "question-search-index.json", "catalogo.json"], "Smoke público da busca");
 
 for (const [name, content] of Object.entries({
   "release-contract": publicReleaseContract,
@@ -89,4 +94,4 @@ if (exists("dist")) {
   }
 }
 
-console.log("✓ Navegação v2.15 validada: Home limpa, DOM enxuto, Brasília, Configurações sem flash, simulados por cargo, breadcrumbs, busca rápida e contrato público atual.");
+console.log("✓ Navegação v2.15 validada: Home limpa, Configurações canônicas, simulados por cargo, busca com abertura individual e contrato público atual.");
