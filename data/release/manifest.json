@@ -1,7 +1,7 @@
 {
   "schema_version": "3.1",
   "release_version": "2.9.2",
-  "generated_at": "2026-08-07T13:33:39.108Z",
+  "generated_at": "2026-08-07T14:01:01.650Z",
   "summary": {
     "banco_mestre": 3212,
     "materiais": 73,
@@ -33,8 +33,8 @@
       "id": "notion-advogado-crbm-6-quadrix-2026",
       "file": "./data/release/materials/notion-advogado-crbm-6-quadrix-2026.json",
       "questions": 120,
-      "bytes": 234526,
-      "sha256": "ebe7c72751b0e5981d3941db75adb294319d7d8f6dd948a549cf9fe3814bdcd5",
+      "bytes": 234517,
+      "sha256": "998171d96128a6554c038fa8a903560edc285057ea3cb0e225809905529908b3",
       "display_items": 0
     },
     {
