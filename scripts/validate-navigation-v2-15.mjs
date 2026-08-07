@@ -29,9 +29,23 @@ requireMarkers(navigation, [
   "data-ux15-settings-tab",
   "dataset.ux15Settings",
 ], "Navegação v2.15");
-requireMarkers(navigationPolish, ["relativeSync", "sincronizado há", "ux15-breadcrumb", "focusSearchWhenReady", "pruneLegacyHome", ":scope > [data-ux15-home]", "#/perfil/configuracoes", 'event.key === "/"'], "Polimento da navegação v2.15");
+requireMarkers(navigationPolish, [
+  "relativeSync",
+  "sincronizado há",
+  "ux15-breadcrumb",
+  "focusSearchWhenReady",
+  "pruneLegacyHome",
+  ":scope > [data-ux15-home]",
+  "#/perfil/configuracoes",
+  'event.key === "/"',
+  "primeRouteClass",
+  "injectRoleTemplatesInStudy",
+  "reconcileHomeReviewTotal",
+  "aria-selected",
+  "pendingSettingsTabFocus",
+], "Polimento da navegação v2.15");
 requireMarkers(css, ["ux15-home-active", "ux15-home-grid", "ux15-settings-page", "ux15-sync-card", "ux15-facts-grid"], "CSS v2.15");
-requireMarkers(polishCss, ["ux15-sync-age", "ux15-breadcrumb", "fresh", "attention", "stale"], "CSS de polimento v2.15");
+requireMarkers(polishCss, ["ux15-clean-home", "ux15-sync-age", "ux15-breadcrumb", "ux15-role-templates", "fresh", "attention", "stale"], "CSS de polimento v2.15");
 requireMarkers(builder, ["platform_navigation_js", "platform_navigation_css", "platform_navigation_polish_js", "platform_navigation_polish_css", "navigation-v2-15-polish.js", "navigation-v2-15-polish.css"], "Build público");
 
 if (exists("dist")) {
@@ -48,4 +62,4 @@ if (exists("dist")) {
   }
 }
 
-console.log("✓ Navegação v2.15 validada: Home limpa, DOM enxuto, Brasília, Configurações, breadcrumbs e busca rápida.");
+console.log("✓ Navegação v2.15 validada: Home limpa, DOM enxuto, Brasília, Configurações acessíveis, simulados por cargo, breadcrumbs e busca rápida.");
