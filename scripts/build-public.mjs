@@ -26,6 +26,7 @@ const canonicalFiles = {
   index_html: "index.html",
   app_js: "assets/app-v4.js",
   service_worker_js: "service-worker.js",
+  learning_js: "assets/learning-v2-9.js",
   pwa_js: "assets/pwa-v2-9.js",
   material_downloads_js: "assets/material-downloads-v1.js",
   material_downloads_css: "assets/material-downloads-v1.css",
@@ -48,11 +49,12 @@ const sources = Object.fromEntries(Object.entries(canonicalFiles).map(([key, fil
 
 for (const marker of ["manifest.webmanifest", "study-navigation-v2-6.css?v=1", "intelligence-v2-9.css?v=1", "reports-v2-10.css?v=2", "material-downloads-v1.css?v=1", "platform-v2-13.css?v=1", "ux-v2-14.css?v=1", "navigation-v2-15.css?v=1", "navigation-v2-15-polish.css?v=1", "app-v4.js?v=13", "learning-v2-9.js?v=1", "pwa-v2-9.js?v=1", "reports-v2-10.js?v=2", "material-downloads-v1.js?v=1", "release-v2-13.js?v=1", "vault-v2-13.js?v=1", "report-v2-13.js?v=1", "official-exam-v2-13.js?v=1", "adaptive-review-v2-13.js?v=1", "ux-v2-14.js?v=1", "ux-v2-14-guardrails.js?v=1", "navigation-v2-15.js?v=1", "navigation-v2-15-polish.js?v=1"]) requireMarker(sources.index_html, marker, "HTML canônico");
 for (const marker of ['const STUDY_INDEX_URL = "./data/release/study-index.json?release=3048-3046-71-r5";', "const indexedQuestions = Object.keys(state.catalog?.question_index || {}).length;", 'data-study-view="materias"', 'data-study-view="simulados"', 'data-study-view="provas"', "function renderDisciplineTopics()", "Catálogo inconsistente."]) requireMarker(sources.app_js, marker, "Aplicação canônica");
-for (const marker of [expectedCacheVersion, 'event.request.mode === "navigate"', 'cache: "no-store"', 'type === "SKIP_WAITING"', "shared-v2-13.js?v=1", "release-v2-13.js?v=1", "vault-v2-13.js?v=1", "report-v2-13.js?v=1", "official-exam-v2-13.js?v=1", "adaptive-review-v2-13.js?v=1", "platform-v2-13.css?v=1", "ux-v2-14.js?v=1", "ux-v2-14-guardrails.js?v=1", "ux-v2-14.css?v=1", "navigation-v2-15.js?v=1", "navigation-v2-15.css?v=1", "navigation-v2-15-polish.js?v=1", "navigation-v2-15-polish.css?v=1", "question-search-index", "release-meta"]) requireMarker(sources.service_worker_js, marker, "Service worker canônico");
+for (const marker of ["cleanHomeLayerEnabled", 'script[src*="navigation-v2-15.js"]', "if (cleanHomeLayerEnabled()) return;"]) requireMarker(sources.learning_js, marker, "Inteligência v2.9");
+for (const marker of [expectedCacheVersion, 'event.request.mode === "navigate"', 'cache: "no-store"', 'type === "SKIP_WAITING"', "learning-v2-9.js?v=1", "shared-v2-13.js?v=1", "release-v2-13.js?v=1", "vault-v2-13.js?v=1", "report-v2-13.js?v=1", "official-exam-v2-13.js?v=1", "adaptive-review-v2-13.js?v=1", "platform-v2-13.css?v=1", "ux-v2-14.js?v=1", "ux-v2-14-guardrails.js?v=1", "ux-v2-14.css?v=1", "navigation-v2-15.js?v=1", "navigation-v2-15.css?v=1", "navigation-v2-15-polish.js?v=1", "navigation-v2-15-polish.css?v=1", "question-search-index", "release-meta"]) requireMarker(sources.service_worker_js, marker, "Service worker canônico");
 for (const marker of ['updateViaCache: "none"', "controllerchange", "registration.update()"]) requireMarker(sources.pwa_js, marker, "Registro PWA canônico");
 for (const marker of ["data-material-download-card", "PDF para responder", "PDF comentado", "printableDocument"]) requireMarker(sources.material_downloads_js, marker, "Download de materiais canônico");
 for (const marker of ["material-download-card", "material-download-actions"]) requireMarker(sources.material_downloads_css, marker, "Estilos de download canônicos");
-for (const marker of ["release-meta.json", "createCompatibleSession"]) requireMarker(sources.platform_shared_js, marker, "Base das melhorias");
+for (const marker of ["release-meta.json", "createCompatibleSession", "let scheduled = false"]) requireMarker(sources.platform_shared_js, marker, "Base das melhorias");
 for (const marker of ["enhanceReleaseMetadata", "data-release-footer", "#sync-label", "state.release.app_version"]) requireMarker(sources.platform_release_js, marker, "Metadados da release");
 for (const marker of ["sedes-protected-backup", "PBKDF2", "vault-tools"]) requireMarker(sources.platform_vault_js, marker, "Proteção do progresso");
 for (const marker of ["Reportar problema nesta questão", "issues/new"]) requireMarker(sources.platform_report_js, marker, "Reporte por questão");
@@ -64,8 +66,8 @@ for (const marker of ["closeAfterConsecutiveCorrect: 3", "correctedFilteredIds",
 for (const marker of ["ux-focus-mode", "ux-today", "ux-mastery-grid", "ux-error-reasons"]) requireMarker(sources.platform_ux_css, marker, "Estilos da experiência v2.14");
 for (const marker of ["Seu estudo, sem ruído.", "Última sincronização do catálogo", "#/perfil/configuracoes", "America/Sao_Paulo", "Dados do projeto", "setNodeText"]) requireMarker(sources.platform_navigation_js, marker, "Navegação e Home v2.15");
 for (const marker of ["ux15-home-active", "ux15-settings-page", "ux15-facts-grid", "ux15-sync-card"]) requireMarker(sources.platform_navigation_css, marker, "Estilos da navegação v2.15");
-for (const marker of ["relativeSync", "ux15-breadcrumb", 'event.key === "/"', "sincronizado há", "enhanceSearchResultActions", "data-ux15-open-question", "moveSettingsTabFocus"]) requireMarker(sources.platform_navigation_polish_js, marker, "Polimento da navegação v2.15");
-for (const marker of ["ux15-sync-age", "ux15-breadcrumb", "data-ux15-open-question", "attention", "stale"]) requireMarker(sources.platform_navigation_polish_css, marker, "Estilos do polimento v2.15");
+for (const marker of ["relativeSync", "ux15-breadcrumb", 'aria-current="page"', "aria-controls", "tabpanel", 'event.key === "/"', "sincronizado há", "enhanceSearchResultActions", "data-ux15-open-question", "moveSettingsTabFocus"]) requireMarker(sources.platform_navigation_polish_js, marker, "Polimento da navegação v2.15");
+for (const marker of ["ux15-sync-age", "ux15-breadcrumb", "data-ux15-open-question", ".brand strong{display:none}", "attention", "stale"]) requireMarker(sources.platform_navigation_polish_css, marker, "Estilos do polimento v2.15");
 if (sources.app_js.includes("Release incompleta.")) throw new Error("A fonte canônica ainda contém a trava antiga de totais fixos.");
 
 fs.rmSync(dist, {recursive: true, force: true});
