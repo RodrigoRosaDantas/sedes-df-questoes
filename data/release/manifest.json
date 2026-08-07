@@ -1,514 +1,593 @@
 {
   "schema_version": "3.1",
   "release_version": "2.9.2",
-  "generated_at": "2026-08-05T19:38:08.790Z",
+  "generated_at": "2026-08-07T12:50:48.274Z",
   "summary": {
-    "banco_mestre": 3048,
-    "materiais": 71,
-    "questoes": 3046,
-    "aguardando_auditoria": 0,
-    "provas": 36,
+    "banco_mestre": 3212,
+    "materiais": 72,
+    "questoes": 3161,
+    "aguardando_auditoria": 49,
+    "provas": 37,
     "simulados": 35,
     "discursivas_consulta": 2
   },
-  "catalog_sha256": "248dc1cf4c764d9d3874e997ca1dd6922437cbe1e1078504ed461f973fd79818",
+  "catalog_sha256": "85f1ff737f477d875dee33ff40742b66ba42d17938b571141cf0f6c7830c5c19",
   "materials": [
     {
       "id": "notion-administrador-crf-df-quadrix-2026",
       "file": "./data/release/materials/notion-administrador-crf-df-quadrix-2026.json",
       "questions": 120,
       "bytes": 303131,
-      "sha256": "3a278d44e4ce3ca58ae6cdba3a62a3108a9b8fc75d3e3f9b789baebcdca4664d"
+      "sha256": "3a278d44e4ce3ca58ae6cdba3a62a3108a9b8fc75d3e3f9b789baebcdca4664d",
+      "display_items": 0
     },
     {
       "id": "notion-advogado-crbm-6-quadrix-2026",
       "file": "./data/release/materials/notion-advogado-crbm-6-quadrix-2026.json",
       "questions": 120,
       "bytes": 234526,
-      "sha256": "ebe7c72751b0e5981d3941db75adb294319d7d8f6dd948a549cf9fe3814bdcd5"
+      "sha256": "ebe7c72751b0e5981d3941db75adb294319d7d8f6dd948a549cf9fe3814bdcd5",
+      "display_items": 0
     },
     {
       "id": "notion-advogado-crefito-17-quadrix-2026",
       "file": "./data/release/materials/notion-advogado-crefito-17-quadrix-2026.json",
       "questions": 119,
       "bytes": 211406,
-      "sha256": "16567d2e71a6ef3c22b1974708eaa3ab1af6563528e8da357dc00cbdad0e0e44"
+      "sha256": "16567d2e71a6ef3c22b1974708eaa3ab1af6563528e8da357dc00cbdad0e0e44",
+      "display_items": 0
     },
     {
       "id": "notion-agente-administrativo-crbm-6-quadrix-2026",
       "file": "./data/release/materials/notion-agente-administrativo-crbm-6-quadrix-2026.json",
       "questions": 50,
       "bytes": 98108,
-      "sha256": "1677badb8d88d5e66eb5b504767f7fd7a1c613f3917d8d7bbed4856d0cb1ad16"
+      "sha256": "1677badb8d88d5e66eb5b504767f7fd7a1c613f3917d8d7bbed4856d0cb1ad16",
+      "display_items": 0
     },
     {
       "id": "notion-agente-administrativo-crmv-rn-quadrix-2026",
       "file": "./data/release/materials/notion-agente-administrativo-crmv-rn-quadrix-2026.json",
       "questions": 120,
       "bytes": 261358,
-      "sha256": "75bb9ceac353baf9d0ca783fa7c0e0b413144fd90ab3d682c1344d51df9c3d17"
+      "sha256": "75bb9ceac353baf9d0ca783fa7c0e0b413144fd90ab3d682c1344d51df9c3d17",
+      "display_items": 0
     },
     {
       "id": "notion-agente-fiscal-crefito-17-quadrix-2026",
       "file": "./data/release/materials/notion-agente-fiscal-crefito-17-quadrix-2026.json",
       "questions": 119,
       "bytes": 230791,
-      "sha256": "68674ff0052bff61fa2874c02d46b01c879d69176f464739d5a2a67a84ac4da0"
+      "sha256": "68674ff0052bff61fa2874c02d46b01c879d69176f464739d5a2a67a84ac4da0",
+      "display_items": 0
     },
     {
       "id": "notion-agente-fiscal-crmv-rn-quadrix-2026",
       "file": "./data/release/materials/notion-agente-fiscal-crmv-rn-quadrix-2026.json",
       "questions": 28,
       "bytes": 57268,
-      "sha256": "33a22fd40c8cb8c8fdf6e7b5363ca86edea5316014e432f1891604151e251a6b"
+      "sha256": "33a22fd40c8cb8c8fdf6e7b5363ca86edea5316014e432f1891604151e251a6b",
+      "display_items": 0
     },
     {
       "id": "notion-agente-fiscal-crtr-12-quadrix-2026",
       "file": "./data/release/materials/notion-agente-fiscal-crtr-12-quadrix-2026.json",
       "questions": 120,
       "bytes": 246556,
-      "sha256": "a1eccff472087b05050cb309f2aa6595eb855551cfe64c6d7bb28841a43d7d1a"
+      "sha256": "a1eccff472087b05050cb309f2aa6595eb855551cfe64c6d7bb28841a43d7d1a",
+      "display_items": 0
+    },
+    {
+      "id": "notion-analista-administrativo-crfa-1-quadrix-2026",
+      "file": "./data/release/materials/notion-analista-administrativo-crfa-1-quadrix-2026.json",
+      "questions": 115,
+      "bytes": 294601,
+      "sha256": "882cdcb5d955e5d6296f19567c6d0cba97668682ee76b755a5da6f57fd7ce037",
+      "display_items": 0
     },
     {
       "id": "notion-analista-de-tecnologia-da-informacao-crefito-17-quadrix-2026",
       "file": "./data/release/materials/notion-analista-de-tecnologia-da-informacao-crefito-17-quadrix-2026.json",
       "questions": 21,
       "bytes": 33586,
-      "sha256": "467ddaa4bd25ad824b275b973bce7cacccb463425a0c2b998c99d14303793b9c"
+      "sha256": "467ddaa4bd25ad824b275b973bce7cacccb463425a0c2b998c99d14303793b9c",
+      "display_items": 0
     },
     {
       "id": "notion-analista-i-advogado-crf-df-quadrix-2026",
       "file": "./data/release/materials/notion-analista-i-advogado-crf-df-quadrix-2026.json",
       "questions": 9,
       "bytes": 13928,
-      "sha256": "891cbf915a1077ad3fc34176719397e1224508ec32e70b721e10400b0e25a965"
+      "sha256": "891cbf915a1077ad3fc34176719397e1224508ec32e70b721e10400b0e25a965",
+      "display_items": 0
     },
     {
       "id": "notion-analista-i-atendimento-e-cobranca-cra-sp-quadrix-2025",
       "file": "./data/release/materials/notion-analista-i-atendimento-e-cobranca-cra-sp-quadrix-2025.json",
       "questions": 50,
       "bytes": 163530,
-      "sha256": "df4d953267caf9706b11cc7bafe391d4b72d7f5d79f9c14c410abec7a91c993a"
+      "sha256": "df4d953267caf9706b11cc7bafe391d4b72d7f5d79f9c14c410abec7a91c993a",
+      "display_items": 1
     },
     {
       "id": "notion-assistente-administrativo-cremam-quadrix-2025",
       "file": "./data/release/materials/notion-assistente-administrativo-cremam-quadrix-2025.json",
       "questions": 50,
       "bytes": 169315,
-      "sha256": "730dcc398daa7099121f9058fa9645166290fd97dccd003446288273f65d4880"
+      "sha256": "730dcc398daa7099121f9058fa9645166290fd97dccd003446288273f65d4880",
+      "display_items": 1
     },
     {
       "id": "notion-assistente-i-crf-df-quadrix-2026",
       "file": "./data/release/materials/notion-assistente-i-crf-df-quadrix-2026.json",
       "questions": 118,
       "bytes": 227300,
-      "sha256": "fe98ca8de532b3afab9f7a55cb3872c70f2f5b20aacfd419974c5ce96f8c875d"
+      "sha256": "fe98ca8de532b3afab9f7a55cb3872c70f2f5b20aacfd419974c5ce96f8c875d",
+      "display_items": 0
     },
     {
       "id": "notion-assistente-social-fundacao-do-abc-quadrix-2025",
       "file": "./data/release/materials/notion-assistente-social-fundacao-do-abc-quadrix-2025.json",
       "questions": 50,
       "bytes": 94837,
-      "sha256": "4b9c484558323676a287ecc6fbff146333f9f50032c8c6606b671595aec15815"
+      "sha256": "4b9c484558323676a287ecc6fbff146333f9f50032c8c6606b671595aec15815",
+      "display_items": 0
     },
     {
       "id": "notion-assistente-social-municipio-de-alto-paraiso-de-goias-go-quadrix-2023",
       "file": "./data/release/materials/notion-assistente-social-municipio-de-alto-paraiso-de-goias-go-quadrix-2023.json",
       "questions": 40,
       "bytes": 60616,
-      "sha256": "ac1d10934d704ec6387f10f19bf7c4889eed5b537ab50b8e48c6d255d64b903c"
+      "sha256": "ac1d10934d704ec6387f10f19bf7c4889eed5b537ab50b8e48c6d255d64b903c",
+      "display_items": 0
     },
     {
       "id": "notion-assistente-social-processamento-de-dados-amazonas-s-a-prodam-quadrix-2022",
       "file": "./data/release/materials/notion-assistente-social-processamento-de-dados-amazonas-s-a-prodam-quadrix-2022.json",
       "questions": 5,
       "bytes": 14576,
-      "sha256": "b86dfa90b54e60a7abce21e9a1c5274e0b3da0743296f17db64628359b10c5be"
+      "sha256": "b86dfa90b54e60a7abce21e9a1c5274e0b3da0743296f17db64628359b10c5be",
+      "display_items": 0
     },
     {
       "id": "notion-auxiliar-administrativo-crbm-6-quadrix-2026",
       "file": "./data/release/materials/notion-auxiliar-administrativo-crbm-6-quadrix-2026.json",
       "questions": 120,
       "bytes": 274770,
-      "sha256": "600492f1dec40373808e3f874d224f4493348702b119f472383d58e1fea52055"
+      "sha256": "600492f1dec40373808e3f874d224f4493348702b119f472383d58e1fea52055",
+      "display_items": 0
     },
     {
       "id": "notion-auxiliar-administrativo-crefito-17-quadrix-2026",
       "file": "./data/release/materials/notion-auxiliar-administrativo-crefito-17-quadrix-2026.json",
       "questions": 120,
       "bytes": 287880,
-      "sha256": "71145008f1138614ccf431ad792dfee1e042448ab71c7294eb4a335408dce2ec"
+      "sha256": "71145008f1138614ccf431ad792dfee1e042448ab71c7294eb4a335408dce2ec",
+      "display_items": 0
     },
     {
       "id": "notion-auxiliar-administrativo-crtr-12-ms-mt-quadrix-2026-campo-grande",
       "file": "./data/release/materials/notion-auxiliar-administrativo-crtr-12-ms-mt-quadrix-2026-campo-grande.json",
       "questions": 57,
       "bytes": 102945,
-      "sha256": "69d8ee543c24fc158541de6ee812c4635ca7bf4883e86a1e1390368030c8de7a"
+      "sha256": "69d8ee543c24fc158541de6ee812c4635ca7bf4883e86a1e1390368030c8de7a",
+      "display_items": 0
     },
     {
       "id": "notion-contador-crbm-6-quadrix-2026",
       "file": "./data/release/materials/notion-contador-crbm-6-quadrix-2026.json",
       "questions": 120,
       "bytes": 260350,
-      "sha256": "bb1d02929d64a7e42ea6a712af29fe4cadce012ea0e7bc647d3a5f0dac391562"
+      "sha256": "bb1d02929d64a7e42ea6a712af29fe4cadce012ea0e7bc647d3a5f0dac391562",
+      "display_items": 0
     },
     {
       "id": "notion-gestor-em-politicas-publicas-e-gestao-governamental-administracao-seec-df-iades-2023-tipo-a",
       "file": "./data/release/materials/notion-gestor-em-politicas-publicas-e-gestao-governamental-administracao-seec-df-iades-2023-tipo-a.json",
       "questions": 58,
       "bytes": 141799,
-      "sha256": "1bf2bc33d5387e333a0b0892cf280108f7f94dbb40c046d8309435e5acc8bd95"
+      "sha256": "1bf2bc33d5387e333a0b0892cf280108f7f94dbb40c046d8309435e5acc8bd95",
+      "display_items": 0
     },
     {
       "id": "prova-qdx-seedf-2022-gppgadm-a",
       "file": "./data/release/materials/prova-qdx-seedf-2022-gppgadm-a.json",
       "questions": 119,
       "bytes": 238256,
-      "sha256": "b4ae5d0784ae06d47c37efeafeeaf78295452aa64c7908084e9577b4b3abfde2"
+      "sha256": "b4ae5d0784ae06d47c37efeafeeaf78295452aa64c7908084e9577b4b3abfde2",
+      "display_items": 0
     },
     {
       "id": "notion-orientador-social-prefeitura-de-alto-paraiso-de-goias-go-quadrix-2023",
       "file": "./data/release/materials/notion-orientador-social-prefeitura-de-alto-paraiso-de-goias-go-quadrix-2023.json",
       "questions": 37,
       "bytes": 107007,
-      "sha256": "5bd9431e688379b58aed4a6c4fff0c0c67e8b9c0c088239222bb7cf81e5fa9ee"
+      "sha256": "5bd9431e688379b58aed4a6c4fff0c0c67e8b9c0c088239222bb7cf81e5fa9ee",
+      "display_items": 0
     },
     {
       "id": "notion-professor-de-educacao-basica-administracao-seedf-df-quadrix-2025-tipo-a",
       "file": "./data/release/materials/notion-professor-de-educacao-basica-administracao-seedf-df-quadrix-2025-tipo-a.json",
       "questions": 119,
       "bytes": 235844,
-      "sha256": "00364de15987233a0b02e1d392d84afe3048db543c0efc7e9c37535774f36a0b"
+      "sha256": "00364de15987233a0b02e1d392d84afe3048db543c0efc7e9c37535774f36a0b",
+      "display_items": 0
     },
     {
       "id": "notion-professor-de-educacao-basica-arquitetura-seedf-df-quadrix-2025-tipo-a",
       "file": "./data/release/materials/notion-professor-de-educacao-basica-arquitetura-seedf-df-quadrix-2025-tipo-a.json",
       "questions": 49,
       "bytes": 79320,
-      "sha256": "9eb2ed9f7645d08ab21c8c727be3e7bbe343bae1287b8c68cec6fe4cececb2e9"
+      "sha256": "9eb2ed9f7645d08ab21c8c727be3e7bbe343bae1287b8c68cec6fe4cececb2e9",
+      "display_items": 0
     },
     {
       "id": "notion-professor-de-educacao-basica-artes-seedf-df-quadrix-2025-tipo-a",
       "file": "./data/release/materials/notion-professor-de-educacao-basica-artes-seedf-df-quadrix-2025-tipo-a.json",
       "questions": 50,
       "bytes": 84614,
-      "sha256": "543afb700cf1980f1dcdee396c1bf228300e07fa6f65f5271818ae881f14f9a2"
+      "sha256": "543afb700cf1980f1dcdee396c1bf228300e07fa6f65f5271818ae881f14f9a2",
+      "display_items": 0
     },
     {
       "id": "notion-professor-de-educacao-basica-biologia-seedf-df-quadrix-2025-tipo-a",
       "file": "./data/release/materials/notion-professor-de-educacao-basica-biologia-seedf-df-quadrix-2025-tipo-a.json",
       "questions": 50,
       "bytes": 86175,
-      "sha256": "c2a0939d87a283f9d5c9378f071bfa493e44d2c9c1c75ebe748080bb2ee667e1"
+      "sha256": "c2a0939d87a283f9d5c9378f071bfa493e44d2c9c1c75ebe748080bb2ee667e1",
+      "display_items": 0
     },
     {
       "id": "notion-professor-de-educacao-basica-biomedicina-seedf-df-quadrix-2025-tipo-a",
       "file": "./data/release/materials/notion-professor-de-educacao-basica-biomedicina-seedf-df-quadrix-2025-tipo-a.json",
       "questions": 50,
       "bytes": 90837,
-      "sha256": "b8edd5bbc2c237c07d1a786b8488077a230c19bd1fa529b7a7eca4e5afde6c3f"
+      "sha256": "b8edd5bbc2c237c07d1a786b8488077a230c19bd1fa529b7a7eca4e5afde6c3f",
+      "display_items": 0
     },
     {
       "id": "notion-professor-de-educacao-basica-contabilidade-seedf-df-quadrix-2025-tipo-a",
       "file": "./data/release/materials/notion-professor-de-educacao-basica-contabilidade-seedf-df-quadrix-2025-tipo-a.json",
       "questions": 50,
-      "bytes": 211873,
-      "sha256": "0b8e40c83f315d9f6d6e01ef34dbc5e1d35d197c9449a463022e86dbf9272400"
+      "bytes": 191438,
+      "sha256": "0b8dca07fd51d721640679c83afe4021bc7a414a9d413cea72201858df1710dc",
+      "display_items": 0
     },
     {
       "id": "notion-professor-de-educacao-basica-direito-seedf-df-quadrix-2025-tipo-a",
       "file": "./data/release/materials/notion-professor-de-educacao-basica-direito-seedf-df-quadrix-2025-tipo-a.json",
       "questions": 50,
       "bytes": 102509,
-      "sha256": "2665c98eb86b00168a972987bd561fd1560f6f8ef280cae9a32a97a70f95578e"
+      "sha256": "2665c98eb86b00168a972987bd561fd1560f6f8ef280cae9a32a97a70f95578e",
+      "display_items": 0
     },
     {
       "id": "notion-professor-de-educacao-basica-eletronica-seedf-df-quadrix-2025-tipo-a",
       "file": "./data/release/materials/notion-professor-de-educacao-basica-eletronica-seedf-df-quadrix-2025-tipo-a.json",
       "questions": 25,
-      "bytes": 100032,
-      "sha256": "5376545e76339197d024c4101de8f34993604fd47e1e9105a79b9ed29c2cac18"
+      "bytes": 89722,
+      "sha256": "bfaca66c36c2fe7d25b4dc8019829fd5f508aa3adddfbd69210fedb629e749ae",
+      "display_items": 0
     },
     {
       "id": "notion-professor-de-educacao-basica-eletrotecnica-seedf-df-quadrix-2025-tipo-a",
       "file": "./data/release/materials/notion-professor-de-educacao-basica-eletrotecnica-seedf-df-quadrix-2025-tipo-a.json",
       "questions": 43,
       "bytes": 81297,
-      "sha256": "81c8b205aa9e95b8ca29b0ded0af60a9b16203f5a5036a010023a732b385f58b"
+      "sha256": "81c8b205aa9e95b8ca29b0ded0af60a9b16203f5a5036a010023a732b385f58b",
+      "display_items": 0
     },
     {
       "id": "notion-professor-de-educacao-basica-pedagogia-seedf-df-quadrix-2025-tipo-a",
       "file": "./data/release/materials/notion-professor-de-educacao-basica-pedagogia-seedf-df-quadrix-2025-tipo-a.json",
       "questions": 72,
       "bytes": 191372,
-      "sha256": "251d4d2844ca8b190053d2fd098d6fab74e7d4e8823733bf66f8cf8697f8f21b"
+      "sha256": "251d4d2844ca8b190053d2fd098d6fab74e7d4e8823733bf66f8cf8697f8f21b",
+      "display_items": 0
     },
     {
       "id": "notion-professor-de-educacao-basica-producao-cultural-seedf-df-quadrix-2025-tipo-a",
       "file": "./data/release/materials/notion-professor-de-educacao-basica-producao-cultural-seedf-df-quadrix-2025-tipo-a.json",
       "questions": 50,
       "bytes": 119393,
-      "sha256": "0e674c640d4c6fa303d3aa1c871e9343691747ae6e8fd8d18cbf4e338befdac8"
+      "sha256": "0e674c640d4c6fa303d3aa1c871e9343691747ae6e8fd8d18cbf4e338befdac8",
+      "display_items": 0
     },
     {
       "id": "notion-professor-de-educacao-basica-psicologia-seedf-df-quadrix-2025-tipo-a",
       "file": "./data/release/materials/notion-professor-de-educacao-basica-psicologia-seedf-df-quadrix-2025-tipo-a.json",
       "questions": 50,
       "bytes": 94225,
-      "sha256": "99ed778617fecf81478ee03f0c6a33fdc6421d5df46826e441bf1ae89b27f3c7"
+      "sha256": "99ed778617fecf81478ee03f0c6a33fdc6421d5df46826e441bf1ae89b27f3c7",
+      "display_items": 0
     },
     {
       "id": "notion-professor-de-educacao-basica-quimica-seedf-df-quadrix-2025-tipo-a",
       "file": "./data/release/materials/notion-professor-de-educacao-basica-quimica-seedf-df-quadrix-2025-tipo-a.json",
       "questions": 48,
       "bytes": 97842,
-      "sha256": "c3a4b72bddf79cca737f65072aa2e606a138b33d5d157eeb33ccb8ec4f5e4a1d"
+      "sha256": "c3a4b72bddf79cca737f65072aa2e606a138b33d5d157eeb33ccb8ec4f5e4a1d",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-adm01",
       "file": "./data/release/materials/sim-emilia-2026-tdas-adm01.json",
       "questions": 20,
       "bytes": 17283,
-      "sha256": "c213084f856c39143f2c7a83215e97ff6f1a3c52dbc0878aa9aa5fa16648a556"
+      "sha256": "c213084f856c39143f2c7a83215e97ff6f1a3c52dbc0878aa9aa5fa16648a556",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-arq01",
       "file": "./data/release/materials/sim-emilia-2026-tdas-arq01.json",
       "questions": 20,
       "bytes": 18555,
-      "sha256": "cf434dc2ee8387747c8c07349d85bbe4f67a2d719e66ebbbd3eb4e69ec81fe17"
+      "sha256": "cf434dc2ee8387747c8c07349d85bbe4f67a2d719e66ebbbd3eb4e69ec81fe17",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-as01",
       "file": "./data/release/materials/sim-emilia-2026-tdas-as01.json",
       "questions": 30,
       "bytes": 29854,
-      "sha256": "8d76a05bb7b59413926ff587547299c459864d6003fe85e7358d33bc73cd1fb2"
+      "sha256": "8d76a05bb7b59413926ff587547299c459864d6003fe85e7358d33bc73cd1fb2",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-as02",
       "file": "./data/release/materials/sim-emilia-2026-tdas-as02.json",
       "questions": 30,
       "bytes": 30778,
-      "sha256": "dad7b0e2c92e1e84a25f33f7b96b02092aa16f512fe3637a8b45fe49345a3bae"
+      "sha256": "dad7b0e2c92e1e84a25f33f7b96b02092aa16f512fe3637a8b45fe49345a3bae",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-as03",
       "file": "./data/release/materials/sim-emilia-2026-tdas-as03.json",
       "questions": 30,
       "bytes": 31765,
-      "sha256": "88baedb48af8e62dc0dbfadb186aa72b503e289502e483734c94f9e027b161ea"
+      "sha256": "88baedb48af8e62dc0dbfadb186aa72b503e289502e483734c94f9e027b161ea",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-const01",
       "file": "./data/release/materials/sim-emilia-2026-tdas-const01.json",
       "questions": 20,
       "bytes": 15929,
-      "sha256": "5e6e8906ec69da7543eb9fc6d1757e7d9b84439b4a16b7de5e1e19cd10954adc"
+      "sha256": "5e6e8906ec69da7543eb9fc6d1757e7d9b84439b4a16b7de5e1e19cd10954adc",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-dfr01",
       "file": "./data/release/materials/sim-emilia-2026-tdas-dfr01.json",
       "questions": 20,
       "bytes": 18446,
-      "sha256": "f34cdd5b4fe27ecdac6cefaa2e08a4f17bf936439ae1a2119627a2a5063017a8"
+      "sha256": "f34cdd5b4fe27ecdac6cefaa2e08a4f17bf936439ae1a2119627a2a5063017a8",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-leg01",
       "file": "./data/release/materials/sim-emilia-2026-tdas-leg01.json",
       "questions": 20,
       "bytes": 20727,
-      "sha256": "b144e0069065af91f251e441c56947faf538fd49d7311b83d87d4272b2142ba9"
+      "sha256": "b144e0069065af91f251e441c56947faf538fd49d7311b83d87d4272b2142ba9",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-leg02",
       "file": "./data/release/materials/sim-emilia-2026-tdas-leg02.json",
       "questions": 20,
       "bytes": 17415,
-      "sha256": "c17b0f11a32bf58a10d420c24db9f39a0ef0a30c2c392d1c253fc7c9fe361020"
+      "sha256": "c17b0f11a32bf58a10d420c24db9f39a0ef0a30c2c392d1c253fc7c9fe361020",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-leg03",
       "file": "./data/release/materials/sim-emilia-2026-tdas-leg03.json",
       "questions": 20,
       "bytes": 18228,
-      "sha256": "0ae1b8bea745cd7e1ab4afc769e0e75c2b8539644ca78964fc9016708ce63103"
+      "sha256": "0ae1b8bea745cd7e1ab4afc769e0e75c2b8539644ca78964fc9016708ce63103",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-mat01",
       "file": "./data/release/materials/sim-emilia-2026-tdas-mat01.json",
       "questions": 20,
       "bytes": 19295,
-      "sha256": "409c570f326ededfcf7e5a07152e30814e8c2ab10b305e0fecb366b852cd9504"
+      "sha256": "409c570f326ededfcf7e5a07152e30814e8c2ab10b305e0fecb366b852cd9504",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-mul01",
       "file": "./data/release/materials/sim-emilia-2026-tdas-mul01.json",
       "questions": 20,
       "bytes": 21995,
-      "sha256": "ad213f531e5f95b60cfb0d5b5148495ee770c97ecada15de0a23d99be740be5e"
+      "sha256": "ad213f531e5f95b60cfb0d5b5148495ee770c97ecada15de0a23d99be740be5e",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-mul02",
       "file": "./data/release/materials/sim-emilia-2026-tdas-mul02.json",
       "questions": 20,
       "bytes": 19091,
-      "sha256": "c4d43cf1c86d70f63e697f7be5c31bde1200ff5f55a016e657558cdc70084472"
+      "sha256": "c4d43cf1c86d70f63e697f7be5c31bde1200ff5f55a016e657558cdc70084472",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-prog01",
       "file": "./data/release/materials/sim-emilia-2026-tdas-prog01.json",
       "questions": 20,
       "bytes": 23563,
-      "sha256": "da6938bcd49203bc7b014c5c4ccd5662d2e21ae4bbd8786d2c45c955de37835f"
+      "sha256": "da6938bcd49203bc7b014c5c4ccd5662d2e21ae4bbd8786d2c45c955de37835f",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-prog02",
       "file": "./data/release/materials/sim-emilia-2026-tdas-prog02.json",
       "questions": 20,
       "bytes": 21393,
-      "sha256": "e18cbff2eb968e791db9110cb62a328bf07c8d535cd693ff9046a3e0bd8445ab"
+      "sha256": "e18cbff2eb968e791db9110cb62a328bf07c8d535cd693ff9046a3e0bd8445ab",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-prog03",
       "file": "./data/release/materials/sim-emilia-2026-tdas-prog03.json",
       "questions": 20,
       "bytes": 22272,
-      "sha256": "175476c8e9d917eaf500cdff5aba871248f6178a6cdabdc2187fba8e9c409dc9"
+      "sha256": "175476c8e9d917eaf500cdff5aba871248f6178a6cdabdc2187fba8e9c409dc9",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-prog04",
       "file": "./data/release/materials/sim-emilia-2026-tdas-prog04.json",
       "questions": 20,
       "bytes": 21456,
-      "sha256": "621bdefcbc9fba34616ea8a016e8c1aeaa752ef3a1f53e72b6c8b183ed799cb4"
+      "sha256": "621bdefcbc9fba34616ea8a016e8c1aeaa752ef3a1f53e72b6c8b183ed799cb4",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-prog05",
       "file": "./data/release/materials/sim-emilia-2026-tdas-prog05.json",
       "questions": 20,
       "bytes": 21405,
-      "sha256": "c2f7d8400617592cdb8af8c2c7b2c629048646064c0b22d5425f5bdbdf7edf33"
+      "sha256": "c2f7d8400617592cdb8af8c2c7b2c629048646064c0b22d5425f5bdbdf7edf33",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-pt01",
       "file": "./data/release/materials/sim-emilia-2026-tdas-pt01.json",
       "questions": 10,
       "bytes": 20823,
-      "sha256": "f6f4a0f5e2779164b502b565734fd2bf90c77feb4358823d30a0617f767648f3"
+      "sha256": "f6f4a0f5e2779164b502b565734fd2bf90c77feb4358823d30a0617f767648f3",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-pt02",
       "file": "./data/release/materials/sim-emilia-2026-tdas-pt02.json",
       "questions": 10,
       "bytes": 20878,
-      "sha256": "b2a51beeccae504479fd64be4c4c24a7588bb216eac92484ea3441387be87267"
+      "sha256": "b2a51beeccae504479fd64be4c4c24a7588bb216eac92484ea3441387be87267",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-pt03",
       "file": "./data/release/materials/sim-emilia-2026-tdas-pt03.json",
       "questions": 10,
       "bytes": 7711,
-      "sha256": "9bb2d4055e82f32dc33f003b41a47937e19abd4f2f5e94c97432ab1c26c6ec69"
+      "sha256": "9bb2d4055e82f32dc33f003b41a47937e19abd4f2f5e94c97432ab1c26c6ec69",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-pt04",
       "file": "./data/release/materials/sim-emilia-2026-tdas-pt04.json",
       "questions": 10,
       "bytes": 19500,
-      "sha256": "679c1fdd54eec8ecb77cdd0f7747ca47664870d022bd2d29fb79a332ea272517"
+      "sha256": "679c1fdd54eec8ecb77cdd0f7747ca47664870d022bd2d29fb79a332ea272517",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-pt05",
       "file": "./data/release/materials/sim-emilia-2026-tdas-pt05.json",
       "questions": 10,
       "bytes": 19571,
-      "sha256": "7597a0381abca59a511a81a1b448b575201cb02d02f5554dbdf805daaff7d4de"
+      "sha256": "7597a0381abca59a511a81a1b448b575201cb02d02f5554dbdf805daaff7d4de",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-pt06",
       "file": "./data/release/materials/sim-emilia-2026-tdas-pt06.json",
       "questions": 10,
       "bytes": 17993,
-      "sha256": "3df3096e4b15cdb1aaf819e3019015867ad67d7213e60f7d63e6307c2cc00a44"
+      "sha256": "3df3096e4b15cdb1aaf819e3019015867ad67d7213e60f7d63e6307c2cc00a44",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-pt07",
       "file": "./data/release/materials/sim-emilia-2026-tdas-pt07.json",
       "questions": 10,
       "bytes": 18532,
-      "sha256": "e02aaeb617d0f14ed38eeb44c01e5969b7882fd88f29de57045f6c8f09169185"
+      "sha256": "e02aaeb617d0f14ed38eeb44c01e5969b7882fd88f29de57045f6c8f09169185",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-pt08",
       "file": "./data/release/materials/sim-emilia-2026-tdas-pt08.json",
       "questions": 10,
       "bytes": 17523,
-      "sha256": "fa6dd3f1f04cbe9fba0777e672eef79d380d553c9ca85a663ab252921f53b6ed"
+      "sha256": "fa6dd3f1f04cbe9fba0777e672eef79d380d553c9ca85a663ab252921f53b6ed",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-pt09",
       "file": "./data/release/materials/sim-emilia-2026-tdas-pt09.json",
       "questions": 10,
       "bytes": 17498,
-      "sha256": "54b62cbb752d69efe6ae9764c1e225c362e4376e904437383a802501e401b207"
+      "sha256": "54b62cbb752d69efe6ae9764c1e225c362e4376e904437383a802501e401b207",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-pt10",
       "file": "./data/release/materials/sim-emilia-2026-tdas-pt10.json",
       "questions": 10,
       "bytes": 18542,
-      "sha256": "adeb4c9e0b6519eac333060d2825d06d3ef3e85302a1e1b257d3f778b2acdcb6"
+      "sha256": "adeb4c9e0b6519eac333060d2825d06d3ef3e85302a1e1b257d3f778b2acdcb6",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-pt11",
       "file": "./data/release/materials/sim-emilia-2026-tdas-pt11.json",
       "questions": 10,
       "bytes": 17528,
-      "sha256": "f93c388acba965cd5dcc501372a77e13b6f3d57954231bd9c4bee01e1359fe3c"
+      "sha256": "f93c388acba965cd5dcc501372a77e13b6f3d57954231bd9c4bee01e1359fe3c",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-pt12",
       "file": "./data/release/materials/sim-emilia-2026-tdas-pt12.json",
       "questions": 10,
       "bytes": 17335,
-      "sha256": "df4be58c0394d558732f6777620069535aa5c6f9444f40b339a44f9925ea63b4"
+      "sha256": "df4be58c0394d558732f6777620069535aa5c6f9444f40b339a44f9925ea63b4",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-pt13",
       "file": "./data/release/materials/sim-emilia-2026-tdas-pt13.json",
       "questions": 10,
       "bytes": 17325,
-      "sha256": "9261c7df82dcd8134f23ab34193ca0eb1a1eb74ffb9ccd313719d6f69be4d214"
+      "sha256": "9261c7df82dcd8134f23ab34193ca0eb1a1eb74ffb9ccd313719d6f69be4d214",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-pt14",
       "file": "./data/release/materials/sim-emilia-2026-tdas-pt14.json",
       "questions": 10,
       "bytes": 18447,
-      "sha256": "5d383ae6168c41c5fd263bf5aeb2259cae27560d815c2ef73f82a6ceb3e191c1"
+      "sha256": "5d383ae6168c41c5fd263bf5aeb2259cae27560d815c2ef73f82a6ceb3e191c1",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-pt15",
       "file": "./data/release/materials/sim-emilia-2026-tdas-pt15.json",
       "questions": 10,
       "bytes": 19244,
-      "sha256": "48d99729a4d6b01b7ecae5b382ca05a0836605d29bf07fff24f16443da48910b"
+      "sha256": "48d99729a4d6b01b7ecae5b382ca05a0836605d29bf07fff24f16443da48910b",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-pt16",
       "file": "./data/release/materials/sim-emilia-2026-tdas-pt16.json",
       "questions": 10,
       "bytes": 8117,
-      "sha256": "917e06d084efec8f09fca8f3f0c60fe1def1d7396c9cd3d40e41df5c3791242b"
+      "sha256": "917e06d084efec8f09fca8f3f0c60fe1def1d7396c9cd3d40e41df5c3791242b",
+      "display_items": 0
     },
     {
       "id": "sim-emilia-2026-tdas-soc01",
       "file": "./data/release/materials/sim-emilia-2026-tdas-soc01.json",
       "questions": 20,
       "bytes": 20812,
-      "sha256": "8d7145691eff82bf35c4611ecb5e4270701f10eda7e5e8ad6a360761a9e0b795"
+      "sha256": "8d7145691eff82bf35c4611ecb5e4270701f10eda7e5e8ad6a360761a9e0b795",
+      "display_items": 0
     }
   ]
 }
