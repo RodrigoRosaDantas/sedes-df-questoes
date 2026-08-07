@@ -78,12 +78,15 @@ async function startOfficialExam() {
   }
 }
 function injectCard() {
-  if (currentRoute() !== "inicio" || document.querySelector("[data-official-exam-card]")) return;
-  const target = document.querySelector("[data-release-health]") || document.querySelector(".bank-status");
+  const route = currentRoute();
+  if (!["inicio", "estudar"].includes(route) || document.querySelector("[data-official-exam-card]")) return;
+  const target = route === "estudar"
+    ? document.querySelector("[data-ux-study-launcher]") || document.querySelector(".study-view-tabs") || document.querySelector(".page-heading")
+    : document.querySelector("[data-release-health]") || document.querySelector(".bank-status");
   if (!target) return;
   const card = document.createElement("section"); card.className = "official-exam-card card"; card.dataset.officialExamCard = "";
   card.innerHTML = `<div><p class="eyebrow">Modo Prova Real</p><h2>SEDES/DF 2026</h2><p>60 questões: 20 gerais (peso 1) e 40 específicas (peso 2). A janela oficial de 4 horas é compartilhada com a discursiva.</p></div><div class="official-exam-facts"><span><strong>60</strong><small>questões</small></span><span><strong>100</strong><small>pontos</small></span><span><strong>4h</strong><small>janela conjunta</small></span></div><button class="btn primary" data-start-official-exam>Iniciar prova real</button>`;
-  target.insertAdjacentElement("afterend", card);
+  target.insertAdjacentElement(route === "estudar" ? "afterend" : "afterend", card);
   card.querySelector("[data-start-official-exam]").addEventListener("click", startOfficialExam);
 }
 let timer = null;
