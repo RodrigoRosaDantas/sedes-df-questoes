@@ -23,6 +23,7 @@ const publicDashboard = read("tests-public/dashboard-card.spec.js");
 const publicNavigation = read("tests-public/navigation-v2-15.spec.js");
 const publicUx = read("tests-public/ux-v2-14.spec.js");
 const publicPlatform = read("tests-public/platform-v2-13.spec.js");
+const localNavigation = read("tests/navigation-v2-15.spec.js");
 
 requireMarkers(index, ["navigation-v2-15.css?v=1", "navigation-v2-15.js?v=1", "navigation-v2-15-polish.css?v=1", "navigation-v2-15-polish.js?v=1", "data-ux-tech-status>Configurações"], "HTML");
 requireMarkers(worker, ["navigation-v2-15.css?v=1", "navigation-v2-15.js?v=1", "navigation-v2-15-polish.css?v=1", "navigation-v2-15-polish.js?v=1"], "Service worker");
@@ -43,6 +44,7 @@ requireMarkers(navigationPolish, [
   "relativeSync",
   "sincronizado há",
   "ux15-breadcrumb",
+  'aria-current="page"',
   "focusSearchWhenReady",
   "pruneLegacyHome",
   ":scope > [data-ux15-home]",
@@ -56,6 +58,9 @@ requireMarkers(navigationPolish, [
   "data-ux15-open-question",
   "reconcileHomeReviewTotal",
   "aria-selected",
+  "aria-controls",
+  "tabpanel",
+  "aria-labelledby",
   "pendingSettingsTabFocus",
   "moveSettingsTabFocus",
   'event.key === "ArrowRight"',
@@ -70,6 +75,7 @@ requireMarkers(packageData, ["node --check playwright.config.js", "node --check 
 requireMarkers(publicReleaseContract, ["arquitetura v2.15", "perfil/configuracoes", "[data-ux15-home]", "[data-official-exam-card]", "[data-adaptive-review]"], "Contrato público da release");
 requireMarkers(publicDashboard, ["Configurações usa o release-meta reconciliado", "Banco Mestre", "navigation-v2-15.js?v=1"], "Smoke público do painel");
 requireMarkers(publicUx, ["[data-ux15-open-question]", "question-search-index.json", "catalogo.json"], "Smoke público da busca");
+requireMarkers(localNavigation, ["aria-controls", "tabpanel", "aria-labelledby", "aria-current=page", "ArrowRight", "End", "Home"], "Teste local de acessibilidade");
 
 for (const [name, content] of Object.entries({
   "release-contract": publicReleaseContract,
