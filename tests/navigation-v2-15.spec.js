@@ -20,8 +20,9 @@ test("home exibe apenas o essencial e horário de Brasília", async ({page}) => 
   await expect(page.locator("[data-ux-start-today]").first()).toBeVisible();
 });
 
-test("configurações concentram dados do projeto", async ({page}) => {
+test("configurações concentram dados do projeto em URL própria", async ({page}) => {
   await page.locator("[data-ux15-settings]").click();
+  await expect(page).toHaveURL(/#\/perfil\/configuracoes$/);
   await expect(page.locator("[data-ux15-settings-page]")).toBeVisible({timeout: 30000});
   await expect(page.locator("[data-ux15-settings-tab=plataforma]")).toBeVisible();
   await page.locator("[data-ux15-settings-tab=plataforma]").click();
@@ -60,5 +61,6 @@ test("mobile mantém quatro destinos principais e configurações no topo", asyn
   await expect(page.locator("[data-ux15-settings]")).toBeVisible({timeout: 30000});
   await expect(page.locator("[data-ux15-home]")).toBeVisible();
   await page.locator("[data-ux15-settings]").click();
+  await expect(page).toHaveURL(/#\/perfil\/configuracoes$/);
   await expect(page.locator(".ux15-settings-tabs")).toBeVisible({timeout: 30000});
 });
