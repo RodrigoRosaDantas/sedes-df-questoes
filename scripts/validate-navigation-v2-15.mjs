@@ -12,11 +12,13 @@ const requireMarkers = (content, markers, context) => markers.forEach(marker => 
 const index = read("index.html");
 const worker = read("service-worker.js");
 const navigation = read("assets/navigation-v2-15.js");
+const navigationPolish = read("assets/navigation-v2-15-polish.js");
 const css = read("assets/navigation-v2-15.css");
+const polishCss = read("assets/navigation-v2-15-polish.css");
 const builder = read("scripts/build-public.mjs");
 
-requireMarkers(index, ["navigation-v2-15.css?v=1", "navigation-v2-15.js?v=1", "data-ux-tech-status>Configurações"], "HTML");
-requireMarkers(worker, ["navigation-v2-15.css?v=1", "navigation-v2-15.js?v=1"], "Service worker");
+requireMarkers(index, ["navigation-v2-15.css?v=1", "navigation-v2-15.js?v=1", "navigation-v2-15-polish.css?v=1", "navigation-v2-15-polish.js?v=1", "data-ux-tech-status>Configurações"], "HTML");
+requireMarkers(worker, ["navigation-v2-15.css?v=1", "navigation-v2-15.js?v=1", "navigation-v2-15-polish.css?v=1", "navigation-v2-15-polish.js?v=1"], "Service worker");
 requireMarkers(navigation, [
   "Seu estudo, sem ruído.",
   "Última sincronização do catálogo",
@@ -27,19 +29,23 @@ requireMarkers(navigation, [
   "data-ux15-settings-tab",
   "dataset.ux15Settings",
 ], "Navegação v2.15");
+requireMarkers(navigationPolish, ["relativeSync", "sincronizado há", "ux15-breadcrumb", "focusSearchWhenReady", 'event.key === "/"'], "Polimento da navegação v2.15");
 requireMarkers(css, ["ux15-home-active", "ux15-home-grid", "ux15-settings-page", "ux15-sync-card", "ux15-facts-grid"], "CSS v2.15");
-requireMarkers(builder, ["platform_navigation_js", "platform_navigation_css", "navigation-v2-15.js", "navigation-v2-15.css"], "Build público");
+requireMarkers(polishCss, ["ux15-sync-age", "ux15-breadcrumb", "fresh", "attention", "stale"], "CSS de polimento v2.15");
+requireMarkers(builder, ["platform_navigation_js", "platform_navigation_css", "platform_navigation_polish_js", "platform_navigation_polish_css", "navigation-v2-15-polish.js", "navigation-v2-15-polish.css"], "Build público");
 
 if (exists("dist")) {
-  for (const required of ["dist/assets/navigation-v2-15.js", "dist/assets/navigation-v2-15.css", "dist/data/release/build-info.json", "dist/data/release/release-meta.json"]) {
+  for (const required of ["dist/assets/navigation-v2-15.js", "dist/assets/navigation-v2-15.css", "dist/assets/navigation-v2-15-polish.js", "dist/assets/navigation-v2-15-polish.css", "dist/data/release/build-info.json", "dist/data/release/release-meta.json"]) {
     if (!exists(required)) throw new Error(`Pacote público sem recurso da navegação v2.15: ${required}`);
   }
-  if (read("assets/navigation-v2-15.js") !== read("dist/assets/navigation-v2-15.js") || read("assets/navigation-v2-15.css") !== read("dist/assets/navigation-v2-15.css")) throw new Error("O dist diverge das fontes da navegação v2.15.");
+  for (const relative of ["assets/navigation-v2-15.js", "assets/navigation-v2-15.css", "assets/navigation-v2-15-polish.js", "assets/navigation-v2-15-polish.css"]) {
+    if (read(relative) !== read(`dist/${relative}`)) throw new Error(`O dist diverge da fonte canônica: ${relative}`);
+  }
   const buildInfo = JSON.parse(read("dist/data/release/build-info.json"));
   const releaseMeta = JSON.parse(read("dist/data/release/release-meta.json"));
-  for (const key of ["platform_navigation_js", "platform_navigation_css"]) {
+  for (const key of ["platform_navigation_js", "platform_navigation_css", "platform_navigation_polish_js", "platform_navigation_polish_css"]) {
     if (!buildInfo.source_files_sha256?.[key] || !releaseMeta.source_files_sha256?.[key]) throw new Error(`Proveniência da navegação v2.15 ausente: ${key}`);
   }
 }
 
-console.log("✓ Navegação v2.15 validada: Home limpa, relógio de Brasília e Configurações separadas.");
+console.log("✓ Navegação v2.15 validada: Home limpa, Brasília, Configurações, breadcrumbs e busca rápida.");
