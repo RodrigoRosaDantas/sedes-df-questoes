@@ -33,7 +33,7 @@ if (!TOKEN) throw new Error('NOTION_TOKEN ausente.');
 const EXPORT_PROPERTIES = [
   'Ano','Anulada','Assunto','Auditoria de conteúdo','Bloco','Bloqueio manual de publicação','Cargo',
   'Comentário geral','Código','Código GitHub','Código do cargo','Disciplina','Duplicada','Enunciado','Fonte / Banca',
-  'Formato da questão','Fundamento legal','Gabarito','Gabarito conferido - registro manual anterior',
+  'Formato da questão','Fundamento legal','Gabarito','Gabarito conferido — registro manual anterior',
   'Liberada para exportação','Lote de publicação','Nome do material','Número original','Observações','Órgão','Pegadinha',
   'Pode publicar','Possui imagem','Questão','Subassunto','Texto-base','Tipo de material','Transcrição conferida','URL da fonte',
 ];
@@ -120,7 +120,7 @@ function validateRow(row, config, {afterRelease = false, requireEditorialMetadat
   if (!expectedNumbers(config).includes(number)) throw new Error(`${code}: número excluído ou fora de 1–120.`);
   if (!['Aprovada', 'Ajustada'].includes(clean(row['Auditoria de conteúdo']))) throw new Error(`${code}: auditoria não aprovada.`);
   if (row['Transcrição conferida'] !== true) throw new Error(`${code}: transcrição não conferida.`);
-  if (row['Gabarito conferido - registro manual anterior'] !== true) throw new Error(`${code}: gabarito não conferido.`);
+  if (row['Gabarito conferido — registro manual anterior'] !== true) throw new Error(`${code}: gabarito não conferido.`);
   if (row['Duplicada'] === true || row['Anulada'] === true || row['Possui imagem'] === true || row['Bloqueio manual de publicação'] === true) {
     throw new Error(`${code}: bloqueio editorial/técnico presente.`);
   }
