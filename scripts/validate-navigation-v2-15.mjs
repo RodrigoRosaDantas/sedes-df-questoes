@@ -58,7 +58,8 @@ requireMarkers(navigationPolish, [
   "data-ux15-open-question",
   "reconcileHomeReviewTotal",
   "aria-selected",
-  "aria-controls",
+  'aria-controls", "ux15-settings-panel"',
+  'panel.id = "ux15-settings-panel"',
   "tabpanel",
   "aria-labelledby",
   "pendingSettingsTabFocus",
@@ -75,7 +76,7 @@ requireMarkers(packageData, ["node --check playwright.config.js", "node --check 
 requireMarkers(publicReleaseContract, ["arquitetura v2.15", "perfil/configuracoes", "[data-ux15-home]", "[data-official-exam-card]", "[data-adaptive-review]"], "Contrato público da release");
 requireMarkers(publicDashboard, ["Configurações usa o release-meta reconciliado", "Banco Mestre", "navigation-v2-15.js?v=1"], "Smoke público do painel");
 requireMarkers(publicUx, ["[data-ux15-open-question]", "question-search-index.json", "catalogo.json"], "Smoke público da busca");
-requireMarkers(localNavigation, ["aria-controls", "tabpanel", "aria-labelledby", "aria-current=page", "ArrowRight", "End", "Home", "#install-app", "scrollWidth <= element.clientWidth"], "Teste local de acessibilidade e PWA mobile");
+requireMarkers(localNavigation, ["ux15-settings-panel", "aria-controls", "tabpanel", "aria-labelledby", "aria-current=page", "ArrowRight", "End", "Home", "#install-app", "scrollWidth <= element.clientWidth"], "Teste local de acessibilidade e PWA mobile");
 
 for (const [name, content] of Object.entries({
   "release-contract": publicReleaseContract,
@@ -105,4 +106,4 @@ if (exists("dist")) {
   }
 }
 
-console.log("✓ Navegação v2.15 validada: Home limpa, Configurações acessíveis, PWA mobile sem overflow, simulados por cargo, busca individual e contrato público atual.");
+console.log("✓ Navegação v2.15 validada: Home limpa, Configurações com painel ARIA estável, PWA mobile sem overflow, simulados por cargo, busca individual e contrato público atual.");
