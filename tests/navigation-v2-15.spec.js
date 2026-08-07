@@ -28,6 +28,9 @@ test("configurações concentram dados do projeto e suportam teclado", async ({p
   const geral = page.locator("[data-ux15-settings-tab=geral]");
   await expect(geral).toHaveAttribute("aria-selected", "true");
   await expect(geral).toHaveAttribute("tabindex", "0");
+  await expect(geral).toHaveAttribute("aria-controls", "ux15-panel-geral");
+  await expect(page.locator("#ux15-panel-geral")).toHaveAttribute("role", "tabpanel");
+  await expect(page.locator("#ux15-panel-geral")).toHaveAttribute("aria-labelledby", "ux15-tab-geral");
   await geral.focus();
   await page.keyboard.press("ArrowRight");
   const estudo = page.locator("[data-ux15-settings-tab=estudo]");
@@ -41,8 +44,12 @@ test("configurações concentram dados do projeto e suportam teclado", async ({p
   await expect(page.locator("[data-ux15-settings-tab=geral]")).toBeFocused();
   await page.locator("[data-ux15-settings-tab=plataforma]").click();
   await expect(page.locator("[data-ux15-settings-page]")).toHaveAttribute("data-ux15-tab", "plataforma");
-  await expect(page.locator("[data-ux15-settings-tab=plataforma]")).toHaveAttribute("aria-selected", "true");
-  await expect(page.locator("[data-ux15-settings-tab=plataforma]")).toBeFocused();
+  const plataforma = page.locator("[data-ux15-settings-tab=plataforma]");
+  await expect(plataforma).toHaveAttribute("aria-selected", "true");
+  await expect(plataforma).toHaveAttribute("aria-controls", "ux15-panel-plataforma");
+  await expect(plataforma).toBeFocused();
+  await expect(page.locator("#ux15-panel-plataforma")).toHaveAttribute("role", "tabpanel");
+  await expect(page.locator("#ux15-panel-plataforma")).toHaveAttribute("aria-labelledby", "ux15-tab-plataforma");
   await expect(page.getByRole("heading", {name: "Dados do projeto"})).toBeVisible();
   await expect(page.getByText("Questões publicadas")).toBeVisible();
   await expect(page.getByText("Banco Mestre")).toBeVisible();
@@ -64,12 +71,14 @@ test("estudar preserva simulados por cargo sem poluir a tela", async ({page}) =>
 
 test("navegação contextual orienta sem aumentar o menu principal", async ({page}) => {
   await page.goto("/#/estudar", {waitUntil: "domcontentloaded"});
-  await expect(page.locator("[data-ux15-breadcrumb=estudar]")).toContainText("Início");
-  await expect(page.locator("[data-ux15-breadcrumb=estudar]")).toContainText("Estudar");
+  const estudarBreadcrumb = page.locator("[data-ux15-breadcrumb=estudar]");
+  await expect(estudarBreadcrumb).toContainText("Início");
+  await expect(estudarBreadcrumb).toContainText("Estudar");
+  await expect(estudarBreadcrumb.locator("[aria-current=page]")).toHaveText("Estudar");
   await page.goto("/#/revisar", {waitUntil: "domcontentloaded"});
-  await expect(page.locator("[data-ux15-breadcrumb=revisar]")).toContainText("Revisar");
+  await expect(page.locator("[data-ux15-breadcrumb=revisar] [aria-current=page]")).toHaveText("Revisar");
   await page.goto("/#/desempenho", {waitUntil: "domcontentloaded"});
-  await expect(page.locator("[data-ux15-breadcrumb=desempenho]")).toContainText("Desempenho");
+  await expect(page.locator("[data-ux15-breadcrumb=desempenho] [aria-current=page]")).toHaveText("Desempenho");
   await expect(page.locator(".mobile-nav a")).toHaveCount(4);
 });
 
