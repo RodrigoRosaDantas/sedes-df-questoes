@@ -7,10 +7,14 @@ test.beforeEach(async ({page}) => {
   await expect(page.locator("[data-ux15-home]")).toBeVisible({timeout: 30000});
 });
 
-test("home não monta cards técnicos ou adaptativos antigos", async ({page}) => {
+test("home mantém somente o bloco v2.15 no DOM", async ({page}) => {
+  await expect(page.locator("#app > *")).toHaveCount(1);
+  await expect(page.locator("#app > [data-ux15-home]")).toHaveCount(1);
   await expect(page.locator("[data-release-health]")).toHaveCount(0);
   await expect(page.locator("[data-adaptive-review]")).toHaveCount(0);
   await expect(page.locator("[data-official-exam-card]")).toHaveCount(0);
+  await expect(page.locator("[data-smart-today]")).toHaveCount(0);
+  await expect(page.locator("[data-role-templates]")).toHaveCount(0);
 });
 
 test("modelo adaptativo continua sincronizando em segundo plano", async ({page}) => {
