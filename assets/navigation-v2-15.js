@@ -187,13 +187,13 @@ function ensureShellActions() {
     settings.dataset.ux15Settings = "";
     settings.setAttribute("aria-label", "Configurações");
     settings.textContent = "⚙";
-    settings.addEventListener("click", () => { location.hash = "#/perfil"; });
+    settings.addEventListener("click", () => { location.hash = "#/perfil/configuracoes"; });
     actions.insertBefore(settings, document.querySelector("#theme-toggle"));
   }
   const footerTech = document.querySelector("[data-ux-tech-status]");
   if (footerTech) {
     footerTech.textContent = "Configurações";
-    footerTech.onclick = event => { event.preventDefault(); event.stopImmediatePropagation(); location.hash = "#/perfil"; };
+    footerTech.onclick = event => { event.preventDefault(); event.stopImmediatePropagation(); location.hash = "#/perfil/configuracoes"; };
   }
 }
 
