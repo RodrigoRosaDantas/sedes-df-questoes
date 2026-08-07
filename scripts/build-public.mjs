@@ -36,12 +36,14 @@ const canonicalFiles = {
   platform_official_exam_js: "assets/official-exam-v2-13.js",
   platform_adaptive_review_js: "assets/adaptive-review-v2-13.js",
   platform_css: "assets/platform-v2-13.css",
+  platform_ux_js: "assets/ux-v2-14.js",
+  platform_ux_css: "assets/ux-v2-14.css",
 };
 const sources = Object.fromEntries(Object.entries(canonicalFiles).map(([key, file]) => [key, read(file)]));
 
-for (const marker of ["manifest.webmanifest", "study-navigation-v2-6.css?v=1", "intelligence-v2-9.css?v=1", "reports-v2-10.css?v=2", "material-downloads-v1.css?v=1", "platform-v2-13.css?v=1", "app-v4.js?v=13", "learning-v2-9.js?v=1", "pwa-v2-9.js?v=1", "reports-v2-10.js?v=2", "material-downloads-v1.js?v=1", "release-v2-13.js?v=1", "vault-v2-13.js?v=1", "report-v2-13.js?v=1", "official-exam-v2-13.js?v=1", "adaptive-review-v2-13.js?v=1"]) requireMarker(sources.index_html, marker, "HTML canônico");
+for (const marker of ["manifest.webmanifest", "study-navigation-v2-6.css?v=1", "intelligence-v2-9.css?v=1", "reports-v2-10.css?v=2", "material-downloads-v1.css?v=1", "platform-v2-13.css?v=1", "ux-v2-14.css?v=1", "app-v4.js?v=13", "learning-v2-9.js?v=1", "pwa-v2-9.js?v=1", "reports-v2-10.js?v=2", "material-downloads-v1.js?v=1", "release-v2-13.js?v=1", "vault-v2-13.js?v=1", "report-v2-13.js?v=1", "official-exam-v2-13.js?v=1", "adaptive-review-v2-13.js?v=1", "ux-v2-14.js?v=1"]) requireMarker(sources.index_html, marker, "HTML canônico");
 for (const marker of ['const STUDY_INDEX_URL = "./data/release/study-index.json?release=3048-3046-71-r5";', "const indexedQuestions = Object.keys(state.catalog?.question_index || {}).length;", 'data-study-view="materias"', 'data-study-view="simulados"', 'data-study-view="provas"', "function renderDisciplineTopics()", "Catálogo inconsistente."]) requireMarker(sources.app_js, marker, "Aplicação canônica");
-for (const marker of [expectedCacheVersion, 'event.request.mode === "navigate"', 'cache: "no-store"', 'type === "SKIP_WAITING"', "shared-v2-13.js?v=1", "release-v2-13.js?v=1", "vault-v2-13.js?v=1", "report-v2-13.js?v=1", "official-exam-v2-13.js?v=1", "adaptive-review-v2-13.js?v=1", "platform-v2-13.css?v=1", "release-meta"]) requireMarker(sources.service_worker_js, marker, "Service worker canônico");
+for (const marker of [expectedCacheVersion, 'event.request.mode === "navigate"', 'cache: "no-store"', 'type === "SKIP_WAITING"', "shared-v2-13.js?v=1", "release-v2-13.js?v=1", "vault-v2-13.js?v=1", "report-v2-13.js?v=1", "official-exam-v2-13.js?v=1", "adaptive-review-v2-13.js?v=1", "platform-v2-13.css?v=1", "ux-v2-14.js?v=1", "ux-v2-14.css?v=1", "question-search-index", "release-meta"]) requireMarker(sources.service_worker_js, marker, "Service worker canônico");
 for (const marker of ['updateViaCache: "none"', "controllerchange", "registration.update()"]) requireMarker(sources.pwa_js, marker, "Registro PWA canônico");
 for (const marker of ["data-material-download-card", "PDF para responder", "PDF comentado", "printableDocument"]) requireMarker(sources.material_downloads_js, marker, "Download de materiais canônico");
 for (const marker of ["material-download-card", "material-download-actions"]) requireMarker(sources.material_downloads_css, marker, "Estilos de download canônicos");
@@ -52,6 +54,8 @@ for (const marker of ["Reportar problema nesta questão", "issues/new"]) require
 for (const marker of ["Prova Real SEDES/DF 2026", "generalIds", "specificIds", "240"]) requireMarker(sources.platform_official_exam_js, marker, "Prova real");
 for (const marker of ["Revisão adaptativa", "mastery", "averageSeconds"]) requireMarker(sources.platform_adaptive_review_js, marker, "Revisão adaptativa");
 for (const marker of ["official-exam-card", "vault-tools", "platform-dialog-backdrop", "adaptive-review"]) requireMarker(sources.platform_css, marker, "Estilos da plataforma");
+for (const marker of ["Estudo de hoje", "Busca inteligente", "Mapa de domínio por matéria", "Por que você errou?"]) requireMarker(sources.platform_ux_js, marker, "Experiência de estudo v2.14");
+for (const marker of ["ux-focus-mode", "ux-today", "ux-mastery-grid", "ux-error-reasons"]) requireMarker(sources.platform_ux_css, marker, "Estilos da experiência v2.14");
 if (sources.app_js.includes("Release incompleta.")) throw new Error("A fonte canônica ainda contém a trava antiga de totais fixos.");
 
 fs.rmSync(dist, {recursive: true, force: true});
