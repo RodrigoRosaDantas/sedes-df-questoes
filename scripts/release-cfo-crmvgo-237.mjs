@@ -1,0 +1,201 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const TOKEN = process.env.NOTION_TOKEN;
+const API = 'https://api.notion.com/v1';
+const VERSION = '2026-03-11';
+const SOURCE = '784234ae-deca-4514-b60d-19524e122a89';
+const CATALOG_PATH = path.resolve(root, 'data/release/catalogo.json');
+
+const MATERIALS = [
+  {
+    name: 'Técnico Administrativo — CFO — Quadrix 2025',
+    prefix: 'PROVA-QDX-CFO-2025-TECNICO-ADMINISTRATIVO-201-',
+    lot: 'CFO-2025-TECNICO-ADMINISTRATIVO-201-118-20260807',
+    expected: 118,
+    excluded: new Set([45, 104]),
+    spotAnswers: new Map([[8, 'Errado']]),
+  },
+  {
+    name: 'Técnico Administrativo — CRMV-GO — Quadrix 2025',
+    prefix: 'PROVA-QDX-CRMVGO-2025-TECNICO-ADMINISTRATIVO-200-',
+    lot: 'CRMVGO-2025-TECNICO-ADMINISTRATIVO-200-119-20260807',
+    expected: 119,
+    excluded: new Set([94]),
+    spotAnswers: new Map([[73, 'Errado'], [83, 'Errado'], [98, 'Errado'], [104, 'Certo']]),
+  },
+];
+
+if (!TOKEN) throw new Error('NOTION_TOKEN ausente.');
+
+const EXPORT_PROPERTIES = [
+  'Ano','Anulada','Assunto','Auditoria de conteúdo','Bloco','Bloqueio manual de publicação','Cargo',
+  'Comentário geral','Código','Código GitHub','Código do cargo','Disciplina','Duplicada','Enunciado','Fonte / Banca',
+  'Formato da questão','Fundamento legal','Gabarito','Gabarito conferido — registro manual anterior',
+  'Liberada para exportação','Lote de publicação','Nome do material','Número original','Observações','Órgão','Pegadinha',
+  'Pode publicar','Possui imagem','Questão','Subassunto','Texto-base','Tipo de material','Transcrição conferida','URL da fonte',
+];
+const params = new URLSearchParams();
+for (const property of EXPORT_PROPERTIES) params.append('filter_properties[]', property);
+const QUERY_ENDPOINT = `/data_sources/${SOURCE}/query?${params.toString()}`;
+
+const clean = value => String(value ?? '').replace(/\r/g, '').replace(/[ \t]+/g, ' ').replace(/ *\n */g, '\n').trim();
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+async function request(endpoint, options = {}, attempt = 1) {
+  const response = await fetch(`${API}${endpoint}`, {
+    ...options,
+    headers: {
+      Authorization: `Bearer ${TOKEN}`,
+      'Notion-Version': VERSION,
+      'Content-Type': 'application/json',
+      ...(options.headers || {}),
+    },
+  });
+  if (response.ok) return response.status === 204 ? {} : response.json();
+  const body = await response.text();
+  if ((response.status === 429 || response.status >= 500) && attempt < 9) {
+    await sleep(Math.max(Number(response.headers.get('retry-after') || 0) * 1000, 400 * 2 ** (attempt - 1)));
+    return request(endpoint, options, attempt + 1);
+  }
+  throw new Error(`Notion API ${response.status}: ${body.slice(0, 800)}`);
+}
+
+const rich = items => (items || []).map(item => item.plain_text ?? item.text?.content ?? '').join('').trim();
+function value(property) {
+  if (!property) return null;
+  if (property.type === 'title') return rich(property.title);
+  if (property.type === 'rich_text') return rich(property.rich_text);
+  if (property.type === 'select') return property.select?.name ?? null;
+  if (property.type === 'status') return property.status?.name ?? null;
+  if (property.type === 'checkbox') return Boolean(property.checkbox);
+  if (property.type === 'number') return property.number;
+  if (property.type === 'url') return property.url;
+  if (property.type === 'date') return property.date?.start ?? null;
+  if (property.type === 'formula') {
+    const formula = property.formula;
+    if (!formula) return null;
+    if (formula.type === 'string') return formula.string;
+    if (formula.type === 'boolean') return formula.boolean;
+    if (formula.type === 'number') return formula.number;
+    if (formula.type === 'date') return formula.date?.start ?? null;
+  }
+  return null;
+}
+
+async function readAll() {
+  const rows = [];
+  let cursor;
+  do {
+    const body = {page_size: 100, result_type: 'page'};
+    if (cursor) body.start_cursor = cursor;
+    const page = await request(QUERY_ENDPOINT, {method: 'POST', body: JSON.stringify(body)});
+    for (const item of page.results || []) {
+      rows.push({
+        notion_id: item.id,
+        notion_url: item.url,
+        ...Object.fromEntries(Object.entries(item.properties || {}).map(([name, property]) => [name, value(property)])),
+      });
+    }
+    cursor = page.has_more ? page.next_cursor : null;
+  } while (cursor);
+  return rows;
+}
+
+function configFor(row) {
+  return MATERIALS.find(item => clean(row['Nome do material']) === item.name) || null;
+}
+
+function expectedNumbers(config) {
+  return Array.from({length: 120}, (_, i) => i + 1).filter(number => !config.excluded.has(number));
+}
+
+function validateRow(row, config, {afterRelease = false} = {}) {
+  const code = clean(row['Código']);
+  const number = Number(row['Número original']);
+  if (!code.startsWith(config.prefix)) throw new Error(`${code}: prefixo fora do escopo.`);
+  if (code !== `${config.prefix}${String(number).padStart(3, '0')}`) throw new Error(`${code}: código/número original divergentes.`);
+  if (!expectedNumbers(config).includes(number)) throw new Error(`${code}: número excluído ou fora de 1–120.`);
+  if (!['Aprovada', 'Ajustada'].includes(clean(row['Auditoria de conteúdo']))) throw new Error(`${code}: auditoria não aprovada.`);
+  if (row['Transcrição conferida'] !== true) throw new Error(`${code}: transcrição não conferida.`);
+  if (row['Gabarito conferido — registro manual anterior'] !== true) throw new Error(`${code}: gabarito não conferido.`);
+  if (row['Duplicada'] === true || row['Anulada'] === true || row['Possui imagem'] === true || row['Bloqueio manual de publicação'] === true) {
+    throw new Error(`${code}: bloqueio editorial/técnico presente.`);
+  }
+  if (clean(row['Código GitHub'])) throw new Error(`${code}: Código GitHub já preenchido antes do deploy.`);
+  if (clean(row['Formato da questão']) !== 'Certo / Errado') throw new Error(`${code}: formato não é Certo / Errado.`);
+  if (!['Certo', 'Errado'].includes(clean(row['Gabarito']))) throw new Error(`${code}: gabarito C/E inválido.`);
+  for (const field of ['Questão','Enunciado','Comentário geral','Fundamento legal','Disciplina','Assunto','Subassunto','URL da fonte']) {
+    if (!clean(row[field])) throw new Error(`${code}: ${field} vazio.`);
+  }
+  const expectedSpot = config.spotAnswers.get(number);
+  if (expectedSpot && clean(row['Gabarito']) !== expectedSpot) throw new Error(`${code}: gabarito definitivo esperado ${expectedSpot}.`);
+  if (afterRelease) {
+    if (row['Liberada para exportação'] !== true) throw new Error(`${code}: liberação não persistiu.`);
+    if (clean(row['Lote de publicação']) !== config.lot) throw new Error(`${code}: lote não persistiu.`);
+    if (row['Pode publicar'] !== true) throw new Error(`${code}: fórmula Pode publicar não ficou verdadeira após lote/liberação.`);
+  } else {
+    const released = row['Liberada para exportação'] === true;
+    const lot = clean(row['Lote de publicação']);
+    if (released && lot !== config.lot) throw new Error(`${code}: liberação prévia com lote conflitante ${lot || '(vazio)'}.`);
+    if (!released && lot) throw new Error(`${code}: lote prévio sem liberação ${lot}.`);
+  }
+}
+
+const before = await readAll();
+if (before.length !== 3449) throw new Error(`Banco Mestre com ${before.length}; esperado 3449.`);
+
+const catalog = JSON.parse(await fs.readFile(CATALOG_PATH, 'utf8'));
+if (Number(catalog.summary?.questoes) !== 3210 || Number(catalog.summary?.materiais) !== 73 || Number(catalog.summary?.discursivas_consulta) !== 2) {
+  throw new Error(`Baseline pública divergente: ${JSON.stringify(catalog.summary)}`);
+}
+for (const config of MATERIALS) {
+  if ((catalog.materials || []).some(item => clean(item.nome) === config.name)) throw new Error(`${config.name}: material já consta no catálogo público.`);
+}
+
+const selectedBefore = before.filter(row => configFor(row));
+if (selectedBefore.length !== 237) throw new Error(`Escopo vivo possui ${selectedBefore.length}; esperado 237.`);
+
+for (const config of MATERIALS) {
+  const rows = selectedBefore.filter(row => configFor(row)?.name === config.name).sort((a, b) => Number(a['Número original']) - Number(b['Número original']));
+  if (rows.length !== config.expected) throw new Error(`${config.name}: ${rows.length}; esperado ${config.expected}.`);
+  const numbers = rows.map(row => Number(row['Número original']));
+  if (JSON.stringify(numbers) !== JSON.stringify(expectedNumbers(config))) throw new Error(`${config.name}: sequência divergente.`);
+  for (const row of rows) validateRow(row, config);
+}
+
+let patched = 0;
+let alreadyPrepared = 0;
+for (const row of selectedBefore) {
+  const config = configFor(row);
+  if (row['Liberada para exportação'] === true && clean(row['Lote de publicação']) === config.lot) {
+    alreadyPrepared += 1;
+    continue;
+  }
+  await request(`/pages/${row.notion_id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({properties: {
+      'Liberada para exportação': {checkbox: true},
+      'Lote de publicação': {rich_text: [{type: 'text', text: {content: config.lot}}]},
+    }}),
+  });
+  patched += 1;
+  if (patched % 25 === 0) console.log(`${patched}/237 registros liberados e loteados.`);
+}
+
+const after = await readAll();
+if (after.length !== 3449) throw new Error(`Banco Mestre mudou de quantidade após liberação: ${after.length}.`);
+const selectedAfter = after.filter(row => configFor(row));
+if (selectedAfter.length !== 237) throw new Error(`Escopo após liberação possui ${selectedAfter.length}; esperado 237.`);
+for (const row of selectedAfter) validateRow(row, configFor(row), {afterRelease: true});
+
+const outsideReleased = after.filter(row => {
+  if (configFor(row)) return false;
+  const lot = clean(row['Lote de publicação']);
+  return lot === MATERIALS[0].lot || lot === MATERIALS[1].lot;
+});
+if (outsideReleased.length) throw new Error(`Lote contaminado por ${outsideReleased.length} registro(s) fora do escopo.`);
+
+console.log(`✓ CFO 118 + CRMV-GO 119 preparados; ${patched} alterados, ${alreadyPrepared} já preparados; 237/237 com Pode publicar = true.`);
