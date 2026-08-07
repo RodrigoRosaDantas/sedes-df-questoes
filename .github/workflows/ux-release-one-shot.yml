@@ -1,0 +1,111 @@
+name: UX one-shot — validar e publicar
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: ux-release-one-shot
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar Playwright
+        run: |
+          npm install --no-save @playwright/test
+          npx playwright install --with-deps chromium
+
+      - name: Gate completo do projeto
+        run: npm run check
+
+      - name: Subir dist local
+        run: |
+          python3 -m http.server 4173 --directory dist > /tmp/sedes-http.log 2>&1 &
+          echo $! > /tmp/sedes-http.pid
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/sedes-http.log
+          exit 1
+
+      - name: Playwright local
+        run: npx playwright test --config=playwright.config.js
+
+      - name: Upload relatório em falha
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-local-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: validate
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar Playwright
+        run: |
+          npm install --no-save @playwright/test
+          npx playwright install --with-deps chromium
+
+      - name: Reconstruir pacote público
+        run: npm run build
+
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
+
+      - name: Enviar artefato Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Publicar GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Validar site público
+        env:
+          PUBLIC_BASE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: npx playwright test --config=playwright.public.config.js
+
+      - name: Upload relatório público em falha
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-public-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
