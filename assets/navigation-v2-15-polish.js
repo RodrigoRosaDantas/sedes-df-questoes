@@ -64,8 +64,9 @@ function enhanceSyncStatus() {
     parent.append(" ", badge);
   });
   document.querySelectorAll("[data-ux15-sync-age]").forEach(node => {
-    node.className = `ux15-sync-age ${relative.state}`;
-    node.textContent = relative.label;
+    const className = `ux15-sync-age ${relative.state}`;
+    if (node.className !== className) node.className = className;
+    if (node.textContent !== relative.label) node.textContent = relative.label;
     node.title = `Última sincronização do catálogo: ${absoluteSync(timestamp)} · horário de Brasília`;
   });
   const shell = document.querySelector("#sync-label");
@@ -115,7 +116,8 @@ function reconcileHomeReviewTotal() {
     .map(item => item.id);
   const total = new Set([...recurrent, ...due].filter(Boolean)).size;
   const heading = card.querySelector("h3");
-  if (heading) heading.textContent = `${total} prioridade${total === 1 ? "" : "s"}`;
+  const label = `${total} prioridade${total === 1 ? "" : "s"}`;
+  if (heading && heading.textContent !== label) heading.textContent = label;
 }
 
 function availableIdsForRole(role) {
@@ -156,19 +158,21 @@ function injectRoleTemplatesInStudy() {
   details.dataset.roleTemplates = "";
   details.innerHTML = `<summary><span><small>Simulados por cargo</small><strong>Treino equilibrado por perfil</strong></span><b>${roles.length} cargo${roles.length === 1 ? "" : "s"}</b></summary><div class="ux15-role-content"><p>Organiza 30 questões entre as matérias disponíveis do cargo. Não substitui a distribuição oficial do edital.</p><div class="role-template-grid">${roles.map(role => {
     const total = availableIdsForRole(role).length;
-    return `<article class="card role-template"><span class="type-badge">Cargo ${esc(role)}</span><h3>${esc(role)}</h3><p>${total.toLocaleString("pt-BR")} questões correlatas disponíveis.</p><button class="btn primary full" data-ux15-role-sim="${esc(role)}" ${total ? "" : "disabled"}>Iniciar 30 questões</button></article>`;
+    const count = Math.min(30, total);
+    return `<article class="card role-template"><span class="type-badge">Cargo ${esc(role)}</span><h3>${esc(role)}</h3><p>${total.toLocaleString("pt-BR")} questões correlatas disponíveis.</p><button class="btn primary full" data-ux15-role-sim="${esc(role)}" data-ux15-role-count="${count}" ${total ? "" : "disabled"}>Iniciar ${count} questões</button></article>`;
   }).join("")}</div></div>`;
   target.insertAdjacentElement("afterend", details);
   details.querySelectorAll("[data-ux15-role-sim]").forEach(button => button.addEventListener("click", () => {
     const role = button.dataset.ux15RoleSim;
-    const ids = balancedRoleSample(role, 30);
+    const count = Math.max(1, Number(button.dataset.ux15RoleCount || 30));
+    const ids = balancedRoleSample(role, count);
     if (!ids.length) return;
     createCompatibleSession({
       id: `cargo-${role}`,
       name: `Simulado por cargo ${role}`,
       questionIds: ids,
       mode: "prova",
-      minutes: 60,
+      minutes: ids.length * 2,
       discipline: "Múltiplas matérias",
       source: "Simulado por cargo",
       cargo: role,
