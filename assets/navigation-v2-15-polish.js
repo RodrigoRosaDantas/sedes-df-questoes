@@ -18,7 +18,10 @@ let pendingSettingsTabFocus = null;
 let settingsHeadingFocusKey = null;
 
 function primeRouteClass() {
-  document.documentElement.classList.toggle("ux15-clean-home", currentRoute() === "inicio");
+  const route = currentRoute();
+  if (route === "perfil" && /^#\/?perfil\/?$/i.test(location.hash)) history.replaceState(null, "", "#/perfil/configuracoes");
+  document.documentElement.classList.toggle("ux15-clean-home", route === "inicio");
+  document.documentElement.classList.toggle("ux15-settings-route", route === "perfil");
 }
 
 primeRouteClass();
