@@ -1,7 +1,7 @@
 import {test, expect} from "@playwright/test";
 
 test("home pública fica limpa e configurações expõem sincronização", async ({page}) => {
-  await page.goto("/#/inicio", {waitUntil: "domcontentloaded"});
+  await page.goto("./#/inicio", {waitUntil: "domcontentloaded"});
   await expect(page.locator("[data-ux15-home]")).toBeVisible({timeout: 30000});
   await expect(page.locator("#app > *")).toHaveCount(1);
   await expect(page.locator(".bank-status")).toHaveCount(0);
@@ -20,7 +20,7 @@ test("home pública fica limpa e configurações expõem sincronização", async
 });
 
 test("página pública de estudo preserva recursos sem poluição", async ({page}) => {
-  await page.goto("/#/estudar", {waitUntil: "domcontentloaded"});
+  await page.goto("./#/estudar", {waitUntil: "domcontentloaded"});
   await expect(page.locator("[data-ux15-breadcrumb=estudar]")).toContainText("Início");
   await expect(page.locator("[data-ux15-breadcrumb=estudar]")).toContainText("Estudar");
   await expect(page.locator(".mobile-nav a")).toHaveCount(4);
