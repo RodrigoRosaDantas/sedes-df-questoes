@@ -1,0 +1,32 @@
+name: Exportar catálogo público para auditoria
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/export-release-artifact-pr.yml
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Validar baseline antes da exportação
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(jq '.summary.questoes' data/release/catalogo.json)" = '3210'
+          test "$(jq '.summary.materiais' data/release/catalogo.json)" = '73'
+          test "$(jq '.summary.aguardando_auditoria' data/release/catalogo.json)" = '0'
+          test "$(jq '(.question_index | keys) | length' data/release/catalogo.json)" = '3210'
+      - name: Empacotar somente data/release
+        run: tar -czf release-catalog-3210.tgz data/release
+      - name: Publicar artifact de auditoria
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-catalog-3210
+          path: release-catalog-3210.tgz
+          retention-days: 1
