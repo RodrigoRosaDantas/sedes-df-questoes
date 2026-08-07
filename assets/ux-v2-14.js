@@ -133,6 +133,7 @@ window.addEventListener("resize", () => {
 
 document.addEventListener("keydown", event => {
   if (currentRoute() !== "resolver") return;
+  if (event.ctrlKey || event.metaKey || event.altKey) return;
   const target = event.target;
   if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement) return;
   if (event.key.toLowerCase() === "f") {
