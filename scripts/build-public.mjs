@@ -53,7 +53,7 @@ for (const marker of ['updateViaCache: "none"', "controllerchange", "registratio
 for (const marker of ["data-material-download-card", "PDF para responder", "PDF comentado", "printableDocument"]) requireMarker(sources.material_downloads_js, marker, "Download de materiais canônico");
 for (const marker of ["material-download-card", "material-download-actions"]) requireMarker(sources.material_downloads_css, marker, "Estilos de download canônicos");
 for (const marker of ["release-meta.json", "createCompatibleSession"]) requireMarker(sources.platform_shared_js, marker, "Base das melhorias");
-for (const marker of ["Integridade da publicação", "data-release-health"]) requireMarker(sources.platform_release_js, marker, "Release unificada");
+for (const marker of ["enhanceReleaseMetadata", "data-release-footer", "#sync-label", "state.release.app_version"]) requireMarker(sources.platform_release_js, marker, "Metadados da release");
 for (const marker of ["sedes-protected-backup", "PBKDF2", "vault-tools"]) requireMarker(sources.platform_vault_js, marker, "Proteção do progresso");
 for (const marker of ["Reportar problema nesta questão", "issues/new"]) requireMarker(sources.platform_report_js, marker, "Reporte por questão");
 for (const marker of ["Prova Real SEDES/DF 2026", "generalIds", "specificIds", "240"]) requireMarker(sources.platform_official_exam_js, marker, "Prova real");
@@ -62,10 +62,10 @@ for (const marker of ["official-exam-card", "vault-tools", "platform-dialog-back
 for (const marker of ["Estudo de hoje", "Busca inteligente", "Mapa de domínio por matéria", "Por que você errou?"]) requireMarker(sources.platform_ux_js, marker, "Experiência de estudo v2.14");
 for (const marker of ["closeAfterConsecutiveCorrect: 3", "correctedFilteredIds", "data-ux-run-filter"]) requireMarker(sources.platform_ux_guardrails_js, marker, "Guardrails da experiência v2.14");
 for (const marker of ["ux-focus-mode", "ux-today", "ux-mastery-grid", "ux-error-reasons"]) requireMarker(sources.platform_ux_css, marker, "Estilos da experiência v2.14");
-for (const marker of ["Seu estudo, sem ruído.", "Última sincronização do catálogo", "Configurações", "America/Sao_Paulo", "Dados do projeto"]) requireMarker(sources.platform_navigation_js, marker, "Navegação e Home v2.15");
+for (const marker of ["Seu estudo, sem ruído.", "Última sincronização do catálogo", "#/perfil/configuracoes", "America/Sao_Paulo", "Dados do projeto", "setNodeText"]) requireMarker(sources.platform_navigation_js, marker, "Navegação e Home v2.15");
 for (const marker of ["ux15-home-active", "ux15-settings-page", "ux15-facts-grid", "ux15-sync-card"]) requireMarker(sources.platform_navigation_css, marker, "Estilos da navegação v2.15");
-for (const marker of ["relativeSync", "ux15-breadcrumb", 'event.key === "/"', "sincronizado há"]) requireMarker(sources.platform_navigation_polish_js, marker, "Polimento da navegação v2.15");
-for (const marker of ["ux15-sync-age", "ux15-breadcrumb", "attention", "stale"]) requireMarker(sources.platform_navigation_polish_css, marker, "Estilos do polimento v2.15");
+for (const marker of ["relativeSync", "ux15-breadcrumb", 'event.key === "/"', "sincronizado há", "enhanceSearchResultActions", "data-ux15-open-question", "moveSettingsTabFocus"]) requireMarker(sources.platform_navigation_polish_js, marker, "Polimento da navegação v2.15");
+for (const marker of ["ux15-sync-age", "ux15-breadcrumb", "data-ux15-open-question", "attention", "stale"]) requireMarker(sources.platform_navigation_polish_css, marker, "Estilos do polimento v2.15");
 if (sources.app_js.includes("Release incompleta.")) throw new Error("A fonte canônica ainda contém a trava antiga de totais fixos.");
 
 fs.rmSync(dist, {recursive: true, force: true});
