@@ -112,7 +112,7 @@ for (const entry of activeEntries) {
 
 for (const legacy of ["bundle-fetch.js", "data-updates.js", "consolidated-data-v2.js", "profile-defaults.js", "ux-improvements.js", "app-v3.js"]) if (index.includes(legacy)) fail(`Camada legada ainda ativa no HTML: ${legacy}`);
 if (!index.includes("assets/progress-migration-v2-3.js") || !index.includes("assets/app-v4.js") || !index.includes("assets/true-false.css") || !index.includes("assets/question-images-v2-5.js")) fail("Aplicativo ou camadas da release híbrida não estão ativos.");
-if (!app.includes('const CATALOG_URL = "./data/release/catalogo.json"')) fail("Aplicativo não referencia o catálogo estático final.");
+if (!app.includes('const CATALOG_URL = "./data/release/catalogo.json?release=3048-3046-71-r5"')) fail("Aplicativo não referencia o catálogo estático final versionado.");
 if (!app.includes("Object.entries(question.alternativas || {})")) fail("Resolvedor não renderiza alternativas dinâmicas.");
 if (!app.includes("letter === question.gabarito")) fail("Resolvedor não compara respostas dinâmicas ao gabarito.");
 if (app.includes("CompressionStream") || app.includes("DecompressionStream") || app.includes("window.fetch =")) fail("O navegador ainda executa montagem ou recompressão do banco.");

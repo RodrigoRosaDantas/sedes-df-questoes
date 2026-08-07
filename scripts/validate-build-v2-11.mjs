@@ -11,7 +11,7 @@ const packageData = JSON.parse(read("package.json"));
 if (packageData.version !== "2.13.0") fail(`Versão inesperada: ${packageData.version}`);
 const versionToken = packageData.version.replace(/\./g, "-");
 const expectedBuilder = `copy-public-v${versionToken}`;
-const expectedCacheVersion = `sedes-questoes-v${versionToken}`;
+const expectedCacheVersion = `sedes-questoes-v${versionToken}-r5`;
 const buildCommand = String(packageData.scripts?.build || "");
 for (const required of ["build-release-v2-4.mjs", "apply-notion-snapshot.mjs", "apply-gppgadm-site-correction.mjs", "build-study-index.mjs", "build-public.mjs", "fixed-build-time.mjs"]) if (!buildCommand.includes(required)) fail(`Etapa obrigatória ausente no build: ${required}`);
 if (buildCommand.indexOf("apply-notion-snapshot.mjs") > buildCommand.indexOf("build-study-index.mjs")) fail("O índice está sendo gerado antes da aplicação do snapshot.");
@@ -35,7 +35,7 @@ if ("generated_at" in buildInfo || "generated_at" in releaseMeta) fail("Metadado
 for (const file of ["index.html", "assets/app-v4.js", "service-worker.js", "assets/pwa-v2-9.js", "assets/material-downloads-v1.js", "assets/material-downloads-v1.css", "assets/shared-v2-13.js", "assets/release-v2-13.js", "assets/vault-v2-13.js", "assets/report-v2-13.js", "assets/official-exam-v2-13.js", "assets/adaptive-review-v2-13.js", "assets/platform-v2-13.css"]) if (read(file) !== read(`dist/${file}`)) fail(`O dist diverge da fonte canônica: ${file}`);
 const sourceIndex = read("index.html"), sourceApp = read("assets/app-v4.js"), sourceWorker = read("service-worker.js"), sourcePwa = read("assets/pwa-v2-9.js"), sourceMaterialDownloads = read("assets/material-downloads-v1.js");
 const sourcePlatform = ["shared", "release", "vault", "report", "official-exam", "adaptive-review"].map(name => read(`assets/${name}-v2-13.js`)).join("\n");
-requireMarkers(sourceIndex, ["app-v4.js?v=9", "study-navigation-v2-6.css?v=1", "reports-v2-10.js?v=2", "material-downloads-v1.css?v=1", "material-downloads-v1.js?v=1", "platform-v2-13.css?v=1", "release-v2-13.js?v=1", "vault-v2-13.js?v=1", "report-v2-13.js?v=1", "official-exam-v2-13.js?v=1", "adaptive-review-v2-13.js?v=1"], "HTML canônico");
+requireMarkers(sourceIndex, ["app-v4.js?v=13", "study-navigation-v2-6.css?v=1", "reports-v2-10.js?v=2", "material-downloads-v1.css?v=1", "material-downloads-v1.js?v=1", "platform-v2-13.css?v=1", "release-v2-13.js?v=1", "vault-v2-13.js?v=1", "report-v2-13.js?v=1", "official-exam-v2-13.js?v=1", "adaptive-review-v2-13.js?v=1"], "HTML canônico");
 requireMarkers(sourceApp, ["Catálogo inconsistente.", 'data-study-view="materias"', 'data-study-view="provas"', "function renderDisciplineTopics()"], "Aplicação canônica");
 if (sourceApp.includes("Release incompleta.")) fail("Aplicação canônica ainda contém trava antiga.");
 requireMarkers(sourceWorker, [expectedCacheVersion, 'event.request.mode === "navigate"', 'cache: "no-store"', 'type === "SKIP_WAITING"', "material-downloads-v1.css?v=1", "material-downloads-v1.js?v=1", "platform-v2-13.css?v=1", "shared-v2-13.js?v=1", "release-v2-13.js?v=1", "vault-v2-13.js?v=1", "report-v2-13.js?v=1", "official-exam-v2-13.js?v=1", "adaptive-review-v2-13.js?v=1", "release-meta"], "Service worker");

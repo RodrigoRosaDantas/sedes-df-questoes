@@ -30,7 +30,7 @@ for (const reference of [
   "reports-v2-10.js?v=2",
   "material-downloads-v1.css?v=1",
   "material-downloads-v1.js?v=1",
-  "app-v4.js?v=9",
+  "app-v4.js?v=13",
   "pwa-v2-9.js?v=1",
 ]) {
   if (!index.includes(reference)) throw new Error(`Referência ausente no HTML: ${reference}`);
@@ -40,7 +40,7 @@ const packageData = JSON.parse(fs.readFileSync(path.join(root, "package.json"), 
 const versionToken = String(packageData.version || "").replace(/\./g, "-");
 if (!/^\d+-\d+-\d+$/.test(versionToken)) throw new Error(`Versão inválida no package.json: ${packageData.version || "ausente"}.`);
 const expectedBuilder = `copy-public-v${versionToken}`;
-const expectedCacheVersion = `sedes-questoes-v${versionToken}`;
+const expectedCacheVersion = `sedes-questoes-v${versionToken}-r5`;
 
 const catalog = JSON.parse(fs.readFileSync(path.join(dist, "data/release/catalogo.json"), "utf8"));
 const buildInfo = JSON.parse(fs.readFileSync(path.join(dist, "data/release/build-info.json"), "utf8"));
@@ -80,7 +80,7 @@ for (const marker of ["data-material-download-card", "PDF para responder", "PDF 
 const worker = fs.readFileSync(path.join(dist, "service-worker.js"), "utf8");
 for (const marker of [
   expectedCacheVersion,
-  "app-v4.js?v=9",
+  "app-v4.js?v=13",
   "pwa-v2-9.js?v=1",
   "reports-v2-10.js?v=2",
   "material-downloads-v1.js?v=1",

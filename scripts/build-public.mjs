@@ -19,7 +19,7 @@ const requireMarker = (content, marker, context) => {
 const packageData = JSON.parse(read("package.json"));
 const versionToken = String(packageData.version || "").replace(/\./g, "-");
 if (!/^\d+-\d+-\d+$/.test(versionToken)) throw new Error(`Versão inválida no package.json: ${packageData.version || "ausente"}.`);
-const expectedCacheVersion = `sedes-questoes-v${versionToken}-r3`;
+const expectedCacheVersion = `sedes-questoes-v${versionToken}-r5`;
 const expectedBuilder = `copy-public-v${versionToken}`;
 
 const canonicalFiles = {
@@ -39,8 +39,8 @@ const canonicalFiles = {
 };
 const sources = Object.fromEntries(Object.entries(canonicalFiles).map(([key, file]) => [key, read(file)]));
 
-for (const marker of ["manifest.webmanifest", "study-navigation-v2-6.css?v=1", "intelligence-v2-9.css?v=1", "reports-v2-10.css?v=2", "material-downloads-v1.css?v=1", "platform-v2-13.css?v=1", "app-v4.js?v=11", "learning-v2-9.js?v=1", "pwa-v2-9.js?v=1", "reports-v2-10.js?v=2", "material-downloads-v1.js?v=1", "release-v2-13.js?v=1", "vault-v2-13.js?v=1", "report-v2-13.js?v=1", "official-exam-v2-13.js?v=1", "adaptive-review-v2-13.js?v=1"]) requireMarker(sources.index_html, marker, "HTML canônico");
-for (const marker of ['const STUDY_INDEX_URL = "./data/release/study-index.json?release=3048-3046-71-r3";', "const indexedQuestions = Object.keys(state.catalog?.question_index || {}).length;", 'data-study-view="materias"', 'data-study-view="simulados"', 'data-study-view="provas"', "function renderDisciplineTopics()", "Catálogo inconsistente."]) requireMarker(sources.app_js, marker, "Aplicação canônica");
+for (const marker of ["manifest.webmanifest", "study-navigation-v2-6.css?v=1", "intelligence-v2-9.css?v=1", "reports-v2-10.css?v=2", "material-downloads-v1.css?v=1", "platform-v2-13.css?v=1", "app-v4.js?v=13", "learning-v2-9.js?v=1", "pwa-v2-9.js?v=1", "reports-v2-10.js?v=2", "material-downloads-v1.js?v=1", "release-v2-13.js?v=1", "vault-v2-13.js?v=1", "report-v2-13.js?v=1", "official-exam-v2-13.js?v=1", "adaptive-review-v2-13.js?v=1"]) requireMarker(sources.index_html, marker, "HTML canônico");
+for (const marker of ['const STUDY_INDEX_URL = "./data/release/study-index.json?release=3048-3046-71-r5";', "const indexedQuestions = Object.keys(state.catalog?.question_index || {}).length;", 'data-study-view="materias"', 'data-study-view="simulados"', 'data-study-view="provas"', "function renderDisciplineTopics()", "Catálogo inconsistente."]) requireMarker(sources.app_js, marker, "Aplicação canônica");
 for (const marker of [expectedCacheVersion, 'event.request.mode === "navigate"', 'cache: "no-store"', 'type === "SKIP_WAITING"', "shared-v2-13.js?v=1", "release-v2-13.js?v=1", "vault-v2-13.js?v=1", "report-v2-13.js?v=1", "official-exam-v2-13.js?v=1", "adaptive-review-v2-13.js?v=1", "platform-v2-13.css?v=1", "release-meta"]) requireMarker(sources.service_worker_js, marker, "Service worker canônico");
 for (const marker of ['updateViaCache: "none"', "controllerchange", "registration.update()"]) requireMarker(sources.pwa_js, marker, "Registro PWA canônico");
 for (const marker of ["data-material-download-card", "PDF para responder", "PDF comentado", "printableDocument"]) requireMarker(sources.material_downloads_js, marker, "Download de materiais canônico");
