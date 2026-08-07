@@ -225,8 +225,10 @@ function enhanceSettingsAccessibility() {
   const tabs = page.querySelector(".ux15-settings-tabs");
   if (tabs) tabs.setAttribute("role", "tablist");
   page.querySelectorAll("[data-ux15-settings-tab]").forEach(button => {
+    const active = button.classList.contains("active");
     button.setAttribute("role", "tab");
-    button.setAttribute("aria-selected", String(button.classList.contains("active")));
+    button.setAttribute("aria-selected", String(active));
+    button.tabIndex = active ? 0 : -1;
   });
   document.querySelector("#theme-toggle")?.setAttribute("aria-pressed", String(document.documentElement.dataset.theme === "dark"));
   if (pendingSettingsTabFocus) {
@@ -242,6 +244,23 @@ function enhanceSettingsAccessibility() {
   settingsHeadingFocusKey = focusKey;
   heading.tabIndex = -1;
   requestAnimationFrame(() => heading.focus({preventScroll: true}));
+}
+
+function moveSettingsTabFocus(event) {
+  const current = event.target.closest("[data-ux15-settings-tab]");
+  if (!current) return false;
+  const tabs = [...current.closest(".ux15-settings-tabs")?.querySelectorAll("[data-ux15-settings-tab]") || []];
+  if (!tabs.length) return false;
+  const index = tabs.indexOf(current);
+  let next = null;
+  if (event.key === "ArrowRight" || event.key === "ArrowDown") next = tabs[(index + 1) % tabs.length];
+  if (event.key === "ArrowLeft" || event.key === "ArrowUp") next = tabs[(index - 1 + tabs.length) % tabs.length];
+  if (event.key === "Home") next = tabs[0];
+  if (event.key === "End") next = tabs[tabs.length - 1];
+  if (!next) return false;
+  event.preventDefault();
+  next.click();
+  return true;
 }
 
 function focusSearchWhenReady() {
@@ -273,6 +292,7 @@ function bindNavigationShortcuts() {
     if (event.target.closest("[data-ux15-search]")) focusSearchWhenReady();
   }, true);
   document.addEventListener("keydown", event => {
+    if (moveSettingsTabFocus(event)) return;
     const target = event.target;
     const editing = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement || target?.isContentEditable;
     if (event.key === "/" && !editing && !event.ctrlKey && !event.metaKey && !event.altKey) {
