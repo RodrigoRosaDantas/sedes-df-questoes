@@ -13,7 +13,11 @@ const navigation = read("assets/navigation-v2-15.js");
 const references = ["release-v2-13.js?v=1", "vault-v2-13.js?v=1", "report-v2-13.js?v=1", "official-exam-v2-13.js?v=1", "adaptive-review-v2-13.js?v=1"];
 requireMarkers(index, ["platform-v2-13.css?v=1", ...references, "navigation-v2-15.js?v=1"], "HTML");
 requireMarkers(worker, ["sedes-questoes-v2-13-0", "shared-v2-13.js?v=1", ...references, "navigation-v2-15.js?v=1", "release-meta"], "Service worker");
-requireMarkers(modules.shared, ["release-meta.json", "createCompatibleSession", "questionIndexEntries", "let scheduled = false", "if (scheduled) return", "scheduled = false"], "Módulo compartilhado");
+requireMarkers(modules.shared, [
+  "release-meta.json", "createCompatibleSession", "questionIndexEntries",
+  "let dataPromise = null", "if (dataPromise) return dataPromise", "dataPromise = null",
+  "let scheduled = false", "if (scheduled) return", "scheduled = false",
+], "Módulo compartilhado");
 requireMarkers(modules.release, ["enhanceReleaseMetadata", "data-release-footer", "#sync-label", "state.release.app_version"], "Metadados da release");
 requireMarkers(navigation, ["#/perfil/configuracoes", "Dados do projeto", "Questões publicadas", "Banco Mestre"], "Configurações da plataforma");
 requireMarkers(modules.vault, ["sedes-protected-backup", "PBKDF2", "AES-GCM", "data-vault-tools"], "Cofre local");
@@ -31,4 +35,4 @@ const questions = Object.keys(catalog.question_index || {}).length, materials = 
 if (releaseMeta.app_version !== pkg.version || releaseMeta.questions !== questions || releaseMeta.materials !== materials) fail("Release-meta diverge do pacote.");
 if (releaseMeta.official_exam?.objective_questions !== 60 || releaseMeta.official_exam?.joint_duration_minutes !== 240) fail("Configuração oficial divergente.");
 for (const key of ["platform_shared_js", "platform_release_js", "platform_vault_js", "platform_report_js", "platform_official_exam_js", "platform_adaptive_review_js", "platform_css", "platform_navigation_js"]) if (!releaseMeta.source_files_sha256?.[key]) fail(`Hash ausente: ${key}`);
-console.log(`✓ Plataforma 2.13 validada: ${questions} questões, ${materials} materiais, observers coalescidos, metadados em Configurações, cofre local, reporte, prova real e revisão adaptativa.`);
+console.log(`✓ Plataforma 2.13 validada: ${questions} questões, ${materials} materiais, carga inicial compartilhada, observers coalescidos, metadados em Configurações, cofre local, reporte, prova real e revisão adaptativa.`);
