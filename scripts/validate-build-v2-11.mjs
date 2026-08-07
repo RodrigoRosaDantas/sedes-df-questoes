@@ -97,13 +97,23 @@ requireMarkers(read("scripts/validate-ux-v2-14.mjs"), ["closeAfterConsecutiveCor
 requireMarkers(read("scripts/validate-navigation-v2-15.mjs"), ["PWA mobile sem overflow", "data-ux15-open-question", "aria-controls"], "Validador de navegação v2.15");
 requireMarkers(read("tests-public/material-downloads.spec.js"), ["provas", "simulados", "PDF para responder", "PDF comentado"], "Teste público dos downloads");
 requireMarkers(read("tests-public/ux-v2-14.spec.js"), ["question-search-index.json", "data-ux15-open-question"], "Teste público da UX v2.14");
-requireMarkers(read("tests-public/navigation-v2-15.spec.js"), ["data-ux15-home", "perfil/configuracoes", "data-official-exam-card"], "Teste público da navegação v2.15");
+requireMarkers(read("tests-public/navigation-v2-15.spec.js"), ["data-ux15-home", "#\\/perfil\\/configuracoes", "data-official-exam-card"], "Teste público da navegação v2.15");
 const pagesWorkflow = read(".github/workflows/pages.yml");
-requireMarkers(pagesWorkflow, ["verify-deployment.mjs", "playwright.public.config.js", "rollback-deployment.mjs", "mark-notion-published.mjs", "PUBLICATION_PLAN_PATH", "source_sha:", "steps.traceability.outcome == 'failure'", "actions: write", "contents: read"], "Workflow de Pages");
-for (const forbidden of ["contents: write", "deployment-receipt.json", "git push origin HEAD:main", "export-notion-snapshot.mjs"]) if (pagesWorkflow.includes(forbidden)) fail(`Workflow de Pages contém marcador proibido: ${forbidden}`);
 const notionWorkflow = read(".github/workflows/notion-sync.yml");
-requireMarkers(notionWorkflow, ["workflow_dispatch:", "schedule:", "export-notion-snapshot.mjs", "create-publication-plan.mjs", "git push origin HEAD:main", "actions: write", "build-info.json", "gh workflow run pages.yml", "-f source_sha=", "gh run watch", "--exit-status"], "Workflow do Notion");
-if (/^  push:/m.test(notionWorkflow)) fail("Workflow do Notion não pode reagir ao próprio push.");
-const dispatchCount = (notionWorkflow.match(/gh workflow run pages\.yml/g) || []).length;
-if (dispatchCount !== 1) fail(`Workflow do Notion deve criar uma única publicação explícita; encontrado: ${dispatchCount}.`);
-console.log("✓ Build 2.13.0 validado: proveniência da inteligência v2.9, release-meta, UX v2.14/v2.15, PWA, vault, reporte, prova real, revisão adaptativa e publicação protegida.");
+const suspensionPath = path.join(root, "data", "operations", "site-automations-suspended.json");
+const suspension = exists("data/operations/site-automations-suspended.json") ? JSON.parse(read("data/operations/site-automations-suspended.json")) : null;
+const manualOnly = suspension?.mode === "manual_only";
+if (manualOnly) {
+  for (const [name, workflow] of [["Pages", pagesWorkflow], ["Notion", notionWorkflow]]) {
+    requireMarkers(workflow, ["workflow_dispatch:", "SUSPENSO", "contents: read"], `Workflow ${name} suspenso`);
+    if (/^  (push|pull_request|schedule):/m.test(workflow)) fail(`Workflow ${name} suspenso contém gatilho automático.`);
+  }
+} else {
+  requireMarkers(pagesWorkflow, ["verify-deployment.mjs", "playwright.public.config.js", "rollback-deployment.mjs", "mark-notion-published.mjs", "PUBLICATION_PLAN_PATH", "source_sha:", "steps.traceability.outcome == 'failure'", "actions: write", "contents: read"], "Workflow de Pages");
+  for (const forbidden of ["contents: write", "deployment-receipt.json", "git push origin HEAD:main", "export-notion-snapshot.mjs"]) if (pagesWorkflow.includes(forbidden)) fail(`Workflow de Pages contém marcador proibido: ${forbidden}`);
+  requireMarkers(notionWorkflow, ["workflow_dispatch:", "schedule:", "export-notion-snapshot.mjs", "create-publication-plan.mjs", "git push origin HEAD:main", "actions: write", "build-info.json", "gh workflow run pages.yml", "-f source_sha=", "gh run watch", "--exit-status"], "Workflow do Notion");
+  if (/^  push:/m.test(notionWorkflow)) fail("Workflow do Notion não pode reagir ao próprio push.");
+  const dispatchCount = (notionWorkflow.match(/gh workflow run pages\.yml/g) || []).length;
+  if (dispatchCount !== 1) fail(`Workflow do Notion deve criar uma única publicação explícita; encontrado: ${dispatchCount}.`);
+}
+console.log(`✓ Build 2.13.0 validado: proveniência da inteligência v2.9, release-meta, UX v2.14/v2.15, PWA, vault, reporte, prova real, revisão adaptativa e governança ${manualOnly ? "manual" : "automática"}.`);
