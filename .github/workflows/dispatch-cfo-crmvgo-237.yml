@@ -1,4 +1,5 @@
 name: Fechar publicação CFO e CRMV-GO 237
+# disparo de recuperação autorizado em 2026-08-07
 
 on:
   pull_request:
