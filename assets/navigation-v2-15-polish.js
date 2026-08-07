@@ -1,7 +1,24 @@
-import {currentRoute, ensureData, observeApp, state} from "./shared-v2-13.js?v=1";
+import {
+  createCompatibleSession,
+  currentRoute,
+  ensureData,
+  esc,
+  materialIdFromIndex,
+  observeApp,
+  profileRoles,
+  shuffle,
+  state,
+} from "./shared-v2-13.js?v=1";
 
 const BRASILIA = "America/Sao_Paulo";
 let focusToken = 0;
+
+function primeRouteClass() {
+  document.documentElement.classList.toggle("ux15-clean-home", currentRoute() === "inicio");
+}
+
+primeRouteClass();
+window.addEventListener("hashchange", primeRouteClass);
 
 function syncTimestamp() {
   return state.release?.exported_at || state.catalog?.exported_at || null;
@@ -81,6 +98,64 @@ function pruneLegacyHome() {
   for (const child of [...app.children]) if (child !== home) child.remove();
 }
 
+function availableIdsForRole(role) {
+  const materialIds = new Set((state.catalog?.materials || [])
+    .filter(item => String(item.codigo_cargo) === String(role) || String(item.codigo_cargo) === "multicargo")
+    .map(item => item.id));
+  return Object.entries(state.catalog?.question_index || {})
+    .filter(([, raw]) => materialIds.has(materialIdFromIndex(raw)))
+    .map(([id]) => id);
+}
+
+function balancedRoleSample(role, count = 30) {
+  const available = new Set(availableIdsForRole(role));
+  const groups = (state.studyIndex?.disciplines || [])
+    .map(item => ({name: item.name, ids: shuffle((item.question_ids || []).filter(id => available.has(id))) }))
+    .filter(item => item.ids.length);
+  const selected = [];
+  const used = new Set();
+  while (selected.length < count && groups.some(group => group.ids.length)) {
+    for (const group of groups) {
+      let id = group.ids.shift();
+      while (id && used.has(id)) id = group.ids.shift();
+      if (id) { selected.push(id); used.add(id); }
+      if (selected.length >= count) break;
+    }
+  }
+  return selected;
+}
+
+function injectRoleTemplatesInStudy() {
+  if (currentRoute() !== "estudar" || document.querySelector("[data-role-templates]")) return;
+  const target = document.querySelector("[data-ux-study-launcher]");
+  if (!target) return;
+  const roles = profileRoles();
+  if (!roles.length) return;
+  const section = document.createElement("section");
+  section.className = "role-templates section";
+  section.dataset.roleTemplates = "";
+  section.innerHTML = `<div class="section-head"><div><p class="eyebrow">Simulado por cargo</p><h2>Treino equilibrado por perfil</h2><p>Organiza 30 questões entre as matérias disponíveis do cargo. Não substitui a distribuição oficial do edital.</p></div></div><div class="role-template-grid">${roles.map(role => {
+    const total = availableIdsForRole(role).length;
+    return `<article class="card role-template"><span class="type-badge">Cargo ${esc(role)}</span><h3>${esc(role)}</h3><p>${total.toLocaleString("pt-BR")} questões correlatas disponíveis.</p><button class="btn primary full" data-ux15-role-sim="${esc(role)}" ${total ? "" : "disabled"}>Iniciar 30 questões</button></article>`;
+  }).join("")}</div>`;
+  target.insertAdjacentElement("afterend", section);
+  section.querySelectorAll("[data-ux15-role-sim]").forEach(button => button.addEventListener("click", () => {
+    const role = button.dataset.ux15RoleSim;
+    const ids = balancedRoleSample(role, 30);
+    if (!ids.length) return;
+    createCompatibleSession({
+      id: `cargo-${role}`,
+      name: `Simulado por cargo ${role}`,
+      questionIds: ids,
+      mode: "prova",
+      minutes: 60,
+      discipline: "Múltiplas matérias",
+      source: "Simulado por cargo",
+      cargo: role,
+    });
+  }));
+}
+
 function focusSearchWhenReady() {
   const token = ++focusToken;
   const started = performance.now();
@@ -120,8 +195,10 @@ function bindNavigationShortcuts() {
 }
 
 function enhance() {
+  primeRouteClass();
   enhanceSyncStatus();
   enhanceBreadcrumb();
+  injectRoleTemplatesInStudy();
   pruneLegacyHome();
 }
 
