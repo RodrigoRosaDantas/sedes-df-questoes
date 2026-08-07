@@ -11,6 +11,8 @@ test("home exibe apenas o essencial e horário de Brasília", async ({page}) => 
   await expect(page.locator("[data-ux15-current-date]").first()).toBeVisible();
   await expect(page.locator("[data-ux15-current-time]").first()).toHaveText(/^\d{2}:\d{2}:\d{2}$/);
   await expect(page.locator("[data-ux15-sync-time]").first()).toContainText(/\d{2}\/\d{2}\/\d{4}/);
+  await expect(page.locator("[data-ux15-sync-age]").first()).toContainText(/sincroniz/);
+  await expect(page.locator("[data-ux15-sync-age]").first()).toHaveClass(/fresh|attention|stale/);
   await expect(page.locator("#sync-label")).toContainText("Brasília");
   await expect(page.locator(".bank-status")).toBeHidden();
   await expect(page.locator(".dashboard-metrics")).toBeHidden();
@@ -29,6 +31,26 @@ test("configurações concentram dados do projeto", async ({page}) => {
   await expect(page.getByText("Banco Mestre")).toBeVisible();
   await expect(page.getByText("Última sincronização do catálogo")).toBeVisible();
   await expect(page.locator("[data-ux15-current-time]")).toHaveText(/^\d{2}:\d{2}:\d{2}$/);
+  await expect(page.locator("[data-ux15-sync-age]")).toContainText(/sincroniz/);
+});
+
+test("navegação contextual orienta sem aumentar o menu principal", async ({page}) => {
+  await page.goto("/#/estudar", {waitUntil: "domcontentloaded"});
+  await expect(page.locator("[data-ux15-breadcrumb=estudar]")).toContainText("Início");
+  await expect(page.locator("[data-ux15-breadcrumb=estudar]")).toContainText("Estudar");
+  await page.goto("/#/revisar", {waitUntil: "domcontentloaded"});
+  await expect(page.locator("[data-ux15-breadcrumb=revisar]")).toContainText("Revisar");
+  await page.goto("/#/desempenho", {waitUntil: "domcontentloaded"});
+  await expect(page.locator("[data-ux15-breadcrumb=desempenho]")).toContainText("Desempenho");
+  await expect(page.locator(".mobile-nav a")).toHaveCount(4);
+});
+
+test("atalho de barra abre e foca a busca", async ({page}) => {
+  await expect(page.locator("[data-ux15-home]")).toBeVisible({timeout: 30000});
+  await page.keyboard.press("/");
+  await expect(page).toHaveURL(/#\/estudar$/);
+  await expect(page.locator("[data-ux-question-search]")).toBeVisible({timeout: 30000});
+  await expect(page.locator("[data-ux-question-search]")).toBeFocused();
 });
 
 test("mobile mantém quatro destinos principais e configurações no topo", async ({page}) => {
