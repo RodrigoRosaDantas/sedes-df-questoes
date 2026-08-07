@@ -15,7 +15,7 @@ const navigation = read("assets/navigation-v2-15.js");
 const css = read("assets/navigation-v2-15.css");
 const builder = read("scripts/build-public.mjs");
 
-requireMarkers(index, ["navigation-v2-15.css?v=1", "navigation-v2-15.js?v=1"], "HTML");
+requireMarkers(index, ["navigation-v2-15.css?v=1", "navigation-v2-15.js?v=1", "data-ux-tech-status>Configurações"], "HTML");
 requireMarkers(worker, ["navigation-v2-15.css?v=1", "navigation-v2-15.js?v=1"], "Service worker");
 requireMarkers(navigation, [
   "Seu estudo, sem ruído.",
@@ -25,7 +25,7 @@ requireMarkers(navigation, [
   "Dados do projeto",
   "data-ux15-current-time",
   "data-ux15-settings-tab",
-  "data-ux15-settings=",
+  "dataset.ux15Settings",
 ], "Navegação v2.15");
 requireMarkers(css, ["ux15-home-active", "ux15-home-grid", "ux15-settings-page", "ux15-sync-card", "ux15-facts-grid"], "CSS v2.15");
 requireMarkers(builder, ["platform_navigation_js", "platform_navigation_css", "navigation-v2-15.js", "navigation-v2-15.css"], "Build público");
