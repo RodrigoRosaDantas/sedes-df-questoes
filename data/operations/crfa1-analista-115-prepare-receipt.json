@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "CRFA1-2026-ANALISTA-400-115-20260807",
+  "status": "prepared_not_published",
+  "expected_additions": 115,
+  "expected_public_total_before": 3046,
+  "expected_public_total_after": 3161,
+  "blocked_original_numbers": [
+    5,
+    48,
+    54,
+    102,
+    104
+  ],
+  "snapshot_sha256": "d1aa0e165dd0b2fb83e78ba75bda550d57f1f23f1ee5366f6fbab9c80c4e4b3d",
+  "plan_sha256": "2b49c85b2654a1094258385117648a5036f82bd2467279a25a5284a28628ed24",
+  "prepared_from_sha": "e386acc1284b49e68d659daf2b83e46378facb23",
+  "publication_started": false,
+  "notion_traceability_closed": false
+}
