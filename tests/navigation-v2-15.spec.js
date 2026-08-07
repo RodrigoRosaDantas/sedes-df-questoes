@@ -38,6 +38,5 @@ test("mobile mantém quatro destinos principais e configurações no topo", asyn
   await expect(page.locator("[data-ux15-settings]")).toBeVisible({timeout: 30000});
   await expect(page.locator("[data-ux15-home]")).toBeVisible();
   await page.locator("[data-ux15-settings]").click();
-  await expect(page.locator("[data-ux15-settings-tabs]")).toBeVisible().catch(() => {});
-  await expect(page.locator(".ux15-settings-tabs")).toBeVisible();
+  await expect(page.locator(".ux15-settings-tabs")).toBeVisible({timeout: 30000});
 });
