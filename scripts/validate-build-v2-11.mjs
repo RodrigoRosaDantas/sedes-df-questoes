@@ -20,6 +20,7 @@ for (const legacy of ["patch-runtime-catalog", "patch-study-navigation", "patch-
 for (const legacyFile of ["scripts/patch-runtime-catalog.mjs", "scripts/patch-study-navigation-v2-6.mjs", "scripts/patch-intelligence-v2-9.mjs", "scripts/build-dist.mjs", "scripts/fragments/study-navigation-v2-6.js.txt", "scripts/consolidate-source-once.mjs", ".github/workflows/consolidate-source-once.yml"]) if (exists(legacyFile)) fail(`Artefato temporário ou mutável ainda existe: ${legacyFile}`);
 const checkCommand = String(packageData.scripts?.check || ""), testCommand = String(packageData.scripts?.test || "");
 for (const marker of [
+  "node --check assets/learning-v2-9.js",
   "node --check assets/material-downloads-v1.js",
   "node --check assets/shared-v2-13.js",
   "node --check assets/release-v2-13.js",
@@ -40,7 +41,7 @@ for (const validator of ["validate-material-downloads.mjs", "validate-platform-v
 const builder = read("scripts/build-public.mjs");
 for (const forbidden of [".replace(\"Release incompleta", "staleGuard", "compileApplication", "compileIndex", "study-navigation-v2-6.js.txt"]) if (builder.includes(forbidden)) fail(`Build público ainda transforma fontes: ${forbidden}`);
 requireMarkers(builder, [
-  "expectedBuilder", "expectedCacheVersion", "service_worker_js", "pwa_js", "material_downloads_js", "material_downloads_css",
+  "expectedBuilder", "expectedCacheVersion", "service_worker_js", "learning_js", "pwa_js", "material_downloads_js", "material_downloads_css",
   "platform_shared_js", "platform_release_js", "platform_vault_js", "platform_report_js", "platform_official_exam_js", "platform_adaptive_review_js", "platform_css",
   "platform_ux_js", "platform_ux_guardrails_js", "platform_ux_css",
   "platform_navigation_js", "platform_navigation_css", "platform_navigation_polish_js", "platform_navigation_polish_css",
@@ -53,14 +54,14 @@ if (buildInfo.version !== packageData.version || buildInfo.builder !== expectedB
 if (releaseMeta.app_version !== packageData.version || releaseMeta.builder !== expectedBuilder || releaseMeta.cache_version !== expectedCacheVersion) fail("release-meta sem proveniência coerente.");
 if (releaseMeta.questions !== Number(catalog.summary.questoes) || releaseMeta.materials !== Number(catalog.summary.materiais)) fail("release-meta diverge do catálogo.");
 for (const hash of [
-  "index_html", "app_js", "service_worker_js", "pwa_js", "material_downloads_js", "material_downloads_css",
+  "index_html", "app_js", "service_worker_js", "learning_js", "pwa_js", "material_downloads_js", "material_downloads_css",
   "platform_shared_js", "platform_release_js", "platform_vault_js", "platform_report_js", "platform_official_exam_js", "platform_adaptive_review_js", "platform_css",
   "platform_ux_js", "platform_ux_guardrails_js", "platform_ux_css",
   "platform_navigation_js", "platform_navigation_css", "platform_navigation_polish_js", "platform_navigation_polish_css",
 ]) if (!buildInfo.source_files_sha256?.[hash] || !releaseMeta.source_files_sha256?.[hash]) fail(`Hash canônico ausente: ${hash}`);
 if ("generated_at" in buildInfo || "generated_at" in releaseMeta) fail("Metadados contêm horário variável.");
 for (const file of [
-  "index.html", "assets/app-v4.js", "service-worker.js", "assets/pwa-v2-9.js", "assets/material-downloads-v1.js", "assets/material-downloads-v1.css",
+  "index.html", "assets/app-v4.js", "service-worker.js", "assets/learning-v2-9.js", "assets/pwa-v2-9.js", "assets/material-downloads-v1.js", "assets/material-downloads-v1.css",
   "assets/shared-v2-13.js", "assets/release-v2-13.js", "assets/vault-v2-13.js", "assets/report-v2-13.js", "assets/official-exam-v2-13.js", "assets/adaptive-review-v2-13.js", "assets/platform-v2-13.css",
   "assets/ux-v2-14.js", "assets/ux-v2-14-guardrails.js", "assets/ux-v2-14.css",
   "assets/navigation-v2-15.js", "assets/navigation-v2-15.css", "assets/navigation-v2-15-polish.js", "assets/navigation-v2-15-polish.css",
@@ -71,7 +72,7 @@ const sourcePlatform = ["shared", "release", "vault", "report", "official-exam",
 const sourceUx = `${read("assets/ux-v2-14.js")}\n${read("assets/ux-v2-14-guardrails.js")}`;
 const sourceNavigation = `${read("assets/navigation-v2-15.js")}\n${read("assets/navigation-v2-15-polish.js")}`;
 requireMarkers(sourceIndex, [
-  "app-v4.js?v=13", "study-navigation-v2-6.css?v=1", "reports-v2-10.js?v=2", "material-downloads-v1.css?v=1", "material-downloads-v1.js?v=1",
+  "app-v4.js?v=13", "study-navigation-v2-6.css?v=1", "reports-v2-10.js?v=2", "material-downloads-v1.css?v=1", "material-downloads-v1.js?v=1", "learning-v2-9.js?v=1",
   "platform-v2-13.css?v=1", "release-v2-13.js?v=1", "vault-v2-13.js?v=1", "report-v2-13.js?v=1", "official-exam-v2-13.js?v=1", "adaptive-review-v2-13.js?v=1",
   "ux-v2-14.css?v=1", "ux-v2-14.js?v=1", "ux-v2-14-guardrails.js?v=1",
   "navigation-v2-15.css?v=1", "navigation-v2-15-polish.css?v=1", "navigation-v2-15.js?v=1", "navigation-v2-15-polish.js?v=1",
@@ -80,7 +81,7 @@ requireMarkers(sourceApp, ["Catálogo inconsistente.", 'data-study-view="materia
 if (sourceApp.includes("Release incompleta.")) fail("Aplicação canônica ainda contém trava antiga.");
 requireMarkers(sourceWorker, [
   expectedCacheVersion, 'event.request.mode === "navigate"', 'cache: "no-store"', 'type === "SKIP_WAITING"',
-  "material-downloads-v1.css?v=1", "material-downloads-v1.js?v=1", "platform-v2-13.css?v=1", "shared-v2-13.js?v=1", "release-v2-13.js?v=1", "vault-v2-13.js?v=1", "report-v2-13.js?v=1", "official-exam-v2-13.js?v=1", "adaptive-review-v2-13.js?v=1",
+  "learning-v2-9.js?v=1", "material-downloads-v1.css?v=1", "material-downloads-v1.js?v=1", "platform-v2-13.css?v=1", "shared-v2-13.js?v=1", "release-v2-13.js?v=1", "vault-v2-13.js?v=1", "report-v2-13.js?v=1", "official-exam-v2-13.js?v=1", "adaptive-review-v2-13.js?v=1",
   "ux-v2-14.css?v=1", "ux-v2-14.js?v=1", "ux-v2-14-guardrails.js?v=1",
   "navigation-v2-15.css?v=1", "navigation-v2-15-polish.css?v=1", "navigation-v2-15.js?v=1", "navigation-v2-15-polish.js?v=1",
   "question-search-index", "release-meta",
@@ -105,4 +106,4 @@ requireMarkers(notionWorkflow, ["workflow_dispatch:", "schedule:", "export-notio
 if (/^  push:/m.test(notionWorkflow)) fail("Workflow do Notion não pode reagir ao próprio push.");
 const dispatchCount = (notionWorkflow.match(/gh workflow run pages\.yml/g) || []).length;
 if (dispatchCount !== 1) fail(`Workflow do Notion deve criar uma única publicação explícita; encontrado: ${dispatchCount}.`);
-console.log("✓ Build 2.13.0 validado: release-meta, UX v2.14/v2.15, PWA, vault, reporte, prova real, revisão adaptativa e publicação protegida.");
+console.log("✓ Build 2.13.0 validado: proveniência da inteligência v2.9, release-meta, UX v2.14/v2.15, PWA, vault, reporte, prova real, revisão adaptativa e publicação protegida.");
