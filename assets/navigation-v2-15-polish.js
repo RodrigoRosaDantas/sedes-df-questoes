@@ -73,6 +73,14 @@ function enhanceBreadcrumb() {
   heading.insertAdjacentElement("beforebegin", nav);
 }
 
+function pruneLegacyHome() {
+  if (currentRoute() !== "inicio") return;
+  const app = document.querySelector("#app");
+  const home = app?.querySelector(":scope > [data-ux15-home]");
+  if (!app || !home) return;
+  for (const child of [...app.children]) if (child !== home) child.remove();
+}
+
 function focusSearchWhenReady() {
   const token = ++focusToken;
   const started = performance.now();
@@ -109,6 +117,7 @@ function bindSearchNavigation() {
 function enhance() {
   enhanceSyncStatus();
   enhanceBreadcrumb();
+  pruneLegacyHome();
 }
 
 bindSearchNavigation();
