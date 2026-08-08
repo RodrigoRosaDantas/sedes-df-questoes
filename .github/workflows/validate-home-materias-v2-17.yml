@@ -62,7 +62,7 @@ jobs:
         shell: bash
         run: |
           node --check assets/home-study-today-v2-16.js
-          node --check assets/home-study-subjects-v2-17.js
+          node --check assets/home-study-subjects-v2-17-stable.js
           node --check assets/navigation-v2-15.js
           node scripts/validate-home-study-v2-16.mjs
           node scripts/validate-runtime-catalog.mjs
