@@ -13,6 +13,7 @@ export default defineConfig({
     "platform-v2-13.spec.js",
     "ux-v2-14.spec.js",
     "navigation-v2-15.spec.js",
+    "home-study-subjects-v2-17.spec.js",
   ],
   timeout: 240000,
   retries: 1,
