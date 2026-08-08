@@ -11,7 +11,7 @@ import {
 } from "./shared-v2-13.js?v=1";
 
 const DAILY_SIZE = 25;
-const TEMP_SELECTION_KEY = () => profileKey("homeStudySubjects.v1");
+const TEMP_SELECTION_KEY = () => profileKey("homeStudySubjects.v2");
 const targetCache = new Map();
 const trackCache = new Map();
 const subjectCache = new Map();
@@ -196,20 +196,21 @@ function saveTempSelection(value) {
   catch { /* escolha temporária não deve bloquear o estudo */ }
 }
 
-function selectedSubjectNames(track, options, selection) {
+function selectionForTrack(track, options, selection) {
   const stored = selection[track.id];
-  if (!Array.isArray(stored)) return options.map(option => option.name);
+  const allMode = !Array.isArray(stored);
+  if (allMode) return {allMode: true, names: options.map(option => option.name)};
   const valid = new Set(options.map(option => option.name));
-  return stored.filter(name => valid.has(name));
+  return {allMode: false, names: [...new Set(stored.filter(name => valid.has(name)))]};
 }
 
 function selectedTrackIds(card) {
   return [...card.querySelectorAll("[data-ux16-track-input]:checked")].map(input => input.value);
 }
 
-function filteredIds(track, options, selectedNames) {
+function filteredIds(track, options, selectedNames, allMode = false) {
+  if (allMode) return trackPool(track);
   if (!selectedNames.length) return [];
-  if (selectedNames.length === options.length) return trackPool(track);
   const selected = new Set(selectedNames);
   return [...new Set(options.filter(option => selected.has(option.name)).flatMap(option => option.ids))];
 }
@@ -219,22 +220,34 @@ function currentPools(card) {
   const selectedIds = new Set(selectedTrackIds(card));
   return TRACKS.filter(track => selectedIds.has(track.id)).map(track => {
     const options = subjectOptions(track);
-    const names = selectedSubjectNames(track, options, selection);
-    return {track, options, names, ids: filteredIds(track, options, names)};
+    const chosen = selectionForTrack(track, options, selection);
+    return {
+      track,
+      options,
+      names: chosen.names,
+      allMode: chosen.allMode,
+      ids: filteredIds(track, options, chosen.names, chosen.allMode),
+    };
   });
 }
 
 function subjectGroup(pool, openIds) {
-  const {track, options, names} = pool;
-  const selected = new Set(names);
+  const {track, options, names, allMode} = pool;
+  const selected = new Set(allMode ? [] : names);
   const target = TARGETS[track.target];
   const typeLabel = track.type === "prova" ? "Provas anteriores" : "Simulados";
-  const status = names.length === options.length ? `Todas · ${options.length}` : `${names.length} de ${options.length}`;
+  const status = allMode ? `Todas · ${options.length}` : `${names.length} de ${options.length}`;
   return `<details class="ux17-subject-group" data-ux17-subject-group="${track.id}" ${openIds.has(track.id) ? "open" : ""}>
     <summary><span><small>${typeLabel} · ${esc(target.label)}</small><strong>Matérias</strong></span><b data-ux17-subject-status>${status}</b></summary>
     <div class="ux17-subject-body">
-      <div class="ux17-subject-actions"><span>Escolha as matérias para este recorte.</span><div><button type="button" class="ux17-mini" data-ux17-all="${track.id}">Todas</button><button type="button" class="ux17-mini" data-ux17-clear="${track.id}">Limpar</button></div></div>
-      <div class="ux17-subject-chips" role="group" aria-label="Matérias de ${esc(track.label)}">${options.map(option => `<label class="ux17-subject-chip ${selected.has(option.name) ? "selected" : ""}"><input type="checkbox" data-ux17-subject-input data-ux17-track="${track.id}" value="${esc(option.name)}" ${selected.has(option.name) ? "checked" : ""}><span>${esc(option.name)}</span><small>${option.ids.length}</small></label>`).join("")}</div>
+      <div class="ux17-subject-actions">
+        <span>Toque em uma matéria para estudar só ela; toque em outras para combinar.</span>
+        <div>
+          <button type="button" class="ux17-mini ${allMode ? "selected" : ""}" data-ux17-all="${track.id}" aria-pressed="${allMode ? "true" : "false"}">Todas</button>
+          <button type="button" class="ux17-mini" data-ux17-clear="${track.id}">Limpar</button>
+        </div>
+      </div>
+      <div class="ux17-subject-chips" role="group" aria-label="Matérias de ${esc(track.label)}">${options.map(option => `<button type="button" class="ux17-subject-chip ${selected.has(option.name) ? "selected" : ""}" data-ux17-subject-button data-ux17-track="${track.id}" data-ux17-subject="${esc(option.name)}" aria-pressed="${selected.has(option.name) ? "true" : "false"}"><span>${esc(option.name)}</span><small>${option.ids.length}</small></button>`).join("")}</div>
     </div>
   </details>`;
 }
@@ -242,7 +255,7 @@ function subjectGroup(pool, openIds) {
 function summaryText(pools) {
   if (!pools.length) return "Selecione pelo menos uma das quatro opções.";
   const available = new Set(pools.flatMap(pool => pool.ids)).size;
-  const custom = pools.filter(pool => pool.names.length !== pool.options.length);
+  const custom = pools.filter(pool => !pool.allMode);
   const matterText = custom.length
     ? `${custom.reduce((total, pool) => total + pool.names.length, 0)} matéria(s) escolhida(s) manualmente`
     : "todas as matérias disponíveis";
@@ -292,6 +305,30 @@ function openGroupIds(card, extra = null) {
   return ids;
 }
 
+function setCustomSubject(card, trackId, subjectName) {
+  const track = TRACKS.find(item => item.id === trackId);
+  if (!track) return;
+  const options = subjectOptions(track);
+  const valid = new Set(options.map(option => option.name));
+  if (!valid.has(subjectName)) return;
+  const selection = readTempSelection();
+  const stored = selection[trackId];
+
+  if (!Array.isArray(stored)) {
+    selection[trackId] = [subjectName];
+  } else if (stored.includes(subjectName)) {
+    selection[trackId] = stored.filter(name => name !== subjectName);
+  } else {
+    selection[trackId] = [...stored, subjectName];
+  }
+
+  const normalized = [...new Set(selection[trackId].filter(name => valid.has(name)))];
+  if (normalized.length === options.length && options.length) delete selection[trackId];
+  else selection[trackId] = normalized;
+  saveTempSelection(selection);
+  renderSubjects(card, trackId);
+}
+
 function bindSubjectControls(card) {
   card.querySelectorAll("[data-ux17-all]").forEach(button => button.addEventListener("click", () => {
     const trackId = button.dataset.ux17All;
@@ -300,6 +337,7 @@ function bindSubjectControls(card) {
     saveTempSelection(selection);
     renderSubjects(card, trackId);
   }));
+
   card.querySelectorAll("[data-ux17-clear]").forEach(button => button.addEventListener("click", () => {
     const trackId = button.dataset.ux17Clear;
     const selection = readTempSelection();
@@ -307,20 +345,9 @@ function bindSubjectControls(card) {
     saveTempSelection(selection);
     renderSubjects(card, trackId);
   }));
-  card.querySelectorAll("[data-ux17-subject-input]").forEach(input => input.addEventListener("change", () => {
-    const trackId = input.dataset.ux17Track;
-    const group = card.querySelector(`[data-ux17-subject-group="${CSS.escape(trackId)}"]`);
-    if (!group) return;
-    const checked = [...group.querySelectorAll("[data-ux17-subject-input]:checked")].map(node => node.value);
-    const selection = readTempSelection();
-    const total = group.querySelectorAll("[data-ux17-subject-input]").length;
-    if (checked.length === total) delete selection[trackId];
-    else selection[trackId] = checked;
-    saveTempSelection(selection);
-    group.querySelectorAll(".ux17-subject-chip").forEach(label => label.classList.toggle("selected", label.querySelector("input")?.checked));
-    const status = group.querySelector("[data-ux17-subject-status]");
-    if (status) status.textContent = checked.length === total ? `Todas · ${total}` : `${checked.length} de ${total}`;
-    updateSummary(card);
+
+  card.querySelectorAll("[data-ux17-subject-button]").forEach(button => button.addEventListener("click", () => {
+    setCustomSubject(card, button.dataset.ux17Track, button.dataset.ux17Subject);
   }));
 }
 
@@ -335,7 +362,7 @@ function renderSubjects(card, keepOpen = null) {
   }
   const pools = currentPools(card);
   panel.innerHTML = pools.length
-    ? `<div class="ux17-subjects-head"><div><small>Personalize o conteúdo</small><strong>Quais matérias você quer fazer agora?</strong></div><span>“Todas” mantém o recorte completo do edital.</span></div><div class="ux17-subject-list">${pools.map(pool => subjectGroup(pool, openIds)).join("")}</div>`
+    ? `<div class="ux17-subjects-head"><div><small>Personalize o conteúdo</small><strong>Quais matérias você quer fazer agora?</strong></div><span>“Todas” mantém o recorte completo; tocar numa matéria inicia uma seleção específica.</span></div><div class="ux17-subject-list">${pools.map(pool => subjectGroup(pool, openIds)).join("")}</div>`
     : "";
   panel.hidden = !pools.length;
   bindSubjectControls(card);
@@ -348,7 +375,7 @@ function startFilteredSession(card) {
   if (pools.some(pool => !pool.names.length)) return toast("Escolha ao menos uma matéria em cada recorte selecionado ou desmarque o recorte vazio.", "info");
   const ids = balancedDailyIds(pools, answeredIds());
   if (!ids.length) return toast("Não há questões disponíveis para as matérias escolhidas nessa combinação.", "info");
-  const names = pools.map(pool => `${pool.track.label} (${pool.names.length === pool.options.length ? "todas" : `${pool.names.length} matérias`})`).join(" + ");
+  const names = pools.map(pool => `${pool.track.label} (${pool.allMode ? "todas" : `${pool.names.length} matérias`})`).join(" + ");
   const uniqueSubjects = [...new Set(pools.flatMap(pool => pool.names))];
   createCompatibleSession({
     id: `estudo-hoje-materias-${dateKey(Date.now())}`,
@@ -387,8 +414,17 @@ function enhanceCard(card) {
   renderSubjects(card);
 }
 
+function stopWatchdog() {
+  if (!watchdog) return;
+  window.clearInterval(watchdog);
+  watchdog = null;
+}
+
 function tick() {
-  if (currentRoute() !== "inicio") return;
+  if (currentRoute() !== "inicio") {
+    stopWatchdog();
+    return;
+  }
   const card = document.querySelector("#app > [data-ux15-home] [data-ux-today][data-ux16-ready]");
   if (!card) return;
   const stable = card.dataset.ux17Ready && card.querySelector("[data-ux17-subjects]") && card.querySelector("[data-ux17-start]");
@@ -397,8 +433,8 @@ function tick() {
 
 function arm() {
   tick();
-  if (!watchdog) watchdog = window.setInterval(tick, 900);
+  if (!watchdog && currentRoute() === "inicio") watchdog = window.setInterval(tick, 900);
 }
 
-window.addEventListener("hashchange", () => window.setTimeout(tick, 120));
+window.addEventListener("hashchange", () => window.setTimeout(arm, 120));
 ensureData().then(() => window.setTimeout(arm, 120)).catch(error => console.error("Falha ao preparar matérias do Estudo de hoje v2.17:", error));
