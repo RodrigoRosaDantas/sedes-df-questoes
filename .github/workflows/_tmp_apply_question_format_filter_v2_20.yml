@@ -1,0 +1,359 @@
+name: Aplicar filtro de formato v2.20
+
+on:
+  push:
+    branches: [agent/filtro-formato-questoes-v2-20]
+    paths:
+      - .github/workflows/_tmp_apply_question_format_filter_v2_20.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/filtro-formato-questoes-v2-20
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Aplicar patch funcional e testes
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              p = Path(path)
+              text = p.read_text()
+              if old not in text:
+                  raise SystemExit(f"marcador não encontrado em {path}: {old[:120]!r}")
+              if text.count(old) != 1:
+                  raise SystemExit(f"marcador não é único em {path}: {old[:120]!r}")
+              p.write_text(text.replace(old, new, 1))
+
+          # 1) Índice derivado por questão no build público.
+          build_marker = 'if (materialFiles !== materialCount) throw new Error(`Arquivos de material divergentes: ${materialFiles} arquivos para ${materialCount} materiais.`);\n'
+          build_insert = build_marker + r'''
+
+const normalizeQuestionFormatToken = value => String(value || "")
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g, "")
+  .toLocaleLowerCase("pt-BR")
+  .replace(/\s+/g, " ")
+  .trim();
+const classifyQuestionFormat = (question, material) => {
+  const declared = normalizeQuestionFormatToken(question?.formato_questao || material?.formato_questao);
+  if (declared.includes("certo") && declared.includes("errado")) return "true-false";
+  if (declared.includes("multipla") || declared.includes("escolha") || declared.includes("alternativa")) return "multiple-choice";
+  const alternatives = question?.alternativas && typeof question.alternativas === "object" && !Array.isArray(question.alternativas)
+    ? Object.entries(question.alternativas).filter(([key, value]) => String(key || "").trim() && String(value ?? "").trim())
+    : [];
+  const tokens = new Set(alternatives.flatMap(([key, value]) => [normalizeQuestionFormatToken(key), normalizeQuestionFormatToken(value)]));
+  if (alternatives.length === 2 && tokens.has("certo") && tokens.has("errado")) return "true-false";
+  if (alternatives.length >= 2) return "multiple-choice";
+  return null;
+};
+const questionFormats = {};
+for (const materialMeta of catalog.materials || []) {
+  const relativeFile = String(materialMeta.file || "").replace(/^\.\//, "");
+  if (!relativeFile) throw new Error(`Material sem arquivo para indexar formato: ${materialMeta.id || "sem id"}.`);
+  const material = JSON.parse(fs.readFileSync(path.join(dist, relativeFile), "utf8"));
+  for (const question of material.questoes || []) {
+    const id = String(question?.id || "").trim();
+    if (!id) throw new Error(`Questão sem id no material ${materialMeta.id}.`);
+    const format = classifyQuestionFormat(question, material);
+    if (!format) throw new Error(`Formato não reconhecido para ${id} (${materialMeta.id}).`);
+    if (questionFormats[id]) throw new Error(`Questão duplicada no índice de formato: ${id}.`);
+    questionFormats[id] = format;
+  }
+}
+const indexedQuestionIds = Object.keys(catalog.question_index || {});
+const missingFormatIds = indexedQuestionIds.filter(id => !questionFormats[id]);
+const extraFormatIds = Object.keys(questionFormats).filter(id => !catalog.question_index?.[id]);
+if (Object.keys(questionFormats).length !== questionCount || missingFormatIds.length || extraFormatIds.length) {
+  throw new Error(`Índice de formato divergente: ${Object.keys(questionFormats).length}/${questionCount}; ausentes=${missingFormatIds.length}; extras=${extraFormatIds.length}.`);
+}
+const formatSummary = Object.values(questionFormats).reduce((summary, format) => {
+  summary[format] = (summary[format] || 0) + 1;
+  return summary;
+}, {});
+fs.writeFileSync(path.join(dist, "data/release/question-format-index.json"), `${JSON.stringify({
+  schema_version: "1.0",
+  generated_from: "data/release/materials",
+  question_count: questionCount,
+  summary: formatSummary,
+  formats: questionFormats,
+}, null, 2)}\n`);
+'''
+          replace_once('scripts/build-public.mjs', build_marker, build_insert)
+
+          # 2) Estado e carregamento do filtro no módulo da Home.
+          replace_once('assets/home-study-subjects-v2-17-stable.js',
+          '''const DAILY_SIZE = 25;\nconst TEMP_SELECTION_KEY = () => profileKey("homeStudySubjects.v2");\nconst targetCache = new Map();\nconst trackCache = new Map();\nconst subjectCache = new Map();\nlet watchdog = null;\n\nconst dateKey = value => new Intl.DateTimeFormat("en-CA", {timeZone: "America/Sao_Paulo"}).format(new Date(value));\n''',
+          '''const DAILY_SIZE = 25;\nconst TEMP_SELECTION_KEY = () => profileKey("homeStudySubjects.v2");\nconst TEMP_FORMAT_KEY = () => profileKey("homeStudyFormat.v1");\nconst FORMAT_MODES = [\n  {id: "all", label: "Todas"},\n  {id: "true-false", label: "Certo ou Errado"},\n  {id: "multiple-choice", label: "Múltipla escolha"},\n];\nconst targetCache = new Map();\nconst trackCache = new Map();\nconst subjectCache = new Map();\nlet questionFormatIndex = null;\nlet questionFormatPromise = null;\nlet watchdog = null;\n\nconst dateKey = value => new Intl.DateTimeFormat("en-CA", {timeZone: "America/Sao_Paulo"}).format(new Date(value));\n\nasync function ensureQuestionFormatIndex() {\n  if (questionFormatIndex) return questionFormatIndex;\n  if (!questionFormatPromise) {\n    questionFormatPromise = fetch("./data/release/question-format-index.json", {cache: "no-store"})\n      .then(response => {\n        if (!response.ok) throw new Error(`Índice de formato indisponível (${response.status}).`);\n        return response.json();\n      })\n      .then(payload => {\n        if (!payload?.formats || typeof payload.formats !== "object") throw new Error("Índice de formato inválido.");\n        questionFormatIndex = payload.formats;\n        return questionFormatIndex;\n      });\n  }\n  return questionFormatPromise;\n}\n\nfunction readFormatSelection() {\n  try {\n    const value = sessionStorage.getItem(TEMP_FORMAT_KEY()) || "all";\n    return FORMAT_MODES.some(mode => mode.id === value) ? value : "all";\n  } catch {\n    return "all";\n  }\n}\n\nfunction saveFormatSelection(value) {\n  const normalized = FORMAT_MODES.some(mode => mode.id === value) ? value : "all";\n  try { sessionStorage.setItem(TEMP_FORMAT_KEY(), normalized); }\n  catch { /* filtro temporário não deve bloquear o estudo */ }\n}\n\nfunction formatLabel(value) {\n  return FORMAT_MODES.find(mode => mode.id === value)?.label || "Todas";\n}\n\nfunction questionFormat(questionId) {\n  return questionFormatIndex?.[questionId] || "unknown";\n}\n\nfunction applyQuestionFormat(ids, formatMode = readFormatSelection()) {\n  if (formatMode === "all") return [...ids];\n  return ids.filter(id => questionFormat(id) === formatMode);\n}\n''')
+
+          replace_once('assets/home-study-subjects-v2-17-stable.js',
+          '''function currentPools(card) {\n  const selection = readTempSelection();\n  const selectedIds = new Set(selectedTrackIds(card));\n  return TRACKS.filter(track => selectedIds.has(track.id)).map(track => {\n    const options = subjectOptions(track);\n    const chosen = selectionForTrack(track, options, selection);\n    return {\n      track,\n      options,\n      names: chosen.names,\n      allMode: chosen.allMode,\n      ids: filteredIds(track, options, chosen.names, chosen.allMode),\n    };\n  });\n}\n\nfunction subjectGroup(pool, openIds) {\n''',
+          '''function currentPools(card) {\n  const selection = readTempSelection();\n  const formatMode = readFormatSelection();\n  const selectedIds = new Set(selectedTrackIds(card));\n  return TRACKS.filter(track => selectedIds.has(track.id)).map(track => {\n    const options = subjectOptions(track);\n    const chosen = selectionForTrack(track, options, selection);\n    const subjectIds = filteredIds(track, options, chosen.names, chosen.allMode);\n    return {\n      track,\n      options,\n      names: chosen.names,\n      allMode: chosen.allMode,\n      subjectIds,\n      ids: applyQuestionFormat(subjectIds, formatMode),\n      formatMode,\n    };\n  });\n}\n\nfunction formatCounts(pools) {\n  const ids = [...new Set(pools.flatMap(pool => pool.subjectIds || []))];\n  return {\n    all: ids.length,\n    "true-false": applyQuestionFormat(ids, "true-false").length,\n    "multiple-choice": applyQuestionFormat(ids, "multiple-choice").length,\n  };\n}\n\nfunction formatPanel(pools) {\n  const selected = readFormatSelection();\n  const counts = formatCounts(pools);\n  return `<section class="ux20-format" data-ux20-format aria-label="Formato das questões">\n    <div class="ux20-format-copy"><small>Formato das questões</small><strong>Como você quer responder agora?</strong></div>\n    <div class="ux20-format-options" role="group" aria-label="Filtrar formato das questões">${FORMAT_MODES.map(mode => `<button type="button" class="ux20-format-option ${selected === mode.id ? "selected" : ""}" data-ux20-format-option="${mode.id}" aria-pressed="${selected === mode.id ? "true" : "false"}" ${counts[mode.id] === 0 && mode.id !== "all" ? "disabled" : ""}><span>${esc(mode.label)}</span><small data-ux20-format-count="${mode.id}">${counts[mode.id].toLocaleString("pt-BR")}</small></button>`).join("")}</div>\n  </section>`;\n}\n\nfunction subjectGroup(pool, openIds) {\n''')
+
+          replace_once('assets/home-study-subjects-v2-17-stable.js',
+          '''function subjectGroup(pool, openIds) {\n  const {track, options, names, allMode} = pool;\n  const selected = new Set(allMode ? [] : names);\n''',
+          '''function subjectGroup(pool, openIds) {\n  const {track, options, names, allMode} = pool;\n  const selected = new Set(allMode ? [] : names);\n  const formatMode = readFormatSelection();\n''')
+
+          replace_once('assets/home-study-subjects-v2-17-stable.js',
+          '''<small>${option.ids.length}</small></button>`).join("")}</div>\n''',
+          '''<small>${applyQuestionFormat(option.ids, formatMode).length}</small></button>`).join("")}</div>\n''')
+
+          replace_once('assets/home-study-subjects-v2-17-stable.js',
+          '''  return `${pools.length} opção(ões) · ${matterText} · ${available.toLocaleString("pt-BR")} questões disponíveis · sessão de até ${DAILY_SIZE}.`;\n}\n''',
+          '''  const formatMode = pools[0]?.formatMode || readFormatSelection();\n  return `${pools.length} opção(ões) · ${matterText} · formato: ${formatLabel(formatMode)} · ${available.toLocaleString("pt-BR")} questões disponíveis · sessão de até ${DAILY_SIZE}.`;\n}\n''')
+
+          replace_once('assets/home-study-subjects-v2-17-stable.js',
+          '''  const start = card.querySelector("[data-ux17-start]");\n  if (start) start.disabled = !pools.length || pools.some(pool => !pool.names.length || !pool.ids.length);\n  return pools;\n}\n''',
+          '''  const start = card.querySelector("[data-ux17-start]");\n  const available = new Set(pools.flatMap(pool => pool.ids)).size;\n  if (start) start.disabled = !pools.length || pools.some(pool => !pool.names.length) || !available;\n  return pools;\n}\n''')
+
+          replace_once('assets/home-study-subjects-v2-17-stable.js',
+          '''function syncSubjectGroup(card, trackId) {\n''',
+          '''function syncFormatControls(card) {\n  const pools = currentPools(card);\n  const counts = formatCounts(pools);\n  const selected = readFormatSelection();\n  card.querySelectorAll("[data-ux20-format-option]").forEach(button => {\n    const mode = button.dataset.ux20FormatOption;\n    const active = selected === mode;\n    button.classList.toggle("selected", active);\n    button.setAttribute("aria-pressed", String(active));\n    button.disabled = mode !== "all" && counts[mode] === 0;\n  });\n  card.querySelectorAll("[data-ux20-format-count]").forEach(node => {\n    const mode = node.dataset.ux20FormatCount;\n    node.textContent = Number(counts[mode] || 0).toLocaleString("pt-BR");\n  });\n}\n\nfunction syncSubjectGroup(card, trackId) {\n''')
+
+          replace_once('assets/home-study-subjects-v2-17-stable.js',
+          '''  const status = group.querySelector("[data-ux17-subject-status]");\n  if (status) status.textContent = chosen.allMode ? `Todas · ${options.length}` : `${chosen.names.length} de ${options.length}`;\n  updateSummary(card);\n}\n''',
+          '''  const status = group.querySelector("[data-ux17-subject-status]");\n  if (status) status.textContent = chosen.allMode ? `Todas · ${options.length}` : `${chosen.names.length} de ${options.length}`;\n  syncFormatControls(card);\n  updateSummary(card);\n}\n''')
+
+          replace_once('assets/home-study-subjects-v2-17-stable.js',
+          '''  card.querySelectorAll("[data-ux17-subject-button]").forEach(button => button.addEventListener("click", () => {\n    setCustomSubject(card, button.dataset.ux17Track, button.dataset.ux17Subject);\n  }));\n}\n''',
+          '''  card.querySelectorAll("[data-ux17-subject-button]").forEach(button => button.addEventListener("click", () => {\n    setCustomSubject(card, button.dataset.ux17Track, button.dataset.ux17Subject);\n  }));\n\n  card.querySelectorAll("[data-ux20-format-option]").forEach(button => button.addEventListener("click", () => {\n    if (button.disabled) return;\n    saveFormatSelection(button.dataset.ux20FormatOption);\n    renderSubjects(card);\n  }));\n}\n''')
+
+          replace_once('assets/home-study-subjects-v2-17-stable.js',
+          '''  panel.innerHTML = pools.length\n    ? `<div class="ux17-subjects-head"><div><small>Personalize o conteúdo</small><strong>Quais matérias você quer fazer agora?</strong></div><span>“Todas” mantém o recorte completo; tocar numa matéria inicia uma seleção específica.</span></div><div class="ux17-subject-list">${pools.map(pool => subjectGroup(pool, openIds)).join("")}</div>`\n    : "";\n''',
+          '''  panel.innerHTML = pools.length\n    ? `<div class="ux17-subjects-head"><div><small>Personalize o conteúdo</small><strong>Quais matérias e formato você quer fazer agora?</strong></div><span>Combine o recorte do edital, as matérias e o formato das questões.</span></div>${formatPanel(pools)}<div class="ux17-subject-list">${pools.map(pool => subjectGroup(pool, openIds)).join("")}</div>`\n    : "";\n''')
+
+          replace_once('assets/home-study-subjects-v2-17-stable.js',
+          '''  const ids = balancedDailyIds(pools, answeredIds());\n  if (!ids.length) return toast("Não há questões disponíveis para as matérias escolhidas nessa combinação.", "info");\n  const names = pools.map(pool => `${pool.track.label} (${pool.allMode ? "todas" : `${pool.names.length} matérias`})`).join(" + ");\n''',
+          '''  const ids = balancedDailyIds(pools, answeredIds());\n  const formatMode = readFormatSelection();\n  if (!ids.length) return toast("Não há questões disponíveis para as matérias e o formato escolhidos nessa combinação.", "info");\n  const names = pools.map(pool => `${pool.track.label} (${pool.allMode ? "todas" : `${pool.names.length} matérias`})`).join(" + ");\n''')
+
+          replace_once('assets/home-study-subjects-v2-17-stable.js',
+          '''    name: `Estudo de hoje — ${names}`,\n''',
+          '''    name: `Estudo de hoje — ${names}${formatMode === "all" ? "" : ` · ${formatLabel(formatMode)}`}`,\n''')
+          replace_once('assets/home-study-subjects-v2-17-stable.js',
+          '''    source: "Provas/simulados filtrados por edital e pelas matérias escolhidas na Home",\n''',
+          '''    source: `Provas/simulados filtrados por edital, matérias e formato ${formatLabel(formatMode)}`,\n''')
+          replace_once('assets/home-study-subjects-v2-17-stable.js',
+          '''  replacement.textContent = "Começar com estas matérias";\n''',
+          '''  replacement.textContent = "Começar com estes filtros";\n''')
+
+          replace_once('assets/home-study-subjects-v2-17-stable.js',
+          '''ensureData().then(() => window.setTimeout(arm, 120)).catch(error => console.error("Falha ao preparar matérias do Estudo de hoje v2.17:", error));\n''',
+          '''Promise.all([ensureData(), ensureQuestionFormatIndex()])\n  .then(() => window.setTimeout(arm, 120))\n  .catch(error => console.error("Falha ao preparar filtros do Estudo de hoje v2.20:", error));\n''')
+
+          # 3) Estilos do novo filtro.
+          css = Path('assets/home-study-subjects-v2-17.css')
+          css.write_text(css.read_text() + r'''
+.ux20-format{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid var(--line);border-radius:14px;background:var(--panel-2);padding:11px 12px}.ux20-format-copy{display:grid;gap:2px}.ux20-format-copy small{font-size:8px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}.ux20-format-copy strong{font-size:11px}.ux20-format-options{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:7px}.ux20-format-option{appearance:none;display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;background:var(--panel-3);color:var(--text);padding:7px 10px;font:inherit;cursor:pointer}.ux20-format-option span{font-size:9px;font-weight:800}.ux20-format-option small{font-size:8px;color:var(--muted);font-weight:900}.ux20-format-option.selected{border-color:color-mix(in srgb,var(--blue) 62%,var(--line));background:color-mix(in srgb,var(--blue) 10%,var(--panel-3))}.ux20-format-option.selected span:before{content:"✓ ";font-weight:1000}.ux20-format-option:focus-visible{outline:2px solid var(--blue);outline-offset:2px}.ux20-format-option:disabled{opacity:.42;cursor:not-allowed}@media(max-width:760px){.ux20-format{align-items:flex-start;flex-direction:column}.ux20-format-options{width:100%;display:grid;grid-template-columns:1fr}.ux20-format-option{min-height:42px;justify-content:space-between;width:100%}}
+''')
+
+          # 4) Cache-bust e dado mutável do PWA.
+          for path in ['index.html', 'service-worker.js']:
+              p = Path(path)
+              text = p.read_text().replace('home-study-subjects-v2-17.css?v=5', 'home-study-subjects-v2-17.css?v=6').replace('home-study-subjects-v2-17-stable.js?v=5', 'home-study-subjects-v2-17-stable.js?v=6')
+              p.write_text(text)
+          replace_once('service-worker.js',
+            'question-search-index|build-info|release-meta',
+            'question-search-index|question-format-index|build-info|release-meta')
+
+          # 5) Atualiza contrato v2.18 para o novo cache-bust/texto sem perder garantias antigas.
+          p = Path('scripts/validate-home-study-v2-16.mjs')
+          text = p.read_text().replace('home-study-subjects-v2-17\\.css\\?v=5', 'home-study-subjects-v2-17\\.css\\?v=6').replace('home-study-subjects-v2-17-stable\\.js\\?v=5', 'home-study-subjects-v2-17-stable\\.js\\?v=6').replace('cache-bust v5.', 'cache-bust v6.', 2).replace('/Começar com estas matérias/', '/Começar com estes filtros/')
+          p.write_text(text)
+
+          # 6) Allowlist pública.
+          replace_once('playwright.public.config.js',
+            '    "resolver-context-v2-19.spec.js",\n',
+            '    "resolver-context-v2-19.spec.js",\n    "home-question-format-v2-20.spec.js",\n')
+
+          # 7) Validador específico v2.20.
+          Path('scripts/validate-home-question-format-v2-20.mjs').write_text(r'''import fs from "node:fs";
+
+const read = path => fs.readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+const home = read("assets/home-study-subjects-v2-17-stable.js");
+const css = read("assets/home-study-subjects-v2-17.css");
+const index = read("index.html");
+const worker = read("service-worker.js");
+const builder = read("scripts/build-public.mjs");
+const publicConfig = read("playwright.public.config.js");
+const requireText = (text, pattern, message) => { if (!pattern.test(text)) throw new Error(message); };
+
+requireText(index, /home-study-subjects-v2-17\.css\?v=6/, "CSS do filtro v2.20 precisa de cache-bust v6.");
+requireText(index, /home-study-subjects-v2-17-stable\.js\?v=6/, "JS do filtro v2.20 precisa de cache-bust v6.");
+requireText(worker, /home-study-subjects-v2-17\.css\?v=6/, "CSS v2.20 precisa estar no shell PWA.");
+requireText(worker, /home-study-subjects-v2-17-stable\.js\?v=6/, "JS v2.20 precisa estar no shell PWA.");
+requireText(worker, /question-format-index/, "Índice de formato precisa ser dado mutável network-first.");
+requireText(builder, /question-format-index\.json/, "Build público precisa gerar o índice de formato por questão.");
+requireText(builder, /alternatives\.length === 2.*tokens\.has\("certo"\).*tokens\.has\("errado"\)/s, "Classificação C/E precisa considerar a estrutura das alternativas.");
+requireText(builder, /alternatives\.length >= 2.*multiple-choice/s, "Classificação de múltipla escolha ausente.");
+requireText(builder, /missingFormatIds/, "Build precisa exigir identidade 1:1 entre catálogo e índice de formato.");
+requireText(home, /homeStudyFormat\.v1/, "Filtro de formato precisa usar estado temporário próprio.");
+requireText(home, /question-format-index\.json/, "Home precisa carregar o índice de formato derivado.");
+requireText(home, /data-ux20-format-option/, "Controles de formato ausentes.");
+requireText(home, /Certo ou Errado/, "Opção Certo ou Errado ausente.");
+requireText(home, /Múltipla escolha/, "Opção Múltipla escolha ausente.");
+requireText(home, /applyQuestionFormat\(subjectIds, formatMode\)/, "Formato precisa ser aplicado depois do filtro de matérias.");
+requireText(home, /pools\.some\(pool => !pool\.names\.length\) \|\| !available/, "Recorte sem aquele formato não pode bloquear recortes válidos.");
+requireText(home, /Começar com estes filtros/, "CTA precisa refletir matérias + formato.");
+requireText(css, /ux20-format-option/, "Estilos do filtro de formato ausentes.");
+requireText(css, /min-height:42px/, "Filtro de formato precisa ter alvo de toque adequado no mobile.");
+requireText(publicConfig, /home-question-format-v2-20\.spec\.js/, "Teste público v2.20 precisa estar allowlisted.");
+
+const distIndex = new URL("../dist/data/release/question-format-index.json", import.meta.url);
+if (fs.existsSync(distIndex)) {
+  const payload = JSON.parse(fs.readFileSync(distIndex, "utf8"));
+  const formats = payload.formats || {};
+  if (Number(payload.question_count) !== 3447 || Object.keys(formats).length !== 3447) throw new Error("Índice de formato não cobre as 3.447 questões.");
+  if (!Number(payload.summary?.["true-false"]) || !Number(payload.summary?.["multiple-choice"])) throw new Error("Índice precisa conter C/E e múltipla escolha.");
+}
+console.log("✓ Filtro v2.20: Todas, Certo ou Errado e Múltipla escolha por questão, 1:1 com o catálogo.");
+''')
+
+          # 8) Testes locais.
+          Path('tests/home-question-format-v2-20.spec.js').write_text(r'''import {test, expect} from "@playwright/test";
+
+const TRACK_KEY = "sedes.questoes.rodrigo.homeStudyToday.v2";
+const SUBJECT_KEY = "sedes.questoes.rodrigo.homeStudySubjects.v2";
+const FORMAT_KEY = "sedes.questoes.rodrigo.homeStudyFormat.v1";
+const SESSION_KEY = "sedes.questoes.rodrigo.session.v3";
+
+async function prepare(page, tracks = ["prova-202", "prova-400"]) {
+  await page.goto("./#/inicio", {waitUntil: "domcontentloaded"});
+  await expect(page.locator("[data-ux15-home]")).toBeVisible({timeout: 30000});
+  await page.evaluate(({tracks, trackKey, subjectKey, formatKey, sessionKey}) => {
+    localStorage.setItem(trackKey, JSON.stringify(tracks));
+    localStorage.removeItem(sessionKey);
+    sessionStorage.removeItem(subjectKey);
+    sessionStorage.removeItem(formatKey);
+  }, {tracks, trackKey: TRACK_KEY, subjectKey: SUBJECT_KEY, formatKey: FORMAT_KEY, sessionKey: SESSION_KEY});
+  await page.reload({waitUntil: "domcontentloaded"});
+  await expect(page.locator("[data-ux20-format]")).toBeVisible({timeout: 30000});
+}
+
+async function formatIndex(request) {
+  const response = await request.get("./data/release/question-format-index.json");
+  expect(response.ok()).toBeTruthy();
+  return response.json();
+}
+
+test("Home oferece Todas, Certo ou Errado e Múltipla escolha com contagens", async ({page, request}) => {
+  await prepare(page);
+  const panel = page.locator("[data-ux20-format]");
+  await expect(panel.locator("[data-ux20-format-option]")).toHaveCount(3);
+  await expect(panel.locator('[data-ux20-format-option="all"]')).toHaveAttribute("aria-pressed", "true");
+  await expect(panel).toContainText("Certo ou Errado");
+  await expect(panel).toContainText("Múltipla escolha");
+  const index = await formatIndex(request);
+  expect(index.question_count).toBe(3447);
+  expect(index.summary["true-false"]).toBeGreaterThan(0);
+  expect(index.summary["multiple-choice"]).toBeGreaterThan(0);
+});
+
+for (const mode of ["true-false", "multiple-choice"]) {
+  test(`sessão respeita exclusivamente o formato ${mode}`, async ({page, request}) => {
+    await prepare(page);
+    const index = await formatIndex(request);
+    const button = page.locator(`[data-ux20-format-option="${mode}"]`);
+    await expect(button).toBeEnabled();
+    await button.click();
+    await expect(button).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator("[data-ux16-summary]")).toContainText(mode === "true-false" ? "Certo ou Errado" : "Múltipla escolha");
+    await page.locator("[data-ux17-start]").click();
+    await page.waitForURL(/#\/resolver/, {timeout: 30000});
+    const session = await page.evaluate(key => JSON.parse(localStorage.getItem(key)), SESSION_KEY);
+    expect(session.questionIds.length).toBeGreaterThan(0);
+    expect(session.questionIds.length).toBeLessThanOrEqual(25);
+    for (const id of session.questionIds) expect(index.formats[id], id).toBe(mode);
+  });
+}
+
+test("formato é temporário e não altera a seleção permanente de trilhas", async ({page}) => {
+  await prepare(page, ["prova-400"]);
+  await page.locator('[data-ux20-format-option="multiple-choice"]').click();
+  const values = await page.evaluate(({formatKey, trackKey}) => ({
+    format: sessionStorage.getItem(formatKey),
+    tracks: JSON.parse(localStorage.getItem(trackKey)),
+  }), {formatKey: FORMAT_KEY, trackKey: TRACK_KEY});
+  expect(values.format).toBe("multiple-choice");
+  expect(values.tracks).toEqual(["prova-400"]);
+});
+
+test.describe("mobile", () => {
+  test.use({viewport: {width: 390, height: 844}, isMobile: true, hasTouch: true});
+  test("filtro de formato usa botões tocáveis sem overflow", async ({page}) => {
+    const errors = [];
+    page.on("pageerror", error => errors.push(error.message));
+    await prepare(page);
+    await page.locator('[data-ux20-format-option="true-false"]').tap();
+    await expect(page.locator('[data-ux20-format-option="true-false"]')).toHaveAttribute("aria-pressed", "true");
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow).toBeLessThanOrEqual(1);
+    expect(errors).toEqual([]);
+  });
+});
+''')
+
+          # 9) Teste público.
+          Path('tests-public/home-question-format-v2-20.spec.js').write_text(r'''import {test, expect} from "@playwright/test";
+
+const TRACK_KEY = "sedes.questoes.rodrigo.homeStudyToday.v2";
+const SUBJECT_KEY = "sedes.questoes.rodrigo.homeStudySubjects.v2";
+const FORMAT_KEY = "sedes.questoes.rodrigo.homeStudyFormat.v1";
+const SESSION_KEY = "sedes.questoes.rodrigo.session.v3";
+
+async function prepare(page) {
+  await page.goto("./#/inicio", {waitUntil: "domcontentloaded"});
+  await expect(page.locator("[data-ux15-home]")).toBeVisible({timeout: 30000});
+  await page.evaluate(({trackKey, subjectKey, formatKey, sessionKey}) => {
+    localStorage.setItem(trackKey, JSON.stringify(["prova-202", "prova-400"]));
+    localStorage.removeItem(sessionKey);
+    sessionStorage.removeItem(subjectKey);
+    sessionStorage.removeItem(formatKey);
+  }, {trackKey: TRACK_KEY, subjectKey: SUBJECT_KEY, formatKey: FORMAT_KEY, sessionKey: SESSION_KEY});
+  await page.reload({waitUntil: "domcontentloaded"});
+  await expect(page.locator("[data-ux20-format]")).toBeVisible({timeout: 30000});
+}
+
+test("site público filtra sessões por Certo/Errado e Múltipla escolha", async ({page, request}) => {
+  const response = await request.get("./data/release/question-format-index.json");
+  expect(response.ok()).toBeTruthy();
+  const index = await response.json();
+  expect(index.question_count).toBe(3447);
+
+  for (const mode of ["true-false", "multiple-choice"]) {
+    await prepare(page);
+    const button = page.locator(`[data-ux20-format-option="${mode}"]`);
+    await expect(button).toBeEnabled();
+    await button.click();
+    await page.locator("[data-ux17-start]").click();
+    await page.waitForURL(/#\/resolver/, {timeout: 30000});
+    const session = await page.evaluate(key => JSON.parse(localStorage.getItem(key)), SESSION_KEY);
+    expect(session.questionIds.length).toBeGreaterThan(0);
+    for (const id of session.questionIds) expect(index.formats[id], `${mode}:${id}`).toBe(mode);
+  }
+});
+''')
+          PY
+
+          node --check assets/home-study-subjects-v2-17-stable.js
+          node --check scripts/build-public.mjs
+          node --check scripts/validate-home-question-format-v2-20.mjs
+          node scripts/build-question-search-index.mjs
+          GITHUB_SHA="$(git rev-parse HEAD)" node scripts/build-public.mjs
+          node scripts/validate-home-study-v2-16.mjs
+          node scripts/validate-home-question-format-v2-20.mjs
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/home-study-subjects-v2-17-stable.js assets/home-study-subjects-v2-17.css index.html service-worker.js scripts/build-public.mjs scripts/validate-home-study-v2-16.mjs scripts/validate-home-question-format-v2-20.mjs playwright.public.config.js tests/home-question-format-v2-20.spec.js tests-public/home-question-format-v2-20.spec.js
+          git commit -m "feat: filtrar questões por formato na Home"
+          git push origin HEAD:agent/filtro-formato-questoes-v2-20
