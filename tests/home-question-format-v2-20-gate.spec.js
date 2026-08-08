@@ -18,10 +18,13 @@ test("índice atrasado não pode trocar a matéria selecionada", async ({page}) 
   });
 
   await page.addInitScript(({trackKey, subjectKey, formatKey, sessionKey}) => {
+    const setupKey = "__sedes.v220.gate.setup";
+    if (sessionStorage.getItem(setupKey)) return;
     localStorage.setItem(trackKey, JSON.stringify(["prova-202"]));
     localStorage.removeItem(sessionKey);
     sessionStorage.removeItem(subjectKey);
     sessionStorage.removeItem(formatKey);
+    sessionStorage.setItem(setupKey, "1");
   }, {trackKey: TRACK_KEY, subjectKey: SUBJECT_KEY, formatKey: FORMAT_KEY, sessionKey: SESSION_KEY});
 
   await page.goto("./#/inicio", {waitUntil: "domcontentloaded"});
@@ -50,5 +53,6 @@ test("índice atrasado não pode trocar a matéria selecionada", async ({page}) 
   await page.locator("[data-ux17-start]").click();
   await page.waitForURL(/#\/resolver/, {timeout: 30000});
   const session = await page.evaluate(key => JSON.parse(localStorage.getItem(key)), SESSION_KEY);
+  expect(session).toBeTruthy();
   expect(session.material.disciplina).toBe(selectedSubject);
 });
