@@ -1,0 +1,46 @@
+name: Auditar gesto touch real
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  audit:
+    if: github.event.pull_request.head.ref == 'agent/audit-touch-gesture-v2-17'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout da auditoria
+        uses: actions/checkout@v4
+        with:
+          ref: agent/audit-touch-gesture-v2-17
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Preservar release editorial
+        run: |
+          sha256sum data/release/catalogo.json > /tmp/catalog.sha256
+          find data/release/materials -type f -name '*.json' -print0 | sort -z | xargs -0 sha256sum > /tmp/materials.sha256
+      - name: Gerar pacote público sem rebuild editorial
+        run: |
+          node scripts/build-question-search-index.mjs
+          node scripts/build-public.mjs
+          node scripts/reconcile-discursive-release-meta.mjs
+          node scripts/reconcile-public-metadata.mjs
+          sha256sum -c /tmp/catalog.sha256
+          sha256sum -c /tmp/materials.sha256
+      - name: Instalar Playwright
+        run: |
+          npm install --no-save @playwright/test
+          npx playwright install --with-deps chromium
+      - name: Subir dist local
+        run: |
+          python3 -m http.server 4173 --directory dist > /tmp/sedes-audit-http.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/sedes-audit-http.log
+          exit 1
+      - name: Gesto touch real em múltiplas larguras
+        run: timeout 180s npx playwright test tests/audit-touch-gesture-v2-17.spec.js --config=playwright.config.js --workers=1
