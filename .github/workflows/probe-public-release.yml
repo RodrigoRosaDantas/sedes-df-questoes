@@ -1,0 +1,28 @@
+name: Sonda release pública UX
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Consultar build público
+        run: |
+          curl -fsSL --retry 3 --retry-delay 2 'https://rodrigorosadantas.github.io/sedes-df-questoes/data/release/build-info.json?probe=${{ github.run_id }}' -o /tmp/build.json
+          curl -fsSL --retry 3 --retry-delay 2 'https://rodrigorosadantas.github.io/sedes-df-questoes/data/release/release-meta.json?probe=${{ github.run_id }}' -o /tmp/meta.json
+          node - <<'NODE'
+          const fs=require('fs');
+          const build=JSON.parse(fs.readFileSync('/tmp/build.json','utf8'));
+          const meta=JSON.parse(fs.readFileSync('/tmp/meta.json','utf8'));
+          console.log('PUBLIC_SOURCE_SHA=' + build.source_sha);
+          console.log('PUBLIC_QUESTIONS=' + build.questions);
+          console.log('PUBLIC_MATERIALS=' + build.materials);
+          console.log('PUBLIC_BANCO_MESTRE=' + meta.banco_mestre);
+          console.log('PUBLIC_AWAITING_AUDIT=' + meta.awaiting_audit);
+          if (Number(build.questions)!==3447 || Number(build.materials)!==75 || Number(meta.banco_mestre)!==3449 || Number(meta.awaiting_audit)!==0) process.exit(1);
+          NODE
