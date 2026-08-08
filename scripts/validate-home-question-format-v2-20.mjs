@@ -27,6 +27,9 @@ requireText(home, /applyQuestionFormat\(subjectIds, formatMode\)/, "Formato prec
 requireText(home, /pools\.some\(pool => !pool\.names\.length\) \|\| !available/, "Recorte sem aquele formato não pode bloquear recortes válidos.");
 requireText(home, /activeTracks = pools\.filter\(pool => pool\.ids\.length\)/, "Tipo da sessão deve considerar apenas recortes que realmente contribuíram com questões.");
 requireText(home, /const stable = card\.dataset\.ux17Ready[\s\S]*card\.querySelector\("\[data-ux20-format\]"\)/, "Watchdog precisa recuperar o filtro de formato se a Home for redesenhada.");
+requireText(home, /ensureData\(\)[\s\S]*window\.setTimeout\(arm, 120\)[\s\S]*loadFormatIndexAndRefresh\(\)/, "Home e matérias precisam subir sem depender do índice de formato.");
+requireText(home, /questionFormatPromise = null;[\s\S]*throw error/, "Falha do índice de formato precisa liberar nova tentativa.");
+requireText(home, /setTimeout\(\(\) => \{[\s\S]*loadFormatIndexAndRefresh\(\);[\s\S]*\}, 1200\)/, "Índice de formato precisa ter retry não bloqueante.");
 requireText(home, /Começar com estes filtros/, "CTA precisa refletir matérias + formato.");
 requireText(css, /ux20-format-option/, "Estilos do filtro de formato ausentes.");
 requireText(css, /min-height:42px/, "Filtro de formato precisa ter alvo de toque adequado no mobile.");
@@ -40,4 +43,4 @@ if (fs.existsSync(distIndex)) {
   if (!Number(payload.summary?.["true-false"]) || !Number(payload.summary?.["multiple-choice"])) throw new Error("Índice precisa conter C/E e múltipla escolha.");
 }
 
-console.log("✓ Filtro v2.20: Todas, Certo ou Errado e Múltipla escolha por questão, 1:1 com o catálogo e recuperação de rerender.");
+console.log("✓ Filtro v2.20: formatos 1:1, recuperação de rerender e bootstrap resiliente sem bloquear a Home.");
