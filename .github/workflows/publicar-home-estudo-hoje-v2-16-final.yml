@@ -1,0 +1,108 @@
+name: Publicar Estudo de hoje v2.16 — final
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main canônica
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Congelar release editorial
+        run: |
+          sha256sum data/release/catalogo.json > /tmp/catalog.sha256
+          find data/release/materials -type f -name '*.json' -print0 | sort -z | xargs -0 sha256sum > /tmp/materials.sha256
+
+      - name: Gerar pacote público canônico
+        id: package
+        run: |
+          MAIN_SHA=$(git rev-parse HEAD)
+          node scripts/build-question-search-index.mjs
+          GITHUB_SHA="$MAIN_SHA" node scripts/build-public.mjs
+          node scripts/reconcile-discursive-release-meta.mjs
+          node scripts/reconcile-public-metadata.mjs
+          sha256sum -c /tmp/catalog.sha256
+          sha256sum -c /tmp/materials.sha256
+          SOURCE_SHA=$(node -e "const fs=require('fs'); const x=JSON.parse(fs.readFileSync('dist/data/release/build-info.json','utf8')); process.stdout.write(String(x.source_sha||''))")
+          test "$SOURCE_SHA" = "$MAIN_SHA"
+          echo "source_sha=$SOURCE_SHA" >> "$GITHUB_OUTPUT"
+          node - <<'NODE'
+          const fs=require('fs');
+          const catalog=JSON.parse(fs.readFileSync('dist/data/release/catalogo.json','utf8'));
+          const meta=JSON.parse(fs.readFileSync('dist/data/release/release-meta.json','utf8'));
+          const questions=Object.keys(catalog.question_index||{}).length;
+          if(questions!==3447) throw new Error(`Questões: ${questions}`);
+          if((catalog.materials||[]).length!==75) throw new Error(`Materiais: ${(catalog.materials||[]).length}`);
+          if(Number(meta.banco_mestre)!==3449 || Number(meta.awaiting_audit)!==0) throw new Error('Release-meta divergente');
+          console.log(`Release preservada: Banco ${meta.banco_mestre}, ${questions} questões, ${(catalog.materials||[]).length} materiais, ${meta.awaiting_audit} auditoria.`);
+          NODE
+
+      - name: Validar contratos críticos
+        run: |
+          node --check assets/home-study-today-v2-16.js
+          node --check assets/navigation-v2-15.js
+          node --check assets/navigation-v2-15-polish.js
+          node --check assets/ux-v2-14.js
+          node --check assets/ux-v2-14-guardrails.js
+          node scripts/validate-home-study-v2-16.mjs
+          node scripts/validate-runtime-catalog.mjs
+          node scripts/validate-platform-v2-13.mjs
+          node scripts/validate-ux-v2-14.mjs
+          node scripts/validate-navigation-v2-15.mjs
+          node scripts/validate-dist-v2-10.mjs
+          node scripts/validate-public-metadata-consistency.mjs
+
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Publicar GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Instalar Playwright
+        run: |
+          npm install --no-save @playwright/test
+          npx playwright install --with-deps chromium
+
+      - name: Executar suíte pública completa
+        env:
+          PUBLIC_BASE_URL: ${{ steps.deployment.outputs.page_url }}
+          EXPECTED_SHA: ${{ steps.package.outputs.source_sha }}
+        run: npx playwright test --config=playwright.public.config.js
+
+      - name: Confirmar SHA e totais servidos
+        env:
+          EXPECTED_SHA: ${{ steps.package.outputs.source_sha }}
+        run: |
+          curl -fsSL --retry 5 --retry-delay 2 "https://rodrigorosadantas.github.io/sedes-df-questoes/data/release/build-info.json?final=${GITHUB_RUN_ID}" -o /tmp/public-build.json
+          curl -fsSL --retry 5 --retry-delay 2 "https://rodrigorosadantas.github.io/sedes-df-questoes/data/release/release-meta.json?final=${GITHUB_RUN_ID}" -o /tmp/public-meta.json
+          node - <<'NODE'
+          const fs=require('fs');
+          const build=JSON.parse(fs.readFileSync('/tmp/public-build.json','utf8'));
+          const meta=JSON.parse(fs.readFileSync('/tmp/public-meta.json','utf8'));
+          const expected=process.env.EXPECTED_SHA;
+          if(build.source_sha!==expected) throw new Error(`SHA público ${build.source_sha} != ${expected}`);
+          if(Number(build.questions)!==3447 || Number(build.materials)!==75 || Number(meta.banco_mestre)!==3449 || Number(meta.awaiting_audit)!==0) throw new Error('Totais públicos divergentes');
+          console.log(`PUBLIC_SOURCE_SHA=${build.source_sha}`);
+          console.log('PUBLIC_RELEASE=3447 questões | 75 materiais | Banco 3449 | 0 auditoria');
+          NODE
