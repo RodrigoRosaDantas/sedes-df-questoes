@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "operation": "ux-v2.14-v2.15-premerge-validation",
+  "validated_at": "2026-08-08T00:06:55Z",
+  "branch": "agent/ux-study-redesign-v2-14",
+  "head_sha": "c9cf8e9a270406369fda300cf94c792f9e20b29e",
+  "workflow": {
+    "name": "UX one-shot — validar e publicar",
+    "run_id": 31229134121,
+    "conclusion": "success"
+  },
+  "release_integrity": {
+    "banco_mestre": 3449,
+    "questions": 3447,
+    "discursive_display_only": 2,
+    "materials": 75,
+    "proofs": 40,
+    "simulations": 35,
+    "awaiting_audit": 0,
+    "catalog_sha256_preserved": true,
+    "all_material_sha256_preserved": true,
+    "question_search_index_identity_1_to_1": true
+  },
+  "validation": {
+    "static_contracts": "success",
+    "playwright_local": {
+      "passed": 30,
+      "failed": 0
+    }
+  },
+  "publication_authorization": "explicit-user-request",
+  "permanent_automation_mode": "manual_only"
+}
