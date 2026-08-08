@@ -15,7 +15,8 @@ requireText(index, /resolver-context-v2-19\.css\?v=1/, "CSS v2.19 não está con
 requireText(index, /resolver-context-v2-19\.js\?v=1/, "JS v2.19 não está conectado ao index.");
 requireText(worker, /resolver-context-v2-19\.css\?v=1/, "CSS v2.19 não está no shell PWA.");
 requireText(worker, /resolver-context-v2-19\.js\?v=1/, "JS v2.19 não está no shell PWA.");
-requireText(script, /currentRoute\(\).*===\s*["']resultado["']/s, "A conclusão precisa detectar a rota de resultado.");
+requireText(script, /const route = currentRoute\(\)/, "O módulo precisa ler a rota atual.");
+requireText(script, /route === ["']resultado["']/, "A conclusão precisa detectar a rota de resultado.");
 requireText(script, /sessionStorage\.removeItem\(profileKey\(suffix\)\)/, "A seleção temporária de matérias deve ser limpa ao concluir.");
 requireText(script, /homeStudySubjects\.v2/, "A chave temporária v2 precisa ser limpa após a conclusão.");
 requireText(script, /state\.catalog\?\.question_index/, "A origem da questão deve vir do question_index publicado.");
