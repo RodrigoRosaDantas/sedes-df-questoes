@@ -1,0 +1,107 @@
+name: Aplicar hotfix do filtro v2.20
+
+on:
+  push:
+    branches: [agent/hotfix-filtro-formato-v2-20]
+    paths:
+      - .github/workflows/_tmp_apply_hotfix_format_v2_20.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/hotfix-filtro-formato-v2-20
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Aplicar hotfix e regressão determinística
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              p=Path(path)
+              text=p.read_text()
+              if text.count(old)!=1:
+                  raise SystemExit(f"marcador não único em {path}: {text.count(old)}")
+              p.write_text(text.replace(old,new,1))
+
+          js='assets/home-study-subjects-v2-17-stable.js'
+          marker='''function syncSubjectGroup(card, trackId) {\n'''
+          insert='''function syncSubjectCounts(card) {\n  const formatMode = readFormatSelection();\n  card.querySelectorAll("[data-ux17-subject-button]").forEach(button => {\n    const track = TRACKS.find(item => item.id === button.dataset.ux17Track);\n    if (!track) return;\n    const option = subjectOptions(track).find(item => item.name === button.dataset.ux17Subject);\n    const count = button.querySelector("small");\n    if (option && count) count.textContent = applyQuestionFormat(option.ids, formatMode).length.toLocaleString("pt-BR");\n  });\n}\n\nfunction syncSubjectGroup(card, trackId) {\n'''
+          replace_once(js, marker, insert)
+
+          old='''function refreshAfterFormatIndex() {\n  if (formatRetryTimer) {\n    window.clearTimeout(formatRetryTimer);\n    formatRetryTimer = null;\n  }\n  const card = document.querySelector("#app > [data-ux15-home] [data-ux-today][data-ux16-ready]");\n  if (card) renderSubjects(card);\n}\n'''
+          new='''function refreshAfterFormatIndex() {\n  if (formatRetryTimer) {\n    window.clearTimeout(formatRetryTimer);\n    formatRetryTimer = null;\n  }\n  const card = document.querySelector("#app > [data-ux15-home] [data-ux-today][data-ux16-ready]");\n  if (!card) return;\n  if (!card.querySelector("[data-ux17-subjects]") || !card.querySelector("[data-ux20-format]")) {\n    enhanceCard(card);\n    return;\n  }\n  syncFormatControls(card);\n  syncSubjectCounts(card);\n  updateSummary(card);\n}\n'''
+          replace_once(js,old,new)
+
+          validator='scripts/validate-home-question-format-v2-20.mjs'
+          p=Path(validator)
+          text=p.read_text()
+          anchor='''requireText(home, /questionFormatPromise = null;[\\s\\S]*throw error/, "Falha do índice de formato precisa liberar nova tentativa.");\n'''
+          addition=anchor+'''requireText(home, /function syncSubjectCounts\\(card\\)/, "Conclusão do índice deve atualizar contagens sem recriar chips.");\nrequireText(home, /function refreshAfterFormatIndex\\(\\) \\{[\\s\\S]*syncFormatControls\\(card\\);[\\s\\S]*syncSubjectCounts\\(card\\);[\\s\\S]*updateSummary\\(card\\);[\\s\\S]*\\}/, "Refresh do índice precisa sincronizar o DOM in-place.");\nif (/function refreshAfterFormatIndex\\(\\) \\{[\\s\\S]*if \\(card\\) renderSubjects\\(card\\)/.test(home)) throw new Error("Regressão: chegada do índice não pode reconstruir o painel de matérias.");\n'''
+          if text.count(anchor)!=1:
+              raise SystemExit('âncora do validador não encontrada')
+          p.write_text(text.replace(anchor,addition,1))
+
+          test='tests/home-question-format-v2-20.spec.js'
+          p=Path(test)
+          text=p.read_text()
+          append=r'''
+
+test("chegada tardia do índice não troca a matéria selecionada", async ({page}) => {
+  let releaseIndex;
+  const gate = new Promise(resolve => { releaseIndex = resolve; });
+  await page.route("**/data/release/question-format-index.json", async route => {
+    await gate;
+    await route.continue();
+  });
+
+  await page.goto("./#/inicio", {waitUntil: "domcontentloaded"});
+  await expect(page.locator("[data-ux15-home]")).toBeVisible({timeout: 30000});
+  await page.evaluate(({trackKey, subjectKey, formatKey, sessionKey}) => {
+    localStorage.setItem(trackKey, JSON.stringify(["prova-202"]));
+    localStorage.removeItem(sessionKey);
+    sessionStorage.removeItem(subjectKey);
+    sessionStorage.removeItem(formatKey);
+  }, {trackKey: TRACK_KEY, subjectKey: SUBJECT_KEY, formatKey: FORMAT_KEY, sessionKey: SESSION_KEY});
+  await page.reload({waitUntil: "domcontentloaded"});
+
+  const group = page.locator('[data-ux17-subject-group="prova-202"]');
+  await expect(group).toBeVisible({timeout: 30000});
+  await group.locator("summary").click();
+  const chip = group.locator("[data-ux17-subject-button]").nth(1);
+  const selectedSubject = await chip.getAttribute("data-ux17-subject");
+  expect(selectedSubject).toBeTruthy();
+  await chip.click();
+  await expect(group.locator('[data-ux17-subject-button][aria-pressed="true"]')).toHaveAttribute("data-ux17-subject", selectedSubject);
+
+  releaseIndex();
+  await expect(page.locator('[data-ux20-format-option="true-false"]')).toBeEnabled({timeout: 30000});
+  await expect(group.locator('[data-ux17-subject-button][aria-pressed="true"]')).toHaveAttribute("data-ux17-subject", selectedSubject);
+  await page.locator("[data-ux17-start]").click();
+  await page.waitForURL(/#\/resolver/, {timeout: 30000});
+  const session = await page.evaluate(key => JSON.parse(localStorage.getItem(key)), SESSION_KEY);
+  expect(session.material.disciplina).toBe(selectedSubject);
+});
+'''
+          if 'chegada tardia do índice não troca a matéria selecionada' not in text:
+              p.write_text(text+append)
+          PY
+
+          node --check assets/home-study-subjects-v2-17-stable.js
+          node scripts/validate-home-question-format-v2-20.mjs
+
+          rm .github/workflows/_tmp_apply_hotfix_format_v2_20.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/home-study-subjects-v2-17-stable.js scripts/validate-home-question-format-v2-20.mjs tests/home-question-format-v2-20.spec.js .github/workflows/_tmp_apply_hotfix_format_v2_20.yml
+          git commit -m "fix: evitar rerender concorrente ao carregar formatos"
+          git push origin HEAD:agent/hotfix-filtro-formato-v2-20
