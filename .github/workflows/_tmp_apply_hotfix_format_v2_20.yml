@@ -1,16 +1,15 @@
 name: Aplicar hotfix do filtro v2.20
 
 on:
-  push:
-    branches: [agent/hotfix-filtro-formato-v2-20]
-    paths:
-      - .github/workflows/_tmp_apply_hotfix_format_v2_20.yml
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: write
 
 jobs:
   apply:
+    if: github.event.pull_request.head.ref == 'agent/hotfix-filtro-formato-v2-20'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
