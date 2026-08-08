@@ -1,0 +1,218 @@
+name: Patch scroll fix
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.event.pull_request.head.ref == 'agent/operar-fix-scroll-materias-v2-17'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/fix-scroll-materias-v2-17
+          fetch-depth: 0
+      - name: Aplicar correção estrutural
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          js = Path('assets/home-study-subjects-v2-17-stable.js')
+          s = js.read_text()
+          old = '''function setCustomSubject(card, trackId, subjectName) {
+            const track = TRACKS.find(item => item.id === trackId);
+            if (!track) return;
+            const options = subjectOptions(track);
+            const valid = new Set(options.map(option => option.name));
+            if (!valid.has(subjectName)) return;
+            const selection = readTempSelection();
+            const stored = selection[trackId];
+
+            if (!Array.isArray(stored)) {
+              selection[trackId] = [subjectName];
+            } else if (stored.includes(subjectName)) {
+              selection[trackId] = stored.filter(name => name !== subjectName);
+            } else {
+              selection[trackId] = [...stored, subjectName];
+            }
+
+            const normalized = [...new Set(selection[trackId].filter(name => valid.has(name)))];
+            if (normalized.length === options.length && options.length) delete selection[trackId];
+            else selection[trackId] = normalized;
+            saveTempSelection(selection);
+            renderSubjects(card, trackId);
+          }
+
+          function bindSubjectControls(card) {
+            card.querySelectorAll("[data-ux17-all]").forEach(button => button.addEventListener("click", () => {
+              const trackId = button.dataset.ux17All;
+              const selection = readTempSelection();
+              delete selection[trackId];
+              saveTempSelection(selection);
+              renderSubjects(card, trackId);
+            }));
+
+            card.querySelectorAll("[data-ux17-clear]").forEach(button => button.addEventListener("click", () => {
+              const trackId = button.dataset.ux17Clear;
+              const selection = readTempSelection();
+              selection[trackId] = [];
+              saveTempSelection(selection);
+              renderSubjects(card, trackId);
+            }));
+
+            card.querySelectorAll("[data-ux17-subject-button]").forEach(button => button.addEventListener("click", () => {
+              setCustomSubject(card, button.dataset.ux17Track, button.dataset.ux17Subject);
+            }));
+          }
+'''
+          new = '''function syncSubjectGroup(card, trackId) {
+            const track = TRACKS.find(item => item.id === trackId);
+            const group = card.querySelector(`[data-ux17-subject-group="${CSS.escape(trackId)}"]`);
+            if (!track || !group) return;
+            const options = subjectOptions(track);
+            const chosen = selectionForTrack(track, options, readTempSelection());
+            const selected = new Set(chosen.allMode ? [] : chosen.names);
+
+            group.querySelectorAll("[data-ux17-subject-button]").forEach(button => {
+              const active = selected.has(button.dataset.ux17Subject);
+              button.classList.toggle("selected", active);
+              button.setAttribute("aria-pressed", String(active));
+            });
+
+            const allButton = group.querySelector(`[data-ux17-all="${CSS.escape(trackId)}"]`);
+            if (allButton) {
+              allButton.classList.toggle("selected", chosen.allMode);
+              allButton.setAttribute("aria-pressed", String(chosen.allMode));
+            }
+
+            const status = group.querySelector("[data-ux17-subject-status]");
+            if (status) status.textContent = chosen.allMode ? `Todas · ${options.length}` : `${chosen.names.length} de ${options.length}`;
+            updateSummary(card);
+          }
+
+          function setCustomSubject(card, trackId, subjectName) {
+            const track = TRACKS.find(item => item.id === trackId);
+            if (!track) return;
+            const options = subjectOptions(track);
+            const valid = new Set(options.map(option => option.name));
+            if (!valid.has(subjectName)) return;
+            const selection = readTempSelection();
+            const stored = selection[trackId];
+
+            if (!Array.isArray(stored)) {
+              selection[trackId] = [subjectName];
+            } else if (stored.includes(subjectName)) {
+              selection[trackId] = stored.filter(name => name !== subjectName);
+            } else {
+              selection[trackId] = [...stored, subjectName];
+            }
+
+            const normalized = [...new Set(selection[trackId].filter(name => valid.has(name)))];
+            if (normalized.length === options.length && options.length) delete selection[trackId];
+            else selection[trackId] = normalized;
+            saveTempSelection(selection);
+            syncSubjectGroup(card, trackId);
+          }
+
+          function bindSubjectControls(card) {
+            card.querySelectorAll("[data-ux17-all]").forEach(button => button.addEventListener("click", () => {
+              const trackId = button.dataset.ux17All;
+              const selection = readTempSelection();
+              delete selection[trackId];
+              saveTempSelection(selection);
+              syncSubjectGroup(card, trackId);
+            }));
+
+            card.querySelectorAll("[data-ux17-clear]").forEach(button => button.addEventListener("click", () => {
+              const trackId = button.dataset.ux17Clear;
+              const selection = readTempSelection();
+              selection[trackId] = [];
+              saveTempSelection(selection);
+              syncSubjectGroup(card, trackId);
+            }));
+
+            card.querySelectorAll("[data-ux17-subject-button]").forEach(button => button.addEventListener("click", () => {
+              setCustomSubject(card, button.dataset.ux17Track, button.dataset.ux17Subject);
+            }));
+          }
+'''
+          if old not in s:
+            raise SystemExit('bloco esperado do seletor não encontrado')
+          js.write_text(s.replace(old, new))
+
+          index = Path('index.html')
+          s = index.read_text().replace('home-study-subjects-v2-17.css?v=2', 'home-study-subjects-v2-17.css?v=3').replace('home-study-subjects-v2-17-stable.js?v=2', 'home-study-subjects-v2-17-stable.js?v=3')
+          index.write_text(s)
+
+          sw = Path('service-worker.js')
+          s = sw.read_text().replace('home-study-subjects-v2-17.css?v=2', 'home-study-subjects-v2-17.css?v=3').replace('home-study-subjects-v2-17-stable.js?v=2', 'home-study-subjects-v2-17-stable.js?v=3')
+          sw.write_text(s)
+
+          test = Path('tests/home-study-subjects-v2-17.spec.js')
+          s = test.read_text()
+          marker = '''  test("toque em matéria funciona sem overflow nem erro de página", async ({page}) => {'''
+          extra = '''  test("rolagem da lista permanece estável ao selecionar matérias", async ({page}) => {
+            const errors = [];
+            page.on("pageerror", error => errors.push(error.message));
+            await openHome(page);
+            await setTracks(page, ["prova-202"]);
+            const group = page.locator('[data-ux17-subject-group="prova-202"]');
+            await group.locator("summary").tap();
+            const chips = group.locator(".ux17-subject-chips");
+            await expect(chips).toBeVisible();
+            await chips.evaluate(node => { node.scrollTop = node.scrollHeight; });
+            const before = await chips.evaluate(node => node.scrollTop);
+            expect(before).toBeGreaterThan(0);
+            const last = group.locator("[data-ux17-subject-button]").last();
+            await last.tap();
+            const after = await chips.evaluate(node => node.scrollTop);
+            expect(after).toBeGreaterThanOrEqual(Math.max(0, before - 2));
+            await expect(last).toHaveAttribute("aria-pressed", "true");
+            expect(errors).toEqual([]);
+          });
+
+'''
+          if extra not in s:
+            s = s.replace(marker, extra + marker)
+          test.write_text(s)
+
+          public = Path('tests-public/home-study-subjects-v2-17.spec.js')
+          s = public.read_text()
+          marker = '''  test("toque seleciona e remove matéria sem erro", async ({page}) => {'''
+          extra = '''  test("rolagem da lista não volta ao topo ao selecionar matéria", async ({page}) => {
+            const errors = [];
+            page.on("pageerror", error => errors.push(error.message));
+            await page.goto("./#/inicio", {waitUntil: "domcontentloaded"});
+            await expect(page.locator("[data-ux17-subjects]")).toBeVisible({timeout: 30000});
+            const group = page.locator('[data-ux17-subject-group="prova-202"]');
+            await group.locator("summary").tap();
+            const chips = group.locator(".ux17-subject-chips");
+            await chips.evaluate(node => { node.scrollTop = node.scrollHeight; });
+            const before = await chips.evaluate(node => node.scrollTop);
+            expect(before).toBeGreaterThan(0);
+            const last = group.locator("[data-ux17-subject-button]").last();
+            await last.tap();
+            const after = await chips.evaluate(node => node.scrollTop);
+            expect(after).toBeGreaterThanOrEqual(Math.max(0, before - 2));
+            await expect(last).toHaveAttribute("aria-pressed", "true");
+            expect(errors).toEqual([]);
+          });
+
+'''
+          if extra not in s:
+            s = s.replace(marker, extra + marker)
+          public.write_text(s)
+          PY
+      - name: Validar sintaxe e diff
+        run: |
+          node --check assets/home-study-subjects-v2-17-stable.js
+          git diff --check
+      - name: Commitar na branch funcional
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/home-study-subjects-v2-17-stable.js tests/home-study-subjects-v2-17.spec.js tests-public/home-study-subjects-v2-17.spec.js index.html service-worker.js
+          git commit -m 'fix: preservar rolagem ao selecionar matérias'
+          git push origin HEAD:agent/fix-scroll-materias-v2-17
