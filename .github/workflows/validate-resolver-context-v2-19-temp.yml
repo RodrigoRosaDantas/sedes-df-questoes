@@ -23,6 +23,7 @@ jobs:
 
       - name: Congelar release editorial
         run: |
+          echo "rerun=2"
           sha256sum data/release/catalogo.json > /tmp/catalog.sha256
           find data/release/materials -type f -name '*.json' -print0 | sort -z | xargs -0 sha256sum > /tmp/materials.sha256
 
