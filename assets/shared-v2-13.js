@@ -64,13 +64,14 @@ export const allQuestionIds = () => {
 };
 export const activeSession = () => readJSON(profileKey("session.v3"), null);
 export const activeHistory = () => readJSON(profileKey("history.v3"), []);
-export const createCompatibleSession = ({id, name, questionIds, questions = null, mode = "treino", minutes = questionIds.length * 2, discipline = "Múltiplas matérias", source = "Plataforma SEDES/DF", cargo = "multicargo"}) => {
+export const createCompatibleSession = ({id, name, questionIds, questions = null, mode = "treino", minutes = questionIds.length * 2, discipline = "Múltiplas matérias", source = "Plataforma SEDES/DF", cargo = "multicargo", materialType = "simulado"}) => {
   if (!questionIds?.length) return false;
   const existing = activeSession();
   if (existing && !confirm("Existe uma tentativa salva. Deseja substituí-la por esta sessão?")) return false;
+  const normalizedMaterialType = String(materialType || "simulado").toLocaleLowerCase("pt-BR") === "prova" ? "prova" : "simulado";
   const payload = {
     version: 4,
-    material: {id, nome: name, disciplina: discipline, fonte: source, tipo_material: "simulado", ano: 2026, codigo_cargo: cargo, tempo_sugerido_minutos: minutes},
+    material: {id, nome: name, disciplina: discipline, fonte: source, tipo_material: normalizedMaterialType, ano: 2026, codigo_cargo: cargo, tempo_sugerido_minutos: minutes},
     questionIds: [...new Set(questionIds)], mode, current: 0, answers: {}, confirmed: {}, flagged: {}, elapsedBase: 0, questionTimes: {}, savedAt: new Date().toISOString(),
   };
   if (Array.isArray(questions) && questions.length === payload.questionIds.length) payload.questions = questions;
