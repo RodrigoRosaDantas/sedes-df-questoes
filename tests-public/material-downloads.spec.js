@@ -53,7 +53,7 @@ async function openGeneratedDocument(page, button) {
 
 async function assertQuestionsDocument(popup, material, materialName, withAnswers) {
   const questions = material.questoes || [];
-  const firstNumber = clean(questions[0]?.numero_original ?? questions[0]?.numero ?? 1);
+  const firstNumber = clean(questions[0]?.numero) || "1";
   await expect(popup.locator(".cover h1")).toContainText(materialName);
   await expect(popup.locator(".question")).toHaveCount(questions.length);
   await expect(popup.locator(".question h2").first()).toHaveText(`Questão ${firstNumber}`);
