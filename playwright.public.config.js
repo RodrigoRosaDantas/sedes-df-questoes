@@ -15,6 +15,7 @@ export default defineConfig({
     "navigation-v2-15.spec.js",
     "home-study-subjects-v2-17.spec.js",
     "resolver-context-v2-19.spec.js",
+    "home-question-format-v2-20.spec.js",
   ],
   timeout: 240000,
   retries: 1,
