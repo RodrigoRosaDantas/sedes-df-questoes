@@ -41,10 +41,11 @@ test("usuário pode escolher uma única matéria para Provas 202 e a sessão res
   const group = page.locator('[data-ux17-subject-group="prova-202"]');
   await group.locator("summary").click();
   await group.locator('[data-ux17-clear="prova-202"]').click();
-  const first = group.locator("[data-ux17-subject-input]").first();
-  const subject = await first.getAttribute("value");
+  const firstChip = group.locator(".ux17-subject-chip").first();
+  const subject = await firstChip.locator("[data-ux17-subject-input]").getAttribute("value");
   expect(subject).toBeTruthy();
-  await first.check();
+  await firstChip.click();
+  await expect(firstChip.locator("[data-ux17-subject-input]")).toBeChecked();
   await expect(group.locator("[data-ux17-subject-status]")).toContainText("1 de");
   await expect(page.locator("[data-ux16-summary]")).toContainText("1 matéria");
 
@@ -84,7 +85,7 @@ test("filtro de matérias é temporário da aba e não altera a seleção perman
   const group = page.locator('[data-ux17-subject-group="simulado-400"]');
   await group.locator("summary").click();
   await group.locator('[data-ux17-clear="simulado-400"]').click();
-  await group.locator("[data-ux17-subject-input]").first().check();
+  await group.locator(".ux17-subject-chip").first().click();
 
   const state = await page.evaluate(() => ({
     permanent: JSON.parse(localStorage.getItem("sedes.questoes.rodrigo.homeStudyToday.v2")),
