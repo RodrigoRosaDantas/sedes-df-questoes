@@ -23,7 +23,6 @@ const COMMON_DISCIPLINES = [
   "ride",
   "primeiros socorros",
   "politicas para mulheres",
-  "assistencia social",
   "seguranca alimentar",
   "legislacao do distrito federal",
 ];
@@ -112,8 +111,10 @@ const TARGETS = {
       ...COMMON_DISCIPLINES,
       "administracao",
       "administracao geral",
+      "teorias da administracao",
       "administracao publica",
       "gestao publica",
+      "gestao organizacional",
       "gestao de pessoas",
       "gestao de projetos",
       "gestao de riscos",
@@ -204,12 +205,20 @@ function includesAny(text, terms) {
   return terms.some(term => value.includes(normalize(term)));
 }
 
+function matchesDiscipline(name, terms) {
+  const value = normalize(name);
+  return terms.some(term => {
+    const expected = normalize(term);
+    return value === expected || value.startsWith(`${expected} `) || value.endsWith(` ${expected}`);
+  });
+}
+
 function targetQuestionIds(targetCode) {
   const target = TARGETS[targetCode];
   if (!target) return new Set();
   const result = new Set();
   for (const discipline of state.studyIndex?.disciplines || []) {
-    if (includesAny(discipline.name, target.disciplines)) {
+    if (matchesDiscipline(discipline.name, target.disciplines)) {
       (discipline.question_ids || []).forEach(id => result.add(id));
       continue;
     }
@@ -250,8 +259,8 @@ function trackStats(track, answered) {
 
 function readSelection() {
   const stored = readJSON(SELECTION_KEY(), DEFAULT_SELECTION);
-  const valid = Array.isArray(stored) ? stored.filter(id => TRACKS.some(track => track.id === id)) : [];
-  return valid.length ? valid : [...DEFAULT_SELECTION];
+  if (!Array.isArray(stored)) return [...DEFAULT_SELECTION];
+  return stored.filter(id => TRACKS.some(track => track.id === id));
 }
 
 function writeSelection(ids) {
@@ -262,7 +271,7 @@ function balancedDailyIds(selectedTracks, statsByTrack, answered) {
   const picked = [];
   const used = new Set();
   const today = dateKey(Date.now());
-  const ordered = [...selectedTracks].sort((a, b) => (a.type === "prova" ? -1 : 1) - (b.type === "prova" ? -1 : 1));
+  const ordered = [...selectedTracks].sort((a, b) => Number(b.type === "prova") - Number(a.type === "prova"));
   const base = Math.floor(DAILY_SIZE / Math.max(1, ordered.length));
   let remainder = DAILY_SIZE - base * ordered.length;
   const add = (ids, count, salt) => {
@@ -333,7 +342,7 @@ function enhanceTodayCard() {
   card.innerHTML = `<div class="ux16-today-head"><div><p class="eyebrow">Estudo de hoje</p><h2>Escolha a origem e o cargo.</h2><p>As questões são filtradas pelo conteúdo do respectivo edital. Provas e simulados ficam separados para você decidir a fonte do treino.</p></div><span class="ux16-edital-badge">Edital → disciplina → assunto</span></div>
     <div class="ux16-track-grid" role="group" aria-label="Opções do estudo de hoje">${TRACKS.map(track => trackCard(track, statsByTrack.get(track.id), selectedIds.has(track.id))).join("")}</div>
     <div class="ux16-today-footer"><div><strong data-ux16-summary></strong><small>Prioridade para questões ainda não respondidas; se faltar conteúdo, entram revisões do mesmo recorte.</small></div><button class="btn primary" data-ux16-start>Começar seleção</button></div>
-    <details class="ux16-criteria"><summary>Como o site decide se a questão pertence ao edital?</summary><p>O recorte usa a classificação publicada de <strong>disciplina, assunto e subassunto</strong> e a cruza com os eixos do macro pós-edital de cada cargo. O tipo do material define se a questão entra em <strong>Provas</strong> ou <strong>Simulados</strong>. Uma questão de outro órgão pode entrar quando o conteúdo dela pertence ao edital selecionado.</p></details>`;
+    <details class="ux16-criteria"><summary>Como o site decide se a questão pertence ao edital?</summary><p>O recorte usa a classificação publicada de <strong>disciplina e assunto/tópico</strong> e a cruza com os eixos dos macros pós-edital dos cargos 202 e 400. O tipo do material define se a questão entra em <strong>Provas</strong> ou <strong>Simulados</strong>. Uma questão de outro órgão pode entrar quando o conteúdo dela pertence ao edital selecionado.</p></details>`;
 
   const update = () => {
     const checked = [...card.querySelectorAll("[data-ux16-track-input]:checked")].map(input => input.value);
