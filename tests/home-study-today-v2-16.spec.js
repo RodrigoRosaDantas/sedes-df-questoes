@@ -30,9 +30,9 @@ test("Estudo de hoje mostra quatro trilhas e prioriza provas na primeira visita"
 test("seleção do Estudo de hoje fica salva por perfil", async ({page}) => {
   await page.addInitScript(() => localStorage.removeItem("sedes.questoes.rodrigo.homeStudyToday.v2"));
   await openHome(page);
-  await page.locator('[data-ux16-track="prova-202"] input').uncheck();
-  await page.locator('[data-ux16-track="prova-400"] input').uncheck();
-  await page.locator('[data-ux16-track="simulado-202"] input').check();
+  await page.locator('[data-ux16-track="prova-202"]').click();
+  await page.locator('[data-ux16-track="prova-400"]').click();
+  await page.locator('[data-ux16-track="simulado-202"]').click();
   await expect(page.locator("[data-ux16-summary]")).toContainText("1 opção");
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("sedes.questoes.rodrigo.homeStudyToday.v2")))).toEqual(["simulado-202"]);
 
