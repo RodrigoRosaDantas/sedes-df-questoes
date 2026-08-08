@@ -122,3 +122,5 @@ jobs:
         env:
           PUBLIC_BASE_URL: ${{ steps.deployment.outputs.page_url }}
         run: npx playwright test --config=playwright.public.config.js
+
+# synchronize trigger for main-context publication
