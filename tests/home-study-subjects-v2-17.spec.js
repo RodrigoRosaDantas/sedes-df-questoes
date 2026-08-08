@@ -12,12 +12,13 @@ async function setTracks(page, ids) {
     localStorage.removeItem("sedes.questoes.rodrigo.session.v3");
     localStorage.setItem("sedes.questoes.rodrigo.homeStudyToday.v2", JSON.stringify(selected));
     sessionStorage.removeItem("sedes.questoes.rodrigo.homeStudySubjects.v1");
+    sessionStorage.removeItem("sedes.questoes.rodrigo.homeStudySubjects.v2");
   }, ids);
   await page.reload({waitUntil: "domcontentloaded"});
   await expect(page.locator("[data-ux17-subjects]")).toBeVisible({timeout: 30000});
 }
 
-test("matérias aparecem somente para os recortes escolhidos e começam com Todas", async ({page}) => {
+test("matérias aparecem nos recortes escolhidos e Todas é um modo próprio", async ({page}) => {
   await openHome(page);
   await expect(page.locator('[data-ux17-subject-group="prova-202"]')).toHaveCount(1);
   await expect(page.locator('[data-ux17-subject-group="prova-400"]')).toHaveCount(1);
@@ -27,26 +28,31 @@ test("matérias aparecem somente para os recortes escolhidos e começam com Toda
   for (const id of ["prova-202", "prova-400"]) {
     const group = page.locator(`[data-ux17-subject-group="${id}"]`);
     await group.locator("summary").click();
-    const total = await group.locator("[data-ux17-subject-input]").count();
+    const subjects = group.locator("[data-ux17-subject-button]");
+    const total = await subjects.count();
     expect(total, `${id} deve oferecer matérias elegíveis`).toBeGreaterThan(0);
-    await expect(group.locator("[data-ux17-subject-input]:checked")).toHaveCount(total);
+    await expect(group.locator(`[data-ux17-all="${id}"]`)).toHaveAttribute("aria-pressed", "true");
+    await expect(group.locator('[data-ux17-subject-button][aria-pressed="true"]')).toHaveCount(0);
     await expect(group.locator("[data-ux17-subject-status]")).toContainText("Todas");
   }
 });
 
-test("usuário pode escolher uma única matéria para Provas 202 e a sessão respeita o filtro", async ({page, request}) => {
+test("toque natural a partir de Todas seleciona somente a matéria tocada e a sessão respeita o filtro", async ({page, request}) => {
+  const errors = [];
+  page.on("pageerror", error => errors.push(error.message));
   await openHome(page);
   await setTracks(page, ["prova-202"]);
 
   const group = page.locator('[data-ux17-subject-group="prova-202"]');
   await group.locator("summary").click();
-  await group.locator('[data-ux17-clear="prova-202"]').click();
-  const firstChip = group.locator(".ux17-subject-chip").first();
-  const subject = await firstChip.locator("[data-ux17-subject-input]").getAttribute("value");
+  const firstChip = group.locator("[data-ux17-subject-button]").first();
+  const subject = await firstChip.getAttribute("data-ux17-subject");
   expect(subject).toBeTruthy();
+
   await firstChip.click();
-  await expect(firstChip.locator("[data-ux17-subject-input]")).toBeChecked();
+  await expect(group.locator('[data-ux17-subject-button][aria-pressed="true"]')).toHaveCount(1);
   await expect(group.locator("[data-ux17-subject-status]")).toContainText("1 de");
+  await expect(group.locator('[data-ux17-all="prova-202"]')).toHaveAttribute("aria-pressed", "false");
   await expect(page.locator("[data-ux16-summary]")).toContainText("1 matéria");
 
   const catalogResponse = await request.get("./data/release/catalogo.json");
@@ -77,30 +83,66 @@ test("usuário pode escolher uma única matéria para Provas 202 e a sessão res
     expect(material, `material de ${id}`).toBeTruthy();
     expect(String(material.tipo_material || "").trim().toLowerCase()).toBe("prova");
   }
+  expect(errors).toEqual([]);
 });
 
-test("filtro de matérias é temporário da aba e não altera a seleção permanente das quatro trilhas", async ({page}) => {
+test("seleção customizada permite combinar, remover, limpar e voltar para Todas", async ({page}) => {
   await openHome(page);
   await setTracks(page, ["simulado-400"]);
   const group = page.locator('[data-ux17-subject-group="simulado-400"]');
   await group.locator("summary").click();
+
+  const first = group.locator("[data-ux17-subject-button]").nth(0);
+  const second = group.locator("[data-ux17-subject-button]").nth(1);
+  await first.click();
+  await second.click();
+  await expect(group.locator('[data-ux17-subject-button][aria-pressed="true"]')).toHaveCount(2);
+
+  await group.locator('[data-ux17-subject-button][aria-pressed="true"]').first().click();
+  await expect(group.locator('[data-ux17-subject-button][aria-pressed="true"]')).toHaveCount(1);
+
   await group.locator('[data-ux17-clear="simulado-400"]').click();
-  await group.locator(".ux17-subject-chip").first().click();
+  await expect(group.locator('[data-ux17-subject-button][aria-pressed="true"]')).toHaveCount(0);
+  await expect(group.locator("[data-ux17-subject-status]")).toContainText("0 de");
+  await expect(page.locator("[data-ux17-start]")).toBeDisabled();
+
+  await group.locator('[data-ux17-all="simulado-400"]').click();
+  await expect(group.locator('[data-ux17-all="simulado-400"]')).toHaveAttribute("aria-pressed", "true");
+  await expect(group.locator("[data-ux17-subject-status]")).toContainText("Todas");
+  await expect(page.locator("[data-ux17-start]")).toBeEnabled();
+});
+
+test("filtro de matérias usa estado temporário v2 e não altera as quatro trilhas", async ({page}) => {
+  await openHome(page);
+  await setTracks(page, ["simulado-400"]);
+  const group = page.locator('[data-ux17-subject-group="simulado-400"]');
+  await group.locator("summary").click();
+  await group.locator("[data-ux17-subject-button]").first().click();
 
   const state = await page.evaluate(() => ({
     permanent: JSON.parse(localStorage.getItem("sedes.questoes.rodrigo.homeStudyToday.v2")),
-    temporary: JSON.parse(sessionStorage.getItem("sedes.questoes.rodrigo.homeStudySubjects.v1")),
+    oldTemporary: sessionStorage.getItem("sedes.questoes.rodrigo.homeStudySubjects.v1"),
+    temporary: JSON.parse(sessionStorage.getItem("sedes.questoes.rodrigo.homeStudySubjects.v2")),
   }));
   expect(state.permanent).toEqual(["simulado-400"]);
+  expect(state.oldTemporary).toBeNull();
   expect(state.temporary["simulado-400"]).toHaveLength(1);
 });
 
-test("seletor de matérias não cria overflow horizontal no celular", async ({page}) => {
-  await page.setViewportSize({width: 390, height: 844});
-  await openHome(page);
-  const group = page.locator('[data-ux17-subject-group="prova-202"]');
-  await group.locator("summary").click();
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
-  expect(overflow).toBeLessThanOrEqual(1);
-  await expect(page.locator("[data-ux17-start]")).toBeVisible();
+test.describe("mobile touch", () => {
+  test.use({viewport: {width: 390, height: 844}, isMobile: true, hasTouch: true});
+
+  test("toque em matéria funciona sem overflow nem erro de página", async ({page}) => {
+    const errors = [];
+    page.on("pageerror", error => errors.push(error.message));
+    await openHome(page);
+    const group = page.locator('[data-ux17-subject-group="prova-202"]');
+    await group.locator("summary").tap();
+    await group.locator("[data-ux17-subject-button]").first().tap();
+    await expect(group.locator('[data-ux17-subject-button][aria-pressed="true"]')).toHaveCount(1);
+    await expect(group.locator("[data-ux17-subject-status]")).toContainText("1 de");
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow).toBeLessThanOrEqual(1);
+    expect(errors).toEqual([]);
+  });
 });
