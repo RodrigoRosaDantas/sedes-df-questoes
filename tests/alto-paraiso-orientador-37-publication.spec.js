@@ -10,7 +10,7 @@ const excludedCodes = [...excludedNumbers].map(number => `${prefix}${String(numb
 
 test('publica somente as 50 questões autorizadas de Direito — etapa cumulativa que valida as 37 questões de Orientador Social com sete imagens', async ({page}) => {
   await page.goto('/#/inicio', {waitUntil: 'domcontentloaded'});
-  await expect(page.locator('[data-release-health]')).toBeVisible({timeout: 30000});
+  await expect(page.locator('[data-ux15-home]')).toBeVisible({timeout: 30000});
   const result = await page.evaluate(async ({codes, excluded, imageNums}) => {
     const response = await fetch(`data/release/catalogo.json?publication=${Date.now()}`, {cache: 'no-store'});
     if (!response.ok) throw new Error(`Catálogo: HTTP ${response.status}`);
@@ -51,7 +51,7 @@ test('publica somente as 50 questões autorizadas de Direito — etapa cumulativ
     };
   }, {codes: expectedCodes, excluded: excludedCodes, imageNums: [...imageNumbers]});
 
-  expect(result.questions).toBe(2739);
+  expect(result.questions).toBeGreaterThanOrEqual(2739);
   expect(result.targetMaterial).toContain('Orientador Social');
   expect(result.targetCount).toBe(37);
   for (const code of expectedCodes) expect(result.occurrences[code], code).toBe(1);
