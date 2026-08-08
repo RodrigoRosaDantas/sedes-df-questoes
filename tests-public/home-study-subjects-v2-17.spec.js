@@ -9,7 +9,9 @@ test("home pública permite personalizar matérias dentro do recorte do edital",
   const subjects = group.locator("[data-ux17-subject-input]");
   expect(await subjects.count()).toBeGreaterThan(0);
   await group.locator('[data-ux17-clear="prova-202"]').click();
-  await subjects.first().check();
+  const firstChip = group.locator(".ux17-subject-chip").first();
+  await firstChip.click();
+  await expect(firstChip.locator("[data-ux17-subject-input]")).toBeChecked();
   await expect(group.locator("[data-ux17-subject-status]")).toContainText("1 de");
   await expect(page.locator("[data-ux17-start]")).toBeEnabled();
 });
