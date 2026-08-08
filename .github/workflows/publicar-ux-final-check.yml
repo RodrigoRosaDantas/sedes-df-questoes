@@ -1,0 +1,86 @@
+name: UX v2.15 — check público final
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Congelar release editorial
+        run: |
+          sha256sum data/release/catalogo.json > /tmp/catalog.sha256
+          find data/release/materials -type f -name '*.json' -print0 | sort -z | xargs -0 sha256sum > /tmp/materials.sha256
+
+      - name: Gerar pacote público
+        id: package
+        run: |
+          node scripts/build-question-search-index.mjs
+          node scripts/build-public.mjs
+          node scripts/reconcile-discursive-release-meta.mjs
+          node scripts/reconcile-public-metadata.mjs
+          sha256sum -c /tmp/catalog.sha256
+          sha256sum -c /tmp/materials.sha256
+          SOURCE_SHA=$(node -e "const fs=require('fs'); const x=JSON.parse(fs.readFileSync('dist/data/release/build-info.json','utf8')); process.stdout.write(String(x.source_sha||''))")
+          test -n "$SOURCE_SHA"
+          echo "source_sha=$SOURCE_SHA" >> "$GITHUB_OUTPUT"
+          node - <<'NODE'
+          const fs=require('fs');
+          const catalog=JSON.parse(fs.readFileSync('dist/data/release/catalogo.json','utf8'));
+          const meta=JSON.parse(fs.readFileSync('dist/data/release/release-meta.json','utf8'));
+          const count=Object.keys(catalog.question_index||{}).length;
+          if(count!==3447) throw new Error(`Questões: ${count}`);
+          if((catalog.materials||[]).length!==75) throw new Error('Materiais divergentes');
+          if(Number(meta.banco_mestre)!==3449 || Number(meta.awaiting_audit)!==0) throw new Error('Release-meta divergente');
+          console.log('Release preservada: Banco 3449, 3447 questões, 75 materiais, 0 auditoria.');
+          NODE
+
+      - name: Contratos críticos
+        run: |
+          node --check assets/navigation-v2-15.js
+          node --check assets/navigation-v2-15-polish.js
+          node --check assets/ux-v2-14.js
+          node --check assets/ux-v2-14-guardrails.js
+          node scripts/validate-runtime-catalog.mjs
+          node scripts/validate-platform-v2-13.mjs
+          node scripts/validate-ux-v2-14.mjs
+          node scripts/validate-navigation-v2-15.mjs
+          node scripts/validate-dist-v2-10.mjs
+          node scripts/validate-public-metadata-consistency.mjs
+
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Publicar GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Instalar Playwright
+        run: |
+          npm install --no-save @playwright/test
+          npx playwright install --with-deps chromium
+
+      - name: Executar suíte pública completa
+        env:
+          PUBLIC_BASE_URL: ${{ steps.deployment.outputs.page_url }}
+          EXPECTED_SHA: ${{ steps.package.outputs.source_sha }}
+        run: npx playwright test --config=playwright.public.config.js
