@@ -305,6 +305,31 @@ function openGroupIds(card, extra = null) {
   return ids;
 }
 
+function syncSubjectGroup(card, trackId) {
+  const track = TRACKS.find(item => item.id === trackId);
+  const group = card.querySelector(`[data-ux17-subject-group="${CSS.escape(trackId)}"]`);
+  if (!track || !group) return;
+  const options = subjectOptions(track);
+  const chosen = selectionForTrack(track, options, readTempSelection());
+  const selected = new Set(chosen.allMode ? [] : chosen.names);
+
+  group.querySelectorAll("[data-ux17-subject-button]").forEach(button => {
+    const active = selected.has(button.dataset.ux17Subject);
+    button.classList.toggle("selected", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+
+  const allButton = group.querySelector(`[data-ux17-all="${CSS.escape(trackId)}"]`);
+  if (allButton) {
+    allButton.classList.toggle("selected", chosen.allMode);
+    allButton.setAttribute("aria-pressed", String(chosen.allMode));
+  }
+
+  const status = group.querySelector("[data-ux17-subject-status]");
+  if (status) status.textContent = chosen.allMode ? `Todas · ${options.length}` : `${chosen.names.length} de ${options.length}`;
+  updateSummary(card);
+}
+
 function setCustomSubject(card, trackId, subjectName) {
   const track = TRACKS.find(item => item.id === trackId);
   if (!track) return;
@@ -326,7 +351,7 @@ function setCustomSubject(card, trackId, subjectName) {
   if (normalized.length === options.length && options.length) delete selection[trackId];
   else selection[trackId] = normalized;
   saveTempSelection(selection);
-  renderSubjects(card, trackId);
+  syncSubjectGroup(card, trackId);
 }
 
 function bindSubjectControls(card) {
@@ -335,7 +360,7 @@ function bindSubjectControls(card) {
     const selection = readTempSelection();
     delete selection[trackId];
     saveTempSelection(selection);
-    renderSubjects(card, trackId);
+    syncSubjectGroup(card, trackId);
   }));
 
   card.querySelectorAll("[data-ux17-clear]").forEach(button => button.addEventListener("click", () => {
@@ -343,7 +368,7 @@ function bindSubjectControls(card) {
     const selection = readTempSelection();
     selection[trackId] = [];
     saveTempSelection(selection);
-    renderSubjects(card, trackId);
+    syncSubjectGroup(card, trackId);
   }));
 
   card.querySelectorAll("[data-ux17-subject-button]").forEach(button => button.addEventListener("click", () => {
