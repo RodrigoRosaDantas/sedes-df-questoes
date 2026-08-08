@@ -26,6 +26,26 @@ async function originMaterial(page, request) {
   return {id, material};
 }
 
+async function finishRealTraining(page) {
+  const total = await page.evaluate(key => JSON.parse(localStorage.getItem(key))?.questionIds?.length || 0, SESSION_KEY);
+  expect(total).toBeGreaterThan(0);
+  for (let index = 0; index < total; index += 1) {
+    await expect(page.locator(".option").first()).toBeVisible({timeout: 15000});
+    await page.locator(".option").first().click();
+    const confirm = page.locator("[data-confirm]");
+    await expect(confirm).toBeEnabled({timeout: 15000});
+    await confirm.click();
+    const next = page.locator("[data-next]");
+    await expect(next).toBeVisible({timeout: 15000});
+    await next.click();
+    if (index < total - 1) {
+      await expect(page.locator(".exam-header .eyebrow")).toContainText(`Questão ${index + 2} de ${total}`, {timeout: 15000});
+    }
+  }
+  await expect(page).toHaveURL(/#\/resultado/, {timeout: 30000});
+  await expect(page.locator(".result-hero")).toBeVisible({timeout: 30000});
+}
+
 test("site público mostra banca/fonte, ano e cargo da questão de prova e simulado", async ({page, request}) => {
   for (const [track, expectedType] of [["prova-202", "Prova anterior"], ["simulado-202", "Simulado"]]) {
     await prepare(page, [track]);
@@ -43,7 +63,7 @@ test("site público mostra banca/fonte, ano e cargo da questão de prova e simul
   }
 });
 
-test("site público permite concluir uma matéria e começar outra sem estado temporário preso", async ({page}) => {
+test("site público permite concluir uma matéria real e começar outra sem estado temporário preso", async ({page}) => {
   await prepare(page, ["prova-202"]);
   const group = page.locator('[data-ux17-subject-group="prova-202"]');
   await group.locator("summary").click();
@@ -52,24 +72,9 @@ test("site público permite concluir uma matéria e começar outra sem estado te
   await first.click();
   await page.locator("[data-ux17-start]").click();
   await page.waitForURL(/#\/resolver/, {timeout: 30000});
-
-  await page.evaluate(key => {
-    const session = JSON.parse(localStorage.getItem(key));
-    session.questionIds = session.questionIds.slice(0, 1);
-    session.current = 0;
-    session.answers = {};
-    session.confirmed = {};
-    session.flagged = {};
-    session.questionTimes = {};
-    localStorage.setItem(key, JSON.stringify(session));
-  }, SESSION_KEY);
-  await page.reload({waitUntil: "domcontentloaded"});
-  await expect(page.locator("[data-question-origin]")).toBeVisible({timeout: 30000});
-  await page.locator(".option").first().click();
-  await page.locator("[data-confirm]").click();
-  await page.locator("[data-next]").click();
-  await expect(page).toHaveURL(/#\/resultado/, {timeout: 30000});
+  await finishRealTraining(page);
   await expect.poll(() => page.evaluate(key => sessionStorage.getItem(key), SUBJECT_KEY)).toBeNull();
+  await expect.poll(() => page.evaluate(key => localStorage.getItem(key), SESSION_KEY)).toBeNull();
 
   await page.locator('.result-hero [data-route="inicio"]').click();
   await expect(page).toHaveURL(/#\/inicio/, {timeout: 30000});
