@@ -13,8 +13,10 @@ jobs:
   deploy-and-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout main canônica
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -26,17 +28,18 @@ jobs:
           sha256sum data/release/catalogo.json > /tmp/catalog.sha256
           find data/release/materials -type f -name '*.json' -print0 | sort -z | xargs -0 sha256sum > /tmp/materials.sha256
 
-      - name: Gerar pacote público
+      - name: Gerar pacote público da main
         id: package
         run: |
+          MAIN_SHA=$(git rev-parse HEAD)
           node scripts/build-question-search-index.mjs
-          node scripts/build-public.mjs
+          GITHUB_SHA="$MAIN_SHA" node scripts/build-public.mjs
           node scripts/reconcile-discursive-release-meta.mjs
           node scripts/reconcile-public-metadata.mjs
           sha256sum -c /tmp/catalog.sha256
           sha256sum -c /tmp/materials.sha256
           SOURCE_SHA=$(node -e "const fs=require('fs'); const x=JSON.parse(fs.readFileSync('dist/data/release/build-info.json','utf8')); process.stdout.write(String(x.source_sha||''))")
-          test -n "$SOURCE_SHA"
+          test "$SOURCE_SHA" = "$MAIN_SHA"
           echo "source_sha=$SOURCE_SHA" >> "$GITHUB_OUTPUT"
           node - <<'NODE'
           const fs=require('fs');
