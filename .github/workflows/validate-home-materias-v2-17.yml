@@ -89,6 +89,10 @@ jobs:
           cat /tmp/sedes-http.log
           exit 1
 
+      - name: Sonda focada v2.17
+        shell: bash
+        run: timeout 180s npx playwright test tests/home-study-subjects-v2-17.spec.js --config=playwright.config.js --workers=1
+
       - name: Playwright local completo
         shell: bash
-        run: npx playwright test --config=playwright.config.js
+        run: timeout 300s npx playwright test --config=playwright.config.js
