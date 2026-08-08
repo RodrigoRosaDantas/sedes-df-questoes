@@ -1,14 +1,9 @@
 {
-  "schema_version": "1.0",
-  "operation": "ux-v2.14-v2.15-premerge-validation",
-  "validated_at": "2026-08-08T00:06:55Z",
-  "branch": "agent/ux-study-redesign-v2-14",
-  "head_sha": "c9cf8e9a270406369fda300cf94c792f9e20b29e",
-  "workflow": {
-    "name": "UX one-shot — validar e publicar",
-    "run_id": 31229134121,
-    "conclusion": "success"
-  },
+  "schema_version": "1.1",
+  "operation": "ux-v2.14-v2.15-publication-validation",
+  "validated_at": "2026-08-08T00:37:14Z",
+  "implementation_pr": 174,
+  "implementation_merge_sha": "eb5c9f4487f73409c4afae31d9ea41b30846953c",
   "release_integrity": {
     "banco_mestre": 3449,
     "questions": 3447,
@@ -21,13 +16,28 @@
     "all_material_sha256_preserved": true,
     "question_search_index_identity_1_to_1": true
   },
-  "validation": {
+  "premerge_validation": {
+    "workflow_run_id": 31229257776,
     "static_contracts": "success",
     "playwright_local": {
       "passed": 30,
       "failed": 0
     }
   },
+  "public_validation": {
+    "workflow_run_id": 31230535538,
+    "pages_deployment": "success",
+    "pages_build_version": "d4f36a0448a9f9c9932e8661ed2732e220fc6944",
+    "public_base_url": "https://rodrigorosadantas.github.io/sedes-df-questoes/",
+    "playwright_public": {
+      "passed": 9,
+      "failed": 0
+    }
+  },
+  "test_contract_adjustments": [
+    "PDF public test now validates the canonical displayed question number (question.numero).",
+    "Annulled-answer prohibition is scoped to the currently authorized publication-plan codes; historical official annulments remain representable while every public question must have a non-empty answer."
+  ],
   "publication_authorization": "explicit-user-request",
   "permanent_automation_mode": "manual_only"
 }
