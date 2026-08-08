@@ -460,16 +460,21 @@ function enhance() {
   return true;
 }
 
+function isStable() {
+  const card = document.querySelector("#app > [data-ux15-home] [data-ux-today][data-ux16-ready]");
+  return Boolean(card?.dataset.ux17Ready && card.querySelector("[data-ux17-subjects]") && card.querySelector("[data-ux17-start]"));
+}
+
 function arm() {
   observer?.disconnect();
   observer = null;
-  if (enhance()) return;
+  if (currentRoute() !== "inicio") return;
+  enhance();
   const app = document.querySelector("#app");
   if (!app) return;
   observer = new MutationObserver(() => {
-    if (!enhance()) return;
-    observer?.disconnect();
-    observer = null;
+    if (currentRoute() !== "inicio" || isStable()) return;
+    enhance();
   });
   observer.observe(app, {childList: true, subtree: true});
 }
