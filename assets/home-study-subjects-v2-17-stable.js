@@ -9,6 +9,13 @@ import {
   state,
   toast,
 } from "./shared-v2-13.js?v=1";
+import {
+  TARGETS,
+  TRACKS,
+  normalizeStudyValue,
+  sessionMaterialTypeForTracks,
+  targetQuestionIdsForStudyIndex,
+} from "./home-study-edital-v2-18.js?v=1";
 
 const DAILY_SIZE = 25;
 const TEMP_SELECTION_KEY = () => profileKey("homeStudySubjects.v2");
@@ -16,73 +23,6 @@ const targetCache = new Map();
 const trackCache = new Map();
 const subjectCache = new Map();
 let watchdog = null;
-
-const COMMON_DISCIPLINES = [
-  "lingua portuguesa", "distrito federal", "ride", "primeiros socorros",
-  "politicas para mulheres", "seguranca alimentar", "legislacao do distrito federal",
-];
-
-const COMMON_TOPICS = [
-  "ride", "distrito federal", "plano distrital de politica para mulheres", "pdpm",
-  "maria da penha", "lei 11.340", "lodf", "lei organica do distrito federal",
-  "lc 840", "lei complementar 840", "primeiros socorros", "programas sociais do df",
-  "beneficios eventuais", "sisan", "seguranca alimentar", "restaurante comunitario", "lei 7.484",
-];
-
-const TARGETS = {
-  "202": {
-    label: "Técnico Administrativo",
-    disciplines: [
-      ...COMMON_DISCIPLINES,
-      "direito administrativo", "administracao publica", "direito constitucional", "arquivologia",
-      "redacao oficial", "atendimento ao publico", "administracao de materiais", "gestao de materiais",
-      "recursos materiais", "gestao patrimonial", "patrimonio", "licitacoes", "compras publicas",
-    ],
-    topics: [
-      ...COMMON_TOPICS,
-      "administrativo", "atos administrativos", "agentes publicos", "provimento", "vacancia",
-      "direitos e deveres", "responsabilidade", "processo administrativo disciplinar", "pad",
-      "suas", "pnas", "nob/suas", "nob suas", "segurancas socioassistenciais", "protocolo",
-      "classificacao de documentos", "metodos de arquivamento", "preservacao documental", "digitalizacao",
-      "atendimento ao publico", "trabalho em equipe", "redacao oficial", "comunicacoes administrativas",
-      "classificacao de materiais", "estoque", "armazenagem", "tombamento", "inventario patrimonial",
-      "baixa patrimonial", "compras publicas", "lei 14.133", "licitacao", "contratacao publica",
-    ],
-  },
-  "400": {
-    label: "Administrador",
-    disciplines: [
-      ...COMMON_DISCIPLINES,
-      "administracao", "administracao geral", "teorias da administracao", "administracao publica",
-      "gestao publica", "gestao organizacional", "gestao de pessoas", "gestao de projetos", "gestao de riscos",
-      "administracao financeira e orcamentaria", "afo", "orcamento publico", "financas publicas",
-      "organizacao sistemas e metodos", "os&m", "qualidade",
-    ],
-    topics: [
-      ...COMMON_TOPICS,
-      "suas", "loas", "pnas", "nob/suas", "nob suas", "siafem", "administracao por objetivos", "apo",
-      "processo decisorio", "descentralizacao", "delegacao", "arquitetura organizacional",
-      "estrutura organizacional", "modelos de excelencia em gestao publica", "planejamento", "indicadores",
-      "qualidade", "gestao de pessoas", "gestao por competencias", "analise e descricao de cargos",
-      "cargos carreiras e salarios", "motivacao", "etica", "gestao de projetos", "gestao de riscos",
-      "mrosc", "cadunico", "cadastro unico", "controle social", "orcamento", "afo",
-    ],
-  },
-};
-
-const TRACKS = [
-  {id: "prova-202", type: "prova", target: "202", label: "Provas 202"},
-  {id: "prova-400", type: "prova", target: "400", label: "Provas 400"},
-  {id: "simulado-202", type: "simulado", target: "202", label: "Simulados 202"},
-  {id: "simulado-400", type: "simulado", target: "400", label: "Simulados 400"},
-];
-
-const normalize = value => String(value || "")
-  .normalize("NFD")
-  .replace(/[\u0300-\u036f]/g, "")
-  .toLocaleLowerCase("pt-BR")
-  .replace(/\s+/g, " ")
-  .trim();
 
 const dateKey = value => new Intl.DateTimeFormat("en-CA", {timeZone: "America/Sao_Paulo"}).format(new Date(value));
 
@@ -107,36 +47,9 @@ function answeredIds() {
   return ids;
 }
 
-function includesAny(text, terms) {
-  const value = normalize(text);
-  return terms.some(term => value.includes(normalize(term)));
-}
-
-function matchesDiscipline(name, terms) {
-  const value = normalize(name);
-  return terms.some(term => {
-    const expected = normalize(term);
-    return value === expected || value.startsWith(`${expected} `) || value.endsWith(` ${expected}`);
-  });
-}
-
 function targetQuestionIds(targetCode) {
   if (targetCache.has(targetCode)) return targetCache.get(targetCode);
-  const target = TARGETS[targetCode];
-  const result = new Set();
-  if (target) {
-    for (const discipline of state.studyIndex?.disciplines || []) {
-      if (matchesDiscipline(discipline.name, target.disciplines)) {
-        (discipline.question_ids || []).forEach(id => result.add(id));
-        continue;
-      }
-      for (const topic of discipline.topics || []) {
-        if (includesAny(`${discipline.name} ${topic.name}`, target.topics)) {
-          (topic.question_ids || []).forEach(id => result.add(id));
-        }
-      }
-    }
-  }
+  const result = targetQuestionIdsForStudyIndex(state.studyIndex, targetCode);
   targetCache.set(targetCode, result);
   return result;
 }
@@ -153,7 +66,7 @@ function trackPool(track) {
   for (const id of eligible) {
     const materialId = materialIdFromIndex(state.catalog?.question_index?.[id]);
     const material = materials.get(String(materialId || ""));
-    if (!material || normalize(material.tipo_material) !== track.type) continue;
+    if (!material || normalizeStudyValue(material.tipo_material) !== track.type) continue;
     ids.push(id);
   }
   const unique = [...new Set(ids)];
@@ -168,7 +81,7 @@ function subjectOptions(track) {
   for (const discipline of state.studyIndex?.disciplines || []) {
     const ids = [...new Set((discipline.question_ids || []).filter(id => pool.has(id)))];
     if (!ids.length) continue;
-    const key = normalize(discipline.name);
+    const key = normalizeStudyValue(discipline.name);
     if (!key) continue;
     const current = merged.get(key) || {name: discipline.name, ids: new Set()};
     ids.forEach(id => current.ids.add(id));
@@ -402,6 +315,7 @@ function startFilteredSession(card) {
   if (!ids.length) return toast("Não há questões disponíveis para as matérias escolhidas nessa combinação.", "info");
   const names = pools.map(pool => `${pool.track.label} (${pool.allMode ? "todas" : `${pool.names.length} matérias`})`).join(" + ");
   const uniqueSubjects = [...new Set(pools.flatMap(pool => pool.names))];
+  const activeTracks = pools.map(pool => pool.track);
   createCompatibleSession({
     id: `estudo-hoje-materias-${dateKey(Date.now())}`,
     name: `Estudo de hoje — ${names}`,
@@ -411,6 +325,7 @@ function startFilteredSession(card) {
     discipline: uniqueSubjects.length === 1 ? uniqueSubjects[0] : "Matérias selecionadas",
     source: "Provas/simulados filtrados por edital e pelas matérias escolhidas na Home",
     cargo: pools.length === 1 ? pools[0].track.target : "multicargo",
+    materialType: sessionMaterialTypeForTracks(activeTracks),
   });
 }
 
