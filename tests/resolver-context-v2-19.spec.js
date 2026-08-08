@@ -89,12 +89,12 @@ test("concluir treino limpa a matéria temporária e permite iniciar outra imedi
   await expect(page.locator("[data-confirm]")).toBeEnabled();
   await page.locator("[data-confirm]").click();
   await page.locator("[data-next]").click();
-  await page.waitForURL(/#\/resultado/, {timeout: 30000});
+  await expect(page).toHaveURL(/#\/resultado/, {timeout: 30000});
   await expect(page.locator(".result-hero")).toBeVisible();
   await expect.poll(() => page.evaluate(key => sessionStorage.getItem(key), SUBJECT_KEY)).toBeNull();
 
   await page.locator('.result-hero [data-route="inicio"]').click();
-  await page.waitForURL(/#\/inicio/, {timeout: 30000});
+  await expect(page).toHaveURL(/#\/inicio/, {timeout: 30000});
   await expect(page.locator("[data-ux17-subjects]")).toBeVisible({timeout: 30000});
   const group = page.locator('[data-ux17-subject-group="prova-202"]');
   await group.locator("summary").click();
