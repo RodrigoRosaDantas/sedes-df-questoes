@@ -1,0 +1,59 @@
+name: Validar scroll touch de matérias
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  validate:
+    if: github.event.pull_request.head.ref == 'agent/fix-touch-scroll-materias-v2-17'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout da correção
+        uses: actions/checkout@v4
+        with:
+          ref: agent/fix-touch-scroll-materias-v2-17
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Congelar release editorial
+        run: |
+          sha256sum data/release/catalogo.json > /tmp/catalog.sha256
+          find data/release/materials -type f -name '*.json' -print0 | sort -z | xargs -0 sha256sum > /tmp/materials.sha256
+      - name: Gerar pacote público sem rebuild editorial
+        run: |
+          node scripts/build-question-search-index.mjs
+          node scripts/build-public.mjs
+          node scripts/reconcile-discursive-release-meta.mjs
+          node scripts/reconcile-public-metadata.mjs
+      - name: Confirmar integridade e contratos
+        run: |
+          sha256sum -c /tmp/catalog.sha256
+          sha256sum -c /tmp/materials.sha256
+          node --check assets/home-study-subjects-v2-17-stable.js
+          node --check service-worker.js
+          node scripts/validate-home-study-v2-16.mjs
+          node scripts/validate-runtime-catalog.mjs
+          node scripts/validate-platform-v2-13.mjs
+          node scripts/validate-ux-v2-14.mjs
+          node scripts/validate-navigation-v2-15.mjs
+          node scripts/validate-dist-v2-10.mjs
+          node scripts/validate-public-metadata-consistency.mjs
+      - name: Instalar Playwright
+        run: |
+          npm install --no-save @playwright/test
+          npx playwright install --with-deps chromium
+      - name: Subir dist local
+        run: |
+          python3 -m http.server 4173 --directory dist > /tmp/sedes-http.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/sedes-http.log
+          exit 1
+      - name: Teste focado do seletor mobile
+        run: timeout 180s npx playwright test tests/home-study-subjects-v2-17.spec.js --config=playwright.config.js --workers=1
+      - name: Suíte completa
+        run: timeout 300s npx playwright test --config=playwright.config.js
