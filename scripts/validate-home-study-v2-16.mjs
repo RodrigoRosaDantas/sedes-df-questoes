@@ -4,7 +4,7 @@ const read = path => fs.readFileSync(new URL(`../${path}`, import.meta.url), "ut
 const index = read("index.html");
 const script = read("assets/home-study-today-v2-16.js");
 const css = read("assets/home-study-today-v2-16.css");
-const subjectsScript = read("assets/home-study-subjects-v2-17.js");
+const subjectsScript = read("assets/home-study-subjects-v2-17-stable.js");
 const subjectsCss = read("assets/home-study-subjects-v2-17.css");
 
 const requireText = (text, pattern, message) => {
@@ -14,7 +14,7 @@ const requireText = (text, pattern, message) => {
 requireText(index, /home-study-today-v2-16\.css/, "CSS do Estudo de hoje v2.16 não está conectado ao index.html.");
 requireText(index, /home-study-today-v2-16\.js/, "JS do Estudo de hoje v2.16 não está conectado ao index.html.");
 requireText(index, /home-study-subjects-v2-17\.css/, "CSS do filtro de matérias v2.17 não está conectado ao index.html.");
-requireText(index, /home-study-subjects-v2-17\.js/, "JS do filtro de matérias v2.17 não está conectado ao index.html.");
+requireText(index, /home-study-subjects-v2-17-stable\.js/, "JS estável do filtro de matérias v2.17 não está conectado ao index.html.");
 
 for (const id of ["prova-202", "prova-400", "simulado-202", "simulado-400"]) {
   requireText(script, new RegExp(`id:\\s*["']${id}["']`), `Trilha ${id} ausente.`);
@@ -40,10 +40,14 @@ requireText(subjectsScript, /filteredIds\(track, options, selectedNames\)/, "A s
 requireText(subjectsScript, /normalize\(material\.tipo_material\)\s*!==\s*track\.type/, "O filtro de matérias deve preservar a separação entre prova e simulado.");
 requireText(subjectsScript, /Começar com estas matérias/, "A ação principal deve deixar explícito que respeita as matérias escolhidas.");
 requireText(subjectsScript, /Escolha ao menos uma matéria em cada recorte selecionado/, "Recortes sem matéria não podem gerar sessão ambígua.");
+requireText(subjectsScript, /targetCache = new Map\(\)/, "O recorte por edital deve ser cacheado para evitar recomputação da Home.");
+requireText(subjectsScript, /subjectCache = new Map\(\)/, "As matérias por trilha devem ser cacheadas.");
+requireText(subjectsScript, /setInterval\(tick, 900\)/, "A recuperação do seletor deve usar watchdog leve.");
+if (/new MutationObserver/.test(subjectsScript)) throw new Error("O filtro de matérias não pode criar MutationObserver concorrente com a Home.");
 
 requireText(css, /grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/, "Layout desktop das quatro opções ausente.");
 requireText(css, /@media\(max-width:520px\).*grid-template-columns:1fr/s, "Layout mobile de uma coluna ausente.");
 requireText(subjectsCss, /ux17-subject-list/, "Layout da seleção de matérias ausente.");
 requireText(subjectsCss, /@media\(max-width:760px\).*ux17-subject-list/s, "A seleção de matérias precisa ter adaptação mobile.");
 
-console.log("✓ Estudo de hoje v2.17: quatro trilhas preservadas, matérias personalizáveis por recorte, seleção temporária e sessão filtrada por edital + fonte + matéria.");
+console.log("✓ Estudo de hoje v2.17: quatro trilhas preservadas, matérias personalizáveis por recorte, seleção temporária, cache de elegibilidade e inicialização sem observer concorrente.");
