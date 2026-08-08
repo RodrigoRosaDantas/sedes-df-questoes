@@ -13,8 +13,8 @@ const requireText = (text, pattern, message) => {
 
 requireText(index, /home-study-today-v2-16\.css/, "CSS do Estudo de hoje v2.16 não está conectado ao index.html.");
 requireText(index, /home-study-today-v2-16\.js/, "JS do Estudo de hoje v2.16 não está conectado ao index.html.");
-requireText(index, /home-study-subjects-v2-17\.css\?v=2/, "CSS corrigido do filtro de matérias v2.17 não está conectado ao index.html com cache-bust.");
-requireText(index, /home-study-subjects-v2-17-stable\.js\?v=2/, "JS corrigido do filtro de matérias v2.17 não está conectado ao index.html com cache-bust.");
+requireText(index, /home-study-subjects-v2-17\.css\?v=3/, "CSS do filtro de matérias v2.17 não está conectado ao index.html com cache-bust v3.");
+requireText(index, /home-study-subjects-v2-17-stable\.js\?v=3/, "JS do filtro de matérias v2.17 não está conectado ao index.html com cache-bust v3.");
 
 for (const id of ["prova-202", "prova-400", "simulado-202", "simulado-400"]) {
   requireText(script, new RegExp(`id:\\s*["']${id}["']`), `Trilha ${id} ausente.`);
@@ -42,6 +42,11 @@ requireText(subjectsScript, /normalize\(material\.tipo_material\)\s*!==\s*track\
 requireText(subjectsScript, /data-ux17-subject-button/, "As matérias devem usar chips-botão explícitos em vez de checkbox invisível.");
 requireText(subjectsScript, /aria-pressed/, "Os chips de matéria devem expor estado acessível.");
 requireText(subjectsScript, /if \(!Array\.isArray\(stored\)\)\s*\{\s*selection\[trackId\]\s*=\s*\[subjectName\]/s, "Ao sair de Todas, tocar numa matéria deve selecionar somente essa matéria.");
+requireText(subjectsScript, /function syncSubjectGroup\(card, trackId\)/, "A seleção de matérias deve atualizar o grupo no próprio DOM.");
+requireText(subjectsScript, /syncSubjectGroup\(card, trackId\)/, "Os controles de matéria devem preservar o container rolável ao atualizar o estado.");
+if (/saveTempSelection\(selection\);\s*renderSubjects\(card, trackId\)/s.test(subjectsScript)) {
+  throw new Error("Regressão: selecionar matéria não pode recriar o painel e zerar a rolagem no mobile.");
+}
 requireText(subjectsScript, /Começar com estas matérias/, "A ação principal deve deixar explícito que respeita as matérias escolhidas.");
 requireText(subjectsScript, /Escolha ao menos uma matéria em cada recorte selecionado/, "Recortes sem matéria não podem gerar sessão ambígua.");
 requireText(subjectsScript, /targetCache = new Map\(\)/, "O recorte por edital deve ser cacheado para evitar recomputação da Home.");
@@ -57,4 +62,4 @@ requireText(subjectsCss, /ux17-subject-chip/, "Chips de matéria ausentes.");
 requireText(subjectsCss, /min-height:40px/, "Chips de matéria precisam de alvo de toque adequado no mobile.");
 requireText(subjectsCss, /@media\(max-width:760px\).*ux17-subject-list/s, "A seleção de matérias precisa ter adaptação mobile.");
 
-console.log("✓ Estudo de hoje v2.17.1: modo Todas explícito, seleção direta por matéria, toque mobile, estado temporário v2 e cache-bust dos assets.");
+console.log("✓ Estudo de hoje v2.17.2: seleção direta, toque mobile e rolagem interna preservada sem rerender do painel.");
