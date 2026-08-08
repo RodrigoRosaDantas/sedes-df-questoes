@@ -118,4 +118,5 @@ jobs:
       - name: Testar site público
         env:
           PUBLIC_BASE_URL: ${{ steps.deployment.outputs.page_url }}
+          EXPECTED_SHA: ${{ github.sha }}
         run: npx playwright test --config=playwright.public.config.js
