@@ -18,6 +18,32 @@ async function setTracks(page, ids) {
   await expect(page.locator("[data-ux17-subjects]")).toBeVisible({timeout: 30000});
 }
 
+async function prepareTouchContext(page) {
+  await openHome(page);
+  await setTracks(page, ["prova-202"]);
+  const group = page.locator('[data-ux17-subject-group="prova-202"]');
+  await group.locator("summary").tap();
+  await expect(group.locator(".ux17-subject-chips")).toBeVisible();
+  return group;
+}
+
+async function dragUpWithTouch(context, page, x, y, distance = 240) {
+  const cdp = await context.newCDPSession(page);
+  await cdp.send("Input.dispatchTouchEvent", {
+    type: "touchStart",
+    touchPoints: [{x, y, radiusX: 6, radiusY: 6, force: 1}],
+  });
+  for (let step = 1; step <= 10; step += 1) {
+    await cdp.send("Input.dispatchTouchEvent", {
+      type: "touchMove",
+      touchPoints: [{x, y: y - (distance * step / 10), radiusX: 6, radiusY: 6, force: 1}],
+    });
+    await page.waitForTimeout(18);
+  }
+  await cdp.send("Input.dispatchTouchEvent", {type: "touchEnd", touchPoints: []});
+  await page.waitForTimeout(300);
+}
+
 test("matérias aparecem nos recortes escolhidos e Todas é um modo próprio", async ({page}) => {
   await openHome(page);
   await expect(page.locator('[data-ux17-subject-group="prova-202"]')).toHaveCount(1);
@@ -74,6 +100,7 @@ test("toque natural a partir de Todas seleciona somente a matéria tocada e a se
   expect(session.questionIds.length).toBeLessThanOrEqual(25);
   expect(session.material.codigo_cargo).toBe("202");
   expect(session.material.disciplina).toBe(subject);
+  expect(session.material.tipo_material).toBe("prova");
 
   for (const id of session.questionIds) {
     expect(allowed.has(id), `${id} deve pertencer à matéria escolhida`).toBeTruthy();
@@ -156,8 +183,7 @@ test.describe("mobile touch", () => {
     expect(layout.touchAction).toBe("auto");
     expect(Math.abs(layout.scrollHeight - layout.clientHeight)).toBeLessThanOrEqual(1);
     await group.locator("[data-ux17-subject-button]").last().scrollIntoViewIfNeeded();
-    const pageY = await page.evaluate(() => window.scrollY);
-    expect(pageY).toBeGreaterThan(0);
+    expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
     expect(errors).toEqual([]);
   });
 
@@ -175,3 +201,43 @@ test.describe("mobile touch", () => {
     expect(errors).toEqual([]);
   });
 });
+
+for (const viewport of [
+  {width: 360, height: 800, label: "360 retrato"},
+  {width: 390, height: 844, label: "390 retrato"},
+  {width: 412, height: 915, label: "412 retrato"},
+  {width: 844, height: 390, label: "844 paisagem"},
+]) {
+  test(`gesto touch real rola a página dentro das matérias — ${viewport.label}`, async ({browser}) => {
+    const context = await browser.newContext({
+      viewport: {width: viewport.width, height: viewport.height},
+      isMobile: true,
+      hasTouch: true,
+      deviceScaleFactor: 1,
+    });
+    const page = await context.newPage();
+    const errors = [];
+    page.on("pageerror", error => errors.push(error.message));
+    const group = await prepareTouchContext(page);
+    const chips = group.locator(".ux17-subject-chips");
+    const style = await chips.evaluate(node => {
+      const css = getComputedStyle(node);
+      return {overflowY: css.overflowY, maxHeight: css.maxHeight, touchAction: css.touchAction};
+    });
+    expect(style).toEqual({overflowY: "visible", maxHeight: "none", touchAction: "auto"});
+
+    await group.scrollIntoViewIfNeeded();
+    await page.evaluate(() => window.scrollBy(0, 60));
+    const box = await chips.boundingBox();
+    expect(box).toBeTruthy();
+    const startX = Math.round(Math.min(viewport.width - 24, Math.max(24, box.x + box.width / 2)));
+    const maxStartY = Math.max(120, viewport.height - 70);
+    const startY = Math.round(Math.min(maxStartY, Math.max(120, box.y + Math.min(box.height - 20, Math.max(160, viewport.height * 0.58)))));
+    const before = await page.evaluate(() => window.scrollY);
+    await dragUpWithTouch(context, page, startX, startY, Math.min(240, Math.max(140, viewport.height * 0.45)));
+    const after = await page.evaluate(() => window.scrollY);
+    expect(after, `${viewport.label} deve mover a página para baixo`).toBeGreaterThan(before + 50);
+    expect(errors).toEqual([]);
+    await context.close();
+  });
+}
