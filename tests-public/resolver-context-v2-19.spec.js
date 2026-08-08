@@ -68,11 +68,11 @@ test("site público permite concluir uma matéria e começar outra sem estado te
   await page.locator(".option").first().click();
   await page.locator("[data-confirm]").click();
   await page.locator("[data-next]").click();
-  await page.waitForURL(/#\/resultado/, {timeout: 30000});
+  await expect(page).toHaveURL(/#\/resultado/, {timeout: 30000});
   await expect.poll(() => page.evaluate(key => sessionStorage.getItem(key), SUBJECT_KEY)).toBeNull();
 
   await page.locator('.result-hero [data-route="inicio"]').click();
-  await page.waitForURL(/#\/inicio/, {timeout: 30000});
+  await expect(page).toHaveURL(/#\/inicio/, {timeout: 30000});
   await expect(page.locator("[data-ux17-subjects]")).toBeVisible({timeout: 30000});
   const nextGroup = page.locator('[data-ux17-subject-group="prova-202"]');
   await nextGroup.locator("summary").click();
