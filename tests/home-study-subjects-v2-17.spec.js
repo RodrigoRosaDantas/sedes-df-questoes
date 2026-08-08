@@ -132,6 +132,30 @@ test("filtro de matérias usa estado temporário v2 e não altera as quatro tril
 test.describe("mobile touch", () => {
   test.use({viewport: {width: 390, height: 844}, isMobile: true, hasTouch: true});
 
+  test("rolagem da lista permanece estável ao selecionar matérias", async ({page}) => {
+    const errors = [];
+    page.on("pageerror", error => errors.push(error.message));
+    await openHome(page);
+    await setTracks(page, ["prova-202"]);
+    const group = page.locator('[data-ux17-subject-group="prova-202"]');
+    await group.locator("summary").tap();
+    const chips = group.locator(".ux17-subject-chips");
+    await expect(chips).toBeVisible();
+    await chips.evaluate(node => {
+      node.scrollTop = node.scrollHeight;
+      node.dataset.scrollSentinel = "keep";
+    });
+    const before = await chips.evaluate(node => node.scrollTop);
+    expect(before).toBeGreaterThan(0);
+    const last = group.locator("[data-ux17-subject-button]").last();
+    await last.tap();
+    await expect(chips).toHaveAttribute("data-scroll-sentinel", "keep");
+    const after = await chips.evaluate(node => node.scrollTop);
+    expect(after).toBeGreaterThanOrEqual(Math.max(0, before - 2));
+    await expect(last).toHaveAttribute("aria-pressed", "true");
+    expect(errors).toEqual([]);
+  });
+
   test("toque em matéria funciona sem overflow nem erro de página", async ({page}) => {
     const errors = [];
     page.on("pageerror", error => errors.push(error.message));
