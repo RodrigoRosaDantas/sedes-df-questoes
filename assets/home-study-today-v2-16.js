@@ -11,172 +11,19 @@ import {
   state,
   toast,
 } from "./shared-v2-13.js?v=1";
+import {
+  TARGETS,
+  TRACKS,
+  normalizeStudyValue,
+  sessionMaterialTypeForTracks,
+  targetQuestionIdsForStudyIndex,
+} from "./home-study-edital-v2-18.js?v=1";
 
 const DAILY_SIZE = 25;
 const SELECTION_KEY = () => profileKey("homeStudyToday.v2");
 const DEFAULT_SELECTION = ["prova-202", "prova-400"];
 let homeObserver = null;
 let stabilityRetry = 0;
-
-const COMMON_DISCIPLINES = [
-  "lingua portuguesa",
-  "distrito federal",
-  "ride",
-  "primeiros socorros",
-  "politicas para mulheres",
-  "seguranca alimentar",
-  "legislacao do distrito federal",
-];
-
-const COMMON_TOPICS = [
-  "ride",
-  "distrito federal",
-  "plano distrital de politica para mulheres",
-  "pdpm",
-  "maria da penha",
-  "lei 11.340",
-  "lodf",
-  "lei organica do distrito federal",
-  "lc 840",
-  "lei complementar 840",
-  "primeiros socorros",
-  "programas sociais do df",
-  "beneficios eventuais",
-  "sisan",
-  "seguranca alimentar",
-  "restaurante comunitario",
-  "lei 7.484",
-];
-
-const TARGETS = {
-  "202": {
-    label: "Técnico Administrativo",
-    subtitle: "Cargo 202 · TDAS",
-    disciplines: [
-      ...COMMON_DISCIPLINES,
-      "direito administrativo",
-      "administracao publica",
-      "direito constitucional",
-      "arquivologia",
-      "redacao oficial",
-      "atendimento ao publico",
-      "administracao de materiais",
-      "gestao de materiais",
-      "recursos materiais",
-      "gestao patrimonial",
-      "patrimonio",
-      "licitacoes",
-      "compras publicas",
-    ],
-    topics: [
-      ...COMMON_TOPICS,
-      "administrativo",
-      "atos administrativos",
-      "agentes publicos",
-      "provimento",
-      "vacancia",
-      "direitos e deveres",
-      "responsabilidade",
-      "processo administrativo disciplinar",
-      "pad",
-      "suas",
-      "pnas",
-      "nob/suas",
-      "nob suas",
-      "segurancas socioassistenciais",
-      "protocolo",
-      "classificacao de documentos",
-      "metodos de arquivamento",
-      "preservacao documental",
-      "digitalizacao",
-      "atendimento ao publico",
-      "trabalho em equipe",
-      "redacao oficial",
-      "comunicacoes administrativas",
-      "classificacao de materiais",
-      "estoque",
-      "armazenagem",
-      "tombamento",
-      "inventario patrimonial",
-      "baixa patrimonial",
-      "compras publicas",
-      "lei 14.133",
-      "licitacao",
-      "contratacao publica",
-    ],
-  },
-  "400": {
-    label: "Administrador",
-    subtitle: "Cargo 400 · EDAS Administração",
-    disciplines: [
-      ...COMMON_DISCIPLINES,
-      "administracao",
-      "administracao geral",
-      "teorias da administracao",
-      "administracao publica",
-      "gestao publica",
-      "gestao organizacional",
-      "gestao de pessoas",
-      "gestao de projetos",
-      "gestao de riscos",
-      "administracao financeira e orcamentaria",
-      "afo",
-      "orcamento publico",
-      "financas publicas",
-      "organizacao sistemas e metodos",
-      "os&m",
-      "qualidade",
-    ],
-    topics: [
-      ...COMMON_TOPICS,
-      "suas",
-      "loas",
-      "pnas",
-      "nob/suas",
-      "nob suas",
-      "siafem",
-      "administracao por objetivos",
-      "apo",
-      "processo decisorio",
-      "descentralizacao",
-      "delegacao",
-      "arquitetura organizacional",
-      "estrutura organizacional",
-      "modelos de excelencia em gestao publica",
-      "planejamento",
-      "indicadores",
-      "qualidade",
-      "gestao de pessoas",
-      "gestao por competencias",
-      "analise e descricao de cargos",
-      "cargos carreiras e salarios",
-      "motivacao",
-      "etica",
-      "gestao de projetos",
-      "gestao de riscos",
-      "mrosc",
-      "cadunico",
-      "cadastro unico",
-      "controle social",
-      "orcamento",
-      "afo",
-    ],
-  },
-};
-
-const TRACKS = [
-  {id: "prova-202", type: "prova", target: "202", eyebrow: "Provas anteriores", icon: "P"},
-  {id: "prova-400", type: "prova", target: "400", eyebrow: "Provas anteriores", icon: "P"},
-  {id: "simulado-202", type: "simulado", target: "202", eyebrow: "Simulados", icon: "S"},
-  {id: "simulado-400", type: "simulado", target: "400", eyebrow: "Simulados", icon: "S"},
-];
-
-const normalize = value => String(value || "")
-  .normalize("NFD")
-  .replace(/[\u0300-\u036f]/g, "")
-  .toLocaleLowerCase("pt-BR")
-  .replace(/\s+/g, " ")
-  .trim();
 
 const dateKey = value => new Intl.DateTimeFormat("en-CA", {timeZone: "America/Sao_Paulo"}).format(new Date(value));
 
@@ -201,49 +48,19 @@ function answeredIds() {
   return ids;
 }
 
-function includesAny(text, terms) {
-  const value = normalize(text);
-  return terms.some(term => value.includes(normalize(term)));
-}
-
-function matchesDiscipline(name, terms) {
-  const value = normalize(name);
-  return terms.some(term => {
-    const expected = normalize(term);
-    return value === expected || value.startsWith(`${expected} `) || value.endsWith(` ${expected}`);
-  });
-}
-
-function targetQuestionIds(targetCode) {
-  const target = TARGETS[targetCode];
-  if (!target) return new Set();
-  const result = new Set();
-  for (const discipline of state.studyIndex?.disciplines || []) {
-    if (matchesDiscipline(discipline.name, target.disciplines)) {
-      (discipline.question_ids || []).forEach(id => result.add(id));
-      continue;
-    }
-    for (const topic of discipline.topics || []) {
-      const descriptor = `${discipline.name} ${topic.name}`;
-      if (includesAny(descriptor, target.topics)) (topic.question_ids || []).forEach(id => result.add(id));
-    }
-  }
-  return result;
-}
-
 function materialMap() {
   return new Map((state.catalog?.materials || []).map(material => [String(material.id), material]));
 }
 
 function trackPool(track) {
   const materials = materialMap();
-  const eligible = targetQuestionIds(track.target);
+  const eligible = targetQuestionIdsForStudyIndex(state.studyIndex, track.target);
   const ids = [];
   const materialIds = new Set();
   for (const id of eligible) {
     const materialId = materialIdFromIndex(state.catalog?.question_index?.[id]);
     const material = materials.get(String(materialId || ""));
-    if (!material || normalize(material.tipo_material) !== track.type) continue;
+    if (!material || normalizeStudyValue(material.tipo_material) !== track.type) continue;
     ids.push(id);
     materialIds.add(material.id);
   }
@@ -376,6 +193,7 @@ function enhanceTodayCard() {
       discipline: "Recorte por edital",
       source: "Provas/simulados filtrados por disciplina e assunto do edital",
       cargo: selectedTracks.length === 1 ? selectedTracks[0].target : "multicargo",
+      materialType: sessionMaterialTypeForTracks(selectedTracks),
     });
   });
   update();
