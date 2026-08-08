@@ -13,7 +13,7 @@ permissions:
 
 concurrency:
   group: ux-release-one-shot
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   validate:
@@ -26,11 +26,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
-      - name: Instalar Playwright
-        run: |
-          npm install --no-save @playwright/test
-          npx playwright install --with-deps chromium
 
       - name: Congelar release editorial atual
         run: |
@@ -96,6 +91,11 @@ jobs:
           node scripts/validate-dist-v2-10.mjs
           node scripts/validate-build-v2-11.mjs
           node scripts/validate-public-metadata-consistency.mjs
+
+      - name: Instalar Playwright
+        run: |
+          npm install --no-save @playwright/test
+          npx playwright install --with-deps chromium
 
       - name: Subir dist local
         run: |
