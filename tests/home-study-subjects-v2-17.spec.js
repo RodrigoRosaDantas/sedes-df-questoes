@@ -132,7 +132,7 @@ test("filtro de matérias usa estado temporário v2 e não altera as quatro tril
 test.describe("mobile touch", () => {
   test.use({viewport: {width: 390, height: 844}, isMobile: true, hasTouch: true});
 
-  test("rolagem da lista permanece estável ao selecionar matérias", async ({page}) => {
+  test("lista de matérias usa a rolagem natural da página, sem barra interna", async ({page}) => {
     const errors = [];
     page.on("pageerror", error => errors.push(error.message));
     await openHome(page);
@@ -141,18 +141,23 @@ test.describe("mobile touch", () => {
     await group.locator("summary").tap();
     const chips = group.locator(".ux17-subject-chips");
     await expect(chips).toBeVisible();
-    await chips.evaluate(node => {
-      node.scrollTop = node.scrollHeight;
-      node.dataset.scrollSentinel = "keep";
+    const layout = await chips.evaluate(node => {
+      const style = getComputedStyle(node);
+      return {
+        overflowY: style.overflowY,
+        maxHeight: style.maxHeight,
+        touchAction: style.touchAction,
+        clientHeight: node.clientHeight,
+        scrollHeight: node.scrollHeight,
+      };
     });
-    const before = await chips.evaluate(node => node.scrollTop);
-    expect(before).toBeGreaterThan(0);
-    const last = group.locator("[data-ux17-subject-button]").last();
-    await last.tap();
-    await expect(chips).toHaveAttribute("data-scroll-sentinel", "keep");
-    const after = await chips.evaluate(node => node.scrollTop);
-    expect(after).toBeGreaterThanOrEqual(Math.max(0, before - 2));
-    await expect(last).toHaveAttribute("aria-pressed", "true");
+    expect(layout.overflowY).toBe("visible");
+    expect(layout.maxHeight).toBe("none");
+    expect(layout.touchAction).toBe("auto");
+    expect(Math.abs(layout.scrollHeight - layout.clientHeight)).toBeLessThanOrEqual(1);
+    await group.locator("[data-ux17-subject-button]").last().scrollIntoViewIfNeeded();
+    const pageY = await page.evaluate(() => window.scrollY);
+    expect(pageY).toBeGreaterThan(0);
     expect(errors).toEqual([]);
   });
 
