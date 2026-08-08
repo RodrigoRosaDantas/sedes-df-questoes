@@ -3,7 +3,8 @@ import {test, expect} from "@playwright/test";
 test("fluxo principal, prova completa, matérias e recursos inteligentes", async ({page}) => {
   await page.goto("/");
   await expect(page.locator("#app h1")).toBeVisible();
-  await expect(page.locator("[data-smart-today]")).toBeVisible();
+  await expect(page.locator("[data-ux15-home]")).toBeVisible();
+  await expect(page.locator("[data-ux-today]")).toBeVisible();
   await expect(page.locator('link[rel="manifest"]')).toHaveAttribute("href", "./manifest.webmanifest");
 
   await page.locator('[data-route="estudar"]').first().click();
