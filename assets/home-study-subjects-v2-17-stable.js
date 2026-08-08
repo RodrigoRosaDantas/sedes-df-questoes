@@ -30,6 +30,7 @@ const trackCache = new Map();
 const subjectCache = new Map();
 let questionFormatIndex = null;
 let questionFormatPromise = null;
+let formatRetryTimer = null;
 let watchdog = null;
 
 const dateKey = value => new Intl.DateTimeFormat("en-CA", {timeZone: "America/Sao_Paulo"}).format(new Date(value));
@@ -46,6 +47,10 @@ async function ensureQuestionFormatIndex() {
         if (!payload?.formats || typeof payload.formats !== "object") throw new Error("Índice de formato inválido.");
         questionFormatIndex = payload.formats;
         return questionFormatIndex;
+      })
+      .catch(error => {
+        questionFormatPromise = null;
+        throw error;
       });
   }
   return questionFormatPromise;
@@ -215,7 +220,7 @@ function formatPanel(pools) {
   const counts = formatCounts(pools);
   return `<section class="ux20-format" data-ux20-format aria-label="Formato das questões">
     <div class="ux20-format-copy"><small>Formato das questões</small><strong>Como você quer responder agora?</strong></div>
-    <div class="ux20-format-options" role="group" aria-label="Filtrar formato das questões">${FORMAT_MODES.map(mode => `<button type="button" class="ux20-format-option ${selected === mode.id ? "selected" : ""}" data-ux20-format-option="${mode.id}" aria-pressed="${selected === mode.id ? "true" : "false"}" ${counts[mode.id] === 0 && mode.id !== "all" ? "disabled" : ""}><span>${esc(mode.label)}</span><small data-ux20-format-count="${mode.id}">${counts[mode.id].toLocaleString("pt-BR")}</small></button>`).join("")}</div>
+    <div class="ux20-format-options" role="group" aria-label="Filtrar formato das questões">${FORMAT_MODES.map(mode => `<button type="button" class="ux20-format-option ${selected === mode.id ? "selected" : ""}" data-ux20-format-option="${mode.id}" aria-pressed="${selected === mode.id ? "true" : "false"}" ${(!questionFormatIndex || counts[mode.id] === 0) && mode.id !== "all" ? "disabled" : ""}><span>${esc(mode.label)}</span><small data-ux20-format-count="${mode.id}">${counts[mode.id].toLocaleString("pt-BR")}</small></button>`).join("")}</div>
   </section>`;
 }
 
@@ -305,7 +310,7 @@ function syncFormatControls(card) {
     const active = selected === mode;
     button.classList.toggle("selected", active);
     button.setAttribute("aria-pressed", String(active));
-    button.disabled = mode !== "all" && counts[mode] === 0;
+    button.disabled = mode !== "all" && (!questionFormatIndex || counts[mode] === 0);
   });
   card.querySelectorAll("[data-ux20-format-count]").forEach(node => {
     const mode = node.dataset.ux20FormatCount;
@@ -482,7 +487,31 @@ function arm() {
   if (!watchdog && currentRoute() === "inicio") watchdog = window.setInterval(tick, 900);
 }
 
+function refreshAfterFormatIndex() {
+  if (formatRetryTimer) {
+    window.clearTimeout(formatRetryTimer);
+    formatRetryTimer = null;
+  }
+  const card = document.querySelector("#app > [data-ux15-home] [data-ux-today][data-ux16-ready]");
+  if (card) renderSubjects(card);
+}
+
+function loadFormatIndexAndRefresh() {
+  ensureQuestionFormatIndex()
+    .then(refreshAfterFormatIndex)
+    .catch(error => {
+      console.error("Falha temporária ao carregar formatos do Estudo de hoje v2.20:", error);
+      if (!formatRetryTimer) formatRetryTimer = window.setTimeout(() => {
+        formatRetryTimer = null;
+        loadFormatIndexAndRefresh();
+      }, 1200);
+    });
+}
+
 window.addEventListener("hashchange", () => window.setTimeout(arm, 120));
-Promise.all([ensureData(), ensureQuestionFormatIndex()])
-  .then(() => window.setTimeout(arm, 120))
-  .catch(error => console.error("Falha ao preparar filtros do Estudo de hoje v2.20:", error));
+ensureData()
+  .then(() => {
+    window.setTimeout(arm, 120);
+    loadFormatIndexAndRefresh();
+  })
+  .catch(error => console.error("Falha ao preparar matérias do Estudo de hoje v2.20:", error));
