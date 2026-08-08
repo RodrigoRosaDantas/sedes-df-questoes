@@ -470,7 +470,10 @@ function tick() {
   }
   const card = document.querySelector("#app > [data-ux15-home] [data-ux-today][data-ux16-ready]");
   if (!card) return;
-  const stable = card.dataset.ux17Ready && card.querySelector("[data-ux17-subjects]") && card.querySelector("[data-ux17-start]");
+  const stable = card.dataset.ux17Ready
+    && card.querySelector("[data-ux17-subjects]")
+    && card.querySelector("[data-ux17-start]")
+    && card.querySelector("[data-ux20-format]");
   if (!stable) enhanceCard(card);
 }
 
