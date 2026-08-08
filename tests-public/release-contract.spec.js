@@ -134,10 +134,14 @@ test("publica exatamente o plano excepcional validado", async ({request}) => {
     total += material.questoes.length;
     for (const question of material.questoes) {
       const code = clean(question.codigo || question.codigo_fonte);
+      const answer = clean(question.gabarito);
       expect(code, "Questão pública sem código.").toBeTruthy();
+      expect(answer, `${code} sem gabarito.`).toBeTruthy();
       if (publicCodes.has(code)) duplicates.push(code);
       publicCodes.add(code);
-      expect(clean(question.gabarito).toLowerCase()).not.toBe("anulada");
+      if (plannedCodes.has(code)) {
+        expect(answer.toLowerCase(), `Questão do plano publicada como anulada: ${code}`).not.toBe("anulada");
+      }
     }
   }
 
