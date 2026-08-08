@@ -14,6 +14,7 @@ export default defineConfig({
     "ux-v2-14.spec.js",
     "navigation-v2-15.spec.js",
     "home-study-subjects-v2-17.spec.js",
+    "resolver-context-v2-19.spec.js",
   ],
   timeout: 240000,
   retries: 1,
