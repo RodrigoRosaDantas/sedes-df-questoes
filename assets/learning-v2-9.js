@@ -29,6 +29,7 @@ const history = () => readJSON(profileKey("history"), []);
 const session = () => readJSON(profileKey("session"), null);
 const notes = () => readJSON(smartKey("notes"), {});
 const reasons = () => readJSON(smartKey("errorReasons"), {});
+const cleanHomeLayerEnabled = () => Boolean(document.querySelector('script[src*="navigation-v2-15.js"]'));
 const esc = (value = "") => String(value)
   .replaceAll("&", "&amp;")
   .replaceAll("<", "&lt;")
@@ -241,6 +242,7 @@ function todayPanel() {
 }
 
 function injectTodayPanel() {
+  if (cleanHomeLayerEnabled()) return;
   const hero = document.querySelector(".home-hero");
   if (!hero || document.querySelector("[data-smart-today]")) return;
   hero.insertAdjacentHTML("afterend", todayPanel());

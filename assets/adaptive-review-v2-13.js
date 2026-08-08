@@ -41,15 +41,18 @@ function startReview() {
   createCompatibleSession({id: "revisao-adaptativa", name: "Revisão adaptativa", questionIds: due.map(item => item.id), mode: "treino", minutes: due.length * 2, discipline: "Prioridades calculadas", source: "Histórico local"});
 }
 function injectCard() {
-  const route = currentRoute();
-  if (!["inicio", "revisar"].includes(route) || document.querySelector("[data-adaptive-review]")) return;
+  if (currentRoute() !== "revisar" || document.querySelector("[data-adaptive-review]")) return;
   const due = dueItems(); const model = Object.values(readJSON(MODEL_KEY(), {}));
   const weakest = [...model].filter(item => item.attempts >= 2).sort((a, b) => a.mastery - b.mastery || b.lapses - a.lapses)[0];
-  const target = route === "revisar" ? document.querySelector(".review-actions") : document.querySelector("[data-smart-today]") || document.querySelector(".home-actions-grid");
+  const target = document.querySelector(".review-actions");
   if (!target) return;
   const card = document.createElement("section"); card.className = "adaptive-review card"; card.dataset.adaptiveReview = "";
   card.innerHTML = `<div><p class="eyebrow">Revisão adaptativa</p><h2>${due.length} questão(ões) prioritária(s)</h2><p>Intervalos ajustados por acerto, reincidência e tempo de resposta. ${weakest ? `Menor domínio: ${esc(weakest.discipline)}${weakest.assunto ? ` · ${esc(weakest.assunto)}` : ""} (${weakest.mastery}%).` : "Resolva novas tentativas para calibrar o modelo."}</p></div><div class="adaptive-facts"><span><strong>${model.filter(item => item.lapses > 1).length}</strong><small>reincidentes</small></span><span><strong>${model.filter(item => item.mastery >= 80).length}</strong><small>dominadas</small></span><span><strong>${due.filter(item => item.averageSeconds > 120).length}</strong><small>lentas</small></span></div><button class="btn primary" data-start-adaptive ${due.length ? "" : "disabled"}>Iniciar revisão adaptativa</button>`;
-  target.insertAdjacentElement(route === "revisar" ? "beforebegin" : "afterend", card);
+  target.insertAdjacentElement("beforebegin", card);
   card.querySelector("[data-start-adaptive]").addEventListener("click", startReview);
 }
-observeApp(injectCard);
+function enhanceAdaptive() {
+  syncModel();
+  injectCard();
+}
+observeApp(enhanceAdaptive);

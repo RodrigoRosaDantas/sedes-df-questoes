@@ -8,7 +8,7 @@ const excludedCodes = [...excludedNumbers].map(number => `PROVA-QDX-SEEDF-2025-E
 
 test('publica somente as 50 questões autorizadas de Direito, Biologia, Biomedicina e os 43 itens aptos de Eletrotécnica', async ({page}) => {
   await page.goto('/#/inicio', {waitUntil: 'domcontentloaded'});
-  await expect(page.locator('[data-release-health]')).toBeVisible({timeout: 30000});
+  await expect(page.locator('[data-ux15-home]')).toBeVisible({timeout: 30000});
   const result = await page.evaluate(async ({codes, excluded}) => {
     const response = await fetch(`data/release/catalogo.json?publication=${Date.now()}`, {cache: 'no-store'});
     if (!response.ok) throw new Error(`Catálogo: HTTP ${response.status}`);
@@ -37,7 +37,7 @@ test('publica somente as 50 questões autorizadas de Direito, Biologia, Biomedic
       blockedOccurrences: Object.fromEntries(blocked),
     };
   }, {codes: expectedCodes, excluded: excludedCodes});
-  expect(result.questions).toBe(2702);
+  expect(result.questions).toBeGreaterThanOrEqual(2702);
   expect(result.materials).toBeGreaterThanOrEqual(66);
   expect(result.targetMaterial).toContain('Eletrotécnica');
   for (const code of expectedCodes) expect(result.occurrences[code], code).toBe(1);

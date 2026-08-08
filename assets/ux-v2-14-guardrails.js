@@ -1,0 +1,212 @@
+import {
+  activeHistory,
+  activeSession,
+  createCompatibleSession,
+  currentRoute,
+  observeApp,
+  profileKey,
+  questionIndexEntries,
+  readJSON,
+  saveJSON,
+  state,
+  toast,
+} from "./shared-v2-13.js?v=1";
+
+const ERRORS_KEY = () => profileKey("errors.v3");
+const MARKED_KEY = () => profileKey("marked.v3");
+const ADAPTIVE_KEY = () => profileKey("adaptiveReview.v1");
+const POLICY_KEY = () => profileKey("errorMasteryPolicy.v1");
+const ERROR_REASONS_KEY = () => profileKey("errorReasons.v1");
+
+const REASON_CANONICAL = {
+  "nao-sabia": "Não sabia o conteúdo",
+  "Não sabia": "Não sabia o conteúdo",
+  desatencao: "Distração",
+  "Desatenção": "Distração",
+  confundi: "Confundi a regra ou a lei",
+  "Confundi conceitos": "Confundi a regra ou a lei",
+  interpretacao: "Erro de interpretação",
+  "Interpretação": "Erro de interpretação",
+  chute: "Chute",
+  tempo: "Falta de tempo",
+};
+const CANONICAL_TO_SLUG = {
+  "Não sabia o conteúdo": "nao-sabia",
+  "Distração": "desatencao",
+  "Confundi a regra ou a lei": "confundi",
+  "Erro de interpretação": "interpretacao",
+  "Chute": "chute",
+  "Falta de tempo": "tempo",
+};
+
+const normalize = value => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("pt-BR");
+const stableScore = (id, salt) => {
+  let hash = 2166136261;
+  for (const char of `${salt}:${id}`) hash = Math.imul(hash ^ char.charCodeAt(0), 16777619);
+  return hash >>> 0;
+};
+const stableTake = (ids, count, salt) => [...ids].sort((a, b) => stableScore(a, salt) - stableScore(b, salt)).slice(0, count);
+const answeredIds = () => new Set(activeHistory().flatMap(attempt => {
+  if (Array.isArray(attempt?.answeredQuestionIds)) return attempt.answeredQuestionIds;
+  if (attempt?.answers && typeof attempt.answers === "object") return Object.entries(attempt.answers).filter(([, answer]) => Boolean(answer)).map(([id]) => id);
+  return Array.isArray(attempt?.questionIds) ? attempt.questionIds : [];
+}));
+
+function normalizeErrorReasons() {
+  const reasons = readJSON(ERROR_REASONS_KEY(), {});
+  let changed = false;
+  for (const item of Object.values(reasons)) {
+    if (!item?.reason) continue;
+    const canonical = REASON_CANONICAL[item.reason] || item.reason;
+    if (canonical !== item.reason) {
+      item.reason = canonical;
+      changed = true;
+    }
+  }
+  if (changed) saveJSON(ERROR_REASONS_KEY(), reasons);
+  return reasons;
+}
+
+function alignReasonButtons(reasons = readJSON(ERROR_REASONS_KEY(), {})) {
+  const session = activeSession();
+  const id = session?.questionIds?.[Number(session.current || 0)] || session?.questions?.[Number(session.current || 0)]?.id || null;
+  if (!id) return;
+  const stored = reasons[id]?.reason || "";
+  const slug = CANONICAL_TO_SLUG[stored] || stored;
+  document.querySelectorAll("[data-ux-error-reason]").forEach(button => {
+    button.classList.toggle("active", button.dataset.uxErrorReason === slug);
+  });
+}
+
+function ensurePolicyActivation() {
+  const key = POLICY_KEY();
+  let policy = readJSON(key, null);
+  if (!policy?.activatedAt) {
+    policy = {schema_version: "1.0", activatedAt: new Date().toISOString(), closeAfterConsecutiveCorrect: 3};
+    saveJSON(key, policy);
+  }
+  return policy;
+}
+
+function reconcileErrorMastery() {
+  const policy = ensurePolicyActivation();
+  const activation = Date.parse(policy.activatedAt || "");
+  if (!Number.isFinite(activation)) return;
+  const book = readJSON(ERRORS_KEY(), {});
+  const model = readJSON(ADAPTIVE_KEY(), {});
+  let changed = false;
+  for (const [id, item] of Object.entries(book)) {
+    const updated = Date.parse(item?.updatedAt || "");
+    if (!item?.count || !Number.isFinite(updated) || updated < activation) continue;
+    const streak = Number(model[id]?.streak || 0);
+    const shouldOpen = streak < Number(policy.closeAfterConsecutiveCorrect || 3);
+    if (Boolean(item.open) !== shouldOpen) {
+      item.open = shouldOpen;
+      if (!shouldOpen) item.masteredAt = new Date().toISOString();
+      changed = true;
+    }
+  }
+  if (changed) saveJSON(ERRORS_KEY(), book);
+}
+
+function alignReviewCopy() {
+  if (currentRoute() !== "revisar") return;
+  const hint = document.querySelector(".review-summary .metric:first-child span");
+  const expected = "saem da fila após 3 acertos consecutivos";
+  if (hint && hint.textContent !== expected) hint.textContent = expected;
+}
+
+function criteriaFrom(root) {
+  const value = name => root.querySelector(`[data-ux-filter-${name}]`)?.value || "";
+  return {
+    type: value("type"), discipline: value("discipline"), cargo: value("cargo"), year: value("year"),
+    source: value("source"), scope: value("scope") || "all", count: value("count") || "20", mode: value("mode") || "treino",
+  };
+}
+
+function correctedFilteredIds(criteria) {
+  const matchingMaterials = (state.catalog?.materials || []).filter(item => {
+    const type = normalize(item.tipo_material);
+    return (!criteria.type || type === criteria.type)
+      && (!criteria.cargo || String(item.codigo_cargo) === criteria.cargo)
+      && (!criteria.year || String(item.ano) === criteria.year)
+      && (!criteria.source || item.fonte === criteria.source);
+  });
+  const materialIds = new Set(matchingMaterials.map(item => item.id));
+  let ids = questionIndexEntries().filter(item => materialIds.has(item.materialId)).map(item => item.id);
+
+  if (criteria.discipline) {
+    const discipline = (state.studyIndex?.disciplines || []).find(item => item.name === criteria.discipline);
+    const allowed = new Set(discipline?.question_ids || []);
+    ids = ids.filter(id => allowed.has(id));
+  }
+
+  const answered = answeredIds();
+  const errors = readJSON(ERRORS_KEY(), {});
+  const marked = readJSON(MARKED_KEY(), {});
+  if (criteria.scope === "unanswered") ids = ids.filter(id => !answered.has(id));
+  if (criteria.scope === "errors") ids = ids.filter(id => errors[id]?.open);
+  if (criteria.scope === "marked") ids = ids.filter(id => Boolean(marked[id]));
+  const count = criteria.count === "all" ? ids.length : Math.max(1, Number(criteria.count || 20));
+  return stableTake(ids, count, `guarded-filter:${JSON.stringify(criteria)}`);
+}
+
+function startCorrectedFilter(event) {
+  const button = event.target.closest("[data-ux-run-filter]");
+  if (!button) return;
+  const root = button.closest("[data-ux-study-launcher]") || document;
+  const criteria = criteriaFrom(root);
+  const ids = correctedFilteredIds(criteria);
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  if (!ids.length) return toast("Não há questões disponíveis para os filtros selecionados.", "info");
+  createCompatibleSession({
+    id: "treino-personalizado-v2",
+    name: "Treino personalizado",
+    questionIds: ids,
+    mode: criteria.mode,
+    minutes: ids.length * 2,
+    discipline: criteria.discipline || "Múltiplas matérias",
+    source: "Filtros avançados v2.14",
+  });
+}
+
+function closeMasteredByStreak(event) {
+  const button = event.target.closest("[data-ux-close-mastered]");
+  if (!button) return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  const book = readJSON(ERRORS_KEY(), {});
+  const model = readJSON(ADAPTIVE_KEY(), {});
+  let closed = 0;
+  for (const [id, item] of Object.entries(book)) {
+    if (item?.open && Number(model[id]?.streak || 0) >= 3) {
+      item.open = false;
+      item.masteredAt = new Date().toISOString();
+      closed += 1;
+    }
+  }
+  if (!closed) return toast("Nenhum erro atingiu 3 acertos consecutivos ainda.", "info");
+  saveJSON(ERRORS_KEY(), book);
+  toast(`${closed} erro(s) dominado(s) encerrado(s).`, "success");
+  location.reload();
+}
+
+function normalizeReasonAfterUxClick(event) {
+  if (!event.target.closest("[data-ux-error-reason]")) return;
+  queueMicrotask(() => alignReasonButtons(normalizeErrorReasons()));
+}
+
+document.addEventListener("click", startCorrectedFilter, true);
+document.addEventListener("click", closeMasteredByStreak, true);
+document.addEventListener("click", normalizeReasonAfterUxClick);
+
+observeApp(() => {
+  document.documentElement.classList.toggle("ux-student-home", currentRoute() === "inicio");
+  queueMicrotask(() => {
+    const reasons = normalizeErrorReasons();
+    alignReasonButtons(reasons);
+    reconcileErrorMastery();
+    alignReviewCopy();
+  });
+});

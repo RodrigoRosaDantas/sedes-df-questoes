@@ -147,16 +147,33 @@ test("publica exatamente o plano excepcional validado", async ({request}) => {
   expect(missing, `Códigos autorizados ausentes: ${missing.slice(0, 20).join(", ")}`).toEqual([]);
 });
 
-test("interface pública usa a mesma release", async ({page, request}) => {
+test("interface pública usa a mesma release na arquitetura v2.15", async ({page, request}) => {
   const {build} = await loadRelease(request);
+
   await openRoute(page, "inicio");
-  await expect(page.locator("[data-release-health]")).toContainText(
-    Number(build.questions).toLocaleString("pt-BR"), {timeout: 30000});
-  await expect(page.locator("[data-official-exam-card]")).toContainText("60 questões");
-  await expect(page.locator("[data-adaptive-review]")).toBeVisible();
+  await expect(page.locator("[data-ux15-home]")).toBeVisible({timeout: 30000});
+  await expect(page.locator("#app > *")).toHaveCount(1);
+  await expect(page.locator("[data-release-health]")).toHaveCount(0);
+  await expect(page.locator("[data-official-exam-card]")).toHaveCount(0);
+  await expect(page.locator("[data-adaptive-review]")).toHaveCount(0);
+
+  await openRoute(page, "perfil/configuracoes");
+  await expect(page.locator("[data-ux15-settings-page]")).toBeVisible({timeout: 30000});
+  await page.locator("[data-ux15-settings-tab=plataforma]").click();
+  const platform = page.locator("[data-ux15-settings-page]");
+  await expect(platform).toContainText("Questões publicadas");
+  await expect(platform).toContainText(Number(build.questions).toLocaleString("pt-BR"));
+
+  await openRoute(page, "estudar");
+  await expect(page.locator("[data-official-exam-card]")).toContainText("60 questões", {timeout: 30000});
+  await expect(page.locator("[data-role-templates]")).toBeVisible({timeout: 30000});
   await page.locator("[data-start-official-exam]").click();
   await expect(page.locator(".question-card")).toBeVisible({timeout: 30000});
   await expect(page.locator("[data-report-question]")).toBeVisible();
+
+  await openRoute(page, "revisar");
+  await expect(page.locator("[data-adaptive-review]")).toBeVisible({timeout: 30000});
+
   await openRoute(page, "desempenho");
   await expect(page.locator("[data-vault-tools]")).toBeVisible({timeout: 30000});
 });

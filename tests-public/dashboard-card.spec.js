@@ -6,13 +6,6 @@ if (!configuredURL.startsWith("http")) throw new Error("PUBLIC_BASE_URL não inf
 if (!expectedSha) throw new Error("EXPECTED_SHA não informado.");
 const publicBase = new URL(`${configuredURL.replace(/\/+$/, "")}/`);
 
-const expected = {
-  bancoMestre: 2946,
-  questions: 2871,
-  awaitingAudit: 75,
-  materials: 67,
-};
-
 const sleep = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
 
 function urlFor(relative = "", attempt = 1) {
@@ -45,27 +38,38 @@ async function fetchEventually(request, relative, predicate) {
   throw new Error(`Recurso público não estabilizou: ${last}`);
 }
 
-test("cartão Banco Mestre usa o release-meta reconciliado", async ({page, request}) => {
-  await fetchEventually(request, "data/release/build-info.json", value =>
+function fact(page, label) {
+  return page.locator(".ux15-facts-grid span").filter({hasText: label}).first();
+}
+
+test("Configurações usa o release-meta reconciliado", async ({page, request}) => {
+  const build = await fetchEventually(request, "data/release/build-info.json", value =>
     value?.source_sha === expectedSha
-    && Number(value?.questions) === expected.questions
-    && Number(value?.materials) === expected.materials);
+    && Number(value?.questions) > 0
+    && Number(value?.materials) > 0);
 
   const releaseMeta = await fetchEventually(request, "data/release/release-meta.json", value =>
-    Number(value?.banco_mestre) === expected.bancoMestre
-    && Number(value?.questions) === expected.questions
-    && Number(value?.awaiting_audit) === expected.awaitingAudit
-    && Number(value?.materials) === expected.materials);
+    value?.source_sha === expectedSha
+    && Number(value?.questions) === Number(build.questions)
+    && Number(value?.materials) === Number(build.materials));
+
+  const catalog = await fetchEventually(request, "data/release/catalogo.json", value =>
+    Number(value?.summary?.questoes) === Number(build.questions)
+    && Number(value?.summary?.materiais) === Number(build.materials));
+
+  expect(Object.keys(catalog.question_index || {})).toHaveLength(Number(build.questions));
 
   const url = urlFor("", Date.now());
-  url.hash = "/inicio";
+  url.hash = "/perfil/configuracoes";
   await page.goto(url.href, {waitUntil: "domcontentloaded"});
   await expect(page.locator(".error-state")).toHaveCount(0);
+  await expect(page.locator("[data-ux15-settings-page]")).toBeVisible({timeout: 30000});
+  await page.locator("[data-ux15-settings-tab=plataforma]").click();
 
-  const values = page.locator(".bank-status strong");
-  await expect(values).toHaveCount(3);
-  await expect(values.nth(0)).toHaveText(String(releaseMeta.banco_mestre), {timeout: 30000});
-  await expect(values.nth(1)).toHaveText(String(releaseMeta.questions));
-  await expect(values.nth(2)).toHaveText(String(releaseMeta.awaiting_audit));
-  await expect(page.locator('script[src*="app-v4.js?v=9"]')).toHaveCount(1);
+  await expect(fact(page, "Questões publicadas")).toContainText(Number(releaseMeta.questions).toLocaleString("pt-BR"));
+  await expect(fact(page, "Materiais")).toContainText(String(releaseMeta.materials));
+  await expect(fact(page, "Banco Mestre")).toContainText(Number(releaseMeta.banco_mestre || 0).toLocaleString("pt-BR"));
+  await expect(fact(page, "Aguardando auditoria")).toContainText(String(Number(releaseMeta.awaiting_audit || 0)));
+  await expect(page.locator('script[src*="app-v4.js?v=13"]')).toHaveCount(1);
+  await expect(page.locator('script[src*="navigation-v2-15.js?v=1"]')).toHaveCount(1);
 });

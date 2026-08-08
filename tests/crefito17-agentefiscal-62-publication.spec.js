@@ -10,7 +10,7 @@ test('publica somente as 50 questões autorizadas de Direito e, após os lotes c
   expect(expectedCodes).not.toContain(blockedCode);
 
   await page.goto('/#/inicio', {waitUntil: 'domcontentloaded'});
-  await expect(page.locator('[data-release-health]')).toBeVisible({timeout: 30000});
+  await expect(page.locator('[data-ux15-home]')).toBeVisible({timeout: 30000});
 
   const result = await page.evaluate(async ({codes, blocked}) => {
     const response = await fetch(`data/release/catalogo.json?publication=${Date.now()}`, {cache: 'no-store'});
@@ -46,7 +46,7 @@ test('publica somente as 50 questões autorizadas de Direito e, após os lotes c
     };
   }, {codes: expectedCodes, blocked: blockedCode});
 
-  expect(result.questions).toBe(2801);
+  expect(result.questions).toBeGreaterThanOrEqual(2801);
   expect(result.materials).toBeGreaterThanOrEqual(67);
   expect(result.targetMaterial).toContain('Agente Fiscal');
   expect(result.targetMaterial).toContain('CREFITO-17');

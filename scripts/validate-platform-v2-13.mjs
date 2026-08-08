@@ -9,24 +9,30 @@ const pkg = JSON.parse(read("package.json"));
 if (pkg.version !== "2.13.0") fail(`Versão inesperada: ${pkg.version}`);
 const index = read("index.html"), worker = read("service-worker.js"), builder = read("scripts/build-public.mjs"), css = read("assets/platform-v2-13.css");
 const modules = {shared: read("assets/shared-v2-13.js"), release: read("assets/release-v2-13.js"), vault: read("assets/vault-v2-13.js"), report: read("assets/report-v2-13.js"), official: read("assets/official-exam-v2-13.js"), adaptive: read("assets/adaptive-review-v2-13.js")};
+const navigation = read("assets/navigation-v2-15.js");
 const references = ["release-v2-13.js?v=1", "vault-v2-13.js?v=1", "report-v2-13.js?v=1", "official-exam-v2-13.js?v=1", "adaptive-review-v2-13.js?v=1"];
-requireMarkers(index, ["platform-v2-13.css?v=1", ...references], "HTML");
-requireMarkers(worker, ["sedes-questoes-v2-13-0", "shared-v2-13.js?v=1", ...references, "release-meta"], "Service worker");
-requireMarkers(modules.shared, ["release-meta.json", "createCompatibleSession", "questionIndexEntries"], "Módulo compartilhado");
-requireMarkers(modules.release, ["Integridade da publicação", "data-release-health"], "Release");
+requireMarkers(index, ["platform-v2-13.css?v=1", ...references, "navigation-v2-15.js?v=1"], "HTML");
+requireMarkers(worker, ["sedes-questoes-v2-13-0", "shared-v2-13.js?v=1", ...references, "navigation-v2-15.js?v=1", "release-meta"], "Service worker");
+requireMarkers(modules.shared, [
+  "release-meta.json", "createCompatibleSession", "questionIndexEntries",
+  "let dataPromise = null", "if (dataPromise) return dataPromise", "dataPromise = null",
+  "let scheduled = false", "if (scheduled) return", "scheduled = false",
+], "Módulo compartilhado");
+requireMarkers(modules.release, ["enhanceReleaseMetadata", "data-release-footer", "#sync-label", "state.release.app_version"], "Metadados da release");
+requireMarkers(navigation, ["#/perfil/configuracoes", "Dados do projeto", "Questões publicadas", "Banco Mestre"], "Configurações da plataforma");
 requireMarkers(modules.vault, ["sedes-protected-backup", "PBKDF2", "AES-GCM", "data-vault-tools"], "Cofre local");
 requireMarkers(modules.report, ["Reportar problema nesta questão", "issues/new", "O relato não altera automaticamente"], "Reporte");
 requireMarkers(modules.official, ["Prova Real SEDES/DF 2026", "20", "40", "240", "general < 10", "specific < 40"], "Prova real");
 requireMarkers(modules.adaptive, ["Revisão adaptativa", "mastery", "averageSeconds", "lapses"], "Revisão adaptativa");
-requireMarkers(css, ["release-health", "official-exam-card", "vault-tools", "platform-dialog-backdrop", "adaptive-review"], "CSS");
-requireMarkers(builder, ["release-meta.json", "official_exam", "joint_duration_minutes: 240", "platform_shared_js", "platform_official_exam_js"], "Build");
+requireMarkers(css, ["official-exam-card", "vault-tools", "platform-dialog-backdrop", "adaptive-review"], "CSS");
+requireMarkers(builder, ["release-meta.json", "official_exam", "joint_duration_minutes: 240", "platform_shared_js", "platform_official_exam_js", "enhanceReleaseMetadata"], "Build");
 requireMarkers(read("README.md"), ["data/release/release-meta.json", "PBKDF2", "AES-GCM", "60 questões objetivas"], "README");
 requireMarkers(read(".github/ISSUE_TEMPLATE/problema-em-questao.yml"), ["Problema em questão", "Possível erro de gabarito", "Release/commit"], "Template de issue");
-requireMarkers(read("tests/platform-v2-13.spec.js"), ["data-release-health", "data-start-official-exam", "data-report-question", "data-vault-tools"], "Teste local");
-requireMarkers(read("tests-public/platform-v2-13.spec.js"), ["data-release-health", "data-start-official-exam", "data-report-question", "data-vault-tools"], "Teste público");
+requireMarkers(read("tests/platform-v2-13.spec.js"), ["data-ux15-settings-page", "data-ux15-settings-tab=plataforma", "data-start-official-exam", "data-report-question", "data-vault-tools"], "Teste local");
+requireMarkers(read("tests-public/platform-v2-13.spec.js"), ["data-ux15-settings-page", "data-ux15-settings-tab=plataforma", "data-start-official-exam", "data-report-question", "data-vault-tools"], "Teste público");
 const releaseMeta = JSON.parse(read("dist/data/release/release-meta.json")), catalog = JSON.parse(read("dist/data/release/catalogo.json"));
 const questions = Object.keys(catalog.question_index || {}).length, materials = (catalog.materials || []).length;
 if (releaseMeta.app_version !== pkg.version || releaseMeta.questions !== questions || releaseMeta.materials !== materials) fail("Release-meta diverge do pacote.");
 if (releaseMeta.official_exam?.objective_questions !== 60 || releaseMeta.official_exam?.joint_duration_minutes !== 240) fail("Configuração oficial divergente.");
-for (const key of ["platform_shared_js", "platform_release_js", "platform_vault_js", "platform_report_js", "platform_official_exam_js", "platform_adaptive_review_js", "platform_css"]) if (!releaseMeta.source_files_sha256?.[key]) fail(`Hash ausente: ${key}`);
-console.log(`✓ Plataforma 2.13 validada: ${questions} questões, ${materials} materiais, release unificada, cofre local, reporte, prova real e revisão adaptativa.`);
+for (const key of ["platform_shared_js", "platform_release_js", "platform_vault_js", "platform_report_js", "platform_official_exam_js", "platform_adaptive_review_js", "platform_css", "platform_navigation_js"]) if (!releaseMeta.source_files_sha256?.[key]) fail(`Hash ausente: ${key}`);
+console.log(`✓ Plataforma 2.13 validada: ${questions} questões, ${materials} materiais, carga inicial compartilhada, observers coalescidos, metadados em Configurações, cofre local, reporte, prova real e revisão adaptativa.`);

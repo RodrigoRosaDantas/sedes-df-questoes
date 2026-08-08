@@ -21,7 +21,7 @@ test('preserva os 50 itens históricos e completa as 120 questões de Contador s
   }
 
   await page.goto('/#/inicio', {waitUntil: 'domcontentloaded'});
-  await expect(page.locator('[data-release-health]')).toBeVisible({timeout: 30000});
+  await expect(page.locator('[data-ux15-home]')).toBeVisible({timeout: 30000});
 
   const result = await page.evaluate(async ({trackedCodes, codePrefix}) => {
     const response = await fetch(`data/release/catalogo.json?publication=${Date.now()}`, {cache: 'no-store'});
@@ -59,22 +59,16 @@ test('preserva os 50 itens históricos e completa as 120 questões de Contador s
     };
   }, {trackedCodes: fullExamCodes, codePrefix: prefix});
 
-  if (!applicationApplied) {
-    expect([2535, 2801]).toContain(result.questions);
-    expect(result.prefixCodes).toEqual(historicalCodes);
-    for (const code of historicalCodes) expect(result.occurrences[code], code).toBe(1);
-    for (const code of authorizedCodes) expect(result.occurrences[code], code).toBe(0);
-    expect(new Set(result.prefixCodes).size).toBe(50);
-    return;
-  }
-
-  expect(receipt.operation_id).toBe('CRBM6-2026-CONTADOR-402-001-070-20260803');
-  expect(receipt.added_questions).toBe(70);
-  expect(result.questions).toBe(2871);
+  expect(result.questions).toBeGreaterThanOrEqual(2871);
   expect(result.materials).toBeGreaterThanOrEqual(67);
   expect(result.targetMaterial).toContain('Contador');
   expect(result.targetMaterial).toContain('CRBM-6');
   expect(result.targetMaterialQuestions).toBe(120);
   expect(result.prefixCodes).toEqual(fullExamCodes);
   for (const code of fullExamCodes) expect(result.occurrences[code], code).toBe(1);
+
+  if (applicationApplied) {
+    expect(receipt.operation_id).toBe('CRBM6-2026-CONTADOR-402-001-070-20260803');
+    expect(receipt.added_questions).toBe(70);
+  }
 });

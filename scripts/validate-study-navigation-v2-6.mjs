@@ -44,7 +44,7 @@ const proof = catalog.materials.find(item => item.id === "prova-qdx-seedf-2022-g
 if (!proof || String(proof.tipo_material).toLowerCase() !== "prova" || proof.quantidade_questoes !== 119) fail("Prova Quadrix 2022 não preserva os 119 itens válidos após a retirada da questão anulada.");
 
 for (const feature of [
-  'const STUDY_INDEX_URL = "./data/release/study-index.json"',
+  'const STUDY_INDEX_URL = "./data/release/study-index.json?release=3048-3046-71-r5"',
   'data-study-view="materias"',
   'data-study-view="simulados"',
   'data-study-view="provas"',
@@ -55,8 +55,7 @@ for (const feature of [
 ]) if (!app.includes(feature)) fail(`Funcionalidade de estudos ausente no pacote público: ${feature}`);
 
 if (!html.includes("assets/study-navigation-v2-6.css?v=1")) fail("Estilos da navegação de estudos não estão ativos.");
-const appVersion = Number(html.match(/assets\/app-v4\.js\?v=(\d+)/)?.[1] || 0);
-if (appVersion < 6) fail("Cache do aplicativo não foi renovado para o build consolidado.");
+if (!html.includes("assets/app-v4.js?v=13")) fail("HTML não referencia o aplicativo canônico v13.");
 for (const selector of [".study-view-tabs", ".discipline-grid", ".topic-list", ".topic-config"]) if (!css.includes(selector)) fail(`Estilo ausente: ${selector}`);
 
-console.log(`✓ Navegação pública validada: ${study.summary.disciplines} matérias, ${study.summary.topics} tópicos, ${catalog.summary.simulados} simulados e ${catalog.summary.provas} prova(s).`);
+console.log(`✓ Navegação pública validada: ${study.summary.disciplines} matérias, ${study.summary.topics} tópicos, ${catalog.summary.simulados} simulados e ${catalog.summary.provas} prova(s), com release revisionado.`);

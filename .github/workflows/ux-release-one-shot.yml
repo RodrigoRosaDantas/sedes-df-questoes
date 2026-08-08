@@ -1,0 +1,172 @@
+name: UX one-shot — validar e publicar
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: ux-release-one-shot
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Congelar release editorial atual
+        run: |
+          sha256sum data/release/catalogo.json > /tmp/catalog.sha256
+          find data/release/materials -type f -name '*.json' -print0 | sort -z | xargs -0 sha256sum > /tmp/materials.sha256
+          node - <<'NODE'
+          const fs = require('fs');
+          const catalog = JSON.parse(fs.readFileSync('data/release/catalogo.json','utf8'));
+          const ids = Object.keys(catalog.question_index || {});
+          const materials = catalog.materials || [];
+          if (!ids.length || !materials.length) throw new Error('Release editorial vazia.');
+          console.log(`Release congelada: ${ids.length} questões e ${materials.length} materiais.`);
+          NODE
+
+      - name: Gerar pacote público de UX sem reconstruir o banco
+        run: |
+          node scripts/build-question-search-index.mjs
+          node scripts/build-public.mjs
+          node scripts/reconcile-discursive-release-meta.mjs
+          node scripts/reconcile-public-metadata.mjs
+
+      - name: Confirmar que catálogo e materiais não mudaram
+        run: |
+          sha256sum -c /tmp/catalog.sha256
+          sha256sum -c /tmp/materials.sha256
+          node - <<'NODE'
+          const fs = require('fs');
+          const source = JSON.parse(fs.readFileSync('data/release/catalogo.json','utf8'));
+          const built = JSON.parse(fs.readFileSync('dist/data/release/catalogo.json','utf8'));
+          const sourceIds = Object.keys(source.question_index || {});
+          const builtIds = Object.keys(built.question_index || {});
+          if (sourceIds.length !== builtIds.length) throw new Error(`Dist alterou a quantidade de questões: ${sourceIds.length} -> ${builtIds.length}.`);
+          if ((source.materials || []).length !== (built.materials || []).length) throw new Error('Dist alterou a quantidade de materiais.');
+          if (sourceIds.some(id => !Object.hasOwn(built.question_index || {}, id))) throw new Error('Dist perdeu IDs do catálogo editorial.');
+          console.log(`Integridade preservada: ${sourceIds.length} questões e ${(source.materials || []).length} materiais.`);
+          NODE
+
+      - name: Validar sintaxe e contratos da UX
+        run: |
+          node --check playwright.config.js
+          node --check playwright.public.config.js
+          node --check assets/app-v4.js
+          node --check assets/learning-v2-9.js
+          node --check assets/shared-v2-13.js
+          node --check assets/release-v2-13.js
+          node --check assets/official-exam-v2-13.js
+          node --check assets/adaptive-review-v2-13.js
+          node --check assets/ux-v2-14.js
+          node --check assets/ux-v2-14-guardrails.js
+          node --check assets/navigation-v2-15.js
+          node --check assets/navigation-v2-15-polish.js
+          node --check service-worker.js
+          node --check scripts/build-question-search-index.mjs
+          node --check scripts/build-public.mjs
+          node scripts/validate-runtime-catalog.mjs
+          node scripts/validate-study-navigation-v2-6.mjs
+          node scripts/validate-intelligence-v2-9.mjs
+          node scripts/validate-material-downloads.mjs
+          node scripts/validate-platform-v2-13.mjs
+          node scripts/validate-ux-v2-14.mjs
+          node scripts/validate-navigation-v2-15.mjs
+          node scripts/validate-discursive-display.mjs
+          node scripts/validate-dist-v2-10.mjs
+          node scripts/validate-build-v2-11.mjs
+          node scripts/validate-public-metadata-consistency.mjs
+
+      - name: Instalar Playwright
+        run: |
+          npm install --no-save @playwright/test
+          npx playwright install --with-deps chromium
+
+      - name: Subir dist local
+        run: |
+          python3 -m http.server 4173 --directory dist > /tmp/sedes-http.log 2>&1 &
+          echo $! > /tmp/sedes-http.pid
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/sedes-http.log
+          exit 1
+
+      - name: Playwright local
+        run: npx playwright test --config=playwright.config.js
+
+      - name: Configurar Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/configure-pages@v5
+
+      - name: Enviar artefato validado para Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Upload relatório em falha
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-local-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: validate
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publicar GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Checkout para validação pública
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar Playwright
+        run: |
+          npm install --no-save @playwright/test
+          npx playwright install --with-deps chromium
+
+      - name: Validar site público
+        env:
+          PUBLIC_BASE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: npx playwright test --config=playwright.public.config.js
+
+      - name: Upload relatório público em falha
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-public-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
