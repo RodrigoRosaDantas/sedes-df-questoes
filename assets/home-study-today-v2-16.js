@@ -5,7 +5,6 @@ import {
   ensureData,
   esc,
   materialIdFromIndex,
-  observeApp,
   profileKey,
   readJSON,
   saveJSON,
@@ -16,6 +15,8 @@ import {
 const DAILY_SIZE = 25;
 const SELECTION_KEY = () => profileKey("homeStudyToday.v2");
 const DEFAULT_SELECTION = ["prova-202", "prova-400"];
+let homeObserver = null;
+let stabilityRetry = 0;
 
 const COMMON_DISCIPLINES = [
   "lingua portuguesa",
@@ -316,24 +317,27 @@ function summaryText(selectedTracks, statsByTrack) {
 }
 
 function rewireHeaderAction(card) {
-  const button = document.querySelector(".ux15-home-head [data-ux15-start]");
+  const button = document.querySelector("[data-ux15-home] .ux15-home-head [data-ux15-start]");
   if (!button || button.dataset.ux16Rewired) return;
   const replacement = button.cloneNode(true);
   replacement.dataset.ux16Rewired = "";
+  replacement.dataset.uxStartToday = "";
   replacement.textContent = "Escolher estudo de hoje";
   replacement.removeAttribute("data-ux15-start");
-  replacement.removeAttribute("data-ux-start-today");
   replacement.addEventListener("click", () => {
     card.scrollIntoView({behavior: "smooth", block: "center"});
-    card.querySelector("[data-ux16-track-input]")?.focus({preventScroll: true});
+    card.querySelector("[data-ux16-track]")?.focus?.({preventScroll: true});
   });
   button.replaceWith(replacement);
 }
 
 function enhanceTodayCard() {
-  if (currentRoute() !== "inicio") return;
-  const card = document.querySelector("[data-ux-today]");
-  if (!card || card.dataset.ux16Ready) return;
+  if (currentRoute() !== "inicio") return false;
+  const home = document.querySelector("#app > [data-ux15-home]");
+  const card = home?.querySelector("[data-ux-today]");
+  if (!home || !card) return false;
+  if (card.dataset.ux16Ready) return true;
+
   const answered = answeredIds();
   const selectedIds = new Set(readSelection());
   const statsByTrack = new Map(TRACKS.map(track => [track.id, trackStats(track, answered)]));
@@ -341,7 +345,7 @@ function enhanceTodayCard() {
   card.classList.add("ux16-today-card");
   card.innerHTML = `<div class="ux16-today-head"><div><p class="eyebrow">Estudo de hoje</p><h2>Escolha a origem e o cargo.</h2><p>As questões são filtradas pelo conteúdo do respectivo edital. Provas e simulados ficam separados para você decidir a fonte do treino.</p></div><span class="ux16-edital-badge">Edital → disciplina → assunto</span></div>
     <div class="ux16-track-grid" role="group" aria-label="Opções do estudo de hoje">${TRACKS.map(track => trackCard(track, statsByTrack.get(track.id), selectedIds.has(track.id))).join("")}</div>
-    <div class="ux16-today-footer"><div><strong data-ux16-summary></strong><small>Prioridade para questões ainda não respondidas; se faltar conteúdo, entram revisões do mesmo recorte.</small></div><button class="btn primary" data-ux16-start>Começar seleção</button></div>
+    <div class="ux16-today-footer"><div><strong data-ux16-summary></strong><small>Prioridade para questões ainda não respondidas; se faltar conteúdo, entram revisões do mesmo recorte.</small></div><button class="btn primary" data-ux-start-today data-ux16-start>Começar seleção</button></div>
     <details class="ux16-criteria"><summary>Como o site decide se a questão pertence ao edital?</summary><p>O recorte usa a classificação publicada de <strong>disciplina e assunto/tópico</strong> e a cruza com os eixos dos macros pós-edital dos cargos 202 e 400. O tipo do material define se a questão entra em <strong>Provas</strong> ou <strong>Simulados</strong>. Uma questão de outro órgão pode entrar quando o conteúdo dela pertence ao edital selecionado.</p></details>`;
 
   const update = () => {
@@ -376,8 +380,50 @@ function enhanceTodayCard() {
   });
   update();
   rewireHeaderAction(card);
+  return true;
 }
 
+function stopHomeObserver() {
+  homeObserver?.disconnect();
+  homeObserver = null;
+}
+
+function armHomeEnhancement() {
+  stopHomeObserver();
+  if (currentRoute() !== "inicio") return;
+  if (enhanceTodayCard()) {
+    window.setTimeout(() => {
+      if (currentRoute() !== "inicio") return;
+      const stable = document.querySelector("#app > [data-ux15-home] [data-ux-today][data-ux16-ready]");
+      if (stable) stabilityRetry = 0;
+      else if (stabilityRetry < 3) {
+        stabilityRetry += 1;
+        armHomeEnhancement();
+      }
+    }, 180);
+    return;
+  }
+  const app = document.querySelector("#app");
+  if (!app) return;
+  homeObserver = new MutationObserver(() => {
+    if (!enhanceTodayCard()) return;
+    stopHomeObserver();
+    window.setTimeout(() => {
+      const stable = document.querySelector("#app > [data-ux15-home] [data-ux-today][data-ux16-ready]");
+      if (!stable && currentRoute() === "inicio" && stabilityRetry < 3) {
+        stabilityRetry += 1;
+        armHomeEnhancement();
+      } else if (stable) stabilityRetry = 0;
+    }, 180);
+  });
+  homeObserver.observe(app, {childList: true, subtree: true});
+}
+
+window.addEventListener("hashchange", () => {
+  stabilityRetry = 0;
+  window.setTimeout(armHomeEnhancement, 0);
+});
+
 ensureData()
-  .then(() => observeApp(enhanceTodayCard))
+  .then(() => armHomeEnhancement())
   .catch(error => console.error("Falha ao preparar Estudo de hoje v2.16:", error));
