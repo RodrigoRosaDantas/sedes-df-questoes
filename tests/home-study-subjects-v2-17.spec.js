@@ -10,12 +10,15 @@ async function openHome(page) {
 async function setTracks(page, ids) {
   await page.evaluate(selected => {
     localStorage.removeItem("sedes.questoes.rodrigo.session.v3");
-    localStorage.setItem("sedes.questoes.rodrigo.homeStudyToday.v2", JSON.stringify(selected));
     sessionStorage.removeItem("sedes.questoes.rodrigo.homeStudySubjects.v1");
     sessionStorage.removeItem("sedes.questoes.rodrigo.homeStudySubjects.v2");
+    const inputs = [...document.querySelectorAll("[data-ux16-track-input]")];
+    for (const input of inputs) input.checked = selected.includes(input.value);
+    const trigger = inputs[0];
+    if (trigger) trigger.dispatchEvent(new Event("change", {bubbles: true}));
   }, ids);
-  await page.reload({waitUntil: "domcontentloaded"});
-  await expect(page.locator("[data-ux17-subjects]")).toBeVisible({timeout: 30000});
+  await expect.poll(async () => page.locator("[data-ux17-subject-group]").count(), {timeout: 30000}).toBe(ids.length);
+  if (ids.length) await expect(page.locator("[data-ux17-subjects]")).toBeVisible({timeout: 30000});
 }
 
 async function prepareTouchContext(page) {
