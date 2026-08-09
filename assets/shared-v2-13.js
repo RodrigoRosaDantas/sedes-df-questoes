@@ -76,7 +76,10 @@ export const createCompatibleSession = ({id, name, questionIds, questions = null
   };
   if (Array.isArray(questions) && questions.length === payload.questionIds.length) payload.questions = questions;
   if (!saveJSON(profileKey("session.v3"), payload)) return false;
-  location.hash = "#/resolver";
+  // Troca o fragmento sem disparar hashchange antes do reload. Isso impede que a
+  // instância antiga do app entre em /resolver e persista estado da sessão anterior
+  // sobre o payload recém-gravado durante pagehide/visibilitychange.
+  history.replaceState(history.state, "", "#/resolver");
   location.reload();
   return true;
 };

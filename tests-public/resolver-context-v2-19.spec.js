@@ -3,15 +3,17 @@ import {test, expect} from "@playwright/test";
 const SUBJECT_KEY = "sedes.questoes.rodrigo.homeStudySubjects.v2";
 const TRACK_KEY = "sedes.questoes.rodrigo.homeStudyToday.v2";
 const SESSION_KEY = "sedes.questoes.rodrigo.session.v3";
+const TRANSITION_KEY = "__sedes.sessionTransitionHashchange.v222";
 
 async function prepare(page, tracks) {
   await page.goto("./#/inicio", {waitUntil: "domcontentloaded"});
   await expect(page.locator("[data-ux15-home]")).toBeVisible({timeout: 30000});
-  await page.evaluate(({tracks: selected}) => {
+  await page.evaluate(({tracks: selected, transitionKey}) => {
     localStorage.removeItem("sedes.questoes.rodrigo.session.v3");
     localStorage.setItem("sedes.questoes.rodrigo.homeStudyToday.v2", JSON.stringify(selected));
     sessionStorage.removeItem("sedes.questoes.rodrigo.homeStudySubjects.v2");
-  }, {tracks});
+    sessionStorage.removeItem(transitionKey);
+  }, {tracks, transitionKey: TRANSITION_KEY});
   await page.reload({waitUntil: "domcontentloaded"});
   await expect(page.locator("[data-ux17-subjects]")).toBeVisible({timeout: 30000});
 }
@@ -105,9 +107,15 @@ test("site público permite concluir uma matéria real e começar outra sem esta
   await expect(selectedChip).toHaveAttribute("data-ux17-subject", secondSubject);
   const persisted = await page.evaluate(key => JSON.parse(sessionStorage.getItem(key) || "{}"), SUBJECT_KEY);
   expect(persisted["prova-202"]).toEqual([secondSubject]);
+
+  await page.evaluate(key => {
+    sessionStorage.removeItem(key);
+    window.addEventListener("hashchange", () => sessionStorage.setItem(key, "fired"), {once: true});
+  }, TRANSITION_KEY);
   await page.locator("[data-ux17-start]").click();
   await page.waitForURL(/#\/resolver/, {timeout: 30000});
   const session = await page.evaluate(key => JSON.parse(localStorage.getItem(key)), SESSION_KEY);
   expect(session.material.disciplina).toBe(secondSubject);
+  expect(await page.evaluate(key => sessionStorage.getItem(key), TRANSITION_KEY)).toBeNull();
   await expect(page.locator("[data-question-origin]")).toBeVisible({timeout: 30000});
 });
