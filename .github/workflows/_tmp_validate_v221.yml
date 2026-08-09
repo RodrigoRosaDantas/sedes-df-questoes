@@ -1,0 +1,83 @@
+name: Validar correções v2.21
+
+on:
+  pull_request:
+    branches: [main]
+    types: [reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    if: github.head_ref == 'agent/corrigir-filtro-formato-v2-21'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout da branch funcional
+        uses: actions/checkout@v4
+        with:
+          ref: agent/corrigir-filtro-formato-v2-21
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Congelar release editorial
+        run: |
+          sha256sum data/release/catalogo.json > /tmp/catalog.sha256
+          find data/release/materials -type f -name '*.json' -print0 | sort -z | xargs -0 sha256sum > /tmp/materials.sha256
+      - name: Gerar pacote público sem rebuild editorial
+        run: |
+          node scripts/build-question-search-index.mjs
+          node scripts/build-public.mjs
+          node scripts/reconcile-discursive-release-meta.mjs
+          node scripts/reconcile-public-metadata.mjs
+          sha256sum -c /tmp/catalog.sha256
+          sha256sum -c /tmp/materials.sha256
+      - name: Validar contratos
+        run: |
+          node --check assets/home-study-subjects-v2-17-stable.js
+          node --check service-worker.js
+          node scripts/validate-home-question-format-v2-20.mjs
+          node scripts/validate-home-question-format-v2-20-gate.mjs
+          node scripts/validate-home-study-v2-16.mjs
+          node scripts/validate-resolver-context-v2-19.mjs
+          node scripts/validate-runtime-catalog.mjs
+          node scripts/validate-platform-v2-13.mjs
+          node scripts/validate-ux-v2-14.mjs
+          node scripts/validate-navigation-v2-15.mjs
+          node scripts/validate-dist-v2-10.mjs
+          node scripts/validate-public-metadata-consistency.mjs
+          node - <<'NODE'
+          const fs=require('fs');
+          const catalog=JSON.parse(fs.readFileSync('dist/data/release/catalogo.json','utf8'));
+          const meta=JSON.parse(fs.readFileSync('dist/data/release/release-meta.json','utf8'));
+          const format=JSON.parse(fs.readFileSync('dist/data/release/question-format-index.json','utf8'));
+          if(Object.keys(catalog.question_index||{}).length!==3447) throw new Error('Questões divergentes');
+          if((catalog.materials||[]).length!==75) throw new Error('Materiais divergentes');
+          if(Number(meta.banco_mestre)!==3449 || Number(meta.awaiting_audit)!==0) throw new Error('Release-meta divergente');
+          if(Number(format.summary?.['true-false'])!==2538 || Number(format.summary?.['multiple-choice'])!==909) throw new Error('Formatos divergentes');
+          console.log('Release preservada: Banco 3449 | 3447 objetivas | 75 materiais | 0 auditoria | 2538 C/E + 909 múltipla.');
+          NODE
+      - name: Instalar Playwright
+        run: |
+          npm install --no-save @playwright/test
+          npx playwright install --with-deps chromium
+      - name: Subir dist local
+        run: |
+          python3 -m http.server 4173 --directory dist > /tmp/sedes-http.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/sedes-http.log
+          exit 1
+      - name: Regressões v2.21
+        run: timeout 300s npx playwright test tests/home-question-format-v2-21.spec.js --config=playwright.config.js --workers=1
+      - name: Filtro v2.20 preservado
+        run: timeout 240s npx playwright test tests/home-question-format-v2-20.spec.js --config=playwright.config.js --workers=1
+      - name: Fluxo resolver v2.19 preservado
+        run: timeout 300s npx playwright test tests/resolver-context-v2-19.spec.js --config=playwright.config.js --workers=1
+      - name: Matérias e touch preservados
+        run: timeout 300s npx playwright test tests/home-study-subjects-v2-17.spec.js --config=playwright.config.js --workers=1
+      - name: Suíte completa
+        run: timeout 600s npx playwright test --config=playwright.config.js
