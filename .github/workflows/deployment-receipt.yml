@@ -11,6 +11,18 @@ on:
         description: Endereço público aprovado pelo workflow de Pages
         required: true
         type: string
+      deployment_run_id:
+        description: ID da execução de Pages que publicou o commit
+        required: true
+        type: string
+      confirmation:
+        description: Confirmação explícita do registro
+        required: true
+        default: NAO_REGISTRAR
+        type: choice
+        options:
+          - NAO_REGISTRAR
+          - REGISTRAR
 
 permissions:
   contents: write
@@ -34,10 +46,15 @@ jobs:
         with:
           node-version: 22
           package-manager-cache: false
+      - name: Confirmar autorização do recibo
+        env:
+          RECEIPT_CONFIRMATION: ${{ inputs.confirmation }}
+        run: test "${RECEIPT_CONFIRMATION}" = "REGISTRAR"
       - name: Reconfirmar o conteúdo público e gerar recibo
         env:
           DEPLOYED_SOURCE_SHA: ${{ inputs.source_sha }}
           PUBLIC_DEPLOYMENT_URL: ${{ inputs.public_url }}
+          DEPLOYMENT_WORKFLOW_RUN_ID: ${{ inputs.deployment_run_id }}
         run: |
           node scripts/verify-deployment.mjs "${PUBLIC_DEPLOYMENT_URL}" "${DEPLOYED_SOURCE_SHA}"
           node scripts/write-deployment-receipt.mjs

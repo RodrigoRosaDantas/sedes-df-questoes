@@ -1,0 +1,33 @@
+name: Validar release pública — somente leitura
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-public-release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Baixar o commit sob revisão
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Preparar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Auditar a release sem credenciais nem escrita externa
+        shell: bash
+        run: |
+          set -euo pipefail
+          RELEASE_SOURCE_SHA="$(git rev-parse HEAD)" npm run check

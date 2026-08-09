@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "operation": "REACTIVATE-SAFE-SITE-GOVERNANCE",
+  "confirmed_at": "2026-08-09T05:21:22Z",
+  "authorized_by": "user",
+  "status": "active_limited",
+  "mode": "manual_deploy_read_only_ci",
+  "scope": {
+    "pull_request_validation": "automatic_read_only",
+    "github_pages_deployment": "manual_exact_main_sha_with_confirmation",
+    "public_browser_verification": "mandatory_before_and_after_deploy",
+    "deployment_receipt": "manual_only"
+  },
+  "still_suspended": [
+    "automatic_notion_sync",
+    "automatic_notion_writes",
+    "automatic_traceability_closure",
+    "automatic_editorial_mutation",
+    "automatic_deployment",
+    "automatic_rollback"
+  ],
+  "safety_contract": [
+    "Pull requests receive only contents:read permission.",
+    "Pages can publish only by workflow_dispatch after an exact 40-character main SHA and PUBLICAR confirmation.",
+    "The public artifact is generated from the committed canonical release without a live Notion read.",
+    "The canonical release is hashed before and after validation and must remain byte-identical.",
+    "The complete public browser suite runs locally before deploy and again against GitHub Pages after deploy.",
+    "No workflow in this scope writes to Notion or closes editorial traceability."
+  ],
+  "audit_basis": {
+    "previous_suspension_receipt": "data/operations/site-automations-suspended.json",
+    "previous_reactivation_decision": "data/operations/permanent-automations-reactivation-audit-20260807.json",
+    "public_source_sha": "ae0a1d0e194de4ecbfafc52cf54093b102c84f83",
+    "successful_public_workflow_run_id": 31295132468,
+    "public_questions": 3447,
+    "public_materials": 75,
+    "master_bank": 3449,
+    "awaiting_audit": 0
+  }
+}

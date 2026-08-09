@@ -61,6 +61,16 @@ O botão **Reportar problema nesta questão** abre uma issue pré-preenchida no 
 npm run check
 ```
 
-O pipeline reconstrói a release, aplica o snapshot do Notion, gera o índice de estudo, cria `build-info.json` e `release-meta.json`, verifica hashes, catálogo, materiais, downloads, PWA, prova real, backups, reporte, revisão adaptativa e reprodutibilidade.
+Esse comando funciona em clone limpo e sem credenciais. Ele congela por hash todos os arquivos versionados da release, gera somente os índices derivados e o `dist`, valida sintaxe, catálogo, materiais, downloads, relevância dos editais, formatos, PWA, acessibilidade, navegação, prova real, discursivas, metadados e governança. Ao final, comprova que a fonte canônica permaneceu byte a byte inalterada.
 
-Pull requests apenas validam. Somente a branch `main`, após aprovação de todas as verificações, pode publicar o GitHub Pages.
+O pipeline editorial completo continua disponível em `npm run check:release`, mas deve ser usado somente depois que uma operação autorizada gerar os arquivos transitórios de exportação do Notion. Ele não é o comando padrão de auditoria de um clone limpo.
+
+## Governança de publicação
+
+- pull requests executam apenas a validação de leitura, com permissão `contents: read`;
+- o GitHub Pages só publica por acionamento manual, com o SHA exato da `main` e confirmação `PUBLICAR`;
+- a suíte pública completa roda contra o artefato local antes do deploy e novamente no endereço público depois dele;
+- sincronização, escrita e fechamento de rastreabilidade no Notion permanecem suspensos sem autorização operacional específica;
+- o recibo cumulativo do último deploy é registrado separadamente e distingue o commit da interface do recibo editorial que formou o acervo.
+
+Pull requests nunca publicam. Somente a `main`, depois da validação e de uma autorização manual explícita, pode gerar um novo deploy do GitHub Pages.
