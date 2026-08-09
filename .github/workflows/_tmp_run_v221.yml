@@ -1,0 +1,32 @@
+name: Aplicar patch temporário v2.21
+
+on:
+  pull_request:
+    branches: [main]
+    types: [reopened]
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.head_ref == 'agent/corrigir-filtro-formato-v2-21'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/corrigir-filtro-formato-v2-21
+          fetch-depth: 0
+      - name: Aplicar patch funcional
+        run: |
+          python scripts/_tmp_apply_v221.py
+          node --check assets/home-study-subjects-v2-17-stable.js
+          node scripts/validate-home-question-format-v2-20-gate.mjs
+          git diff --check
+      - name: Commitar na branch funcional
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: estabilizar filtro de formato v2.21"
+          git push origin HEAD:agent/corrigir-filtro-formato-v2-21
