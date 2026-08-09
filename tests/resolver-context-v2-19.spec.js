@@ -3,15 +3,17 @@ import {test, expect} from "@playwright/test";
 const SUBJECT_KEY = "sedes.questoes.rodrigo.homeStudySubjects.v2";
 const TRACK_KEY = "sedes.questoes.rodrigo.homeStudyToday.v2";
 const SESSION_KEY = "sedes.questoes.rodrigo.session.v3";
+const TRANSITION_KEY = "__sedes.sessionTransitionHashchange.v222";
 
 async function openHome(page, tracks = ["prova-202"]) {
   await page.goto("./#/inicio", {waitUntil: "domcontentloaded"});
   await expect(page.locator("[data-ux15-home]")).toBeVisible({timeout: 30000});
-  await page.evaluate(({trackKey, subjectKey, sessionKey, tracks: selected}) => {
+  await page.evaluate(({trackKey, subjectKey, sessionKey, transitionKey, tracks: selected}) => {
     localStorage.removeItem(sessionKey);
     localStorage.setItem(trackKey, JSON.stringify(selected));
     sessionStorage.removeItem(subjectKey);
-  }, {trackKey: TRACK_KEY, subjectKey: SUBJECT_KEY, sessionKey: SESSION_KEY, tracks});
+    sessionStorage.removeItem(transitionKey);
+  }, {trackKey: TRACK_KEY, subjectKey: SUBJECT_KEY, sessionKey: SESSION_KEY, transitionKey: TRANSITION_KEY, tracks});
   await page.reload({waitUntil: "domcontentloaded"});
   await expect(page.locator("[data-ux17-subjects]")).toBeVisible({timeout: 30000});
 }
@@ -114,10 +116,16 @@ test("concluir treino real limpa a matéria temporária e permite iniciar outra 
   await expect(selectedChip).toHaveAttribute("data-ux17-subject", nextSubject);
   const persisted = await page.evaluate(key => JSON.parse(sessionStorage.getItem(key) || "{}"), SUBJECT_KEY);
   expect(persisted["prova-202"]).toEqual([nextSubject]);
+
+  await page.evaluate(key => {
+    sessionStorage.removeItem(key);
+    window.addEventListener("hashchange", () => sessionStorage.setItem(key, "fired"), {once: true});
+  }, TRANSITION_KEY);
   await page.locator("[data-ux17-start]").click();
   await page.waitForURL(/#\/resolver/, {timeout: 30000});
   const nextSession = await page.evaluate(key => JSON.parse(localStorage.getItem(key)), SESSION_KEY);
   expect(nextSession.material.disciplina).toBe(nextSubject);
   expect(nextSession.questionIds.length).toBeGreaterThan(0);
+  expect(await page.evaluate(key => sessionStorage.getItem(key), TRANSITION_KEY)).toBeNull();
   await expect(page.locator("[data-question-origin]")).toBeVisible({timeout: 30000});
 });
