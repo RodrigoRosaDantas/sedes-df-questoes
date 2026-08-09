@@ -76,6 +76,20 @@ test("site público permite concluir uma matéria real e começar outra sem esta
   await expect.poll(() => page.evaluate(key => sessionStorage.getItem(key), SUBJECT_KEY)).toBeNull();
   await expect.poll(() => page.evaluate(key => localStorage.getItem(key), SESSION_KEY)).toBeNull();
 
+  // Mutações extras no resultado não podem disparar novas limpezas tardias.
+  await page.evaluate(() => {
+    const hero = document.querySelector('.result-hero');
+    if (!hero) return;
+    for (let i = 0; i < 8; i += 1) {
+      const node = document.createElement('i');
+      node.hidden = true;
+      node.textContent = String(i);
+      hero.append(node);
+      node.remove();
+    }
+  });
+  await expect.poll(() => page.evaluate(key => sessionStorage.getItem(key), SUBJECT_KEY)).toBeNull();
+
   await page.locator('.result-hero [data-route="inicio"]').click();
   await expect(page).toHaveURL(/#\/inicio/, {timeout: 30000});
   await expect(page.locator("[data-ux17-subjects]")).toBeVisible({timeout: 30000});
@@ -86,6 +100,11 @@ test("site público permite concluir uma matéria real e começar outra sem esta
   const secondSubject = await second.getAttribute("data-ux17-subject");
   expect(secondSubject).not.toBe(firstSubject);
   await second.click();
+  const selectedChip = nextGroup.locator('[data-ux17-subject-button][aria-pressed="true"]');
+  await expect(selectedChip).toHaveCount(1);
+  await expect(selectedChip).toHaveAttribute("data-ux17-subject", secondSubject);
+  const persisted = await page.evaluate(key => JSON.parse(sessionStorage.getItem(key) || "{}"), SUBJECT_KEY);
+  expect(persisted["prova-202"]).toEqual([secondSubject]);
   await page.locator("[data-ux17-start]").click();
   await page.waitForURL(/#\/resolver/, {timeout: 30000});
   const session = await page.evaluate(key => JSON.parse(localStorage.getItem(key)), SESSION_KEY);

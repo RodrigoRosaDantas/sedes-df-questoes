@@ -9,6 +9,7 @@ import {
 } from "./shared-v2-13.js?v=1";
 
 const SUBJECT_SELECTION_KEYS = ["homeStudySubjects.v1", "homeStudySubjects.v2"];
+let resultSelectionCleared = false;
 
 function readSession() {
   try {
@@ -24,6 +25,12 @@ function clearFinishedSubjectSelection() {
     try { sessionStorage.removeItem(profileKey(suffix)); }
     catch { /* armazenamento temporário não deve bloquear a navegação */ }
   }
+}
+
+function clearFinishedSubjectSelectionOnce() {
+  if (resultSelectionCleared) return;
+  clearFinishedSubjectSelection();
+  resultSelectionCleared = true;
 }
 
 function materialForQuestion(questionId, session) {
@@ -69,9 +76,12 @@ function originMarkup(questionId, material) {
 async function enhanceResolver() {
   const route = currentRoute();
   if (route === "resultado") {
-    clearFinishedSubjectSelection();
+    clearFinishedSubjectSelectionOnce();
     return;
   }
+
+  // Assim que saímos do resultado, um novo ciclo pode ser concluído depois.
+  resultSelectionCleared = false;
   if (route !== "resolver") return;
 
   const header = document.querySelector("#app .exam-header > div:first-child");

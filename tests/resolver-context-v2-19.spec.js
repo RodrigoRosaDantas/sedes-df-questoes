@@ -109,7 +109,11 @@ test("concluir treino real limpa a matéria temporária e permite iniciar outra 
   expect(nextSubject).toBeTruthy();
   expect(nextSubject).not.toBe(firstSubject);
   await nextChip.click();
-  await expect(group.locator('[data-ux17-subject-button][aria-pressed="true"]')).toHaveCount(1);
+  const selectedChip = group.locator('[data-ux17-subject-button][aria-pressed="true"]');
+  await expect(selectedChip).toHaveCount(1);
+  await expect(selectedChip).toHaveAttribute("data-ux17-subject", nextSubject);
+  const persisted = await page.evaluate(key => JSON.parse(sessionStorage.getItem(key) || "{}"), SUBJECT_KEY);
+  expect(persisted["prova-202"]).toEqual([nextSubject]);
   await page.locator("[data-ux17-start]").click();
   await page.waitForURL(/#\/resolver/, {timeout: 30000});
   const nextSession = await page.evaluate(key => JSON.parse(localStorage.getItem(key)), SESSION_KEY);
