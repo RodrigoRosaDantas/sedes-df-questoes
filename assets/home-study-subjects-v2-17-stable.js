@@ -218,7 +218,7 @@ function formatCounts(pools) {
 function formatPanel(pools) {
   const selected = readFormatSelection();
   const counts = formatCounts(pools);
-  return `<section class="ux20-format" data-ux20-format aria-label="Formato das questões">
+  return `<section class="ux20-format" data-ux20-format aria-label="Formato das questões" aria-busy="${questionFormatIndex ? "false" : "true"}">
     <div class="ux20-format-copy"><small>Formato das questões</small><strong>Como você quer responder agora?</strong></div>
     <div class="ux20-format-options" role="group" aria-label="Filtrar formato das questões">${FORMAT_MODES.map(mode => `<button type="button" class="ux20-format-option ${selected === mode.id ? "selected" : ""}" data-ux20-format-option="${mode.id}" aria-pressed="${selected === mode.id ? "true" : "false"}" ${(!questionFormatIndex || counts[mode.id] === 0) && mode.id !== "all" ? "disabled" : ""}><span>${esc(mode.label)}</span><small data-ux20-format-count="${mode.id}">${counts[mode.id].toLocaleString("pt-BR")}</small></button>`).join("")}</div>
   </section>`;
@@ -318,6 +318,29 @@ function syncFormatControls(card) {
   });
 }
 
+function syncSubjectCounts(card) {
+  const formatMode = readFormatSelection();
+  for (const track of TRACKS) {
+    const group = card.querySelector(`[data-ux17-subject-group="${CSS.escape(track.id)}"]`);
+    if (!group) continue;
+    const options = new Map(subjectOptions(track).map(option => [option.name, option]));
+    group.querySelectorAll("[data-ux17-subject-button]").forEach(button => {
+      const option = options.get(button.dataset.ux17Subject);
+      const count = option ? applyQuestionFormat(option.ids, formatMode).length : 0;
+      const node = button.querySelector("small");
+      if (node) node.textContent = count.toLocaleString("pt-BR");
+    });
+  }
+}
+
+function syncDerivedState(card) {
+  const formatPanelNode = card.querySelector("[data-ux20-format]");
+  if (formatPanelNode) formatPanelNode.setAttribute("aria-busy", questionFormatIndex ? "false" : "true");
+  syncFormatControls(card);
+  syncSubjectCounts(card);
+  updateSummary(card);
+}
+
 function syncSubjectGroup(card, trackId) {
   const track = TRACKS.find(item => item.id === trackId);
   const group = card.querySelector(`[data-ux17-subject-group="${CSS.escape(trackId)}"]`);
@@ -392,7 +415,7 @@ function bindSubjectControls(card) {
   card.querySelectorAll("[data-ux20-format-option]").forEach(button => button.addEventListener("click", () => {
     if (button.disabled) return;
     saveFormatSelection(button.dataset.ux20FormatOption);
-    renderSubjects(card);
+    syncDerivedState(card);
   }));
 }
 
@@ -421,9 +444,10 @@ function startFilteredSession(card) {
   const ids = balancedDailyIds(pools, answeredIds());
   const formatMode = readFormatSelection();
   if (!ids.length) return toast("Não há questões disponíveis para as matérias e o formato escolhidos nessa combinação.", "info");
-  const names = pools.map(pool => `${pool.track.label} (${pool.allMode ? "todas" : `${pool.names.length} matérias`})`).join(" + ");
-  const uniqueSubjects = [...new Set(pools.flatMap(pool => pool.names))];
-  const activeTracks = pools.filter(pool => pool.ids.length).map(pool => pool.track);
+  const activePools = pools.filter(pool => pool.ids.length);
+  const names = activePools.map(pool => `${pool.track.label} (${pool.allMode ? "todas" : `${pool.names.length} matérias`})`).join(" + ");
+  const uniqueSubjects = [...new Set(activePools.flatMap(pool => pool.names))];
+  const activeTracks = activePools.map(pool => pool.track);
   createCompatibleSession({
     id: `estudo-hoje-materias-${dateKey(Date.now())}`,
     name: `Estudo de hoje — ${names}${formatMode === "all" ? "" : ` · ${formatLabel(formatMode)}`}`,
@@ -432,7 +456,7 @@ function startFilteredSession(card) {
     minutes: ids.length * 2,
     discipline: uniqueSubjects.length === 1 ? uniqueSubjects[0] : "Matérias selecionadas",
     source: `Provas/simulados filtrados por edital, matérias e formato ${formatLabel(formatMode)}`,
-    cargo: pools.length === 1 ? pools[0].track.target : "multicargo",
+    cargo: activePools.length === 1 ? activePools[0].track.target : "multicargo",
     materialType: sessionMaterialTypeForTracks(activeTracks),
   });
 }
@@ -487,20 +511,28 @@ function arm() {
   if (!watchdog && currentRoute() === "inicio") watchdog = window.setInterval(tick, 900);
 }
 
+function stopFormatRetry() {
+  if (!formatRetryTimer) return;
+  window.clearTimeout(formatRetryTimer);
+  formatRetryTimer = null;
+}
+
 function refreshAfterFormatIndex() {
-  if (formatRetryTimer) {
-    window.clearTimeout(formatRetryTimer);
-    formatRetryTimer = null;
-  }
+  stopFormatRetry();
   const card = document.querySelector("#app > [data-ux15-home] [data-ux-today][data-ux16-ready]");
-  if (card) renderSubjects(card);
+  if (card) syncDerivedState(card);
 }
 
 function loadFormatIndexAndRefresh() {
+  if (currentRoute() !== "inicio" || questionFormatIndex) return;
   ensureQuestionFormatIndex()
     .then(refreshAfterFormatIndex)
     .catch(error => {
-      console.error("Falha temporária ao carregar formatos do Estudo de hoje v2.20:", error);
+      console.error("Falha temporária ao carregar formatos do Estudo de hoje v2.21:", error);
+      if (currentRoute() !== "inicio") {
+        stopFormatRetry();
+        return;
+      }
       if (!formatRetryTimer) formatRetryTimer = window.setTimeout(() => {
         formatRetryTimer = null;
         loadFormatIndexAndRefresh();
@@ -508,10 +540,16 @@ function loadFormatIndexAndRefresh() {
     });
 }
 
-window.addEventListener("hashchange", () => window.setTimeout(arm, 120));
+window.addEventListener("hashchange", () => {
+  if (currentRoute() !== "inicio") stopFormatRetry();
+  window.setTimeout(() => {
+    arm();
+    if (currentRoute() === "inicio" && !questionFormatIndex) loadFormatIndexAndRefresh();
+  }, 120);
+});
 ensureData()
   .then(() => {
     window.setTimeout(arm, 120);
     loadFormatIndexAndRefresh();
   })
-  .catch(error => console.error("Falha ao preparar matérias do Estudo de hoje v2.20:", error));
+  .catch(error => console.error("Falha ao preparar matérias do Estudo de hoje v2.21:", error));
