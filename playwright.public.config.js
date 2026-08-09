@@ -17,6 +17,7 @@ export default defineConfig({
     "resolver-context-v2-19.spec.js",
     "home-question-format-v2-20.spec.js",
     "home-question-format-v2-21.spec.js",
+    "pwa-offline-v2-22.spec.js",
   ],
   timeout: 240000,
   retries: 1,
