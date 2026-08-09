@@ -5,10 +5,13 @@ const FORMAT_KEY = "sedes.questoes.rodrigo.homeStudyFormat.v1";
 const SESSION_KEY = "sedes.questoes.rodrigo.session.v3";
 async function seed(page, tracks = ["prova-202"]) {
   await page.addInitScript(({trackKey, subjectKey, formatKey, sessionKey, tracks}) => {
+    const marker = "__sedes.v221.seeded";
+    if (sessionStorage.getItem(marker)) return;
     localStorage.setItem(trackKey, JSON.stringify(tracks));
     localStorage.removeItem(sessionKey);
     sessionStorage.removeItem(subjectKey);
     sessionStorage.removeItem(formatKey);
+    sessionStorage.setItem(marker, "1");
   }, {trackKey: TRACK_KEY, subjectKey: SUBJECT_KEY, formatKey: FORMAT_KEY, sessionKey: SESSION_KEY, tracks});
 }
 async function openHome(page) {
@@ -22,6 +25,8 @@ test("Limpar → recarregar → Todas nunca bloqueia a recuperação", async ({p
   await group.locator('[data-ux17-clear="prova-202"]').click();
   await expect(group.locator('[data-ux17-subject-status]')).toContainText("0 de");
   await page.reload({waitUntil: "domcontentloaded"});
+  const persisted = await page.evaluate(key => JSON.parse(sessionStorage.getItem(key) || "{}"), SUBJECT_KEY);
+  expect(persisted["prova-202"]).toEqual([]);
   const reloaded = page.locator('[data-ux17-subject-group="prova-202"]');
   await reloaded.locator("summary").click();
   const all = reloaded.locator('[data-ux17-all="prova-202"]');
