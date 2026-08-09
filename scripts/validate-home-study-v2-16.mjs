@@ -15,8 +15,8 @@ const requireText = (text, pattern, message) => {
 
 requireText(index, /home-study-today-v2-16\.css/, "CSS do Estudo de hoje v2.16 não está conectado ao index.html.");
 requireText(index, /home-study-today-v2-16\.js\?v=5/, "JS do Estudo de hoje precisa estar conectado ao index.html com cache-bust v5.");
-requireText(index, /home-study-subjects-v2-17\.css\?v=6/, "CSS do filtro de matérias/formato precisa estar conectado ao index.html com cache-bust v6.");
-requireText(index, /home-study-subjects-v2-17-stable\.js\?v=6/, "JS do filtro de matérias/formato precisa estar conectado ao index.html com cache-bust v6.");
+requireText(index, /home-study-subjects-v2-17\.css\?v=7/, "CSS do filtro de matérias/formato precisa estar conectado ao index.html com cache-bust v7.");
+requireText(index, /home-study-subjects-v2-17-stable\.js\?v=7/, "JS do filtro de matérias/formato precisa estar conectado ao index.html com cache-bust v7.");
 
 for (const id of ["prova-202", "prova-400", "simulado-202", "simulado-400"]) {
   requireText(edital, new RegExp(`id:\\s*["']${id}["']`), `Trilha canônica ${id} ausente.`);
@@ -76,4 +76,4 @@ requireText(subjectsCss, /min-height:40px/, "Chips de matéria precisam de alvo 
 requireText(subjectsCss, /@media\(max-width:760px\).*\.ux17-subject-chips\{[^}]*max-height:none;[^}]*overflow:visible;[^}]*touch-action:auto/s, "No mobile estreito a lista de matérias deve usar a rolagem natural da página.");
 requireText(subjectsCss, /@media\(pointer:coarse\).*\.ux17-subject-chips\{[^}]*max-height:none;[^}]*overflow:visible;[^}]*touch-action:auto/s, "Dispositivos touch/coarse precisam evitar scroll interno mesmo acima de 760px.");
 
-console.log("✓ Estudo de hoje v2.20: matriz canônica, matérias, formato, tipo de sessão e rolagem touch preservados.");
+console.log("✓ Estudo de hoje v2.21: matriz canônica, matérias, formato resiliente, tipo de sessão e rolagem touch preservados.");
