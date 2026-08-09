@@ -1,0 +1,130 @@
+name: Publicar auditoria v2.22
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy-and-verify:
+    if: github.event.pull_request.head.ref == 'agent/publicar-auditoria-v2-22'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main canônica
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Congelar release editorial
+        run: |
+          sha256sum data/release/catalogo.json > /tmp/catalog.sha256
+          sha256sum data/release/study-index.json > /tmp/study.sha256
+          find data/release/materials -type f -name '*.json' -print0 | sort -z | xargs -0 sha256sum > /tmp/materials.sha256
+      - name: Gerar pacote público canônico
+        id: build
+        shell: bash
+        run: |
+          set -euo pipefail
+          MAIN_SHA=$(git rev-parse HEAD)
+          test "$MAIN_SHA" = "678e85aeb52ee52d3531537d71cedba6f19f3375"
+          node scripts/build-question-search-index.mjs
+          GITHUB_SHA="$MAIN_SHA" node scripts/build-public.mjs
+          node scripts/reconcile-discursive-release-meta.mjs
+          node scripts/reconcile-public-metadata.mjs
+          sha256sum -c /tmp/catalog.sha256
+          sha256sum -c /tmp/study.sha256
+          sha256sum -c /tmp/materials.sha256
+          SOURCE_SHA=$(node -e "const fs=require('fs');const x=JSON.parse(fs.readFileSync('dist/data/release/build-info.json','utf8'));process.stdout.write(String(x.source_sha||''))")
+          test "$SOURCE_SHA" = "$MAIN_SHA"
+          echo "source_sha=$SOURCE_SHA" >> "$GITHUB_OUTPUT"
+      - name: Validar contratos críticos
+        run: |
+          node --check assets/home-study-edital-v2-18.js
+          node --check assets/resolver-context-v2-19.js
+          node --check assets/home-study-subjects-v2-17-stable.js
+          node --check service-worker.js
+          node scripts/validate-edital-relevance-v2-22.mjs
+          node scripts/validate-audit-fixes-v2-22.mjs
+          node scripts/validate-resolver-context-v2-19.mjs
+          node scripts/validate-home-question-format-v2-20.mjs
+          node scripts/validate-home-question-format-v2-20-gate.mjs
+          node scripts/validate-home-study-v2-16.mjs
+          node scripts/validate-runtime-catalog.mjs
+          node scripts/validate-platform-v2-13.mjs
+          node scripts/validate-navigation-v2-15.mjs
+          node scripts/validate-dist-v2-10.mjs
+          node scripts/validate-public-metadata-consistency.mjs
+          node - <<'NODE'
+          const fs=require('fs');
+          const catalog=JSON.parse(fs.readFileSync('dist/data/release/catalogo.json','utf8'));
+          const meta=JSON.parse(fs.readFileSync('dist/data/release/release-meta.json','utf8'));
+          const build=JSON.parse(fs.readFileSync('dist/data/release/build-info.json','utf8'));
+          const format=JSON.parse(fs.readFileSync('dist/data/release/question-format-index.json','utf8'));
+          const critical=['home_study_edital_js','home_study_today_js','home_study_today_css','home_study_subjects_js','home_study_subjects_css','resolver_context_js','resolver_context_css'];
+          if(Object.keys(catalog.question_index||{}).length!==3447) throw new Error('Questões divergentes');
+          if((catalog.materials||[]).length!==75) throw new Error('Materiais divergentes');
+          if(Number(meta.banco_mestre)!==3449 || Number(meta.awaiting_audit)!==0) throw new Error('Release-meta divergente');
+          if(Number(format.question_count)!==3447 || Number(format.summary?.['true-false'])!==2538 || Number(format.summary?.['multiple-choice'])!==909) throw new Error('Formatos divergentes');
+          if(meta.provenance_contract_version!=='2.22' || build.provenance_contract_version!=='2.22') throw new Error('Proveniência v2.22 ausente');
+          for(const key of critical) if(!meta.source_files_sha256?.[key] || !build.source_files_sha256?.[key]) throw new Error(`Hash crítico ausente: ${key}`);
+          console.log('Release preservada: Banco 3449 | 3447 objetivas | 75 materiais | 0 auditoria | 2538 C/E + 909 múltipla | proveniência v2.22.');
+          NODE
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Publicar GitHub Pages
+        uses: actions/deploy-pages@v4
+      - name: Instalar Playwright
+        run: |
+          npm install --no-save @playwright/test
+          npx playwright install --with-deps chromium
+      - name: Verificar relevância e offline públicos
+        env:
+          PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes/
+          EXPECTED_SHA: ${{ steps.build.outputs.source_sha }}
+        run: npx playwright test tests-public/home-study-subjects-v2-17.spec.js tests-public/pwa-offline-v2-22.spec.js --config=playwright.public.config.js --workers=1 --retries=0
+      - name: Repetir resolver público 3 vezes sem retries
+        env:
+          PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes/
+          EXPECTED_SHA: ${{ steps.build.outputs.source_sha }}
+        run: npx playwright test tests-public/resolver-context-v2-19.spec.js --config=playwright.public.config.js --workers=1 --repeat-each=3 --retries=0
+      - name: Executar suíte pública completa sem retries
+        env:
+          PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes/
+          EXPECTED_SHA: ${{ steps.build.outputs.source_sha }}
+        run: npx playwright test --config=playwright.public.config.js --retries=0
+      - name: Confirmar SHA, formatos, proveniência e totais servidos
+        env:
+          EXPECTED_SHA: ${{ steps.build.outputs.source_sha }}
+        run: |
+          curl -fsSL --retry 8 --retry-delay 2 "https://rodrigorosadantas.github.io/sedes-df-questoes/data/release/build-info.json?a22=${GITHUB_RUN_ID}" -o /tmp/public-build.json
+          curl -fsSL --retry 8 --retry-delay 2 "https://rodrigorosadantas.github.io/sedes-df-questoes/data/release/release-meta.json?a22=${GITHUB_RUN_ID}" -o /tmp/public-meta.json
+          curl -fsSL --retry 8 --retry-delay 2 "https://rodrigorosadantas.github.io/sedes-df-questoes/data/release/question-format-index.json?a22=${GITHUB_RUN_ID}" -o /tmp/public-format.json
+          node - <<'NODE'
+          const fs=require('fs');
+          const build=JSON.parse(fs.readFileSync('/tmp/public-build.json','utf8'));
+          const meta=JSON.parse(fs.readFileSync('/tmp/public-meta.json','utf8'));
+          const format=JSON.parse(fs.readFileSync('/tmp/public-format.json','utf8'));
+          const expected=process.env.EXPECTED_SHA;
+          const critical=['home_study_edital_js','home_study_today_js','home_study_today_css','home_study_subjects_js','home_study_subjects_css','resolver_context_js','resolver_context_css'];
+          if(build.source_sha!==expected || meta.source_sha!==expected) throw new Error(`SHA público divergente: ${build.source_sha}/${meta.source_sha} != ${expected}`);
+          if(Number(build.questions)!==3447 || Number(build.materials)!==75 || Number(meta.banco_mestre)!==3449 || Number(meta.awaiting_audit)!==0) throw new Error('Totais públicos divergentes');
+          if(Number(format.question_count)!==3447 || Number(format.summary?.['true-false'])!==2538 || Number(format.summary?.['multiple-choice'])!==909) throw new Error('Formatos públicos divergentes');
+          if(build.provenance_contract_version!=='2.22' || meta.provenance_contract_version!=='2.22') throw new Error('Contrato público de proveniência divergente');
+          for(const key of critical) if(!build.source_files_sha256?.[key] || build.source_files_sha256[key]!==meta.source_files_sha256?.[key]) throw new Error(`Hash público crítico divergente: ${key}`);
+          console.log(`PUBLIC_SOURCE_SHA=${build.source_sha}`);
+          console.log('PUBLIC_RELEVANCE=Artes excluída dos recortes 202/400');
+          console.log('PUBLIC_FORMATS=2538 C/E | 909 múltipla escolha | total 3447');
+          console.log('PUBLIC_PROVENANCE=2.22 | 7 fontes UX críticas');
+          console.log('PUBLIC_RELEASE=3447 questões | 75 materiais | Banco 3449 | 0 auditoria');
+          NODE
