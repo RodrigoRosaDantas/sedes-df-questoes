@@ -19,8 +19,8 @@ const fetchText = async relative => { const response = await fetch(`${base}/${re
 let lastError;
 for (let attempt = 1; attempt <= 30; attempt += 1) {
   try {
-    const [buildInfo, releaseMeta, catalog, index, app, worker, pwa, reports, shared, release, vault, report, official, adaptive] = await Promise.all([
-      fetchJSON("data/release/build-info.json"), fetchJSON("data/release/release-meta.json"), fetchJSON("data/release/catalogo.json"), fetchText("index.html"), fetchText("assets/app-v4.js"), fetchText("service-worker.js"), fetchText("assets/pwa-v2-9.js"), fetchText("assets/reports-v2-10.js"), fetchText("assets/shared-v2-13.js"), fetchText("assets/release-v2-13.js"), fetchText("assets/vault-v2-13.js"), fetchText("assets/report-v2-13.js"), fetchText("assets/official-exam-v2-13.js"), fetchText("assets/adaptive-review-v2-13.js")
+    const [buildInfo, releaseMeta, catalog, index, app, worker, pwa, reports, shared, release, vault, report, official, adaptive, navigation] = await Promise.all([
+      fetchJSON("data/release/build-info.json"), fetchJSON("data/release/release-meta.json"), fetchJSON("data/release/catalogo.json"), fetchText("index.html"), fetchText("assets/app-v4.js"), fetchText("service-worker.js"), fetchText("assets/pwa-v2-9.js"), fetchText("assets/reports-v2-10.js"), fetchText("assets/shared-v2-13.js"), fetchText("assets/release-v2-13.js"), fetchText("assets/vault-v2-13.js"), fetchText("assets/report-v2-13.js"), fetchText("assets/official-exam-v2-13.js"), fetchText("assets/adaptive-review-v2-13.js"), fetchText("assets/navigation-v2-15.js")
     ]);
     const questions = Object.keys(catalog.question_index || {}).length, materials = Array.isArray(catalog.materials) ? catalog.materials.length : 0;
     const appReference = index.match(/assets\/app-v4\.js\?v=\d+/)?.[0] || "", pwaReference = index.match(/assets\/pwa-v2-9\.js\?v=\d+/)?.[0] || "";
@@ -37,7 +37,7 @@ for (let attempt = 1; attempt <= 30; attempt += 1) {
     for (const marker of [expectedCacheVersion, appReference, pwaReference, "shared-v2-13.js?v=1", "release-v2-13.js?v=1", "vault-v2-13.js?v=1", "report-v2-13.js?v=1", "official-exam-v2-13.js?v=1", "adaptive-review-v2-13.js?v=1", "release-meta", 'event.request.mode === "navigate"', 'cache: "no-store"', 'type === "SKIP_WAITING"']) if (!worker.includes(marker)) throw new Error(`Service worker público sem ${marker}.`);
     for (const marker of ['updateViaCache: "none"', "controllerchange", "registration.update()"] ) if (!pwa.includes(marker)) throw new Error(`Registro PWA público sem ${marker}.`);
     if (!reports.includes("restoreBackupTransaction")) throw new Error("Relatórios e backup legado não foram publicados.");
-    const moduleChecks = [[shared, ["release-meta.json", "createCompatibleSession"]], [release, ["Integridade da publicação"]], [vault, ["sedes-protected-backup", "PBKDF2"]], [report, ["Reportar problema nesta questão"]], [official, ["Prova Real SEDES/DF 2026", "240"]], [adaptive, ["Revisão adaptativa", "mastery"]]];
+    const moduleChecks = [[shared, ["release-meta.json", "createCompatibleSession"]], [release, ["enhanceReleaseMetadata", "data-release-footer"]], [vault, ["sedes-protected-backup", "PBKDF2"]], [report, ["Reportar problema nesta questão"]], [official, ["Prova Real SEDES/DF 2026", "240"]], [adaptive, ["Revisão adaptativa", "mastery"]], [navigation, ["Dados do projeto", "Aguardando auditoria", "America/Sao_Paulo"]]];
     for (const [content, markers] of moduleChecks) for (const marker of markers) if (!content.includes(marker)) throw new Error(`Módulo 2.13 público sem ${marker}.`);
     if (releaseMeta.official_exam?.objective_questions !== 60 || releaseMeta.official_exam?.joint_duration_minutes !== 240) throw new Error("Plano oficial público divergente.");
     console.log(`✓ Deploy estático confirmado em ${base}: versão ${buildInfo.version}, commit ${buildInfo.source_sha}, cache ${expectedCacheVersion}, ${questions} questões e ${materials} materiais.`);

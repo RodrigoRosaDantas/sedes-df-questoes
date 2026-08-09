@@ -1,0 +1,17 @@
+node_modules/
+dist/
+playwright-report/
+test-results/
+
+# Índices derivados pelo build público.
+data/release/question-format-index.json
+data/release/question-search-index.json
+
+# Exportações transitórias do Notion, geradas somente em operações autorizadas.
+data/editorial-runtime/
+data/pedagogia-runtime/
+
+# Validadores podem criar módulos temporários durante a execução.
+scripts/*.tmp.mjs
+
+.DS_Store

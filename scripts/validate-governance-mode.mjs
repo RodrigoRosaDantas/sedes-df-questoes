@@ -1,102 +1,74 @@
 import fs from "node:fs";
 import path from "node:path";
-import {pathToFileURL, fileURLToPath} from "node:url";
+import {fileURLToPath} from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const scriptsDirectory = path.join(root, "scripts");
-const suspensionPath = path.join(root, "data", "operations", "site-automations-suspended.json");
-const suspension = fs.existsSync(suspensionPath)
-  ? JSON.parse(fs.readFileSync(suspensionPath, "utf8"))
-  : null;
-const manualOnly = suspension?.mode === "manual_only";
+const read = relative => fs.readFileSync(path.join(root, relative), "utf8");
+const fail = message => { throw new Error(message); };
+const requireMarkers = (content, markers, context) => markers.forEach(marker => {
+  if (!content.includes(marker)) fail(`${context}: marcador ausente: ${marker}`);
+});
+const forbidMarkers = (content, markers, context) => markers.forEach(marker => {
+  if (content.includes(marker)) fail(`${context}: marcador proibido: ${marker}`);
+});
+const triggerBlock = content => content.match(/^on:\s*\n((?:^[ \t].*(?:\n|$)|^\s*$)*)/m)?.[1] || "";
 
-async function importFresh(file) {
-  await import(`${pathToFileURL(file).href}?validation=${Date.now()}-${Math.random()}`);
+const receipt = JSON.parse(read("data/operations/site-automations-governance-20260809.json"));
+if (receipt.status !== "active_limited" || receipt.mode !== "manual_deploy_read_only_ci") {
+  fail("Recibo de governança limitada ausente ou inválido.");
 }
 
-function replaceRange(source, startMarker, endMarker, replacement, context) {
-  const start = source.indexOf(startMarker);
-  const endStart = source.indexOf(endMarker, start);
-  if (start < 0 || endStart < 0) throw new Error(`Não foi possível adaptar ${context} ao modo suspenso.`);
-  const end = endStart + endMarker.length;
-  return `${source.slice(0, start)}${replacement}${source.slice(end)}`;
+const pages = read(".github/workflows/pages.yml");
+const pagesTriggers = triggerBlock(pages);
+requireMarkers(pagesTriggers, ["workflow_dispatch:"], "Gatilhos de Pages");
+forbidMarkers(pagesTriggers, ["push:", "pull_request:", "schedule:"], "Gatilhos de Pages");
+requireMarkers(pages, [
+  "source_sha:",
+  "confirmation:",
+  "NAO_PUBLICAR",
+  "PUBLICAR",
+  "contents: read",
+  "pages: write",
+  "id-token: write",
+  "actions/checkout@v6",
+  "actions/setup-node@v6",
+  "RELEASE_SOURCE_SHA",
+  "run: npm run check",
+  "playwright.public.config.js",
+  "--retries=0",
+  "actions/configure-pages@v6",
+  "actions/upload-pages-artifact@v5",
+  "actions/deploy-pages@v5",
+  "verify-deployment.mjs",
+], "Publicação manual");
+forbidMarkers(pages, [
+  "contents: write",
+  "secrets.NOTION_TOKEN",
+  "export-notion-snapshot.mjs",
+  "mark-notion-published.mjs",
+  "rollback-deployment.mjs",
+  "git push",
+], "Publicação manual");
+
+const validationFile = ".github/workflows/validate-public-release.yml";
+const validation = read(validationFile);
+const validationTriggers = triggerBlock(validation);
+requireMarkers(validationTriggers, ["pull_request:", "workflow_dispatch:"], "Gatilhos da validação");
+forbidMarkers(validationTriggers, ["push:", "schedule:"], "Gatilhos da validação");
+requireMarkers(validation, ["contents: read", "npm run check", "RELEASE_SOURCE_SHA", "actions/checkout@v6", "actions/setup-node@v6"], "Validação somente leitura");
+forbidMarkers(validation, ["contents: write", "pages: write", "id-token: write", "secrets.", "deploy-pages", "git push"], "Validação somente leitura");
+
+const workflowDirectory = path.join(root, ".github", "workflows");
+const workflows = fs.readdirSync(workflowDirectory).filter(file => /\.ya?ml$/i.test(file)).sort();
+for (const file of workflows) {
+  if (["pages.yml", "validate-public-release.yml"].includes(file)) continue;
+  const content = read(path.join(".github", "workflows", file));
+  const triggers = triggerBlock(content);
+  if (!triggers.includes("workflow_dispatch:")) fail(`${file}: rotina operacional sem acionamento manual.`);
+  if (/^  (push|pull_request|schedule):/m.test(triggers)) fail(`${file}: rotina operacional ainda possui gatilho automático.`);
 }
 
-function suspendedWorkflowValidation() {
-  return `
-const suspendedWorkflowFiles = fs.readdirSync(path.join(root, ".github", "workflows"))
-  .filter(file => /\\.ya?ml$/i.test(file))
-  .sort();
-for (const file of suspendedWorkflowFiles) {
-  const workflowPath = path.join(root, ".github", "workflows", file);
-  const workflow = fs.readFileSync(workflowPath, "utf8");
-  const match = workflow.match(/^on\\s*:\\s*\\n((?:^[ \\t].*\\n|^\\s*$)*)/m);
-  const block = match?.[1] || "";
-  if (!block.includes("workflow_dispatch:")) fail(\`Workflow suspenso sem acionamento manual: \${file}\`);
-  if (/^  (push|pull_request|schedule):/m.test(block)) fail(\`Workflow suspenso contém gatilho automático: \${file}\`);
-}
-console.log(\`✓ \${suspendedWorkflowFiles.length} workflows confirmados em modo manual e suspenso.\`);
-`;
-}
-
-if (!manualOnly) {
-  await importFresh(path.join(scriptsDirectory, "validate-intelligence-v2-9.mjs"));
-  await importFresh(path.join(scriptsDirectory, "validate-build-v2-11.mjs"));
-  await importFresh(path.join(scriptsDirectory, "validate-workflows.mjs"));
-} else {
-  const temporaryFiles = [];
-  try {
-    const intelligenceSourcePath = path.join(scriptsDirectory, "validate-intelligence-v2-9.mjs");
-    const intelligenceSource = fs.readFileSync(intelligenceSourcePath, "utf8");
-    const intelligenceStart = 'const workflow = read(".github/workflows/pages.yml");';
-    const intelligenceEnd = 'if (workflow.includes("export-notion-snapshot.mjs")) fail("O workflow de Pages não pode substituir o snapshot versionado por leitura ao vivo do Notion.");';
-    const intelligenceReplacement = `const workflow = read(".github/workflows/pages.yml");
-if (!workflow.includes("workflow_dispatch:")) fail("Workflow de Pages suspenso sem acionamento manual.");
-if (/^  (push|pull_request|schedule):/m.test(workflow)) fail("Workflow de Pages suspenso contém gatilho automático.");`;
-    const intelligenceAdapted = replaceRange(
-      intelligenceSource,
-      intelligenceStart,
-      intelligenceEnd,
-      intelligenceReplacement,
-      "validate-intelligence-v2-9.mjs",
-    );
-    const intelligenceTemporary = path.join(scriptsDirectory, ".validate-intelligence-v2-9-suspended.tmp.mjs");
-    fs.writeFileSync(intelligenceTemporary, intelligenceAdapted);
-    temporaryFiles.push(intelligenceTemporary);
-    await importFresh(intelligenceTemporary);
-
-    const buildSourcePath = path.join(scriptsDirectory, "validate-build-v2-11.mjs");
-    const buildSource = fs.readFileSync(buildSourcePath, "utf8");
-    const buildStart = 'const pagesWorkflow = read(".github/workflows/pages.yml");';
-    const buildEnd = 'if (dispatchCount !== 1) fail(`Workflow do Notion deve criar uma única publicação explícita; encontrado: ${dispatchCount}.`);';
-    const buildAdapted = replaceRange(
-      buildSource,
-      buildStart,
-      buildEnd,
-      suspendedWorkflowValidation(),
-      "validate-build-v2-11.mjs",
-    );
-    const buildTemporary = path.join(scriptsDirectory, ".validate-build-v2-11-suspended.tmp.mjs");
-    fs.writeFileSync(buildTemporary, buildAdapted);
-    temporaryFiles.push(buildTemporary);
-    await importFresh(buildTemporary);
-
-    const workflowSourcePath = path.join(scriptsDirectory, "validate-workflows.mjs");
-    const workflowSource = fs.readFileSync(workflowSourcePath, "utf8");
-    const workflowStart = 'const pages = read(".github/workflows/pages.yml");';
-    const workflowEnd = 'const notionExporter = read("scripts/export-notion-snapshot.mjs");';
-    const workflowAdapted = replaceRange(
-      workflowSource,
-      workflowStart,
-      workflowEnd,
-      `${suspendedWorkflowValidation()}\n${workflowEnd}`,
-      "validate-workflows.mjs",
-    );
-    const workflowTemporary = path.join(scriptsDirectory, ".validate-workflows-suspended.tmp.mjs");
-    fs.writeFileSync(workflowTemporary, workflowAdapted);
-    temporaryFiles.push(workflowTemporary);
-    await importFresh(workflowTemporary);
-  } finally {
-    for (const file of temporaryFiles) fs.rmSync(file, {force: true});
-  }
-}
+console.log(
+  `✓ Governança limitada validada em ${workflows.length} workflows: PR somente leitura, `
+  + "deploy manual por SHA exato e rotinas de Notion/rastreabilidade sem gatilhos automáticos.",
+);
