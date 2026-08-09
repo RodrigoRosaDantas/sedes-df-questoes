@@ -1,0 +1,34 @@
+name: Verificar teste público v2.21
+
+on:
+  pull_request:
+    branches: [main]
+    types: [reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    if: github.head_ref == 'agent/estabilizar-teste-publico-v2-21'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/estabilizar-teste-publico-v2-21
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Confirmar site v2.21 publicado
+        run: |
+          curl -fsSL --retry 8 --retry-delay 2 "https://rodrigorosadantas.github.io/sedes-df-questoes/data/release/build-info.json?verify=${GITHUB_RUN_ID}" -o /tmp/build.json
+          node -e "const x=require('/tmp/build.json'); if(x.source_sha!=='11bcb150a59e2dd969bc5a4007d31a1407657adc') throw new Error('SHA público inesperado: '+x.source_sha); console.log('PUBLIC_SOURCE_SHA='+x.source_sha)"
+      - name: Instalar Playwright
+        run: |
+          npm install --no-save @playwright/test
+          npx playwright install --with-deps chromium
+      - name: Executar suíte pública completa com helper estabilizado
+        env:
+          PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes/
+          EXPECTED_SHA: 11bcb150a59e2dd969bc5a4007d31a1407657adc
+        run: npx playwright test --config=playwright.public.config.js
