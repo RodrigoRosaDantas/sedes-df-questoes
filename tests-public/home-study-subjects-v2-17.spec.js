@@ -66,6 +66,26 @@ test("home pública permite personalizar matérias diretamente a partir de Todas
   expect(errors).toEqual([]);
 });
 
+test("recorte público 202/400 não admite disciplina Artes por colisão textual", async ({page}) => {
+  await page.goto("./#/inicio", {waitUntil: "domcontentloaded"});
+  const audit = await page.evaluate(async () => {
+    const module = await import("./assets/home-study-edital-v2-18.js?v=1");
+    const response = await fetch("./data/release/study-index.json", {cache: "no-store"});
+    const studyIndex = await response.json();
+    const arts = (studyIndex.disciplines || []).find(item => item.name === "Artes")?.question_ids || [];
+    const result = {};
+    for (const target of ["202", "400"]) {
+      const ids = module.targetQuestionIdsForStudyIndex(studyIndex, target);
+      result[target] = {count: ids.size, arts: arts.filter(id => ids.has(id))};
+    }
+    return result;
+  });
+  expect(audit["202"].count).toBeGreaterThan(0);
+  expect(audit["400"].count).toBeGreaterThan(0);
+  expect(audit["202"].arts).toEqual([]);
+  expect(audit["400"].arts).toEqual([]);
+});
+
 test.describe("matérias no mobile por toque", () => {
   test.use({viewport: {width: 390, height: 844}, isMobile: true, hasTouch: true});
 

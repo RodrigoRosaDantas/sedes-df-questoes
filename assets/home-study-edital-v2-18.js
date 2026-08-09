@@ -158,14 +158,46 @@ export const normalizeStudyValue = value => String(value || "")
   .replace(/\s+/g, " ")
   .trim();
 
+const GENERIC_DISCIPLINE_TERMS = new Set(["administracao"]);
+const TOPIC_FALLBACK_DISCIPLINES = [
+  "conhecimentos gerais",
+  "conhecimentos especificos",
+  "legislacao",
+  "direito",
+  "politicas publicas",
+  "politica social",
+  "assistencia social",
+  "servico social",
+];
+const regexEscape = value => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+function matchesTopicTerm(value, term) {
+  const expected = normalizeStudyValue(term);
+  if (!expected) return false;
+  const escaped = regexEscape(expected);
+  const shortSingleToken = /^[a-z0-9]+$/.test(expected) && expected.length <= 4;
+  const endBoundary = shortSingleToken ? "(?=$|[^a-z0-9])" : "";
+  return new RegExp(`(?:^|[^a-z0-9])${escaped}${endBoundary}`, "u").test(value);
+}
+
 function includesAny(text, terms) {
   const value = normalizeStudyValue(text);
-  return terms.some(term => value.includes(normalizeStudyValue(term)));
+  return terms.some(term => matchesTopicTerm(value, term));
 }
 
 function matchesDiscipline(name, terms) {
   const value = normalizeStudyValue(name);
   return terms.some(term => {
+    const expected = normalizeStudyValue(term);
+    if (value === expected) return true;
+    if (GENERIC_DISCIPLINE_TERMS.has(expected)) return false;
+    return value.startsWith(`${expected} `) || value.endsWith(` ${expected}`);
+  });
+}
+
+function allowsTopicFallback(name) {
+  const value = normalizeStudyValue(name);
+  return TOPIC_FALLBACK_DISCIPLINES.some(term => {
     const expected = normalizeStudyValue(term);
     return value === expected || value.startsWith(`${expected} `) || value.endsWith(` ${expected}`);
   });
@@ -180,6 +212,7 @@ export function targetQuestionIdsForStudyIndex(studyIndex, targetCode) {
       (discipline.question_ids || []).forEach(id => result.add(id));
       continue;
     }
+    if (!allowsTopicFallback(discipline.name)) continue;
     for (const topic of discipline.topics || []) {
       if (includesAny(`${discipline.name} ${topic.name}`, target.topics)) {
         (topic.question_ids || []).forEach(id => result.add(id));
