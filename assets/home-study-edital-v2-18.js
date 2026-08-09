@@ -158,16 +158,30 @@ export const normalizeStudyValue = value => String(value || "")
   .replace(/\s+/g, " ")
   .trim();
 
+const GENERIC_DISCIPLINE_TERMS = new Set(["administracao"]);
+const regexEscape = value => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+function matchesTopicTerm(value, term) {
+  const expected = normalizeStudyValue(term);
+  if (!expected) return false;
+  const escaped = regexEscape(expected);
+  const shortSingleToken = /^[a-z0-9]+$/.test(expected) && expected.length <= 4;
+  const endBoundary = shortSingleToken ? "(?=$|[^a-z0-9])" : "";
+  return new RegExp(`(?:^|[^a-z0-9])${escaped}${endBoundary}`, "u").test(value);
+}
+
 function includesAny(text, terms) {
   const value = normalizeStudyValue(text);
-  return terms.some(term => value.includes(normalizeStudyValue(term)));
+  return terms.some(term => matchesTopicTerm(value, term));
 }
 
 function matchesDiscipline(name, terms) {
   const value = normalizeStudyValue(name);
   return terms.some(term => {
     const expected = normalizeStudyValue(term);
-    return value === expected || value.startsWith(`${expected} `) || value.endsWith(` ${expected}`);
+    if (value === expected) return true;
+    if (GENERIC_DISCIPLINE_TERMS.has(expected)) return false;
+    return value.startsWith(`${expected} `) || value.endsWith(` ${expected}`);
   });
 }
 
