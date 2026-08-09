@@ -75,6 +75,29 @@ test("Provas 202 cria sessão apenas com questões oriundas de provas", async ({
   }
 });
 
+test("recortes 202 e 400 rejeitam Artes e colisões de APO/ética/DF", async ({page}) => {
+  await openHome(page);
+  const audit = await page.evaluate(async () => {
+    const module = await import("./assets/home-study-edital-v2-18.js?v=1");
+    const response = await fetch("./data/release/study-index.json", {cache: "no-store"});
+    const studyIndex = await response.json();
+    const arts = (studyIndex.disciplines || []).find(item => item.name === "Artes")?.question_ids || [];
+    const result = {};
+    for (const target of ["202", "400"]) {
+      const ids = module.targetQuestionIdsForStudyIndex(studyIndex, target);
+      result[target] = {count: ids.size, arts: arts.filter(id => ids.has(id))};
+    }
+    return result;
+  });
+  expect(audit["202"].count).toBeGreaterThan(0);
+  expect(audit["400"].count).toBeGreaterThan(0);
+  expect(audit["202"].arts).toEqual([]);
+  expect(audit["400"].arts).toEqual([]);
+  for (const id of ["prova-qdx-seedf-2025-art-a-102", "prova-qdx-seedf-2025-art-a-103", "prova-qdx-seedf-2025-art-a-108"]) {
+    expect(audit["400"].arts).not.toContain(id);
+  }
+});
+
 test("Home v2.16 não gera overflow horizontal no celular", async ({page}) => {
   await page.setViewportSize({width: 390, height: 844});
   await openHome(page);
