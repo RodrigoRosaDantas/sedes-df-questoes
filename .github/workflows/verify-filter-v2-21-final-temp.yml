@@ -1,0 +1,46 @@
+name: Verificar público v2.21 final
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify-live:
+    if: github.event.pull_request.head.ref == 'agent/verificar-publico-v2-21-final'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Confirmar SHA e release publicados
+        run: |
+          curl -fsSL --retry 8 --retry-delay 2 "https://rodrigorosadantas.github.io/sedes-df-questoes/data/release/build-info.json?stable=${GITHUB_RUN_ID}" -o /tmp/build.json
+          curl -fsSL --retry 8 --retry-delay 2 "https://rodrigorosadantas.github.io/sedes-df-questoes/data/release/release-meta.json?stable=${GITHUB_RUN_ID}" -o /tmp/meta.json
+          curl -fsSL --retry 8 --retry-delay 2 "https://rodrigorosadantas.github.io/sedes-df-questoes/data/release/question-format-index.json?stable=${GITHUB_RUN_ID}" -o /tmp/format.json
+          node - <<'NODE'
+          const build=require('/tmp/build.json');
+          const meta=require('/tmp/meta.json');
+          const format=require('/tmp/format.json');
+          const expected='0a08f454818d8b3cd9ba53c1cb54abd041705af4';
+          if(build.source_sha!==expected) throw new Error(`SHA público ${build.source_sha} != ${expected}`);
+          if(Number(build.questions)!==3447 || Number(build.materials)!==75 || Number(meta.banco_mestre)!==3449 || Number(meta.awaiting_audit)!==0) throw new Error('Release pública divergente');
+          if(Number(format.question_count)!==3447 || Number(format.summary?.['true-false'])!==2538 || Number(format.summary?.['multiple-choice'])!==909) throw new Error('Formatos públicos divergentes');
+          console.log('PUBLIC_SOURCE_SHA='+build.source_sha);
+          console.log('PUBLIC_FORMATS=2538 C/E | 909 múltipla escolha | total 3447');
+          console.log('PUBLIC_RELEASE=3447 questões | 75 materiais | Banco 3449 | 0 auditoria');
+          NODE
+      - name: Instalar Playwright
+        run: |
+          npm install --no-save @playwright/test
+          npx playwright install --with-deps chromium
+      - name: Executar 19 testes públicos sem retries
+        env:
+          PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes/
+          EXPECTED_SHA: 0a08f454818d8b3cd9ba53c1cb54abd041705af4
+        run: npx playwright test --config=playwright.public.config.js --retries=0
