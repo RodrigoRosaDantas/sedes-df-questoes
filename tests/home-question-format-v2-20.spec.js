@@ -6,15 +6,16 @@ const FORMAT_KEY = "sedes.questoes.rodrigo.homeStudyFormat.v1";
 const SESSION_KEY = "sedes.questoes.rodrigo.session.v3";
 
 async function prepare(page, tracks = ["prova-202", "prova-400"]) {
-  await page.goto("./#/inicio", {waitUntil: "domcontentloaded"});
-  await expect(page.locator("[data-ux15-home]")).toBeVisible({timeout: 30000});
-  await page.evaluate(({tracks, trackKey, subjectKey, formatKey, sessionKey}) => {
+  await page.addInitScript(({tracks, trackKey, subjectKey, formatKey, sessionKey}) => {
+    const marker = "__sedes.v220.seeded";
+    if (sessionStorage.getItem(marker)) return;
     localStorage.setItem(trackKey, JSON.stringify(tracks));
     localStorage.removeItem(sessionKey);
     sessionStorage.removeItem(subjectKey);
     sessionStorage.removeItem(formatKey);
+    sessionStorage.setItem(marker, "1");
   }, {tracks, trackKey: TRACK_KEY, subjectKey: SUBJECT_KEY, formatKey: FORMAT_KEY, sessionKey: SESSION_KEY});
-  await page.reload({waitUntil: "domcontentloaded"});
+  await page.goto("./#/inicio", {waitUntil: "domcontentloaded"});
   await expect(page.locator("[data-ux20-format]")).toBeVisible({timeout: 30000});
 }
 
