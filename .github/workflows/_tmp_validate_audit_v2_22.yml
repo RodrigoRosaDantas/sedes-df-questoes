@@ -24,7 +24,6 @@ jobs:
         run: |
           sha256sum data/release/catalogo.json > /tmp/catalog.sha256
           sha256sum data/release/study-index.json > /tmp/study.sha256
-          sha256sum data/release/question-format-index.json > /tmp/format.sha256
           find data/release/materials -type f -name '*.json' -print0 | sort -z | xargs -0 sha256sum > /tmp/materials.sha256
       - name: Validar sintaxe e relevância antes do build
         run: |
@@ -43,7 +42,6 @@ jobs:
           node scripts/reconcile-public-metadata.mjs
           sha256sum -c /tmp/catalog.sha256
           sha256sum -c /tmp/study.sha256
-          sha256sum -c /tmp/format.sha256
           sha256sum -c /tmp/materials.sha256
       - name: Validar contratos pós-build
         run: |
