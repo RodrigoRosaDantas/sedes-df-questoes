@@ -7,17 +7,19 @@ const fail = message => { throw new Error(message); };
 const requireMarkers = (content, markers, context) => markers.forEach(marker => { if (!content.includes(marker)) fail(`${context}: marcador ausente: ${marker}`); });
 const pkg = JSON.parse(read("package.json"));
 if (pkg.version !== "2.13.0") fail(`Versão inesperada: ${pkg.version}`);
-const index = read("index.html"), worker = read("service-worker.js"), builder = read("scripts/build-public.mjs"), css = read("assets/platform-v2-13.css");
+const index = read("index.html"), worker = read("service-worker.js"), builder = read("scripts/build-public.mjs"), css = read("assets/platform-v2-13.css"), resolverStabilityCss = read("assets/resolver-stability-v2-23.css");
 const modules = {shared: read("assets/shared-v2-13.js"), release: read("assets/release-v2-13.js"), vault: read("assets/vault-v2-13.js"), report: read("assets/report-v2-13.js"), official: read("assets/official-exam-v2-13.js"), adaptive: read("assets/adaptive-review-v2-13.js")};
 const navigation = read("assets/navigation-v2-15.js");
 const references = ["release-v2-13.js?v=1", "vault-v2-13.js?v=1", "report-v2-13.js?v=1", "official-exam-v2-13.js?v=1", "adaptive-review-v2-13.js?v=1"];
-requireMarkers(index, ["platform-v2-13.css?v=1", ...references, "navigation-v2-15.js?v=1"], "HTML");
-requireMarkers(worker, ["sedes-questoes-v2-13-0", "shared-v2-13.js?v=1", ...references, "navigation-v2-15.js?v=1", "release-meta"], "Service worker");
+requireMarkers(index, ["platform-v2-13.css?v=1", ...references, "navigation-v2-15.js?v=1", "resolver-stability-v2-23.css?v=1"], "HTML");
+requireMarkers(worker, ["sedes-questoes-v2-13-0", "shared-v2-13.js?v=1", ...references, "navigation-v2-15.js?v=1", "resolver-stability-v2-23.css?v=1", "release-meta"], "Service worker");
 requireMarkers(modules.shared, [
   "release-meta.json", "createCompatibleSession", "questionIndexEntries",
   "let dataPromise = null", "if (dataPromise) return dataPromise", "dataPromise = null",
   "let scheduled = false", "if (scheduled) return", "scheduled = false",
+  "isTransientTimerMutation", "[data-total-time], [data-question-time]", "mutations.every(isTransientTimerMutation)",
 ], "Módulo compartilhado");
+requireMarkers(resolverStabilityCss, ["font-variant-numeric:tabular-nums", "min-inline-size:96px", "[data-total-time],[data-question-time]"], "Estabilidade da resolução");
 requireMarkers(modules.release, ["enhanceReleaseMetadata", "data-release-footer", "#sync-label", "state.release.app_version"], "Metadados da release");
 requireMarkers(navigation, ["#/perfil/configuracoes", "Dados do projeto", "Questões publicadas", "Banco Mestre"], "Configurações da plataforma");
 requireMarkers(modules.vault, ["sedes-protected-backup", "PBKDF2", "AES-GCM", "data-vault-tools"], "Cofre local");
@@ -35,4 +37,4 @@ const questions = Object.keys(catalog.question_index || {}).length, materials = 
 if (releaseMeta.app_version !== pkg.version || releaseMeta.questions !== questions || releaseMeta.materials !== materials) fail("Release-meta diverge do pacote.");
 if (releaseMeta.official_exam?.objective_questions !== 60 || releaseMeta.official_exam?.joint_duration_minutes !== 240) fail("Configuração oficial divergente.");
 for (const key of ["platform_shared_js", "platform_release_js", "platform_vault_js", "platform_report_js", "platform_official_exam_js", "platform_adaptive_review_js", "platform_css", "platform_navigation_js"]) if (!releaseMeta.source_files_sha256?.[key]) fail(`Hash ausente: ${key}`);
-console.log(`✓ Plataforma 2.13 validada: ${questions} questões, ${materials} materiais, carga inicial compartilhada, observers coalescidos, metadados em Configurações, cofre local, reporte, prova real e revisão adaptativa.`);
+console.log(`✓ Plataforma 2.13 validada: ${questions} questões, ${materials} materiais, carga inicial compartilhada, observers coalescidos, cronômetros estáveis, metadados em Configurações, cofre local, reporte, prova real e revisão adaptativa.`);
