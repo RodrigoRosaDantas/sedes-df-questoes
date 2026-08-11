@@ -102,6 +102,13 @@ export async function ensureData() {
     throw error;
   }
 }
+const isTransientTimerMutation = mutation => {
+  if (mutation.type !== "childList") return false;
+  const target = mutation.target;
+  if (!(target instanceof Element) || !target.matches("[data-total-time], [data-question-time]")) return false;
+  const nodes = [...mutation.addedNodes, ...mutation.removedNodes];
+  return nodes.length > 0 && nodes.every(node => node.nodeType === Node.TEXT_NODE);
+};
 export const observeApp = callback => {
   let scheduled = false;
   const run = () => {
@@ -112,7 +119,10 @@ export const observeApp = callback => {
       Promise.resolve(callback()).catch(console.error);
     });
   };
-  new MutationObserver(run).observe(document.querySelector("#app") || document.body, {childList: true, subtree: true});
+  new MutationObserver(mutations => {
+    if (mutations.length && mutations.every(isTransientTimerMutation)) return;
+    run();
+  }).observe(document.querySelector("#app") || document.body, {childList: true, subtree: true});
   window.addEventListener("hashchange", run);
   run();
 };
