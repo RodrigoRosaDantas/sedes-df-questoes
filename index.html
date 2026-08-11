@@ -27,6 +27,30 @@
   <link rel="stylesheet" href="./assets/home-study-subjects-v2-17.css?v=7">
   <link rel="stylesheet" href="./assets/resolver-context-v2-19.css?v=1">
   <link rel="stylesheet" href="./assets/resolver-stability-v2-23.css?v=1">
+  <script>
+    (() => {
+      const NativeMutationObserver = window.MutationObserver;
+      if (!NativeMutationObserver || NativeMutationObserver.__sedesTimerStable) return;
+      const timerSelector = "[data-total-time],[data-question-time]";
+      const isTimerOnlyMutation = mutation => {
+        if (mutation.type !== "childList") return false;
+        const target = mutation.target;
+        if (!(target instanceof Element) || !target.matches(timerSelector)) return false;
+        const nodes = [...mutation.addedNodes, ...mutation.removedNodes];
+        return nodes.length > 0 && nodes.every(node => node.nodeType === Node.TEXT_NODE);
+      };
+      function StableMutationObserver(callback) {
+        return new NativeMutationObserver((mutations, observer) => {
+          if (mutations.length && mutations.every(isTimerOnlyMutation)) return;
+          callback(mutations, observer);
+        });
+      }
+      StableMutationObserver.prototype = NativeMutationObserver.prototype;
+      Object.setPrototypeOf(StableMutationObserver, NativeMutationObserver);
+      Object.defineProperty(StableMutationObserver, "__sedesTimerStable", {value: true});
+      window.MutationObserver = StableMutationObserver;
+    })();
+  </script>
 </head>
 <body>
   <a class="skip" href="#app">Pular para o conteúdo</a>
