@@ -21,6 +21,7 @@ const MAP_URL = "./data/release/edital-map-v1.json";
 const BLUEPRINT_KEY = () => profileKey("officialBlueprint.v1");
 let mapPromise = null;
 let timer = null;
+let cardInjecting = false;
 
 function ensureFeatureStyles() {
   if (document.querySelector('link[data-edital-verticalizado-css]')) return;
@@ -182,25 +183,31 @@ async function startOfficialExam(targetCode) {
 }
 
 async function injectCard() {
-  if (currentRoute() !== "estudar" || document.querySelector("[data-official-exam-card]")) return;
-  const map = await loadEditalMap();
-  const targetAnchor = document.querySelector("[data-ux-study-launcher]") || document.querySelector(".study-view-tabs") || document.querySelector(".page-heading") || document.querySelector("#app > *");
-  if (!targetAnchor) return;
-  const rule = map.objective_blueprint || {};
-  const card = document.createElement("section");
-  card.className = "official-exam-card card";
-  card.dataset.officialExamCard = "";
-  card.innerHTML = `<div><p class="eyebrow">Modo Prova Real</p><h2>SEDES/DF 2026 · conforme o edital atual</h2><p>${rule.objective_questions || 60} questões de múltipla escolha A–E: ${rule.general_questions || 20} gerais (peso ${rule.general_weight || 1}) e ${rule.specific_questions || 40} específicas (peso ${rule.specific_weight || 2}). O conteúdo é sorteado dentro da matriz do cargo e misturado na sessão.</p></div>
-    <div class="official-exam-facts"><span><strong>60</strong><small>questões</small></span><span><strong>100</strong><small>pontos</small></span><span><strong>4h</strong><small>objetiva + discursiva</small></span><span><strong>≥3</strong><small>Maria da Penha</small></span></div>
-    <div class="official-target-grid">${["202", "400"].map(code => {
-      const target = map.targets?.[code];
-      const ready = Boolean(target?.readiness?.ready);
-      return `<article class="official-target-card"><header><strong>${esc(target?.label || code)}</strong><small>${esc(target?.subtitle || `Cargo ${code}`)}</small></header><p class="official-readiness ${ready ? "ready" : "blocked"}">${esc(deficitText(target))}</p><button class="btn primary" data-start-official-exam="${code}" ${ready ? "" : "disabled"}>Iniciar Prova Real ${code}</button></article>`;
-    }).join("")}</div>
-    <p class="official-rule-note">A distribuição interna entre matérias é balanceada para diversidade, mas não é apresentada como cota oficial: o edital fixa os blocos 20/40 e o mínimo de três questões de Lei Maria da Penha.</p>
-    <p class="official-source-note">Nenhuma falta é preenchida com questão fora do mapa do edital ou em formato Certo/Errado.</p>`;
-  targetAnchor.insertAdjacentElement("afterend", card);
-  card.querySelectorAll("[data-start-official-exam]").forEach(button => button.addEventListener("click", () => startOfficialExam(button.dataset.startOfficialExam)));
+  if (currentRoute() !== "estudar" || cardInjecting || document.querySelector("[data-official-exam-card]")) return;
+  cardInjecting = true;
+  try {
+    const map = await loadEditalMap();
+    if (currentRoute() !== "estudar" || document.querySelector("[data-official-exam-card]")) return;
+    const targetAnchor = document.querySelector("[data-ux-study-launcher]") || document.querySelector(".study-view-tabs") || document.querySelector(".page-heading") || document.querySelector("#app > *");
+    if (!targetAnchor) return;
+    const rule = map.objective_blueprint || {};
+    const card = document.createElement("section");
+    card.className = "official-exam-card card";
+    card.dataset.officialExamCard = "";
+    card.innerHTML = `<div><p class="eyebrow">Modo Prova Real</p><h2>SEDES/DF 2026 · conforme o edital atual</h2><p>${rule.objective_questions || 60} questões de múltipla escolha A–E: ${rule.general_questions || 20} gerais (peso ${rule.general_weight || 1}) e ${rule.specific_questions || 40} específicas (peso ${rule.specific_weight || 2}). O conteúdo é sorteado dentro da matriz do cargo e misturado na sessão.</p></div>
+      <div class="official-exam-facts"><span><strong>60</strong><small>questões</small></span><span><strong>100</strong><small>pontos</small></span><span><strong>4h</strong><small>objetiva + discursiva</small></span><span><strong>≥3</strong><small>Maria da Penha</small></span></div>
+      <div class="official-target-grid">${["202", "400"].map(code => {
+        const target = map.targets?.[code];
+        const ready = Boolean(target?.readiness?.ready);
+        return `<article class="official-target-card"><header><strong>${esc(target?.label || code)}</strong><small>${esc(target?.subtitle || `Cargo ${code}`)}</small></header><p class="official-readiness ${ready ? "ready" : "blocked"}">${esc(deficitText(target))}</p><button class="btn primary" data-start-official-exam="${code}" ${ready ? "" : "disabled"}>Iniciar Prova Real ${code}</button></article>`;
+      }).join("")}</div>
+      <p class="official-rule-note">A distribuição interna entre matérias é balanceada para diversidade, mas não é apresentada como cota oficial: o edital fixa os blocos 20/40 e o mínimo de três questões de Lei Maria da Penha.</p>
+      <p class="official-source-note">Nenhuma falta é preenchida com questão fora do mapa do edital ou em formato Certo/Errado.</p>`;
+    targetAnchor.insertAdjacentElement("afterend", card);
+    card.querySelectorAll("[data-start-official-exam]").forEach(button => button.addEventListener("click", () => startOfficialExam(button.dataset.startOfficialExam)));
+  } finally {
+    cardInjecting = false;
+  }
 }
 
 function isOfficialSession(session) {
