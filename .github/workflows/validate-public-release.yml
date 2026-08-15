@@ -29,6 +29,11 @@ jobs:
         with:
           node-version: 22
           package-manager-cache: false
+      - name: Preparar Java 21 para Firebase Emulator
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
       - name: Auditar a release sem credenciais nem escrita externa
         shell: bash
         run: |
