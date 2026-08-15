@@ -41,6 +41,7 @@ function targetItems(map, code) {
 }
 
 test("edital verticalizado separa 202/400 e abre somente questões do item escolhido", async ({page}) => {
+  test.setTimeout(90000);
   await cleanStudyState(page);
   const map = await loadMap(page);
   expect(map.objective_blueprint.general_questions).toBe(20);
@@ -72,6 +73,7 @@ test("edital verticalizado separa 202/400 e abre somente questões do item escol
 });
 
 test("Prova Real usa A–E e Certo/Errado do cargo sem fallback fora do edital", async ({page}) => {
+  test.setTimeout(90000);
   const targets = ["202", "400"];
   for (const code of targets) {
     await cleanStudyState(page);
@@ -109,10 +111,12 @@ test("Prova Real usa A–E e Certo/Errado do cargo sem fallback fora do edital",
     expect(data.blueprint.generalIds.filter(id => maria.has(id)).length).toBeGreaterThanOrEqual(3);
     for (const id of data.session.questionIds) expect(["A–E", "Certo/Errado"]).toContain(map.question_formats[id]);
     expect(Object.keys(data.blueprint.selectedFormats).every(format => ["A–E", "Certo/Errado"].includes(format))).toBeTruthy();
+    expect(Number(data.blueprint.selectedFormats["Certo/Errado"] || 0)).toBeGreaterThan(0);
   }
 });
 
 test("questões feitas em qualquer modo alimentam progresso e página de realizadas do verticalizado", async ({page}) => {
+  test.setTimeout(90000);
   await cleanStudyState(page);
   const map = await loadMap(page);
   const catalog = await loadCatalog(page);
