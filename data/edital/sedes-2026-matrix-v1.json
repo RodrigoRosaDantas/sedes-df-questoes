@@ -1,0 +1,204 @@
+{
+  "schema_version": "1.0",
+  "matrix_version": "sedes-2026-v1",
+  "source": {
+    "notice": "Edital nº 1/2026 — SEDES/DF",
+    "updated_by": ["Edital nº 2, de 26 de maio de 2026", "Edital nº 3, de 23 de junho de 2026"],
+    "quadrix_url": "https://quadrix.org.br/informacoes/3056/",
+    "updated_notice_pdf": "https://anexos-r2.selecao.net.br/uploads/861/concursos/3056/anexos/b852c323-8771-4021-bbbd-8032e88e58e0.pdf",
+    "objects_item": "20"
+  },
+  "objective_blueprint": {
+    "objective_questions": 60,
+    "general_questions": 20,
+    "general_weight": 1,
+    "specific_questions": 40,
+    "specific_weight": 2,
+    "total_points": 100,
+    "general_minimum_points": 10,
+    "specific_minimum_points": 40,
+    "joint_duration_minutes": 240,
+    "allowed_format": "multiple_choice_ae",
+    "maria_da_penha_minimum_questions": 3,
+    "distribution_note": "O edital fixa totais e pesos por bloco, mas não fixa cotas por disciplina, exceto o mínimo de três questões sobre a Lei Maria da Penha."
+  },
+  "targets": {
+    "202": {
+      "label": "Técnico Administrativo",
+      "subtitle": "Cargo 202 · TDAS",
+      "specific_section_ids": ["tdas-comum-suas", "tdas-comum-programas", "202-constitucional", "202-administrativo", "202-rotinas-arquivologia", "202-materiais-patrimonio-compras"]
+    },
+    "400": {
+      "label": "Administrador",
+      "subtitle": "Cargo 400 · EDAS Administração",
+      "specific_section_ids": ["edas-comum-suas", "edas-comum-direitos", "edas-comum-programas", "400-tga", "400-osm-qualidade", "400-projetos", "400-afo", "400-pessoas", "400-etica"]
+    }
+  },
+  "general_section_ids": ["geral-portugues", "geral-df-legislacao"],
+  "sections": [
+    {
+      "id": "geral-portugues",
+      "scope": "general",
+      "label": "20.2.2.1 Língua Portuguesa",
+      "items": [
+        {"id":"geral-pt-1","label":"1 Compreensão e interpretação de textos de gêneros variados","match":{"discipline_any":["língua portuguesa","português"],"topic_any":["interpretação de textos","compreensão de textos","inferência","ideia global","leitura e interpretação"]}},
+        {"id":"geral-pt-2","label":"2 Reconhecimento de tipos e gêneros textuais","match":{"discipline_any":["língua portuguesa","português"],"topic_any":["tipologia textual","tipos textuais","gêneros textuais","gênero textual"]}},
+        {"id":"geral-pt-3","label":"3 Domínio da ortografia oficial","match":{"discipline_any":["língua portuguesa","português"],"topic_any":["ortografia","acentuação","grafia","emprego de letras"]}},
+        {"id":"geral-pt-4-1","label":"4.1 Referenciação, substituição, repetição, conectores e sequenciação textual","match":{"discipline_any":["língua portuguesa","português"],"topic_any":["coesão textual","referenciação","referência pronominal","conectores","sequenciação textual","coesão"]}},
+        {"id":"geral-pt-4-2","label":"4.2 Emprego de tempos e modos verbais","match":{"discipline_any":["língua portuguesa","português"],"topic_any":["tempos verbais","modos verbais","verbos","emprego de verbos"]}},
+        {"id":"geral-pt-5-1","label":"5.1 Emprego das classes de palavras","match":{"discipline_any":["língua portuguesa","português"],"topic_any":["classes de palavras","classes gramaticais","morfologia","pronome","advérbio","preposição","conjunção"]}},
+        {"id":"geral-pt-5-2","label":"5.2 Relações de coordenação","match":{"discipline_any":["língua portuguesa","português"],"topic_any":["coordenação","orações coordenadas","conjunções coordenativas"]}},
+        {"id":"geral-pt-5-3","label":"5.3 Relações de subordinação","match":{"discipline_any":["língua portuguesa","português"],"topic_any":["subordinação","orações subordinadas"]}},
+        {"id":"geral-pt-5-4","label":"5.4 Emprego dos sinais de pontuação","match":{"discipline_any":["língua portuguesa","português"],"topic_any":["pontuação","vírgula","sinais de pontuação"]}},
+        {"id":"geral-pt-5-5","label":"5.5 Concordância verbal e nominal","match":{"discipline_any":["língua portuguesa","português"],"topic_any":["concordância verbal","concordância nominal","concordância"]}},
+        {"id":"geral-pt-5-6","label":"5.6 Regência verbal e nominal","match":{"discipline_any":["língua portuguesa","português"],"topic_any":["regência verbal","regência nominal","regência"]}},
+        {"id":"geral-pt-5-7","label":"5.7 Emprego do sinal indicativo de crase","match":{"discipline_any":["língua portuguesa","português"],"topic_any":["crase"]}},
+        {"id":"geral-pt-5-8","label":"5.8 Colocação dos pronomes átonos","match":{"discipline_any":["língua portuguesa","português"],"topic_any":["colocação pronominal","pronomes átonos","próclise","ênclise","mesóclise"]}},
+        {"id":"geral-pt-6-1","label":"6.1 Significação das palavras","match":{"discipline_any":["língua portuguesa","português"],"topic_any":["significação das palavras","semântica","relações semânticas","sinonímia","antonímia"]}},
+        {"id":"geral-pt-6-2","label":"6.2 Substituição de palavras ou trechos de texto","match":{"discipline_any":["língua portuguesa","português"],"topic_any":["substituição de palavras","substituição de trechos","reescrita","equivalência textual"]}},
+        {"id":"geral-pt-6-3","label":"6.3 Reorganização da estrutura de orações e períodos","match":{"discipline_any":["língua portuguesa","português"],"topic_any":["reorganização de orações","reescrita de períodos","transformação de estruturas","reescrita"]}},
+        {"id":"geral-pt-6-4","label":"6.4 Reescrita de textos de diferentes gêneros e níveis de formalidade","match":{"discipline_any":["língua portuguesa","português"],"topic_any":["reescrita","níveis de formalidade","adequação textual"]}}
+      ]
+    },
+    {
+      "id": "geral-df-legislacao",
+      "scope": "general",
+      "label": "20.2.2.2 Distrito Federal, Política para Mulheres, Legislação e Primeiros Socorros",
+      "items": [
+        {"id":"geral-df-1","label":"1 Distrito Federal e RIDE: realidade étnica, social, histórica, geográfica, cultural, política e econômica","match":{"any_any":["ride","região integrada de desenvolvimento","distrito federal","lei complementar 94/1998","decreto 7.469/2011"]}},
+        {"id":"geral-df-2","label":"2 Plano Distrital de Política para Mulheres (PDPM)","match":{"any_any":["pdpm","plano distrital de política para mulheres","política para mulheres"]}},
+        {"id":"geral-df-3","label":"3 Lei Orgânica do Distrito Federal — Título VI","match":{"any_any":["lei orgânica do distrito federal","lodf","ordem social e do meio ambiente"]}},
+        {"id":"geral-df-4","label":"4 Lei Complementar nº 840/2011 — títulos indicados no edital","match":{"any_any":["lei complementar 840","lc 840","regime disciplinar","processos de apuração de infração disciplinar"]}},
+        {"id":"geral-df-maria-penha","label":"5 Lei Federal nº 11.340/2006 — Lei Maria da Penha","match":{"any_any":["lei maria da penha","maria da penha","lei 11.340","lei federal 11.340"]}},
+        {"id":"geral-df-6","label":"6 Lei Distrital nº 7.484/2024","match":{"any_any":["lei 7.484","lei distrital 7.484","7484/2024"]}},
+        {"id":"geral-df-7","label":"7 Noções básicas de primeiros socorros","match":{"discipline_any":["primeiros socorros"],"any_any":["primeiros socorros","urgência","emergência","engasgo","sangramento","fratura","queimadura","desmaio","convulsão","intoxicação"]}}
+      ]
+    },
+    {
+      "id":"tdas-comum-suas","scope":"specific","targets":["202"],"label":"20.2.3.1.1 Fundamentos, organização, gestão e marcos operacionais do SUAS","items":[
+        {"id":"tdas-suas-1","label":"1 PNAS/2004 e organização da assistência social","match":{"any_any":["pnas","proteção social básica","proteção social especial","matricialidade sociofamiliar","territorialização","descentralização político-administrativa"]}},
+        {"id":"tdas-suas-2","label":"2 SUAS: princípios, diretrizes, organização e seguranças socioassistenciais","match":{"any_any":["seguranças socioassistenciais","segurança de acolhida","segurança de convívio","segurança de renda","segurança de autonomia","organização do suas"]}},
+        {"id":"tdas-suas-3","label":"3 NOB/SUAS 2012: responsabilidades, cofinanciamento, gestão do trabalho e vigilância socioassistencial","match":{"any_any":["nob/suas","nob suas","cofinanciamento","vigilância socioassistencial","gestão do trabalho no suas"]}}
+      ]
+    },
+    {
+      "id":"tdas-comum-programas","scope":"specific","targets":["202"],"label":"20.2.3.1.2 Programas, benefícios e instrumentos socioassistenciais do Distrito Federal","items":[
+        {"id":"tdas-prog-1","label":"1 Cartão Prato Cheio","match":{"any_any":["prato cheio","lei 7.009","decreto 42.873"]}},
+        {"id":"tdas-prog-2","label":"2 Cartão Gás","match":{"any_any":["cartão gás","cartao gas","lei 6.938","decreto 42.376"]}},
+        {"id":"tdas-prog-3","label":"3 Plano DF Social","match":{"any_any":["df social","lei 7.008","decreto 42.872","portaria 42/2023"]}},
+        {"id":"tdas-prog-4","label":"4 Benefícios Eventuais da Política de Assistência Social do Distrito Federal","match":{"any_any":["benefícios eventuais","beneficios eventuais","lei 5.165","decreto 35.191"]}},
+        {"id":"tdas-prog-5","label":"5 SISAN e Restaurante Comunitário","match":{"any_any":["sisan","restaurante comunitário","restaurante comunitario","decreto 33.329"]}}
+      ]
+    },
+    {
+      "id":"202-constitucional","scope":"specific","targets":["202"],"label":"20.2.3.2.3.1 Noções de Direito Constitucional","items":[
+        {"id":"202-const-1-1","label":"1.1 Constituição Federal de 1988: princípios fundamentais","match":{"discipline_any":["direito constitucional","noções de direito constitucional"],"topic_any":["princípios fundamentais","constituição federal","cf/88"]}},
+        {"id":"202-const-1-2","label":"1.2 Direitos e garantias fundamentais: individuais, coletivos e sociais","match":{"discipline_any":["direito constitucional","noções de direito constitucional"],"topic_any":["direitos e garantias fundamentais","direitos individuais","direitos coletivos","direitos sociais"]}},
+        {"id":"202-const-1-3","label":"1.3 Organização do Estado e da Administração Pública; servidores públicos","match":{"discipline_any":["direito constitucional","noções de direito constitucional"],"topic_any":["organização do estado","administração pública","servidores públicos"]}}
+      ]
+    },
+    {
+      "id":"202-administrativo","scope":"specific","targets":["202"],"label":"20.2.3.2.3.2 Noções de Direito Administrativo e Legislação","items":[
+        {"id":"202-adm-2-1","label":"2.1 Estado, governo e administração pública: conceitos e elementos","match":{"discipline_any":["direito administrativo","administração pública"],"topic_any":["estado governo e administração","estado, governo","administração pública"]}},
+        {"id":"202-adm-2-2","label":"2.2 Ato administrativo: conceito, requisitos, atributos, classificação e extinção","match":{"any_any":["ato administrativo","atos administrativos","anulação e revogação","anular e revogar"]}},
+        {"id":"202-adm-2-3","label":"2.3 Poderes da Administração Pública","match":{"any_any":["poderes administrativos","poder hierárquico","poder disciplinar","poder regulamentar","poder de polícia"]}},
+        {"id":"202-adm-2-4","label":"2.4 LC nº 840/2011: provimento, vacância, direitos, deveres, responsabilidade e PAD","match":{"any_any":["lc 840","lei complementar 840","provimento","vacância","processo administrativo disciplinar","pad","responsabilidade do servidor"]}}
+      ]
+    },
+    {
+      "id":"202-rotinas-arquivologia","scope":"specific","targets":["202"],"label":"20.2.3.2.3.3 Atendimento, Rotinas Administrativas e Arquivologia","items":[
+        {"id":"202-rot-3-1","label":"3.1 Qualidade no atendimento ao público e trabalho em equipe","match":{"any_any":["atendimento ao público","qualidade no atendimento","trabalho em equipe"]}},
+        {"id":"202-rot-3-2","label":"3.2 Redação oficial e comunicações administrativas","match":{"any_any":["redação oficial","comunicações administrativas","comunicação administrativa"]}},
+        {"id":"202-rot-3-3","label":"3.3 Organização e controle de documentos; protocolo; arquivos; preservação e digitalização","match":{"discipline_any":["arquivologia","arquivo","gestão documental"],"any_any":["arquivologia","protocolo","métodos de arquivamento","classificação de documentos","preservação de documentos","digitalização de documentos","gestão de documentos"]}}
+      ]
+    },
+    {
+      "id":"202-materiais-patrimonio-compras","scope":"specific","targets":["202"],"label":"20.2.3.2.3.4 Recursos Materiais, Patrimônio e Compras","items":[
+        {"id":"202-mat-4-1","label":"4.1 Administração de materiais: classificação, estoques e armazenagem","match":{"any_any":["administração de materiais","classificação de materiais","gestão de estoques","estoque","armazenagem"]}},
+        {"id":"202-mat-4-2","label":"4.2 Gestão patrimonial: tombamento, controle, inventário e baixa de bens","match":{"any_any":["gestão patrimonial","patrimônio","tombamento","inventário patrimonial","baixa de bens"]}},
+        {"id":"202-mat-4-3","label":"4.3 Compras no setor público e Lei nº 14.133/2021: etapas e noções básicas de licitação","match":{"any_any":["compras públicas","compras no setor público","lei 14.133","licitação","contratação pública","processo de compras"]}}
+      ]
+    },
+    {
+      "id":"edas-comum-suas","scope":"specific","targets":["400"],"label":"20.2.4.1.1 Fundamentos, organização, gestão e marcos normativos da assistência social","items":[
+        {"id":"edas-suas-1","label":"1 LOAS, PNAS/2004 e SUAS","match":{"any_any":["loas","pnas","proteção social básica","proteção social especial","seguranças socioassistenciais","matricialidade sociofamiliar","territorialização","intersetorialidade"]}},
+        {"id":"edas-suas-2","label":"2 NOB/SUAS: responsabilidades, cofinanciamento, gestão do trabalho e rede","match":{"any_any":["nob/suas","nob suas","cofinanciamento","gestão do trabalho","estruturação da rede"]}},
+        {"id":"edas-suas-3","label":"3 NOB-RH/SUAS","match":{"any_any":["nob-rh/suas","nob rh suas","resolução cnas 269"]}},
+        {"id":"edas-suas-4","label":"4 Tipificação Nacional de Serviços Socioassistenciais","match":{"any_any":["tipificação nacional","tipificação dos serviços","serviços socioassistenciais"]}},
+        {"id":"edas-suas-5","label":"5 CIT, CIB, Conselhos e Conferências de Assistência Social","match":{"any_any":["cit","cib","conselho de assistência social","conferência de assistência social","controle social no suas","pactuação"]}},
+        {"id":"edas-suas-6","label":"6 CadÚnico e Protocolo de Gestão Integrada","match":{"any_any":["cadúnico","cadunico","cadastro único","protocolo de gestão integrada","transferências de renda"]}},
+        {"id":"edas-suas-7","label":"7 MROSC: parcerias com organizações da sociedade civil","match":{"any_any":["mrosc","organizações da sociedade civil","chamamento público","prestação de contas nas parcerias"]}}
+      ]
+    },
+    {
+      "id":"edas-comum-direitos","scope":"specific","targets":["400"],"label":"20.2.4.1.2 Direitos, violações de direitos e vulnerabilidades sociais","items":[
+        {"id":"edas-dir-1","label":"1 Crianças, adolescentes e juventude","match":{"any_any":["eca","estatuto da criança e do adolescente","sinase","acolhimento","adoção","violência contra crianças"]}},
+        {"id":"edas-dir-2","label":"2 Mulheres e violência de gênero","match":{"any_any":["violência de gênero","violência doméstica","medidas protetivas","lei maria da penha","enfrentamento à violência contra as mulheres"]}},
+        {"id":"edas-dir-3","label":"3 Pessoa idosa e pessoa com deficiência","match":{"any_any":["estatuto da pessoa idosa","estatuto do idoso","pessoa com deficiência","lbi","política nacional do idoso"]}},
+        {"id":"edas-dir-4","label":"4 População em situação de rua, pobreza e exclusão social","match":{"any_any":["população em situação de rua","situação de rua","pobreza","exclusão social","decreto 7.053"]}},
+        {"id":"edas-dir-5","label":"5 Diversidade, equidade e relações étnico-raciais","match":{"any_any":["diversidade sexual","identidade de gênero","relações étnico-raciais","racismo","homotransfobia","preconceito de raça"]}}
+      ]
+    },
+    {
+      "id":"edas-comum-programas","scope":"specific","targets":["400"],"label":"20.2.4.1.3 Programas, benefícios e instrumentos socioassistenciais do Distrito Federal","items":[
+        {"id":"edas-prog-1","label":"1 Cartão Prato Cheio","match":{"any_any":["prato cheio","lei 7.009","decreto 42.873"]}},
+        {"id":"edas-prog-2","label":"2 Cartão Gás","match":{"any_any":["cartão gás","cartao gas","lei 6.938","decreto 42.376"]}},
+        {"id":"edas-prog-3","label":"3 Plano DF Social","match":{"any_any":["df social","lei 7.008","decreto 42.872","portaria 42/2023"]}},
+        {"id":"edas-prog-4","label":"4 Benefícios Eventuais","match":{"any_any":["benefícios eventuais","beneficios eventuais","lei 5.165","decreto 35.191"]}},
+        {"id":"edas-prog-5","label":"5 SISAN e Restaurante Comunitário","match":{"any_any":["sisan","restaurante comunitário","restaurante comunitario","decreto 33.329"]}}
+      ]
+    },
+    {
+      "id":"400-tga","scope":"specific","targets":["400"],"label":"20.2.4.2.1.1 Teoria Geral e Processos Administrativos","items":[
+        {"id":"400-tga-1-1","label":"1.1 Evolução do pensamento e da Teoria Administrativa","match":{"any_any":["teoria geral da administração","teorias da administração","evolução do pensamento administrativo","escolas da administração"]}},
+        {"id":"400-tga-1-2","label":"1.2 Funções administrativas: planejamento, organização, direção e controle","match":{"any_any":["funções administrativas","processo administrativo","planejamento organização direção controle"]}},
+        {"id":"400-tga-1-3","label":"1.3 Planejamento estratégico, tático e operacional; missão, visão, SWOT, APO, BSC e decisão","match":{"any_any":["planejamento estratégico","planejamento tático","planejamento operacional","missão e visão","swot","administração por objetivos","apo","balanced scorecard","bsc","processo decisório"]}},
+        {"id":"400-tga-1-4","label":"1.4 Estruturas, departamentalização, cultura, liderança, motivação, comunicação, descentralização e delegação","match":{"any_any":["estrutura organizacional","departamentalização","cultura organizacional","liderança","motivação","comunicação organizacional","descentralização","delegação"]}}
+      ]
+    },
+    {
+      "id":"400-osm-qualidade","scope":"specific","targets":["400"],"label":"20.2.4.2.1.2 Organização, Sistemas, Métodos (OS&M) e Qualidade","items":[
+        {"id":"400-osm-2-1","label":"2.1 Arquitetura organizacional; mapeamento, análise e distribuição de processos e trabalho","match":{"any_any":["arquitetura organizacional","mapeamento de processos","análise de processos","distribuição do trabalho","organização sistemas e métodos","os&m"]}},
+        {"id":"400-osm-2-2","label":"2.2 Organogramas, fluxogramas, manuais e formulários","match":{"any_any":["organograma","fluxograma","manuais administrativos","formulários"]}},
+        {"id":"400-osm-2-3","label":"2.3 Gestão da qualidade, ferramentas e modelos de excelência da gestão pública","match":{"any_any":["gestão da qualidade","ferramentas da qualidade","excelência em gestão pública","modelos de excelência"]}}
+      ]
+    },
+    {
+      "id":"400-projetos","scope":"specific","targets":["400"],"label":"20.2.4.2.1.3 Gestão de Projetos","items":[
+        {"id":"400-proj-3-1","label":"3.1 Elaboração, análise, avaliação e etapas dos projetos","match":{"discipline_any":["gestão de projetos","administração"],"topic_any":["gestão de projetos","elaboração de projetos","etapas dos projetos","ciclo de projetos"]}},
+        {"id":"400-proj-3-2","label":"3.2 Modelos de gestão de projetos","match":{"any_any":["modelos de gestão de projetos","metodologias de projetos","pmbok","scrum"]}}
+      ]
+    },
+    {
+      "id":"400-afo","scope":"specific","targets":["400"],"label":"20.2.4.2.1.4 Administração Financeira e Orçamentária (AFO)","items":[
+        {"id":"400-afo-4-1","label":"4.1 Princípios, diretrizes, processo orçamentário, métodos, técnicas e normas","match":{"any_any":["administração financeira e orçamentária","afo","princípios orçamentários","processo orçamentário","orçamento público"]}},
+        {"id":"400-afo-4-2","label":"4.2 Receita pública: categorias, fontes, estágios e dívida ativa","match":{"any_any":["receita pública","estágios da receita","dívida ativa"]}},
+        {"id":"400-afo-4-3","label":"4.3 Despesa pública: categorias e estágios","match":{"any_any":["despesa pública","estágios da despesa"]}},
+        {"id":"400-afo-4-4","label":"4.4 Suprimento de fundos, Restos a Pagar e Despesas de Exercícios Anteriores","match":{"any_any":["suprimento de fundos","restos a pagar","despesas de exercícios anteriores","dea"]}},
+        {"id":"400-afo-4-5","label":"4.5 Sistemas de planejamento, orçamento e execução financeira do DF; SIAFEM-DF","match":{"any_any":["siafem","siafem-df","execução financeira no distrito federal","sistemas de planejamento e orçamento"]}}
+      ]
+    },
+    {
+      "id":"400-pessoas","scope":"specific","targets":["400"],"label":"20.2.4.2.1.5 Gestão de Pessoas","items":[
+        {"id":"400-gp-5-1","label":"5.1 Conceitos e importância","match":{"discipline_any":["gestão de pessoas","recursos humanos"],"topic_any":["gestão de pessoas","conceitos de gestão de pessoas"]}},
+        {"id":"400-gp-5-2","label":"5.2 Fundamentos da administração e impactos na gestão de pessoas","match":{"discipline_any":["gestão de pessoas","recursos humanos"],"topic_any":["fundamentos da gestão de pessoas","evolução da gestão de pessoas"]}},
+        {"id":"400-gp-5-3","label":"5.3 Funções do órgão de recursos humanos","match":{"any_any":["funções de recursos humanos","subsistemas de recursos humanos","órgão de recursos humanos"]}},
+        {"id":"400-gp-5-4","label":"5.4 Comportamento organizacional","match":{"any_any":["comportamento organizacional"]}},
+        {"id":"400-gp-5-5","label":"5.5 Competência interpessoal e gerenciamento de conflitos","match":{"any_any":["competência interpessoal","relações interpessoais","gerenciamento de conflitos","gestão de conflitos"]}},
+        {"id":"400-gp-5-6","label":"5.6 Gestão da mudança","match":{"any_any":["gestão da mudança","mudança organizacional"]}},
+        {"id":"400-gp-5-7","label":"5.7 Recrutamento e seleção","match":{"any_any":["recrutamento e seleção","recrutamento","seleção de pessoas"]}},
+        {"id":"400-gp-5-8","label":"5.8 Análise e descrição de cargos","match":{"any_any":["análise de cargos","descrição de cargos","análise e descrição de cargos"]}},
+        {"id":"400-gp-5-9","label":"5.9 Gestão de desempenho","match":{"any_any":["gestão de desempenho","avaliação de desempenho"]}},
+        {"id":"400-gp-5-10","label":"5.10 Desenvolvimento e capacitação de pessoal","match":{"any_any":["treinamento e desenvolvimento","desenvolvimento de pessoas","capacitação de pessoal","educação corporativa"]}},
+        {"id":"400-gp-5-11","label":"5.11 Administração de cargos, carreiras e salários","match":{"any_any":["cargos carreiras e salários","plano de cargos","administração de salários","carreiras"]}},
+        {"id":"400-gp-5-12","label":"5.12 Gestão por competências","match":{"any_any":["gestão por competências","competências organizacionais"]}},
+        {"id":"400-gp-5-13","label":"5.13 Tendências em gestão de pessoas no setor público","match":{"any_any":["gestão de pessoas no setor público","gestão pública de pessoas","tendências em gestão de pessoas"]}}
+      ]
+    },
+    {
+      "id":"400-etica","scope":"specific","targets":["400"],"label":"20.2.4.2.1.6 Ética e Conduta Profissional","items":[
+        {"id":"400-etica-6-1","label":"6.1 Ética no serviço público: comportamento profissional, atitudes e organização do trabalho","match":{"any_any":["ética no serviço público","ética profissional","conduta profissional","comportamento profissional"]}}
+      ]
+    }
+  ]
+}

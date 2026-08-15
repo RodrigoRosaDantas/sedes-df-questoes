@@ -1,3 +1,4 @@
+import "./validate-edital-verticalizado-v1.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import {fileURLToPath} from "node:url";
@@ -80,6 +81,6 @@ requireMarkers(workflow, [
   "firestore-rules-v1.mjs",
   "--only auth,firestore",
 ], "CI Firebase");
-requireMarkers(publicConfig, ["audit-hardening-v1.spec.js"], "Playwright público");
+requireMarkers(publicConfig, ["audit-hardening-v1.spec.js", "edital-verticalizado-v1.spec.js"], "Playwright público");
 
 console.log("✓ Achados da auditoria fechados estruturalmente: fila persistente, IDs estáveis, regras auditáveis, PDF fiel com imagens canônicas e teste autenticado entre aparelhos.");

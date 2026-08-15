@@ -15,14 +15,21 @@ test("expõe release unificada, prova real, reporte e proteção do progresso", 
   await expect(page.locator("[data-adaptive-review]")).toBeVisible({timeout: 30000});
 
   await page.goto("./#/estudar", {waitUntil: "domcontentloaded"});
-  await expect(page.locator("[data-official-exam-card]")).toContainText("60 questões", {timeout: 30000});
-  await page.locator("[data-start-official-exam]").click();
-  await expect(page.locator(".question-card")).toBeVisible({timeout: 30000});
-  await expect(page.locator("[data-official-remaining]")).toBeVisible();
-  await expect(page.locator("[data-report-question]")).toBeVisible();
-  await page.locator("[data-report-question]").click();
-  await expect(page.locator("[data-report-dialog]")).toContainText("Reportar problema nesta questão");
-  await page.locator("[data-report-cancel]").click();
+  const official = page.locator("[data-official-exam-card]");
+  await expect(official).toContainText("60 questões", {timeout: 30000});
+  await expect(official.locator("[data-start-official-exam]")).toHaveCount(2);
+  const enabled = official.locator("[data-start-official-exam]:not([disabled])");
+  if (await enabled.count()) {
+    await enabled.first().click();
+    await expect(page.locator(".question-card")).toBeVisible({timeout: 30000});
+    await expect(page.locator("[data-official-remaining]")).toBeVisible();
+    await expect(page.locator("[data-report-question]")).toBeVisible();
+    await page.locator("[data-report-question]").click();
+    await expect(page.locator("[data-report-dialog]")).toContainText("Reportar problema nesta questão");
+    await page.locator("[data-report-cancel]").click();
+  } else {
+    await expect(official).toContainText("Faltam");
+  }
   await page.goto("./#/desempenho", {waitUntil: "domcontentloaded"});
   await expect(page.locator("[data-vault-tools]")).toBeVisible({timeout: 30000});
   await expect(page.locator("[data-vault-snapshot]")).toBeVisible();

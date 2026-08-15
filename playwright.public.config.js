@@ -21,6 +21,7 @@ export default defineConfig({
     "cloud-progress-v1.spec.js",
     "work-convergence-v1.spec.js",
     "audit-hardening-v1.spec.js",
+    "edital-verticalizado-v1.spec.js",
   ],
   timeout: 240000,
   retries: 1,

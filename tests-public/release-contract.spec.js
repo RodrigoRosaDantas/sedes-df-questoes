@@ -171,7 +171,7 @@ test("interface pública usa a mesma release na arquitetura v2.15", async ({page
   await openRoute(page, "estudar");
   await expect(page.locator("[data-official-exam-card]")).toContainText("60 questões", {timeout: 30000});
   await expect(page.locator("[data-role-templates]")).toBeVisible({timeout: 30000});
-  await page.locator("[data-start-official-exam]").click();
+  await page.locator('[data-start-official-exam="202"]').click();
   await expect(page.locator(".question-card")).toBeVisible({timeout: 30000});
   await expect(page.locator("[data-report-question]")).toBeVisible();
 
