@@ -2,19 +2,6 @@ name: Publicar GitHub Pages — autorização manual
 
 on:
   workflow_dispatch:
-    inputs:
-      source_sha:
-        description: SHA exato da main que foi revisado e deve ser publicado
-        required: true
-        type: string
-      confirmation:
-        description: Confirmação explícita da publicação
-        required: true
-        default: NAO_PUBLICAR
-        type: choice
-        options:
-          - NAO_PUBLICAR
-          - PUBLICAR
 
 permissions:
   contents: read
@@ -28,6 +15,8 @@ concurrency:
 env:
   PLAYWRIGHT_VERSION: 1.61.1
   PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes/
+  AUTHORIZED_SOURCE_SHA: ${{ github.sha }}
+  AUTHORIZED_REF: ${{ github.ref_name }}
 
 jobs:
   validate-deploy-verify:
@@ -37,31 +26,33 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Baixar a main canônica
+      - name: Confirmar autorização manual e fixar o commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${AUTHORIZED_REF}" = "main"
+          [[ "${AUTHORIZED_SOURCE_SHA}" =~ ^[0-9a-f]{40}$ ]]
+          echo "✓ Clique manual autorizou a publicação da main ${AUTHORIZED_SOURCE_SHA}."
+      - name: Baixar exatamente o commit autorizado
         uses: actions/checkout@v6
         with:
-          ref: main
+          ref: ${{ env.AUTHORIZED_SOURCE_SHA }}
           fetch-depth: 0
       - name: Preparar Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 22
           package-manager-cache: false
-      - name: Confirmar autorização e identidade do commit
-        env:
-          DEPLOY_CONFIRMATION: ${{ inputs.confirmation }}
-          EXPECTED_SOURCE_SHA: ${{ inputs.source_sha }}
+      - name: Confirmar identidade do checkout
         shell: bash
         run: |
           set -euo pipefail
-          test "${DEPLOY_CONFIRMATION}" = "PUBLICAR"
-          [[ "${EXPECTED_SOURCE_SHA}" =~ ^[0-9a-f]{40}$ ]]
           CURRENT_SHA="$(git rev-parse HEAD)"
-          test "${CURRENT_SHA}" = "${EXPECTED_SOURCE_SHA}"
-          echo "✓ Publicação autorizada para a main ${CURRENT_SHA}."
+          test "${CURRENT_SHA}" = "${AUTHORIZED_SOURCE_SHA}"
+          echo "✓ Checkout fixado no commit autorizado ${CURRENT_SHA}."
       - name: Gerar e auditar o artefato público sem alterar a release
         env:
-          RELEASE_SOURCE_SHA: ${{ inputs.source_sha }}
+          RELEASE_SOURCE_SHA: ${{ env.AUTHORIZED_SOURCE_SHA }}
         run: npm run check
       - name: Instalar navegador de teste isoladamente
         shell: bash
@@ -71,7 +62,7 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Executar a suíte pública contra o artefato local
         env:
-          EXPECTED_SHA: ${{ inputs.source_sha }}
+          EXPECTED_SHA: ${{ env.AUTHORIZED_SOURCE_SHA }}
           PUBLIC_BASE_URL: http://127.0.0.1:4173/
         shell: bash
         run: |
@@ -96,9 +87,9 @@ jobs:
         uses: actions/deploy-pages@v5
       - name: Repetir a suíte completa no endereço público
         env:
-          EXPECTED_SHA: ${{ inputs.source_sha }}
+          EXPECTED_SHA: ${{ env.AUTHORIZED_SOURCE_SHA }}
         run: npx playwright test --config=playwright.public.config.js --workers=1 --retries=0
       - name: Confirmar metadados, PWA, catálogo e commit servidos
         env:
-          EXPECTED_SOURCE_SHA: ${{ inputs.source_sha }}
+          EXPECTED_SOURCE_SHA: ${{ env.AUTHORIZED_SOURCE_SHA }}
         run: node scripts/verify-deployment.mjs "${PUBLIC_BASE_URL}" "${EXPECTED_SOURCE_SHA}"
