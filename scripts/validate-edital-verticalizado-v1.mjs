@@ -88,7 +88,7 @@ for (const code of ["202", "400"]) {
 
 if (builder.includes("question.enunciado") || builder.includes("question.texto_base")) fail("Classificador do edital não pode inferir tópico pelo enunciado/texto-base.");
 for (const marker of ["discipline_any", "topic_any", "subtopic_any", "any_any", "isMultipleChoiceAE", "edital-map-v1.json"]) if (!builder.includes(marker)) fail(`Builder sem contrato de mapeamento: ${marker}.`);
-for (const marker of ["data-start-official-exam", "generalIds", "specificIds", "general < 10", "specific < 40", "maria_da_penha_ae_question_ids", "readiness.ready"]) if (!official.includes(marker)) fail(`Prova Real sem gate obrigatório: ${marker}.`);
+for (const marker of ["data-start-official-exam", "generalIds", "specificIds", "general < 10", "specific < 40", "maria_da_penha_ae_question_ids", "readiness?.ready"]) if (!official.includes(marker)) fail(`Prova Real sem gate obrigatório: ${marker}.`);
 for (const marker of ["Edital verticalizado", "data-edital-target", "data-edital-run", "question_ids", "activeHistory", "createCompatibleSession"]) if (!vertical.includes(marker)) fail(`Verticalizado sem contrato operacional: ${marker}.`);
 
 console.log(`✓ Edital verticalizado validado: ${itemIds.size} itens oficiais, ${allMappedIds.size}/${catalogIds.size} questões mapeadas; Prova Real 202/400 usa somente pools A–E do mesmo mapa, sem fallback fora do edital.`);
