@@ -9,6 +9,9 @@ const targets = {
   platform_cloud_progress_js: "assets/cloud-progress-v1.js",
   platform_cloud_progress_css: "assets/cloud-progress-v1.css",
   platform_work_command_center_js: "assets/work-command-center-v1.js",
+  platform_work_convergence_js: "assets/work-convergence-v1.js",
+  platform_work_convergence_css: "assets/work-convergence-v1.css",
+  platform_question_report_js: "assets/report-v2-13.js",
 };
 const sha256 = content => crypto.createHash("sha256").update(content).digest("hex");
 const hashes = {};
@@ -19,7 +22,7 @@ for (const [key, relative] of Object.entries(targets)) {
   if (!fs.existsSync(sourcePath) || !fs.existsSync(distPath)) throw new Error(`Arquivo de proveniência ausente: ${relative}`);
   const source = fs.readFileSync(sourcePath);
   const published = fs.readFileSync(distPath);
-  if (!source.equals(published)) throw new Error(`Artefato público diverge da fonte da camada Firebase: ${relative}`);
+  if (!source.equals(published)) throw new Error(`Artefato público diverge da fonte da camada Firebase/Work: ${relative}`);
   hashes[key] = sha256(source);
 }
 
@@ -31,4 +34,4 @@ for (const relative of ["data/release/build-info.json", "data/release/release-me
   fs.writeFileSync(file, `${JSON.stringify(data, null, 2)}\n`);
 }
 
-console.log(`✓ Proveniência Firebase/Central de comando reconciliada em ${Object.keys(targets).length} arquivos SHA-256.`);
+console.log(`✓ Proveniência Firebase/Work reconciliada em ${Object.keys(targets).length} arquivos SHA-256.`);
