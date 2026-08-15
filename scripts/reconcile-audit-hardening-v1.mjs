@@ -8,6 +8,7 @@ const dist = path.join(root, "dist");
 const targets = {
   platform_report_queue_js: "assets/question-report-queue-v2.js",
   platform_pdf_fidelity_js: "assets/pdf-fidelity-v2.js",
+  platform_question_visuals_js: "assets/question-images-v2-5.js",
   platform_cloud_progress_js_v2audit: "assets/cloud-progress-v1.js",
 };
 const sha256 = content => crypto.createHash("sha256").update(content).digest("hex");
