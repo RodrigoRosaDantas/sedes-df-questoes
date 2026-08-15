@@ -5,15 +5,15 @@ const FORMAT_KEY = "sedes.questoes.rodrigo.homeStudyFormat.v1";
 const SESSION_KEY = "sedes.questoes.rodrigo.session.v3";
 
 async function prepare(page) {
-  await page.addInitScript(({subjectKey, formatKey, sessionKey}) => {
+  await page.goto("./#/inicio", {waitUntil: "domcontentloaded"});
+  await page.evaluate(({subjectKey, formatKey, sessionKey}) => {
     localStorage.removeItem(sessionKey);
     sessionStorage.removeItem(subjectKey);
     sessionStorage.removeItem(formatKey);
   }, {subjectKey: SUBJECT_KEY, formatKey: FORMAT_KEY, sessionKey: SESSION_KEY});
+  await page.reload({waitUntil: "domcontentloaded"});
 
-  await page.goto("./#/inicio", {waitUntil: "domcontentloaded"});
   await expect(page.locator("[data-ux20-format]")).toBeVisible({timeout: 30000});
-
   const tracks = page.locator("[data-ux16-track-input]");
   await expect(tracks).toHaveCount(4, {timeout: 30000});
   await page.locator('[data-ux16-track-input][value="prova-202"]').setChecked(true);
@@ -45,6 +45,7 @@ test("site público filtra sessões por Certo/Errado e Múltipla escolha", async
     await page.locator("[data-ux17-start]").click();
     await page.waitForURL(/#\/resolver/, {timeout: 30000});
     const session = await page.evaluate(key => JSON.parse(localStorage.getItem(key)), SESSION_KEY);
+    expect(session).not.toBeNull();
     expect(session.questionIds.length).toBeGreaterThan(0);
     for (const id of session.questionIds) expect(index.formats[id], `${mode}:${id}`).toBe(mode);
   }
