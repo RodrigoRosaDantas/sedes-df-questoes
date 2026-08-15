@@ -77,3 +77,9 @@ jobs:
           done
           curl -fsS http://127.0.0.1:4174/ >/dev/null
           npx firebase emulators:exec --config firebase.json --project tdas-68014 --only auth,firestore "PUBLIC_BASE_URL=http://127.0.0.1:4174/ npx playwright test --config=playwright.firebase.config.js --workers=1 --retries=0 tests-integration/firebase-two-device-v1.spec.js && node tests-integration/firestore-rules-v1.mjs"
+      - name: Sondar regras reais do Firestore em produção e limpar a sonda
+        if: github.event_name == 'pull_request' && github.head_ref == 'agent/probe-firestore-production-once'
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/probe-firestore-production-once.mjs
