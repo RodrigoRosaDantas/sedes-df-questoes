@@ -5,18 +5,22 @@ const FORMAT_KEY = "sedes.questoes.rodrigo.homeStudyFormat.v1";
 const SESSION_KEY = "sedes.questoes.rodrigo.session.v3";
 
 async function prepare(page) {
-  await page.goto("./#/inicio", {waitUntil: "domcontentloaded"});
-  await expect(page.locator("[data-ux20-format]")).toBeVisible({timeout: 30000});
-
-  await page.evaluate(({subjectKey, formatKey, sessionKey}) => {
+  await page.addInitScript(({subjectKey, formatKey, sessionKey}) => {
     localStorage.removeItem(sessionKey);
     sessionStorage.removeItem(subjectKey);
     sessionStorage.removeItem(formatKey);
-    const selected = new Set(["prova-202", "prova-400"]);
-    const inputs = [...document.querySelectorAll("[data-ux16-track-input]")];
-    for (const input of inputs) input.checked = selected.has(input.value);
-    inputs[0]?.dispatchEvent(new Event("change", {bubbles: true}));
   }, {subjectKey: SUBJECT_KEY, formatKey: FORMAT_KEY, sessionKey: SESSION_KEY});
+
+  await page.goto("./#/inicio", {waitUntil: "domcontentloaded"});
+  await expect(page.locator("[data-ux20-format]")).toBeVisible({timeout: 30000});
+
+  const tracks = page.locator("[data-ux16-track-input]");
+  await expect(tracks).toHaveCount(4, {timeout: 30000});
+  await page.locator('[data-ux16-track-input][value="prova-202"]').setChecked(true);
+  await page.locator('[data-ux16-track-input][value="prova-400"]').setChecked(true);
+  await page.locator('[data-ux16-track-input][value="simulado-202"]').setChecked(false);
+  await page.locator('[data-ux16-track-input][value="simulado-400"]').setChecked(false);
+  await expect(page.locator("[data-ux16-summary]")).toContainText("2 opção", {timeout: 30000});
 
   await expect(page.locator("[data-ux17-subject-group]")).toHaveCount(2, {timeout: 30000});
   const all = page.locator('[data-ux20-format-option="all"]');
