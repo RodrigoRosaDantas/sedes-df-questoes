@@ -81,20 +81,44 @@ function balancedSelect(map, itemIds, total, excluded = []) {
   return selected;
 }
 
+function firstUnused(values, excluded = []) {
+  const used = new Set(excluded);
+  return shuffle(values || []).find(id => id && !used.has(id)) || null;
+}
+
 function buildExamSelection(map, targetCode) {
   const target = map.targets?.[targetCode];
   const rule = map.objective_blueprint || {};
   if (!target?.readiness?.ready) return null;
+  const generalTotal = Number(rule.general_questions || 20);
+  const specificTotal = Number(rule.specific_questions || 40);
   const mariaRequired = Number(rule.maria_da_penha_minimum_questions || 3);
   const forcedMaria = shuffle(target.maria_da_penha_exam_question_ids || []).slice(0, mariaRequired);
   if (forcedMaria.length !== mariaRequired) return null;
-  const generalRest = balancedSelect(map, target.general_item_ids, Number(rule.general_questions || 20) - forcedMaria.length, forcedMaria);
-  const generalIds = [...forcedMaria, ...generalRest];
-  if (generalIds.length !== Number(rule.general_questions || 20)) return null;
-  const specificIds = balancedSelect(map, target.specific_item_ids, Number(rule.specific_questions || 40), generalIds);
-  if (specificIds.length !== Number(rule.specific_questions || 40)) return null;
-  if (new Set([...generalIds, ...specificIds]).size !== Number(rule.objective_questions || 60)) return null;
-  return {generalIds, specificIds, questionIds: shuffle([...generalIds, ...specificIds])};
+
+  const generalSeeds = [...forcedMaria];
+  const generalCe = new Set(target.general_ce_question_ids || []);
+  if (!generalSeeds.some(id => generalCe.has(id))) {
+    const seed = firstUnused(target.general_ce_question_ids, generalSeeds);
+    if (seed) generalSeeds.push(seed);
+  }
+  const generalRest = balancedSelect(map, target.general_item_ids, generalTotal - generalSeeds.length, generalSeeds);
+  const generalIds = [...generalSeeds, ...generalRest];
+  if (generalIds.length !== generalTotal) return null;
+
+  const specificSeeds = [];
+  const specificCeSeed = firstUnused(target.specific_ce_question_ids, generalIds);
+  if (specificCeSeed) specificSeeds.push(specificCeSeed);
+  const specificRest = balancedSelect(map, target.specific_item_ids, specificTotal - specificSeeds.length, [...generalIds, ...specificSeeds]);
+  const specificIds = [...specificSeeds, ...specificRest];
+  if (specificIds.length !== specificTotal) return null;
+
+  const allIds = [...generalIds, ...specificIds];
+  if (new Set(allIds).size !== Number(rule.objective_questions || 60)) return null;
+  const trueFalseCount = allIds.filter(id => map.question_formats?.[id] === "Certo/Errado").length;
+  const trueFalseAvailable = (target.general_ce_question_ids || []).length + (target.specific_ce_question_ids || []).length > 0;
+  if (trueFalseAvailable && trueFalseCount === 0) return null;
+  return {generalIds, specificIds, questionIds: shuffle(allIds)};
 }
 
 async function loadSelectedQuestions(ids) {
@@ -222,7 +246,7 @@ async function injectCard() {
         return `<article class="official-target-card"><header><strong>${esc(target?.label || code)}</strong><small>${esc(target?.subtitle || `Cargo ${code}`)}</small></header><p class="official-readiness ${ready ? "ready" : "blocked"}">${esc(deficitText(target))}</p><p class="official-pool">${esc(formatPoolText(target))}</p><button class="btn primary" data-start-official-exam="${code}" ${ready ? "" : "disabled"}>Iniciar Prova Real ${code}</button></article>`;
       }).join("")}</div>
       <p class="official-rule-note">A distribuição interna entre matérias é balanceada para diversidade, mas não é apresentada como cota oficial: o edital fixa os blocos 20/40 e o mínimo de três questões de Lei Maria da Penha.</p>
-      <p class="official-source-note">Nenhuma falta é preenchida com conteúdo fora do mapa do edital. A questão mantém suas alternativas e seu gabarito originais.</p>`;
+      <p class="official-source-note">Nenhuma falta é preenchida com conteúdo fora do mapa do edital. A questão mantém suas alternativas e seu gabarito originais; havendo C/E elegível no cargo, a montagem garante presença desse formato na sessão.</p>`;
     targetAnchor.insertAdjacentElement("afterend", card);
     card.querySelectorAll("[data-start-official-exam]").forEach(button => button.addEventListener("click", () => startOfficialExam(button.dataset.startOfficialExam)));
   } finally {
