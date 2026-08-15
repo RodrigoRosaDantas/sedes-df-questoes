@@ -43,7 +43,7 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Executar a suíte pública contra o artefato local
         env:
-          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          EXPECTED_SHA: ${{ github.sha }}
           PUBLIC_BASE_URL: http://127.0.0.1:4173/
         shell: bash
         run: |
