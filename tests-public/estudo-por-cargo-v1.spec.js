@@ -16,47 +16,55 @@ async function loadMap(page) {
   return response.json();
 }
 
-function targetSections(map, code) {
-  const general = new Set(map.general_section_ids || []);
-  const specific = new Set(map.targets[code].specific_item_ids || []);
-  return map.sections.filter(section => general.has(section.id) || section.items.some(item => specific.has(item.id))).map(section => ({
-    ...section,
-    items: section.items.filter(item => general.has(section.id) || specific.has(item.id)),
-  }));
+function mappedItem(map, sectionId, allowedIds = null) {
+  const section = map.sections.find(candidate => candidate.id === sectionId);
+  expect(section).toBeTruthy();
+  const allowed = allowedIds ? new Set(allowedIds) : null;
+  const item = section.items.find(candidate => (!allowed || allowed.has(candidate.id)) && candidate.question_ids.length > 0);
+  expect(item).toBeTruthy();
+  return item;
 }
 
 test("Estudar oferece acesso à página filha por cargo", async ({page}) => {
   await page.goto("./#/estudar");
   const entry = page.locator("[data-role-study-entry]");
   await expect(entry).toBeVisible({timeout: 30000});
-  await expect(entry).toContainText("Matérias → tópicos → questões");
+  await expect(entry).toContainText("Matéria → tópico → questões");
   await expect(entry.locator('a[href*="estudo-por-cargo.html?cargo=202"]')).toBeVisible();
   await expect(entry.locator('a[href*="estudo-por-cargo.html?cargo=400"]')).toBeVisible();
 });
 
-test("página filha navega cargo → matéria → tópico → questão e usa o resolvedor existente", async ({page}) => {
+test("página filha usa matérias reais do cargo e navega matéria → tópico → questão", async ({page}) => {
   test.setTimeout(90000);
   await clearState(page);
   const map = await loadMap(page);
-  const sections = targetSections(map, "202");
-  expect(sections.length).toBeGreaterThan(2);
 
   const shell = page.locator("[data-role-study-shell]");
   await expect(shell).toBeVisible({timeout: 30000});
   await expect(shell).toHaveAttribute("data-role-target-code", "202");
-  await expect(page.locator("[data-role-subject-grid] [data-role-subject]")).toHaveCount(sections.length);
 
-  const section = sections.find(candidate => candidate.items.some(item => item.question_ids.length > 0));
-  expect(section).toBeTruthy();
-  await page.locator(`[data-role-subject="${section.id}"]`).click();
-  await expect(page.locator("[data-role-topics]")).toBeVisible();
-  await expect(page.locator("[data-role-topics]")).toContainText(section.label.replace(/^\s*\d+(?:\.\d+)*\s*/, ""));
+  const grid = page.locator("[data-role-subject-grid]");
+  await expect(grid).toBeVisible();
+  await expect(grid.locator('[data-role-subject="lingua-portuguesa"]')).toContainText("Língua Portuguesa");
+  await expect(grid.locator('[data-role-subject="realidade-df-ride"]')).toContainText("Realidade do DF e RIDE");
+  await expect(grid.locator('[data-role-subject="lei-organica-df"]')).toContainText("Lei Orgânica do Distrito Federal");
+  await expect(grid.locator('[data-role-subject="lei-maria-da-penha"]')).toContainText("Lei Maria da Penha");
+  await expect(grid.locator('[data-role-subject="direito-administrativo"]')).toContainText("Direito Administrativo");
+  await expect(grid.locator('[data-role-subject="arquivologia"]')).toContainText("Arquivologia");
+  await expect(grid.locator('[data-role-subject="administracao-recursos-materiais"]')).toContainText("Administração de Recursos Materiais");
+  await expect(grid).not.toContainText("Distrito Federal, Política para Mulheres, Legislação e Primeiros Socorros");
 
-  const item = section.items.find(candidate => candidate.question_ids.length > 0);
-  await page.locator(`[data-role-topic="${item.id}"]`).click();
+  const item = mappedItem(map, "202-administrativo", ["202-adm-2-1", "202-adm-2-2", "202-adm-2-3"]);
+  await grid.locator('[data-role-subject="direito-administrativo"]').click();
+  const topics = page.locator("[data-role-topics]");
+  await expect(topics).toBeVisible();
+  await expect(topics.locator(`[data-role-topic="${item.id}"]`)).toBeVisible();
+  await expect(topics.locator(`[data-role-topic="${item.id}"]`)).toContainText(`Ver questões (${item.question_ids.length})`);
+
+  await topics.locator(`[data-role-topic="${item.id}"]`).click();
   const detail = page.locator(`[data-role-topic-detail="${item.id}"]`);
   await expect(detail).toBeVisible();
-  await expect(detail.locator("[data-role-question]").first()).toBeVisible();
+  await expect(detail).toContainText("Questões deste tópico");
   const firstId = item.question_ids[0];
   await expect(detail.locator(`[data-role-question="${firstId}"]`)).toBeVisible();
 
@@ -66,15 +74,14 @@ test("página filha navega cargo → matéria → tópico → questão e usa o r
   const session = await page.evaluate(() => JSON.parse(localStorage.getItem("sedes.questoes.rodrigo.session.v3") || "null"));
   expect(session.material.codigo_cargo).toBe("202");
   expect(session.questionIds).toEqual([firstId]);
-  expect(session.material.nome).toContain("Estudo por Cargo");
+  expect(session.material.nome).toContain("Direito Administrativo");
 });
 
-test("progresso da página filha considera histórico global e cargo 400 possui matérias próprias", async ({page}) => {
+test("progresso é global e Administrador 400 mostra suas matérias próprias", async ({page}) => {
   test.setTimeout(90000);
   await clearState(page);
   const map = await loadMap(page);
-  const sections202 = targetSections(map, "202");
-  const mapped = sections202.flatMap(section => section.items).find(item => item.question_ids.length > 0);
+  const mapped = mappedItem(map, "geral-portugues");
   const mappedId = mapped.question_ids[0];
 
   await page.evaluate(mappedId => {
@@ -96,8 +103,10 @@ test("progresso da página filha considera histórico global e cargo 400 possui 
   await page.locator('[data-role-target="400"]').click();
   const shell = page.locator("[data-role-study-shell]");
   await expect(shell).toHaveAttribute("data-role-target-code", "400");
-  const sections400 = targetSections(map, "400");
-  await expect(page.locator("[data-role-subject-grid] [data-role-subject]")).toHaveCount(sections400.length);
-  const labels400 = sections400.map(section => section.label).join(" ");
-  expect(labels400).toMatch(/Gestão de Pessoas|Administração Financeira|Teoria Geral/i);
+  const grid = page.locator("[data-role-subject-grid]");
+  await expect(grid.locator('[data-role-subject="administracao-geral-publica"]')).toContainText("Administração Geral e Pública");
+  await expect(grid.locator('[data-role-subject="afo"]')).toContainText("Administração Financeira e Orçamentária (AFO)");
+  await expect(grid.locator('[data-role-subject="gestao-pessoas"]')).toContainText("Gestão de Pessoas");
+  await expect(grid.locator('[data-role-subject="gestao-projetos"]')).toContainText("Gestão de Projetos");
+  await expect(grid.locator('[data-role-subject="assistencia-social-suas"]')).toContainText("Assistência Social (SUAS)");
 });
