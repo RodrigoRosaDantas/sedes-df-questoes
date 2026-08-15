@@ -20,6 +20,45 @@ const PAGE_SELECTOR = "[data-estudo-por-cargo-page]";
 let mapPromise = null;
 let entryInjecting = false;
 
+const COMMON_STUDY_SUBJECTS = [
+  {id: "lingua-portuguesa", label: "Língua Portuguesa", scope: "general", refs: [{section: "geral-portugues"}]},
+  {id: "realidade-df-ride", label: "Realidade do DF e RIDE", scope: "general", refs: [{section: "geral-df-legislacao", items: ["geral-df-1"]}]},
+  {id: "politica-mulheres-pdpm", label: "Política para Mulheres (PDPM)", scope: "general", refs: [{section: "geral-df-legislacao", items: ["geral-df-2"]}]},
+  {id: "lei-organica-df", label: "Lei Orgânica do Distrito Federal (LODF)", scope: "general", refs: [{section: "geral-df-legislacao", items: ["geral-df-3"]}]},
+  {id: "lc-840-2011", label: "LC 840/2011 — Servidores do DF", scope: "general", refs: [
+    {section: "geral-df-legislacao", items: ["geral-df-4"]},
+    {section: "202-administrativo", items: ["202-adm-2-4"]},
+  ]},
+  {id: "lei-maria-da-penha", label: "Lei Maria da Penha", scope: "general", refs: [{section: "geral-df-legislacao", items: ["geral-df-maria-penha"]}]},
+  {id: "lei-7484-2024", label: "Lei 7.484/2024 — Carreira SEDES", scope: "general", refs: [{section: "geral-df-legislacao", items: ["geral-df-6"]}]},
+  {id: "primeiros-socorros", label: "Primeiros Socorros", scope: "general", refs: [{section: "geral-df-legislacao", items: ["geral-df-7"]}]},
+];
+
+const TARGET_STUDY_SUBJECTS = {
+  "202": [
+    {id: "assistencia-social-suas", label: "Assistência Social (SUAS)", scope: "specific", refs: [{section: "tdas-comum-suas"}]},
+    {id: "programas-beneficios-df", label: "Programas e Benefícios do DF", scope: "specific", refs: [{section: "tdas-comum-programas"}]},
+    {id: "direito-constitucional", label: "Direito Constitucional", scope: "specific", refs: [{section: "202-constitucional"}]},
+    {id: "direito-administrativo", label: "Direito Administrativo", scope: "specific", refs: [{section: "202-administrativo", items: ["202-adm-2-1", "202-adm-2-2", "202-adm-2-3"]}]},
+    {id: "atendimento-rotinas-administrativas", label: "Atendimento e Rotinas Administrativas", scope: "specific", refs: [{section: "202-rotinas-arquivologia", items: ["202-rot-3-1", "202-rot-3-2"]}]},
+    {id: "arquivologia", label: "Arquivologia", scope: "specific", refs: [{section: "202-rotinas-arquivologia", items: ["202-rot-3-3"]}]},
+    {id: "administracao-recursos-materiais", label: "Administração de Recursos Materiais", scope: "specific", refs: [{section: "202-materiais-patrimonio-compras", items: ["202-mat-4-1"]}]},
+    {id: "gestao-patrimonial", label: "Gestão Patrimonial", scope: "specific", refs: [{section: "202-materiais-patrimonio-compras", items: ["202-mat-4-2"]}]},
+    {id: "compras-publicas-licitacoes", label: "Compras Públicas e Licitações", scope: "specific", refs: [{section: "202-materiais-patrimonio-compras", items: ["202-mat-4-3"]}]},
+  ],
+  "400": [
+    {id: "assistencia-social-suas", label: "Assistência Social (SUAS)", scope: "specific", refs: [{section: "edas-comum-suas"}]},
+    {id: "direitos-vulnerabilidades", label: "Direitos e Vulnerabilidades Sociais", scope: "specific", refs: [{section: "edas-comum-direitos"}]},
+    {id: "programas-beneficios-df", label: "Programas e Benefícios do DF", scope: "specific", refs: [{section: "edas-comum-programas"}]},
+    {id: "administracao-geral-publica", label: "Administração Geral e Pública", scope: "specific", refs: [{section: "400-tga"}]},
+    {id: "osm-qualidade", label: "Organização, Sistemas, Métodos e Qualidade", scope: "specific", refs: [{section: "400-osm-qualidade"}]},
+    {id: "gestao-projetos", label: "Gestão de Projetos", scope: "specific", refs: [{section: "400-projetos"}]},
+    {id: "afo", label: "Administração Financeira e Orçamentária (AFO)", scope: "specific", refs: [{section: "400-afo"}]},
+    {id: "gestao-pessoas", label: "Gestão de Pessoas", scope: "specific", refs: [{section: "400-pessoas"}]},
+    {id: "etica-conduta", label: "Ética e Conduta Profissional", scope: "specific", refs: [{section: "400-etica"}]},
+  ],
+};
+
 function cleanLabel(value = "") {
   return String(value).replace(/^\s*\d+(?:\.\d+)*\s*/, "").trim();
 }
@@ -78,7 +117,7 @@ function globalQuestionState() {
   return {answered, latest};
 }
 
-function eligibleSections(map, targetCode) {
+function rawEligibleSections(map, targetCode) {
   const target = map.targets?.[targetCode];
   if (!target) return [];
   const generalSections = new Set(map.general_section_ids || []);
@@ -90,6 +129,30 @@ function eligibleSections(map, targetCode) {
     ...section,
     items: (section.items || []).filter(item => generalSections.has(section.id) || specificItems.has(item.id)),
   }));
+}
+
+function buildStudySubject(rawSections, definition) {
+  const byId = new Map(rawSections.map(section => [section.id, section]));
+  const items = [];
+  const seen = new Set();
+  for (const ref of definition.refs || []) {
+    const source = byId.get(ref.section);
+    if (!source) continue;
+    const allowed = ref.items ? new Set(ref.items) : null;
+    for (const item of source.items || []) {
+      if (allowed && !allowed.has(item.id)) continue;
+      if (seen.has(item.id)) continue;
+      seen.add(item.id);
+      items.push({...item, source_section_id: source.id, source_section_label: source.label});
+    }
+  }
+  return {...definition, items};
+}
+
+function eligibleSections(map, targetCode) {
+  const rawSections = rawEligibleSections(map, targetCode);
+  const definitions = [...COMMON_STUDY_SUBJECTS, ...(TARGET_STUDY_SUBJECTS[targetCode] || [])];
+  return definitions.map(definition => buildStudySubject(rawSections, definition)).filter(subject => subject.items.length > 0);
 }
 
 function progressForIds(ids, progress) {
@@ -225,24 +288,24 @@ function renderSubjectCards(sections, progress) {
     const percent = stats.total ? Math.round(stats.answered / stats.total * 100) : 0;
     return `<button type="button" class="role-subject-card" data-role-subject="${esc(section.id)}">
       <span class="role-scope">${section.scope === "general" ? "Conhecimentos gerais" : "Conhecimentos específicos"}</span>
-      <strong>${esc(cleanLabel(section.label))}</strong>
-      <span>${(section.items || []).length} tópicos · ${stats.total.toLocaleString("pt-BR")} questões</span>
+      <strong>${esc(section.label)}</strong>
+      <span>${(section.items || []).length} tópico(s) · ${stats.total.toLocaleString("pt-BR")} questões</span>
       <span>${stats.answered.toLocaleString("pt-BR")} feitas · ${stats.accuracy == null ? "sem taxa" : `${stats.accuracy}% de acerto`}</span>
       <i class="role-progress"><b style="width:${percent}%"></b></i>
-      <em>Abrir matéria →</em>
+      <em>Ver tópicos →</em>
     </button>`;
   }).join("")}</div>`;
 }
 
 function renderTopics(section, progress) {
   return `<section class="role-panel" data-role-topics>
-    <div class="role-panel-head"><div><p class="eyebrow">Matéria</p><h2>${esc(cleanLabel(section.label))}</h2><p>Escolha um tópico para ver exatamente quais questões estão disponíveis e o que você já realizou.</p></div><button type="button" class="btn ghost" data-role-back-subjects>← Todas as matérias</button></div>
+    <div class="role-panel-head"><div><p class="eyebrow">Matéria</p><h2>${esc(section.label)}</h2><p>Escolha um tópico desta matéria. Dentro dele você verá a lista das questões disponíveis para fazer.</p></div><button type="button" class="btn ghost" data-role-back-subjects>← Todas as matérias</button></div>
     <div class="role-topic-list">${(section.items || []).map(item => {
       const stats = progressForIds(item.question_ids, progress);
       const percent = stats.total ? Math.round(stats.answered / stats.total * 100) : 0;
       return `<article class="role-topic-card ${stats.total ? "" : "is-empty"}" data-role-topic-card="${esc(item.id)}">
         <div class="role-topic-copy"><strong>${esc(cleanLabel(item.label))}</strong><span>${stats.total} questões · ${stats.answered} feitas · ${stats.remaining} inéditas${stats.accuracy == null ? "" : ` · ${stats.accuracy}% de acerto`}</span><i class="role-progress"><b style="width:${percent}%"></b></i></div>
-        <button type="button" class="btn ${stats.total ? "primary" : "secondary"}" data-role-topic="${esc(item.id)}" ${stats.total ? "" : "disabled"}>${stats.total ? "Abrir tópico" : "Sem questões"}</button>
+        <button type="button" class="btn ${stats.total ? "primary" : "secondary"}" data-role-topic="${esc(item.id)}" ${stats.total ? "" : "disabled"}>${stats.total ? `Ver questões (${stats.total})` : "Sem questões"}</button>
       </article>`;
     }).join("")}</div>
   </section>`;
@@ -260,8 +323,8 @@ function renderQuestions(map, targetCode, section, item, progress) {
   const stats = progressForIds(item.question_ids, progress);
   const percent = stats.total ? Math.round(stats.answered / stats.total * 100) : 0;
   return `<section class="role-panel role-topic-detail" data-role-topic-detail="${esc(item.id)}">
-    <div class="role-breadcrumb"><button type="button" class="link-button" data-role-back-subjects>Matérias</button><span>›</span><button type="button" class="link-button" data-role-back-topics>${esc(cleanLabel(section.label))}</button><span>›</span><strong>${esc(cleanLabel(item.label))}</strong></div>
-    <div class="role-topic-hero"><div><p class="eyebrow">Tópico do edital</p><h1>${esc(cleanLabel(item.label))}</h1><p>${stats.total} questões mapeadas · ${stats.answered} realizadas · ${stats.remaining} inéditas · ${stats.wrong} erro(s).</p></div><div class="role-topic-score"><strong>${stats.accuracy == null ? "—" : `${stats.accuracy}%`}</strong><span>aproveitamento</span></div></div>
+    <div class="role-breadcrumb"><button type="button" class="link-button" data-role-back-subjects>Matérias</button><span>›</span><button type="button" class="link-button" data-role-back-topics>${esc(section.label)}</button><span>›</span><strong>${esc(cleanLabel(item.label))}</strong></div>
+    <div class="role-topic-hero"><div><p class="eyebrow">Tópico da matéria</p><h1>${esc(cleanLabel(item.label))}</h1><p>${stats.total} questões mapeadas · ${stats.answered} realizadas · ${stats.remaining} inéditas · ${stats.wrong} erro(s).</p></div><div class="role-topic-score"><strong>${stats.accuracy == null ? "—" : `${stats.accuracy}%`}</strong><span>aproveitamento</span></div></div>
     <i class="role-progress role-progress-large"><b style="width:${percent}%"></b></i>
     <div class="role-topic-actions" role="group" aria-label="Ações do tópico">
       <button type="button" class="btn primary" data-role-run="fresh" data-role-size="10" ${stats.remaining ? "" : "disabled"}>Resolver 10 inéditas</button>
@@ -269,7 +332,7 @@ function renderQuestions(map, targetCode, section, item, progress) {
       <button type="button" class="btn secondary" data-role-run="mixed" data-role-size="20" ${stats.total ? "" : "disabled"}>Resolver 20</button>
       <button type="button" class="btn ghost" data-role-run="mixed" data-role-size="all" ${stats.total ? "" : "disabled"}>Todas</button>
     </div>
-    <div class="role-question-head"><div><h2>Questões deste tópico</h2><p>As questões abaixo são as mesmas do banco principal; o status considera seu histórico inteiro.</p></div><label>Filtrar<select data-role-question-filter><option value="all">Todas</option><option value="fresh">Inéditas</option><option value="wrong">Erros</option><option value="correct">Acertos</option></select></label></div>
+    <div class="role-question-head"><div><h2>Questões deste tópico</h2><p>Escolha uma questão abaixo para resolver individualmente ou use os botões acima para criar uma sessão.</p></div><label>Filtrar<select data-role-question-filter><option value="all">Todas</option><option value="fresh">Inéditas</option><option value="wrong">Erros</option><option value="correct">Acertos</option></select></label></div>
     <div class="role-question-list" data-role-question-list>${renderQuestionRows(map, targetCode, section, item, progress, "all")}</div>
   </section>`;
 }
@@ -304,12 +367,12 @@ function renderPage(map) {
   const progress = globalQuestionState();
 
   app.innerHTML = `<section class="role-study-shell" data-role-study-shell data-role-target-code="${esc(targetCode)}">
-    <div class="role-hero card"><div><p class="eyebrow">Estudo por Cargo</p><h1>${esc(target.label)} · Cargo ${esc(targetCode)}</h1><p>Escolha a matéria, entre no tópico e faça somente as questões ligadas àquele ponto. Seu progresso inclui respostas feitas no Banco, Prova Real, simulados, revisões e Edital Verticalizado.</p></div><div class="role-profile"><span>Perfil ativo</span><strong>${esc(profileName())}</strong><small>histórico global por ID permanente</small></div></div>
+    <div class="role-hero card"><div><p class="eyebrow">Estudo por Cargo</p><h1>${esc(target.label)} · Cargo ${esc(targetCode)}</h1><p>Escolha uma matéria do seu cargo, abra um tópico e faça as questões daquele conteúdo. O edital define o que pertence ao cargo; a navegação organiza isso em matérias de estudo.</p></div><div class="role-profile"><span>Perfil ativo</span><strong>${esc(profileName())}</strong><small>progresso global por ID permanente</small></div></div>
     <div class="role-targets" role="group" aria-label="Escolher cargo">
       ${["202", "400"].map(code => `<button type="button" data-role-target="${code}" class="${code === targetCode ? "active" : ""}" aria-pressed="${code === targetCode}"><strong>${esc(map.targets[code].label)}</strong><span>${esc(map.targets[code].subtitle)}</span></button>`).join("")}
     </div>
     ${renderKpis(map, targetCode, progress)}
-    ${!section ? `<section class="role-section-intro"><div><p class="eyebrow">1 · Matérias</p><h2>Escolha uma matéria do ${esc(target.label)}</h2><p>São exibidas apenas as matérias que pertencem ao edital deste cargo.</p></div><a class="btn ghost" href="./index.html#/estudar">Abrir Banco livre</a></section>${renderSubjectCards(sections, progress)}` : item ? renderQuestions(map, targetCode, section, item, progress) : renderTopics(section, progress)}
+    ${!section ? `<section class="role-section-intro"><div><p class="eyebrow">1 · Matérias do cargo</p><h2>Escolha a matéria que quer estudar</h2><p>As matérias abaixo foram separadas para navegação de estudo; ao abrir uma delas você verá os tópicos e, dentro de cada tópico, as questões correspondentes.</p></div><a class="btn ghost" href="./index.html#/estudar">Abrir Banco livre</a></section>${renderSubjectCards(sections, progress)}` : item ? renderQuestions(map, targetCode, section, item, progress) : renderTopics(section, progress)}
   </section>`;
   bindPageEvents(map, query, progress);
 }
@@ -384,7 +447,7 @@ async function injectEntry() {
     const card = document.createElement("section");
     card.className = "card role-study-entry";
     card.dataset.roleStudyEntry = "";
-    card.innerHTML = `<div><p class="eyebrow">Novo · Estudo por Cargo</p><h2>Matérias → tópicos → questões</h2><p>Entre por Técnico 202 ou Administrador 400 e navegue somente pelas matérias do edital daquele cargo. O progresso considera tudo que você já respondeu na plataforma.</p></div><div class="role-study-entry-actions">${["202", "400"].map(code => `<a class="btn ${code === "202" ? "primary" : "secondary"}" href="./estudo-por-cargo.html?cargo=${code}">${esc(map.targets[code].label)} · ${code}</a>`).join("")}</div>`;
+    card.innerHTML = `<div><p class="eyebrow">Estudo por Cargo</p><h2>Matéria → tópico → questões</h2><p>Escolha Técnico 202 ou Administrador 400. A nova página separa as matérias do cargo e abre os tópicos com as questões correspondentes.</p></div><div class="role-study-entry-actions">${["202", "400"].map(code => `<a class="btn ${code === "202" ? "primary" : "secondary"}" href="./estudo-por-cargo.html?cargo=${code}">${esc(map.targets[code].label)} · ${code}</a>`).join("")}</div>`;
     anchor.insertAdjacentElement("afterend", card);
   } catch (error) {
     console.error(error);
