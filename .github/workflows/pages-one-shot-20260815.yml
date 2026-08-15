@@ -1,0 +1,88 @@
+name: Publicar integração Firebase — execução única
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/pages-one-shot-20260815.yml'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages-manual
+  cancel-in-progress: false
+
+env:
+  PLAYWRIGHT_VERSION: 1.61.1
+  PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes/
+
+jobs:
+  validate-deploy-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Baixar a main canônica
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Capturar SHA autorizado
+        id: source
+        shell: bash
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Preparar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Gerar e auditar o artefato público
+        env:
+          RELEASE_SOURCE_SHA: ${{ steps.source.outputs.sha }}
+        run: |
+          npm run check
+          node scripts/validate-cloud-progress-v1.mjs
+      - name: Instalar navegador de teste isoladamente
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm --cache "${RUNNER_TEMP}/npm-cache" install --no-save --package-lock=false "@playwright/test@${PLAYWRIGHT_VERSION}"
+          npx playwright install --with-deps chromium
+      - name: Executar a suíte pública contra o artefato local
+        env:
+          EXPECTED_SHA: ${{ steps.source.outputs.sha }}
+          PUBLIC_BASE_URL: http://127.0.0.1:4173/
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4173 --directory dist >"${RUNNER_TEMP}/sedes-local-server.log" 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "${SERVER_PID}" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 20); do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then break; fi
+            sleep 0.25
+          done
+          curl -fsS http://127.0.0.1:4173/ >/dev/null
+          npx playwright test --config=playwright.public.config.js --workers=1 --retries=0
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v6
+      - name: Enviar o artefato aprovado
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+      - name: Publicar o artefato aprovado
+        id: deployment
+        uses: actions/deploy-pages@v5
+      - name: Repetir a suíte completa no endereço público
+        env:
+          EXPECTED_SHA: ${{ steps.source.outputs.sha }}
+        run: npx playwright test --config=playwright.public.config.js --workers=1 --retries=0
+      - name: Confirmar metadados, PWA, catálogo e commit servidos
+        env:
+          EXPECTED_SOURCE_SHA: ${{ steps.source.outputs.sha }}
+        run: node scripts/verify-deployment.mjs "${PUBLIC_BASE_URL}" "${EXPECTED_SOURCE_SHA}"
