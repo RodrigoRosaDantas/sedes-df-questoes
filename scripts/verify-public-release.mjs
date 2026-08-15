@@ -93,6 +93,7 @@ const cloudHashKeys = [
 const hardeningHashKeys = [
   "platform_report_queue_js",
   "platform_pdf_fidelity_js",
+  "platform_question_visuals_js",
   "platform_cloud_progress_js_v2audit",
 ];
 
