@@ -41,6 +41,7 @@ for (const file of syntaxFiles) run("--check", [file]);
 for (const script of [
   "scripts/build-question-search-index.mjs",
   "scripts/build-public.mjs",
+  "scripts/build-content-model-v1.mjs",
   "scripts/reconcile-discursive-release-meta.mjs",
   "scripts/reconcile-public-metadata.mjs",
   "scripts/reconcile-cloud-provenance-v1.mjs",
@@ -61,6 +62,7 @@ for (const script of [
   "scripts/validate-ux-v2-14.mjs",
   "scripts/validate-navigation-v2-15.mjs",
   "scripts/validate-cloud-progress-v1.mjs",
+  "scripts/validate-work-convergence-v1.mjs",
   "scripts/validate-discursive-display.mjs",
   "scripts/validate-dist-v2-10.mjs",
   "scripts/validate-governance-mode.mjs",
@@ -71,25 +73,39 @@ const catalog = readJSON("dist/data/release/catalogo.json");
 const build = readJSON("dist/data/release/build-info.json");
 const release = readJSON("dist/data/release/release-meta.json");
 const format = readJSON("dist/data/release/question-format-index.json");
+const contentModel = readJSON("dist/data/release/content-model-v1.json");
 const questions = Object.keys(catalog.question_index || {}).length;
 const materials = Array.isArray(catalog.materials) ? catalog.materials.length : 0;
 const discursive = Number(release.discursive_display_items || 0);
 const awaiting = Number(release.awaiting_audit || 0);
 const bank = Number(release.banco_mestre || 0);
 const formatTotal = Object.values(format.summary || {}).reduce((sum, value) => sum + Number(value || 0), 0);
-const cloudHashKeys = ["platform_cloud_progress_js", "platform_cloud_progress_css", "platform_work_command_center_js"];
+const cloudHashKeys = [
+  "platform_cloud_progress_js",
+  "platform_cloud_progress_css",
+  "platform_work_command_center_js",
+  "platform_work_convergence_js",
+  "platform_work_convergence_css",
+  "platform_question_report_js",
+];
 
 if (build.source_sha !== requestedSha || release.source_sha !== requestedSha) throw new Error("Recibos do dist não pertencem ao checkout validado.");
 if (Number(build.questions) !== questions || Number(release.questions) !== questions) throw new Error("Totais de questões divergentes no dist.");
 if (Number(build.materials) !== materials || Number(release.materials) !== materials) throw new Error("Totais de materiais divergentes no dist.");
 if (bank - questions - discursive !== awaiting) throw new Error("Banco Mestre não fecha em objetivas + discursivas + auditoria.");
 if (Number(format.question_count) !== questions || formatTotal !== questions) throw new Error("Índice de formatos não fecha com o catálogo.");
+if (Number(contentModel.schema) !== 1 || Number(contentModel.question_count) !== questions || Number(contentModel.material_count) !== materials) {
+  throw new Error("Modelo normalizado não fecha com o catálogo público.");
+}
+if (!Array.isArray(contentModel.questions) || contentModel.questions.length !== questions || !Array.isArray(contentModel.materials) || contentModel.materials.length !== materials) {
+  throw new Error("Coleções normalizadas incompletas.");
+}
 for (const key of cloudHashKeys) {
-  if (!/^[0-9a-f]{64}$/.test(String(build.source_files_sha256?.[key] || ""))) throw new Error(`Build sem hash Firebase/Central de comando: ${key}.`);
+  if (!/^[0-9a-f]{64}$/.test(String(build.source_files_sha256?.[key] || ""))) throw new Error(`Build sem hash Firebase/Work: ${key}.`);
   if (build.source_files_sha256[key] !== release.source_files_sha256?.[key]) throw new Error(`Hash de proveniência divergente entre build e release: ${key}.`);
 }
 if (Number(build.cloud_progress_provenance?.files) !== cloudHashKeys.length || Number(release.cloud_progress_provenance?.files) !== cloudHashKeys.length) {
-  throw new Error("Recibo de proveniência da camada Firebase incompleto.");
+  throw new Error("Recibo de proveniência da camada Firebase/Work incompleto.");
 }
 
 const currentRelease = trackedReleaseDigest();
@@ -100,5 +116,6 @@ if (currentRelease.sha256 !== frozenRelease.sha256 || currentRelease.files !== f
 console.log(
   `✓ Auditoria reproduzível concluída no commit ${requestedSha.slice(0, 8)}: `
   + `${bank} no Banco Mestre = ${questions} objetivas + ${discursive} discursivas + ${awaiting} em auditoria; `
-  + `${materials} materiais; Firebase/Central de comando protegidos por SHA-256; fontes canônicas preservadas em ${frozenRelease.files} arquivos.`,
+  + `${materials} materiais; modelo normalizado validado; Firebase/Work protegidos por SHA-256; `
+  + `fontes canônicas preservadas em ${frozenRelease.files} arquivos.`,
 );
