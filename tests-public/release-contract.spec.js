@@ -182,14 +182,15 @@ test("interface pública usa a mesma release na arquitetura v2.15", async ({page
   await expect(page.locator("[data-vault-tools]")).toBeVisible({timeout: 30000});
 });
 
-test("gera cadernos íntegros para prova e simulado", async ({page, request}) => {
+test("gera download direto e mantém cadernos íntegros para prova e simulado", async ({page, request}) => {
   const {catalog} = await loadRelease(request);
   for (const view of ["provas", "simulados"]) {
     const {download, material, name} = await openFirstMaterial(page, request, catalog, view);
-    const blank = await openGenerated(page, download.getByRole("button", {name: "PDF para responder"}));
+    await expect(download.getByRole("button", {name: "Baixar PDF direto"})).toBeVisible();
+    const blank = await openGenerated(page, download.getByRole("button", {name: "Imprimir versão completa"}));
     await assertDocument(blank, material, name, false);
     await blank.close();
-    const commented = await openGenerated(page, download.getByRole("button", {name: "PDF comentado"}));
+    const commented = await openGenerated(page, download.getByRole("button", {name: "Imprimir comentado"}));
     await assertDocument(commented, material, name, true);
     await commented.close();
   }
