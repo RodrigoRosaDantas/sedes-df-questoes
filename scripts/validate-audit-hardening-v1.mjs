@@ -53,7 +53,7 @@ requireMarkers(pdf, [
   "image/jpeg",
   "PDF fiel baixado com Unicode e imagens",
 ], "PDF fiel");
-forbidMarkers(pdf, ["WinAnsiEncoding", "[^\\x09"], "replace(/[^\\x"], "PDF fiel");
+forbidMarkers(pdf, ["WinAnsiEncoding", "replace(/[^\\x"], "PDF fiel");
 
 requireMarkers(rules, [
   "rules_version = '2'",
