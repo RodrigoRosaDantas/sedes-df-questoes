@@ -113,12 +113,18 @@ for (const marker of [
   'path.join(root, "dist", "data", "release", "release-meta.json")',
   "const artifactReleaseMeta =",
   'const expectedCacheVersion = String(artifactReleaseMeta.cache_version || "").trim()',
-  "Hash público divergente do artefato aprovado",
+  'import crypto from "node:crypto"',
+  "const publicCanonicalContents =",
+  "const publicHash = sha256(publicCanonicalContents[hash])",
+  "Arquivo público diverge byte a byte do artefato aprovado",
 ]) {
-  if (!deploymentVerifier.includes(marker)) throw new Error(`Verificador pós-deploy não está ancorado no artefato aprovado: ${marker}.`);
+  if (!deploymentVerifier.includes(marker)) throw new Error(`Verificador pós-deploy não está ancorado no artefato aprovado por hash: ${marker}.`);
 }
 if (deploymentVerifier.includes('path.join(root, "data/release/release-meta.json")')) {
   throw new Error("Verificador pós-deploy voltou a usar o template versionado da release como referência do artefato.");
+}
+if (/report-v2-13\.js\?v=\d+/.test(deploymentVerifier) || /release-v2-13\.js\?v=\d+/.test(deploymentVerifier)) {
+  throw new Error("Verificador pós-deploy voltou a depender de versão textual fixa de asset em vez de hash do artefato.");
 }
 
 const currentRelease = trackedReleaseDigest();
@@ -130,5 +136,5 @@ console.log(
   `✓ Auditoria reproduzível concluída no commit ${requestedSha.slice(0, 8)}: `
   + `${bank} no Banco Mestre = ${questions} objetivas + ${discursive} discursivas + ${awaiting} em auditoria; `
   + `${materials} materiais; modelo normalizado validado; Firebase/Work protegidos por SHA-256; `
-  + `verificador pós-deploy ancorado no artefato aprovado; fontes canônicas preservadas em ${frozenRelease.files} arquivos.`,
+  + `verificador pós-deploy ancorado no artefato aprovado por hash; fontes canônicas preservadas em ${frozenRelease.files} arquivos.`,
 );
