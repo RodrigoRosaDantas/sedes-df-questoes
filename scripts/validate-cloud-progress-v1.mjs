@@ -64,7 +64,11 @@ requireMarkers(command, [
   "Dados oficiais",
   "Seu progresso",
   "SEDES_CLOUD_PROGRESS",
+  "if (node.textContent !== value) node.textContent = value",
 ], "Central de comando");
+if (/forEach\(node => \{\s*node\.textContent = cloudStateText\(\)/s.test(command)) {
+  throw new Error("Central de comando voltou a mutar o DOM em todo ciclo do observer.");
+}
 requireMarkers(css, ["cloud-progress-pill", "cloud-dialog-backdrop", "work-command-center", "work-command-grid"], "CSS cloud/work");
 
-console.log("✓ Firebase local-first e Central de comando validados estruturalmente: shell, PWA, namespace, auth, estados de sync e separação entre catálogo oficial e progresso pessoal.");
+console.log("✓ Firebase local-first e Central de comando validados estruturalmente: shell, PWA, namespace, auth, estados de sync, observer idempotente e separação entre catálogo oficial e progresso pessoal.");

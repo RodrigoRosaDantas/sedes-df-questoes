@@ -28,7 +28,10 @@ function cloudStateText() {
   return cloud.lastSyncAt ? "progresso sincronizado na conta" : "conta conectada";
 }
 function updateCloudCopy() {
-  document.querySelectorAll("[data-work-cloud-state]").forEach(node => { node.textContent = cloudStateText(); });
+  const value = cloudStateText();
+  document.querySelectorAll("[data-work-cloud-state]").forEach(node => {
+    if (node.textContent !== value) node.textContent = value;
+  });
 }
 
 function injectCommandCenter() {
