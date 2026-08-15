@@ -35,11 +35,15 @@ test("abertura offline recupera a inicialização da nuvem quando a conexão vol
   });
   await page.goto("./#/inicio", {waitUntil: "domcontentloaded"});
   await expect(page.locator("[data-cloud-progress]")).toHaveAttribute("data-cloud-state", "offline", {timeout: 30000});
+
+  const reloaded = page.waitForEvent("domcontentloaded", {timeout: 30000});
   await page.evaluate(() => {
     sessionStorage.setItem("sedes.test.navigatorOnline", "1");
-    window.dispatchEvent(new Event("online"));
+    window.setTimeout(() => window.dispatchEvent(new Event("online")), 0);
   });
-  await expect.poll(async () => page.evaluate(() => performance.getEntriesByType("navigation")[0]?.type || ""), {timeout: 30000}).toBe("reload");
+  await reloaded;
+
+  await expect.poll(() => page.evaluate(() => sessionStorage.getItem("sedes.questoes.cloudRecovery.v1")), {timeout: 30000}).toBe("1");
   await expect(page.locator("[data-cloud-progress]")).toBeVisible({timeout: 30000});
 });
 
