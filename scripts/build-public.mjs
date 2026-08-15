@@ -67,8 +67,8 @@ for (const marker of ["closeAfterConsecutiveCorrect: 3", "correctedFilteredIds",
 for (const marker of ["ux-focus-mode", "ux-today", "ux-mastery-grid", "ux-error-reasons"]) requireMarker(sources.platform_ux_css, marker, "Estilos da experiência v2.14");
 for (const marker of ["Seu estudo, sem ruído.", "Última sincronização do catálogo", "#/perfil/configuracoes", "America/Sao_Paulo", "Dados do projeto", "setNodeText"]) requireMarker(sources.platform_navigation_js, marker, "Navegação e Home v2.15");
 for (const marker of ["ux15-home-active", "ux15-settings-page", "ux15-facts-grid", "ux15-sync-card"]) requireMarker(sources.platform_navigation_css, marker, "Estilos da navegação v2.15");
-for (const marker of ["relativeSync", "ux15-breadcrumb", 'aria-current="page"', "aria-controls", "tabpanel", 'event.key === "/"', "sincronizado há", "enhanceSearchResultActions", "data-ux15-open-question", "moveSettingsTabFocus"]) requireMarker(sources.platform_navigation_polish_js, marker, "Polimento da navegação v2.15");
-for (const marker of ["ux15-sync-age", "ux15-breadcrumb", "data-ux15-open-question", ".brand strong{display:none}", "attention", "stale"]) requireMarker(sources.platform_navigation_polish_css, marker, "Estilos do polimento v2.15");
+for (const marker of ["relativeCatalogAge", "Catálogo oficial atualizado em", "atualizado há", "ux15-breadcrumb", 'aria-current="page"', "aria-controls", "tabpanel", 'event.key === "/"', "enhanceSearchResultActions", "data-ux15-open-question", "moveSettingsTabFocus"]) requireMarker(sources.platform_navigation_polish_js, marker, "Polimento da navegação v2.15");
+for (const marker of ["ux15-sync-age", "ux15-sync-age.catalog", "ux15-breadcrumb", "data-ux15-open-question", ".brand strong{display:none}"]) requireMarker(sources.platform_navigation_polish_css, marker, "Estilos do polimento v2.15");
 if (sources.app_js.includes("Release incompleta.")) throw new Error("A fonte canônica ainda contém a trava antiga de totais fixos.");
 
 fs.rmSync(dist, {recursive: true, force: true});
