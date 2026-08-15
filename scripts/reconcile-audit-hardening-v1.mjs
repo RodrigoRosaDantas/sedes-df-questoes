@@ -35,3 +35,4 @@ for (const relative of ["data/release/build-info.json", "data/release/release-me
 }
 
 console.log(`✓ Proveniência dos endurecimentos reconciliada em ${Object.keys(targets).length} arquivos SHA-256.`);
+await import("./validate-study-by-role-v1.mjs");
