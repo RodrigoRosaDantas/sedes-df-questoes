@@ -90,6 +90,14 @@
     ],
   ]);
 
+  window.SEDES_QUESTION_VISUALS = Object.freeze({
+    forText(value) {
+      const visual = visuals.get(String(value ?? "").trim());
+      return visual ? Object.freeze({...visual}) : null;
+    },
+    size: visuals.size,
+  });
+
   function figureFor(visual) {
     const figure = document.createElement("figure");
     figure.className = "question-visual";

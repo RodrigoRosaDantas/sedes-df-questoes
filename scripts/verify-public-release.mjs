@@ -45,6 +45,7 @@ for (const script of [
   "scripts/reconcile-discursive-release-meta.mjs",
   "scripts/reconcile-public-metadata.mjs",
   "scripts/reconcile-cloud-provenance-v1.mjs",
+  "scripts/reconcile-audit-hardening-v1.mjs",
 ]) run(script, [], {GITHUB_SHA: requestedSha});
 
 for (const script of [
@@ -63,6 +64,7 @@ for (const script of [
   "scripts/validate-navigation-v2-15.mjs",
   "scripts/validate-cloud-progress-v1.mjs",
   "scripts/validate-work-convergence-v1.mjs",
+  "scripts/validate-audit-hardening-v1.mjs",
   "scripts/validate-discursive-display.mjs",
   "scripts/validate-dist-v2-10.mjs",
   "scripts/validate-governance-mode.mjs",
@@ -88,6 +90,12 @@ const cloudHashKeys = [
   "platform_work_convergence_css",
   "platform_question_report_js",
 ];
+const hardeningHashKeys = [
+  "platform_report_queue_js",
+  "platform_pdf_fidelity_js",
+  "platform_question_visuals_js",
+  "platform_cloud_progress_js_v2audit",
+];
 
 if (build.source_sha !== requestedSha || release.source_sha !== requestedSha) throw new Error("Recibos do dist não pertencem ao checkout validado.");
 if (Number(build.questions) !== questions || Number(release.questions) !== questions) throw new Error("Totais de questões divergentes no dist.");
@@ -106,6 +114,13 @@ for (const key of cloudHashKeys) {
 }
 if (Number(build.cloud_progress_provenance?.files) !== cloudHashKeys.length || Number(release.cloud_progress_provenance?.files) !== cloudHashKeys.length) {
   throw new Error("Recibo de proveniência da camada Firebase/Work incompleto.");
+}
+for (const key of hardeningHashKeys) {
+  if (!/^[0-9a-f]{64}$/.test(String(build.source_files_sha256?.[key] || ""))) throw new Error(`Build sem hash do endurecimento: ${key}.`);
+  if (build.source_files_sha256[key] !== release.source_files_sha256?.[key]) throw new Error(`Hash do endurecimento divergente entre build e release: ${key}.`);
+}
+if (Number(build.audit_hardening_provenance?.files) !== hardeningHashKeys.length || Number(release.audit_hardening_provenance?.files) !== hardeningHashKeys.length) {
+  throw new Error("Recibo de proveniência dos endurecimentos incompleto.");
 }
 
 const deploymentVerifier = fs.readFileSync(path.join(root, "scripts/verify-deployment.mjs"), "utf8");
@@ -135,6 +150,6 @@ if (currentRelease.sha256 !== frozenRelease.sha256 || currentRelease.files !== f
 console.log(
   `✓ Auditoria reproduzível concluída no commit ${requestedSha.slice(0, 8)}: `
   + `${bank} no Banco Mestre = ${questions} objetivas + ${discursive} discursivas + ${awaiting} em auditoria; `
-  + `${materials} materiais; modelo normalizado validado; Firebase/Work protegidos por SHA-256; `
+  + `${materials} materiais; Firebase/Work e endurecimentos protegidos por SHA-256; `
   + `verificador pós-deploy ancorado no artefato aprovado por hash; fontes canônicas preservadas em ${frozenRelease.files} arquivos.`,
 );

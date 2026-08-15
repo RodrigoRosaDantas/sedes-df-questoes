@@ -18,7 +18,7 @@ env:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - name: Baixar o commit sob revisão
         uses: actions/checkout@v6
@@ -29,18 +29,25 @@ jobs:
         with:
           node-version: 22
           package-manager-cache: false
+      - name: Preparar Java 21 para Firebase Emulator
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
       - name: Auditar a release sem credenciais nem escrita externa
         shell: bash
         run: |
           set -euo pipefail
           RELEASE_SOURCE_SHA="$(git rev-parse HEAD)" npm run check
           node scripts/validate-cloud-progress-v1.mjs
-      - name: Instalar navegador de teste isoladamente
+          node scripts/validate-audit-hardening-v1.mjs
+      - name: Instalar navegador e Firebase Emulator isoladamente
         shell: bash
         run: |
           set -euo pipefail
-          npm --cache "${RUNNER_TEMP}/npm-cache" install --no-save --package-lock=false "@playwright/test@${PLAYWRIGHT_VERSION}"
+          npm --cache "${RUNNER_TEMP}/npm-cache" install --no-save --package-lock=false "@playwright/test@${PLAYWRIGHT_VERSION}" "firebase@12.16.0" "@firebase/rules-unit-testing" "firebase-tools"
           npx playwright install --with-deps chromium
+          java -version
       - name: Executar a suíte pública contra o artefato local
         env:
           EXPECTED_SHA: ${{ github.sha }}
@@ -57,3 +64,16 @@ jobs:
           done
           curl -fsS http://127.0.0.1:4173/ >/dev/null
           npx playwright test --config=playwright.public.config.js --workers=1 --retries=0
+      - name: Provar autenticação, dois aparelhos e isolamento por UID no emulador
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4174 --directory dist >"${RUNNER_TEMP}/sedes-firebase-server.log" 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "${SERVER_PID}" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 20); do
+            if curl -fsS http://127.0.0.1:4174/ >/dev/null; then break; fi
+            sleep 0.25
+          done
+          curl -fsS http://127.0.0.1:4174/ >/dev/null
+          npx firebase emulators:exec --config firebase.json --project tdas-68014 --only auth,firestore "PUBLIC_BASE_URL=http://127.0.0.1:4174/ npx playwright test --config=playwright.firebase.config.js --workers=1 --retries=0 tests-integration/firebase-two-device-v1.spec.js && node tests-integration/firestore-rules-v1.mjs"

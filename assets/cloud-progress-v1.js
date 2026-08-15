@@ -34,15 +34,29 @@ const safeJSON = (value, fallback = null) => {
   try { return value == null ? fallback : JSON.parse(value); }
   catch { return fallback; }
 };
+const stableSerialize = value => {
+  if (Array.isArray(value)) return `[${value.map(stableSerialize).join(",")}]`;
+  if (value && typeof value === "object") {
+    return `{${Object.keys(value).sort().filter(key => value[key] !== undefined).map(key => `${JSON.stringify(key)}:${stableSerialize(value[key])}`).join(",")}}`;
+  }
+  return JSON.stringify(value);
+};
 const activeProfileId = () => localStorage.getItem(ACTIVE_PROFILE_KEY) || "rodrigo";
 const profilePrefix = profileId => `sedes.questoes.${profileId}.`;
 const historyKey = profileId => `${profilePrefix(profileId)}history.v3`;
 const stateDocId = key => encodeURIComponent(key);
-const attemptDocId = (attempt, index) => encodeURIComponent(String(attempt?.id || `${attempt?.finishedAt || attempt?.savedAt || "attempt"}-${index}-${fnv1a(JSON.stringify(attempt || {}))}`));
+const canonicalAttemptPayload = attempt => stableSerialize(Object.fromEntries(Object.entries(attempt || {}).filter(([key]) => key !== "id")));
+const stableAttemptId = attempt => String(attempt?.id || `legacy-v2-${attempt?.finishedAt || attempt?.savedAt || attempt?.startedAt || "attempt"}-${fnv1a(canonicalAttemptPayload(attempt))}`);
+const normalizeAttempt = attempt => {
+  if (!attempt || typeof attempt !== "object") return attempt;
+  return attempt.id ? attempt : {...attempt, id: stableAttemptId(attempt)};
+};
+const attemptDocId = attempt => encodeURIComponent(stableAttemptId(attempt));
 const timestampOf = value => {
   const parsed = new Date(value || 0).getTime();
   return Number.isFinite(parsed) ? parsed : 0;
 };
+const attemptTimestamp = attempt => Math.max(timestampOf(attempt?.finishedAt), timestampOf(attempt?.savedAt), timestampOf(attempt?.startedAt));
 
 function readMeta() {
   return safeJSON(localStorage.getItem(META_KEY), {schema: 1, accounts: {}}) || {schema: 1, accounts: {}};
@@ -90,6 +104,13 @@ async function firebaseModules() {
     const firebaseApp = app.getApps().find(item => item.name === FIREBASE_APP_NAME) || app.initializeApp(FIREBASE_CONFIG, FIREBASE_APP_NAME);
     const authInstance = auth.getAuth(firebaseApp);
     const db = firestore.getFirestore(firebaseApp);
+    const emulatorMode = typeof location !== "undefined"
+      && ["127.0.0.1", "localhost"].includes(location.hostname)
+      && new URLSearchParams(location.search).get("firebaseEmulator") === "1";
+    if (emulatorMode) {
+      auth.connectAuthEmulator(authInstance, "http://127.0.0.1:9099", {disableWarnings: true});
+      firestore.connectFirestoreEmulator(db, "127.0.0.1", 8080);
+    }
     return {app, auth, firestore, firebaseApp, authInstance, db};
   });
   return modulesPromise;
@@ -197,29 +218,69 @@ async function readRemoteAttempts(refs, firestore) {
 }
 
 async function syncAttempts(profileId, refs, firestore) {
-  const local = collectAttempts(profileId);
+  const localRaw = collectAttempts(profileId);
+  const local = localRaw.map(normalizeAttempt).filter(Boolean);
   const remote = await readRemoteAttempts(refs, firestore);
+  const remoteCanonical = new Map();
+
+  for (const [remoteDocId, item] of remote) {
+    const attempt = normalizeAttempt(item.attempt);
+    const canonicalId = attemptDocId(attempt);
+    const existing = remoteCanonical.get(canonicalId);
+    const aliases = [...(existing?.aliases || []), remoteDocId];
+    const winner = !existing || attemptTimestamp(attempt) >= attemptTimestamp(existing.attempt)
+      ? {...item, attempt, aliases}
+      : {...existing, aliases};
+    remoteCanonical.set(canonicalId, winner);
+  }
+
   const byId = new Map();
-  for (let index = 0; index < local.length; index += 1) byId.set(attemptDocId(local[index], index), local[index]);
-  for (const [id, item] of remote) if (!byId.has(id)) byId.set(id, item.attempt);
-  const merged = [...byId.values()].sort((a, b) => timestampOf(b.finishedAt || b.savedAt) - timestampOf(a.finishedAt || a.savedAt)).slice(0, 250);
-  const localSerialized = JSON.stringify(local);
+  for (const attempt of local) byId.set(attemptDocId(attempt), attempt);
+  for (const [canonicalId, item] of remoteCanonical) if (!byId.has(canonicalId)) byId.set(canonicalId, item.attempt);
+
+  const merged = [...byId.values()]
+    .sort((a, b) => attemptTimestamp(b) - attemptTimestamp(a))
+    .slice(0, 250);
+  const localSerialized = JSON.stringify(localRaw);
   const mergedSerialized = JSON.stringify(merged);
   if (localSerialized !== mergedSerialized) localStorage.setItem(historyKey(profileId), mergedSerialized);
 
-  let batch = firestore.writeBatch(refs.profileRef.firestore || (await firebaseModules()).db);
+  const db = refs.profileRef.firestore || (await firebaseModules()).db;
+  let batch = firestore.writeBatch(db);
   let writes = 0;
-  for (let index = 0; index < merged.length; index += 1) {
-    const attempt = merged[index];
-    const id = attemptDocId(attempt, index);
+  const flush = async () => {
+    if (!writes) return;
+    await batch.commit();
+    batch = firestore.writeBatch(db);
+    writes = 0;
+  };
+
+  for (const attempt of merged) {
+    const id = attemptDocId(attempt);
     const payload = JSON.stringify(attempt);
     const hash = fnv1a(payload);
-    if (remote.get(id)?.hash === hash) continue;
-    batch.set(firestore.doc(refs.attempts, id), {payload, hash, updatedAt: Date.now(), serverUpdatedAt: firestore.serverTimestamp()}, {merge: true});
-    writes += 1;
-    if (writes === 400) { await batch.commit(); batch = firestore.writeBatch((await firebaseModules()).db); writes = 0; }
+    const canonicalRemote = remote.get(id);
+    if (canonicalRemote?.hash !== hash) {
+      batch.set(firestore.doc(refs.attempts, id), {
+        payload,
+        hash,
+        stableIdSchema: 2,
+        updatedAt: Date.now(),
+        serverUpdatedAt: firestore.serverTimestamp(),
+      }, {merge: true});
+      writes += 1;
+    }
+
+    const aliases = remoteCanonical.get(id)?.aliases || [];
+    for (const alias of aliases) {
+      if (alias === id) continue;
+      batch.delete(firestore.doc(refs.attempts, alias));
+      writes += 1;
+      if (writes >= 380) await flush();
+    }
+    if (writes >= 380) await flush();
   }
-  if (writes) await batch.commit();
+  await flush();
 }
 
 async function syncState(profileId, refs, firestore, db, uid) {

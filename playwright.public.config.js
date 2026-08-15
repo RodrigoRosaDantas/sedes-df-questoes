@@ -20,6 +20,7 @@ export default defineConfig({
     "pwa-offline-v2-22.spec.js",
     "cloud-progress-v1.spec.js",
     "work-convergence-v1.spec.js",
+    "audit-hardening-v1.spec.js",
   ],
   timeout: 240000,
   retries: 1,
