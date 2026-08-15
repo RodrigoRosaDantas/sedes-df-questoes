@@ -12,10 +12,13 @@ concurrency:
   group: validate-public-release-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  PLAYWRIGHT_VERSION: 1.61.1
+
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Baixar o commit sob revisão
         uses: actions/checkout@v6
@@ -32,3 +35,25 @@ jobs:
           set -euo pipefail
           RELEASE_SOURCE_SHA="$(git rev-parse HEAD)" npm run check
           node scripts/validate-cloud-progress-v1.mjs
+      - name: Instalar navegador de teste isoladamente
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm --cache "${RUNNER_TEMP}/npm-cache" install --no-save --package-lock=false "@playwright/test@${PLAYWRIGHT_VERSION}"
+          npx playwright install --with-deps chromium
+      - name: Executar a suíte pública contra o artefato local
+        env:
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          PUBLIC_BASE_URL: http://127.0.0.1:4173/
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4173 --directory dist >"${RUNNER_TEMP}/sedes-local-server.log" 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "${SERVER_PID}" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 20); do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then break; fi
+            sleep 0.25
+          done
+          curl -fsS http://127.0.0.1:4173/ >/dev/null
+          npx playwright test --config=playwright.public.config.js --workers=1 --retries=0
