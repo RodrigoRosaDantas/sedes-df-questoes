@@ -23,10 +23,10 @@ const pagesTriggers = triggerBlock(pages);
 requireMarkers(pagesTriggers, ["workflow_dispatch:"], "Gatilhos de Pages");
 forbidMarkers(pagesTriggers, ["push:", "pull_request:", "schedule:"], "Gatilhos de Pages");
 requireMarkers(pages, [
-  "source_sha:",
-  "confirmation:",
-  "NAO_PUBLICAR",
-  "PUBLICAR",
+  "AUTHORIZED_SOURCE_SHA: ${{ github.sha }}",
+  "AUTHORIZED_REF: ${{ github.ref_name }}",
+  'test "${AUTHORIZED_REF}" = "main"',
+  'ref: ${{ env.AUTHORIZED_SOURCE_SHA }}',
   "contents: read",
   "pages: write",
   "id-token: write",
@@ -42,6 +42,10 @@ requireMarkers(pages, [
   "verify-deployment.mjs",
 ], "Publicação manual");
 forbidMarkers(pages, [
+  "inputs:",
+  "source_sha:",
+  "confirmation:",
+  "NAO_PUBLICAR",
   "contents: write",
   "secrets.NOTION_TOKEN",
   "export-notion-snapshot.mjs",
@@ -70,5 +74,5 @@ for (const file of workflows) {
 
 console.log(
   `✓ Governança limitada validada em ${workflows.length} workflows: PR somente leitura, `
-  + "deploy manual por SHA exato e rotinas de Notion/rastreabilidade sem gatilhos automáticos.",
+  + "deploy manual por clique com SHA capturado no acionamento e rotinas de Notion/rastreabilidade sem gatilhos automáticos.",
 );
