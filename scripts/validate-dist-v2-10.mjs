@@ -22,6 +22,9 @@ const required = [
   "assets/navigation-v2-15.css",
   "assets/navigation-v2-15-polish.js",
   "assets/navigation-v2-15-polish.css",
+  "assets/work-convergence-v1.js",
+  "assets/work-convergence-v1.css",
+  "data/release/content-model-v1.json",
   "data/release/catalogo.json",
   "data/release/study-index.json",
   "data/release/build-info.json",
@@ -48,6 +51,9 @@ for (const reference of [
   "navigation-v2-15-polish.css?v=1",
   "navigation-v2-15.js?v=1",
   "navigation-v2-15-polish.js?v=1",
+  "work-convergence-v1.css?v=1",
+  "work-convergence-v1.js?v=1",
+  "report-v2-13.js?v=2",
 ]) {
   if (!index.includes(reference)) throw new Error(`Referência ausente no HTML: ${reference}`);
 }
@@ -56,11 +62,12 @@ const packageData = JSON.parse(fs.readFileSync(path.join(root, "package.json"), 
 const versionToken = String(packageData.version || "").replace(/\./g, "-");
 if (!/^\d+-\d+-\d+$/.test(versionToken)) throw new Error(`Versão inválida no package.json: ${packageData.version || "ausente"}.`);
 const expectedBuilder = `copy-public-v${versionToken}`;
-const expectedCacheVersion = `sedes-questoes-v${versionToken}-r5`;
+const expectedCacheVersion = `sedes-questoes-v${versionToken}-r6`;
 
 const catalog = JSON.parse(fs.readFileSync(path.join(dist, "data/release/catalogo.json"), "utf8"));
 const buildInfo = JSON.parse(fs.readFileSync(path.join(dist, "data/release/build-info.json"), "utf8"));
 const releaseMeta = JSON.parse(fs.readFileSync(path.join(dist, "data/release/release-meta.json"), "utf8"));
+const contentModel = JSON.parse(fs.readFileSync(path.join(dist, "data/release/content-model-v1.json"), "utf8"));
 const materialFiles = fs.readdirSync(path.join(dist, "data/release/materials")).filter(file => file.endsWith(".json")).length;
 const questionCount = Object.keys(catalog.question_index || {}).length;
 const materialCount = (catalog.materials || []).length;
@@ -85,6 +92,7 @@ if (buildInfo.catalog_schema_version !== (catalog.schema_version || null)) throw
 if (buildInfo.questions !== questionCount || buildInfo.materials !== materialCount || buildInfo.material_files !== materialFiles) throw new Error("Proveniência do pacote diverge do catálogo publicado.");
 if (releaseMeta.questions !== questionCount || releaseMeta.materials !== materialCount) throw new Error("Release-meta diverge do catálogo publicado.");
 if (questionCount !== Number(catalog.summary?.questoes) || materialCount !== Number(catalog.summary?.materiais)) throw new Error("Resumo do catálogo diverge dos dados reais.");
+if (Number(contentModel.schema) !== 1 || Number(contentModel.question_count) !== questionCount || Number(contentModel.material_count) !== materialCount) throw new Error("Modelo normalizado diverge do catálogo.");
 
 const learning = fs.readFileSync(path.join(dist, "assets/learning-v2-9.js"), "utf8");
 for (const marker of ["cleanHomeLayerEnabled", 'script[src*="navigation-v2-15.js"]', "if (cleanHomeLayerEnabled()) return;"]) {
@@ -100,6 +108,10 @@ const downloads = fs.readFileSync(path.join(dist, "assets/material-downloads-v1.
 for (const marker of ["data-material-download-card", "PDF para responder", "PDF comentado", "printableDocument"]) {
   if (!downloads.includes(marker)) throw new Error(`Download de materiais ausente: ${marker}`);
 }
+const convergence = fs.readFileSync(path.join(dist, "assets/work-convergence-v1.js"), "utf8");
+for (const marker of ["primaryProfileId", "preferences.v1", "data-work-direct-pdf", "application/pdf", "SEDES_WORK_CONVERGENCE"]) {
+  if (!convergence.includes(marker)) throw new Error(`Convergência Work ausente: ${marker}`);
+}
 
 const worker = fs.readFileSync(path.join(dist, "service-worker.js"), "utf8");
 for (const marker of [
@@ -114,6 +126,9 @@ for (const marker of [
   "ux-v2-14-guardrails.js?v=1",
   "navigation-v2-15.js?v=1",
   "navigation-v2-15-polish.js?v=1",
+  "work-convergence-v1.js?v=1",
+  "work-convergence-v1.css?v=1",
+  "content-model-v1",
   "question-search-index",
   "build-info.json",
   'event.request.mode === "navigate"',
@@ -131,4 +146,4 @@ for (const forbidden of ["scripts", ".github", "data/consolidated", "data/true-f
   if (fs.existsSync(path.join(dist, forbidden))) throw new Error(`Conteúdo privado exposto no dist: ${forbidden}`);
 }
 
-console.log(`✓ Dist ${packageData.version} validado: cache ${expectedCacheVersion}, ${questionCount} questões, ${materialCount} materiais, UX v2.15, PWA e proveniência canônica completa.`);
+console.log(`✓ Dist ${packageData.version} validado: cache ${expectedCacheVersion}, ${questionCount} questões, ${materialCount} materiais, convergência Work, PWA e proveniência canônica completa.`);

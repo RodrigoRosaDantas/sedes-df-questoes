@@ -19,6 +19,7 @@ export default defineConfig({
     "home-question-format-v2-21.spec.js",
     "pwa-offline-v2-22.spec.js",
     "cloud-progress-v1.spec.js",
+    "work-convergence-v1.spec.js",
   ],
   timeout: 240000,
   retries: 1,

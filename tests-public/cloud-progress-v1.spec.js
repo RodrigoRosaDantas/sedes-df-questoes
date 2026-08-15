@@ -48,7 +48,7 @@ test("abertura offline recupera a inicialização da nuvem quando a conexão vol
   await expect(page.locator("[data-cloud-progress]")).toBeVisible({timeout: 30000});
 });
 
-test("release publica hashes SHA-256 da camada Firebase e Central de comando", async ({request}) => {
+test("release publica hashes SHA-256 das camadas Firebase, Work e reporte", async ({request}) => {
   const releaseResponse = await request.get("./data/release/release-meta.json?cloud-audit=1");
   const buildResponse = await request.get("./data/release/build-info.json?cloud-audit=1");
   expect(releaseResponse.ok()).toBeTruthy();
@@ -59,6 +59,9 @@ test("release publica hashes SHA-256 da camada Firebase e Central de comando", a
     platform_cloud_progress_js: "assets/cloud-progress-v1.js",
     platform_cloud_progress_css: "assets/cloud-progress-v1.css",
     platform_work_command_center_js: "assets/work-command-center-v1.js",
+    platform_work_convergence_js: "assets/work-convergence-v1.js",
+    platform_work_convergence_css: "assets/work-convergence-v1.css",
+    platform_question_report_js: "assets/report-v2-13.js",
   };
 
   for (const [key, relative] of Object.entries(targets)) {
@@ -68,6 +71,7 @@ test("release publica hashes SHA-256 da camada Firebase e Central de comando", a
     expect(release.source_files_sha256?.[key], `release ${key}`).toBe(digest);
     expect(build.source_files_sha256?.[key], `build ${key}`).toBe(digest);
   }
-  expect(release.cloud_progress_provenance?.files).toBe(3);
-  expect(build.cloud_progress_provenance?.files).toBe(3);
+  const protectedFiles = Object.keys(targets).length;
+  expect(release.cloud_progress_provenance?.files).toBe(protectedFiles);
+  expect(build.cloud_progress_provenance?.files).toBe(protectedFiles);
 });
