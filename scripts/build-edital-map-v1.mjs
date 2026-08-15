@@ -58,6 +58,16 @@ function isMultipleChoiceAE(question) {
   return /^[A-E]$/i.test(String(question.gabarito || "").trim());
 }
 
+function isTrueFalse(question) {
+  if (question?.anulada === true) return false;
+  const alternatives = question?.alternativas;
+  if (!alternatives || Array.isArray(alternatives) || typeof alternatives !== "object") return false;
+  const keys = Object.keys(alternatives).map(key => normalize(key));
+  const hasPair = keys.includes("certo") && keys.includes("errado");
+  const answer = normalize(question.gabarito);
+  return hasPair && (answer === "certo" || answer === "errado");
+}
+
 const sectionsById = new Map((matrix.sections || []).map(section => [section.id, section]));
 const items = new Map();
 for (const section of matrix.sections || []) {
@@ -72,6 +82,8 @@ for (const section of matrix.sections || []) {
       targets: section.targets || ["202", "400"],
       question_ids: [],
       ae_question_ids: [],
+      ce_question_ids: [],
+      exam_question_ids: [],
     });
   }
 }
@@ -79,6 +91,8 @@ for (const section of matrix.sections || []) {
 const allQuestionIds = new Set();
 const mappedQuestionIds = new Set();
 const aeQuestionIds = new Set();
+const ceQuestionIds = new Set();
+const questionFormats = {};
 for (const materialMeta of catalog.materials || []) {
   const file = materialMeta.file;
   if (!file || !fs.existsSync(resolve(file))) throw new Error(`Material do catálogo não encontrado: ${file || materialMeta.id}.`);
@@ -87,13 +101,18 @@ for (const materialMeta of catalog.materials || []) {
     if (!question.id || allQuestionIds.has(question.id)) throw new Error(`Questão ausente ou repetida durante o mapeamento: ${question.id || "sem ID"}.`);
     allQuestionIds.add(question.id);
     const ae = isMultipleChoiceAE(question);
+    const ce = isTrueFalse(question);
     if (ae) aeQuestionIds.add(question.id);
+    if (ce) ceQuestionIds.add(question.id);
+    questionFormats[question.id] = ae ? "A–E" : ce ? "Certo/Errado" : "Outro";
     for (const section of matrix.sections || []) {
       for (const sourceItem of section.items || []) {
         if (!matchesItem(question, sourceItem)) continue;
         const targetItem = items.get(sourceItem.id);
         targetItem.question_ids.push(question.id);
         if (ae) targetItem.ae_question_ids.push(question.id);
+        if (ce) targetItem.ce_question_ids.push(question.id);
+        if (ae || ce) targetItem.exam_question_ids.push(question.id);
         mappedQuestionIds.add(question.id);
       }
     }
@@ -114,14 +133,18 @@ for (const [targetCode, target] of Object.entries(matrix.targets || {})) {
   const specificItemIds = (target.specific_section_ids || []).flatMap(sectionItemIds);
   const generalIds = unionForItems(generalItemIds, "question_ids");
   const generalAeIds = unionForItems(generalItemIds, "ae_question_ids");
+  const generalCeIds = unionForItems(generalItemIds, "ce_question_ids");
+  const generalExamIds = unionForItems(generalItemIds, "exam_question_ids");
   const specificIds = unionForItems(specificItemIds, "question_ids");
   const specificAeIds = unionForItems(specificItemIds, "ae_question_ids");
-  const mariaAeIds = items.get("geral-df-maria-penha")?.ae_question_ids || [];
+  const specificCeIds = unionForItems(specificItemIds, "ce_question_ids");
+  const specificExamIds = unionForItems(specificItemIds, "exam_question_ids");
+  const mariaExamIds = items.get("geral-df-maria-penha")?.exam_question_ids || [];
   const blueprint = matrix.objective_blueprint || {};
   const deficits = {
-    general: Math.max(0, Number(blueprint.general_questions || 20) - generalAeIds.length),
-    specific: Math.max(0, Number(blueprint.specific_questions || 40) - specificAeIds.length),
-    maria_da_penha: Math.max(0, Number(blueprint.maria_da_penha_minimum_questions || 3) - mariaAeIds.length),
+    general: Math.max(0, Number(blueprint.general_questions || 20) - generalExamIds.length),
+    specific: Math.max(0, Number(blueprint.specific_questions || 40) - specificExamIds.length),
+    maria_da_penha: Math.max(0, Number(blueprint.maria_da_penha_minimum_questions || 3) - mariaExamIds.length),
   };
   targets[targetCode] = {
     label: target.label,
@@ -130,15 +153,23 @@ for (const [targetCode, target] of Object.entries(matrix.targets || {})) {
     specific_item_ids: specificItemIds,
     general_question_ids: generalIds,
     general_ae_question_ids: generalAeIds,
+    general_ce_question_ids: generalCeIds,
+    general_exam_question_ids: generalExamIds,
     specific_question_ids: specificIds,
     specific_ae_question_ids: specificAeIds,
-    maria_da_penha_ae_question_ids: unique(mariaAeIds),
+    specific_ce_question_ids: specificCeIds,
+    specific_exam_question_ids: specificExamIds,
+    maria_da_penha_exam_question_ids: unique(mariaExamIds),
     readiness: {
       ready: deficits.general === 0 && deficits.specific === 0 && deficits.maria_da_penha === 0,
       deficits,
+      general_exam: generalExamIds.length,
       general_ae: generalAeIds.length,
+      general_ce: generalCeIds.length,
+      specific_exam: specificExamIds.length,
       specific_ae: specificAeIds.length,
-      maria_da_penha_ae: unique(mariaAeIds).length,
+      specific_ce: specificCeIds.length,
+      maria_da_penha_exam: unique(mariaExamIds).length,
     },
   };
 }
@@ -155,25 +186,38 @@ const publicSections = (matrix.sections || []).map(section => ({
       label: item.label,
       question_count: item.question_ids.length,
       ae_question_count: item.ae_question_ids.length,
+      ce_question_count: item.ce_question_ids.length,
+      exam_question_count: item.exam_question_ids.length,
       question_ids: unique(item.question_ids),
       ae_question_ids: unique(item.ae_question_ids),
+      ce_question_ids: unique(item.ce_question_ids),
+      exam_question_ids: unique(item.exam_question_ids),
     };
   }),
 }));
 
 const output = {
-  schema_version: "1.0",
+  schema_version: "1.1",
   matrix_version: matrix.matrix_version,
   generated_at: new Date().toISOString(),
   matrix_sha256: sha256(matrixText),
   source: matrix.source,
   objective_blueprint: matrix.objective_blueprint,
+  simulation_policy: {
+    preserves_official_blocks_and_weights: true,
+    preserves_original_question_format: true,
+    accepted_question_formats: ["multiple_choice_ae", "true_false"],
+    note: "A prova oficial prevista no edital é A–E; a simulação aceita também Certo/Errado do acervo Quadrix para ampliar a prática de conteúdo sem converter a questão original.",
+  },
   general_section_ids: matrix.general_section_ids,
   targets,
   sections: publicSections,
+  question_formats: questionFormats,
   summary: {
     catalog_questions: allQuestionIds.size,
     catalog_multiple_choice_ae: aeQuestionIds.size,
+    catalog_true_false: ceQuestionIds.size,
+    catalog_exam_eligible: new Set([...aeQuestionIds, ...ceQuestionIds]).size,
     mapped_questions: mappedQuestionIds.size,
     unmapped_questions: allQuestionIds.size - mappedQuestionIds.size,
     official_items: items.size,
@@ -184,6 +228,6 @@ fs.mkdirSync(path.dirname(distPath), {recursive: true});
 fs.writeFileSync(distPath, `${JSON.stringify(output, null, 2)}\n`);
 for (const [code, target] of Object.entries(targets)) {
   const status = target.readiness.ready ? "apta" : `bloqueada (${JSON.stringify(target.readiness.deficits)})`;
-  console.log(`✓ Matriz ${code}: ${target.readiness.general_ae} gerais A–E, ${target.readiness.specific_ae} específicas A–E, ${target.readiness.maria_da_penha_ae} Maria da Penha A–E — Prova Real ${status}.`);
+  console.log(`✓ Matriz ${code}: ${target.readiness.general_exam} gerais elegíveis (${target.readiness.general_ae} A–E + ${target.readiness.general_ce} C/E), ${target.readiness.specific_exam} específicas elegíveis (${target.readiness.specific_ae} A–E + ${target.readiness.specific_ce} C/E), ${target.readiness.maria_da_penha_exam} Maria da Penha — Prova Real ${status}.`);
 }
 console.log(`✓ Edital verticalizado gerado: ${items.size} itens oficiais, ${mappedQuestionIds.size}/${allQuestionIds.size} questões mapeadas sem usar enunciado como classificador.`);
