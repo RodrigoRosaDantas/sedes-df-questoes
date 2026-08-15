@@ -38,8 +38,10 @@ async function openFirstMaterial(page, request, catalog, view) {
   await materialCard.locator("[data-open-material]").click();
   const downloadCard = page.locator("[data-material-download-card]");
   await expect(downloadCard).toBeVisible({timeout: 30000});
-  await expect(downloadCard.getByRole("button", {name: "PDF para responder"})).toBeVisible();
-  await expect(downloadCard.getByRole("button", {name: "PDF comentado"})).toBeVisible();
+  await expect(downloadCard.getByRole("button", {name: "Baixar PDF direto"})).toBeVisible();
+  await expect(downloadCard.getByRole("button", {name: "Baixar PDF comentado"})).toBeVisible();
+  await expect(downloadCard.getByRole("button", {name: "Imprimir versão completa"})).toBeVisible();
+  await expect(downloadCard.getByRole("button", {name: "Imprimir comentado"})).toBeVisible();
   return {downloadCard, material, materialName};
 }
 
@@ -69,22 +71,27 @@ async function assertQuestionsDocument(popup, material, materialName, withAnswer
   }
 }
 
-test("site público gera PDFs íntegros de provas e simulados", async ({page, request}) => {
+test("site público baixa PDF direto e preserva impressão completa de provas e simulados", async ({page, request}) => {
   const catalog = await loadCatalog(request);
 
   for (const view of ["provas", "simulados"]) {
     const {downloadCard, material, materialName} = await openFirstMaterial(page, request, catalog, view);
 
+    const downloadPromise = page.waitForEvent("download");
+    await downloadCard.getByRole("button", {name: "Baixar PDF direto"}).click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toMatch(/\.pdf$/i);
+
     const questionsPopup = await openGeneratedDocument(
       page,
-      downloadCard.getByRole("button", {name: "PDF para responder"}),
+      downloadCard.getByRole("button", {name: "Imprimir versão completa"}),
     );
     await assertQuestionsDocument(questionsPopup, material, materialName, false);
     await questionsPopup.close();
 
     const commentedPopup = await openGeneratedDocument(
       page,
-      downloadCard.getByRole("button", {name: "PDF comentado"}),
+      downloadCard.getByRole("button", {name: "Imprimir comentado"}),
     );
     await assertQuestionsDocument(commentedPopup, material, materialName, true);
     await commentedPopup.close();
