@@ -38,7 +38,14 @@ async function loadMaterial() {
 }
 
 function questionImages(question) {
-  const raw = [question?.imagem, question?.imagem_url, question?.image, ...(Array.isArray(question?.imagens) ? question.imagens : [])];
+  const mapped = window.SEDES_QUESTION_VISUALS?.forText?.(question?.enunciado || "");
+  const raw = [
+    question?.imagem,
+    question?.imagem_url,
+    question?.image,
+    ...(Array.isArray(question?.imagens) ? question.imagens : []),
+    mapped?.src,
+  ];
   const values = [];
   for (const item of raw) {
     if (!item) continue;
