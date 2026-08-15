@@ -43,8 +43,9 @@ requireMarkers(navigation, [
 ], "Navegação v2.15");
 if (navigation.includes('location.hash = "#/perfil";')) throw new Error("Navegação v2.15 voltou a depender da rota legada #/perfil.");
 requireMarkers(navigationPolish, [
-  "relativeSync",
-  "sincronizado há",
+  "relativeCatalogAge",
+  "Catálogo oficial atualizado em",
+  "atualizado há",
   "ux15-breadcrumb",
   'aria-current="page"',
   "focusSearchWhenReady",
@@ -71,8 +72,8 @@ requireMarkers(navigationPolish, [
   "button.tabIndex = active ? 0 : -1",
 ], "Polimento da navegação v2.15");
 requireMarkers(css, ["ux15-home-active", "ux15-home-grid", "ux15-settings-page", "ux15-sync-card", "ux15-facts-grid"], "CSS v2.15");
-requireMarkers(polishCss, ["ux15-clean-home", "ux15-settings-route", "ux15-sync-age", "ux15-breadcrumb", "ux15-role-templates", "data-ux15-open-question", ".brand strong{display:none}", ".top-actions{gap:6px}", "fresh", "attention", "stale"], "CSS de polimento v2.15");
-requireMarkers(builder, ["platform_navigation_js", "platform_navigation_css", "platform_navigation_polish_js", "platform_navigation_polish_css", "navigation-v2-15-polish.js", "navigation-v2-15-polish.css"], "Build público");
+requireMarkers(polishCss, ["ux15-clean-home", "ux15-settings-route", "ux15-sync-age", "ux15-sync-age.catalog", "ux15-breadcrumb", "ux15-role-templates", "data-ux15-open-question", ".brand strong{display:none}", ".top-actions{gap:6px}"], "CSS de polimento v2.15");
+requireMarkers(builder, ["platform_navigation_js", "platform_navigation_css", "platform_navigation_polish_js", "platform_navigation_polish_css", "navigation-v2-15-polish.js", "navigation-v2-15-polish.css", "relativeCatalogAge", "Catálogo oficial atualizado em"], "Build público");
 requireMarkers(publicPlaywright, ["release-contract.spec.js", "dashboard-card.spec.js", "material-downloads.spec.js", "platform-v2-13.spec.js", "ux-v2-14.spec.js", "navigation-v2-15.spec.js"], "Playwright público");
 requireMarkers(packageData, ['"check": "node scripts/verify-public-release.mjs"'], "npm check");
 requireMarkers(publicVerifier, ['const syntaxFiles = git(["ls-files"])', 'run("--check", [file])'], "Auditoria de sintaxe");
@@ -80,6 +81,7 @@ requireMarkers(deploymentVerifier, ["enhanceReleaseMetadata", "data-release-foot
 if (deploymentVerifier.includes("Integridade da publicação")) throw new Error("Verificador público ainda depende do cartão técnico removido da Home.");
 requireMarkers(publicReleaseContract, ["arquitetura v2.15", "perfil/configuracoes", "[data-ux15-home]", "[data-official-exam-card]", "[data-adaptive-review]"], "Contrato público da release");
 requireMarkers(publicDashboard, ["Configurações usa o release-meta reconciliado", "Banco Mestre", "navigation-v2-15.js?v=1"], "Smoke público do painel");
+requireMarkers(publicNavigation, ["distingue catálogo de progresso", "Catálogo oficial atualizado em", "atualizad", "catalog"], "Smoke público da separação catálogo/progresso");
 requireMarkers(publicUx, ["[data-ux15-open-question]", "question-search-index.json", "catalogo.json"], "Smoke público da busca");
 requireMarkers(localNavigation, ["ux15-settings-panel", "aria-controls", "tabpanel", "aria-labelledby", "aria-current=page", "ArrowRight", "End", "Home", "#install-app", "scrollWidth <= element.clientWidth"], "Teste local de acessibilidade e PWA mobile");
 
@@ -111,4 +113,4 @@ if (exists("dist")) {
   }
 }
 
-console.log("✓ Navegação v2.15 validada: Home limpa, Configurações com painel ARIA estável, PWA mobile sem overflow, simulados por cargo, busca individual e contrato público atual.");
+console.log("✓ Navegação v2.15 validada: Home limpa, catálogo oficial separado do progresso pessoal, Configurações com painel ARIA estável, PWA mobile sem overflow, simulados por cargo, busca individual e contrato público atual.");

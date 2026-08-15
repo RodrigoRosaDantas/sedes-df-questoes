@@ -31,17 +31,17 @@ function syncTimestamp() {
   return state.release?.exported_at || state.catalog?.exported_at || null;
 }
 
-function relativeSync(value) {
+function relativeCatalogAge(value) {
   const time = new Date(value || 0).getTime();
-  if (!Number.isFinite(time) || time <= 0) return {label: "sincronização indisponível", state: "stale"};
+  if (!Number.isFinite(time) || time <= 0) return {label: "data do catálogo indisponível", state: "catalog"};
   const minutes = Math.max(0, Math.floor((Date.now() - time) / 60000));
-  if (minutes < 1) return {label: "sincronizado agora", state: "fresh"};
-  if (minutes < 60) return {label: `sincronizado há ${minutes} min`, state: "fresh"};
+  if (minutes < 1) return {label: "atualizado agora", state: "catalog"};
+  if (minutes < 60) return {label: `atualizado há ${minutes} min`, state: "catalog"};
   const hours = Math.floor(minutes / 60);
   const rest = minutes % 60;
-  if (hours < 24) return {label: `sincronizado há ${hours}h${rest ? ` ${rest}min` : ""}`, state: "fresh"};
+  if (hours < 24) return {label: `atualizado há ${hours}h${rest ? ` ${rest}min` : ""}`, state: "catalog"};
   const days = Math.floor(hours / 24);
-  return {label: `sincronizado há ${days} dia${days === 1 ? "" : "s"}`, state: days <= 3 ? "attention" : "stale"};
+  return {label: `atualizado há ${days} dia${days === 1 ? "" : "s"}`, state: "catalog"};
 }
 
 function absoluteSync(value) {
@@ -54,10 +54,18 @@ function absoluteSync(value) {
   }).format(date);
 }
 
+function labelCatalogTimestamp(node) {
+  const parent = node?.parentElement;
+  if (!parent) return;
+  const textNode = [...parent.childNodes].find(child => child.nodeType === Node.TEXT_NODE && child.textContent.trim());
+  if (textNode && /sincroniza|catálogo|catalogo/i.test(textNode.textContent)) textNode.nodeValue = "Catálogo oficial atualizado em ";
+}
+
 function enhanceSyncStatus() {
   const timestamp = syncTimestamp();
-  const relative = relativeSync(timestamp);
+  const relative = relativeCatalogAge(timestamp);
   document.querySelectorAll("[data-ux15-sync-time]").forEach(node => {
+    labelCatalogTimestamp(node);
     const parent = node.parentElement;
     if (!parent || parent.querySelector("[data-ux15-sync-age]")) return;
     const badge = document.createElement("em");
@@ -70,10 +78,10 @@ function enhanceSyncStatus() {
     const className = `ux15-sync-age ${relative.state}`;
     if (node.className !== className) node.className = className;
     if (node.textContent !== relative.label) node.textContent = relative.label;
-    node.title = `Última sincronização do catálogo: ${absoluteSync(timestamp)} · horário de Brasília`;
+    node.title = `Catálogo oficial atualizado em ${absoluteSync(timestamp)} · horário de Brasília`;
   });
   const shell = document.querySelector("#sync-label");
-  if (shell) shell.title = `${relative.label}. Última sincronização: ${absoluteSync(timestamp)} · horário de Brasília`;
+  if (shell) shell.title = `Catálogo oficial ${relative.label}. Atualização: ${absoluteSync(timestamp)} · horário de Brasília`;
 }
 
 const ROUTES = {

@@ -2,6 +2,7 @@ import {activeSession, currentRoute, observeApp} from "./shared-v2-13.js?v=1";
 
 const CLOUD_RECOVERY_KEY = "sedes.questoes.cloudRecovery.v1";
 let lastCloudKind = document.querySelector("[data-cloud-progress]")?.dataset.cloudState || null;
+let lastCloudSyncAt = window.SEDES_CLOUD_PROGRESS?.getState?.()?.lastSyncAt || null;
 const startedOffline = !navigator.onLine || lastCloudKind === "offline";
 
 function routeTo(route) {
@@ -25,16 +26,31 @@ function startNow() {
   document.querySelector("[data-ux15-start], [data-ux-start-today]")?.focus();
 }
 
+function progressSyncAge(value) {
+  const time = Number(value || 0);
+  if (!Number.isFinite(time) || time <= 0) return "";
+  const seconds = Math.max(0, Math.floor((Date.now() - time) / 1000));
+  if (seconds < 60) return "agora";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `há ${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `há ${hours}h`;
+  const days = Math.floor(hours / 24);
+  return `há ${days} dia${days === 1 ? "" : "s"}`;
+}
+
 function cloudStateText() {
   const cloud = window.SEDES_CLOUD_PROGRESS?.getState?.();
-  if (lastCloudKind === "saved") return "progresso sincronizado na conta";
+  const syncedAt = lastCloudSyncAt || cloud?.lastSyncAt || null;
+  const age = progressSyncAge(syncedAt);
+  if (lastCloudKind === "saved") return `progresso salvo na conta${age ? ` · ${age}` : ""}`;
   if (lastCloudKind === "saving") return "sincronizando seu progresso";
   if (lastCloudKind === "error") return "progresso local; falha ao sincronizar";
   if (lastCloudKind === "offline") return "offline; progresso salvo localmente";
   if (lastCloudKind === "signed-out") return "progresso local; entre para sincronizar";
   if (!cloud?.signedIn) return "progresso local; entre para sincronizar";
   if (cloud.syncing) return "sincronizando seu progresso";
-  return cloud.lastSyncAt ? "progresso sincronizado na conta" : "conta conectada";
+  return syncedAt ? `progresso salvo na conta${age ? ` · ${age}` : ""}` : "conta conectada";
 }
 function updateCloudCopy() {
   const value = cloudStateText();
@@ -44,6 +60,7 @@ function updateCloudCopy() {
 }
 function handleCloudStatus(event) {
   lastCloudKind = event.detail?.kind || document.querySelector("[data-cloud-progress]")?.dataset.cloudState || lastCloudKind;
+  lastCloudSyncAt = event.detail?.lastSyncAt || window.SEDES_CLOUD_PROGRESS?.getState?.()?.lastSyncAt || lastCloudSyncAt;
   updateCloudCopy();
 }
 function recoverCloudAfterOfflineStart() {

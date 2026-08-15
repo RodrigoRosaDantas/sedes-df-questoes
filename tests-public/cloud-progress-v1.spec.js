@@ -17,8 +17,8 @@ test("controle de nuvem e Central de comando expõem estados coerentes", async (
   const progress = page.locator("[data-work-cloud-state]");
   await page.evaluate(() => window.dispatchEvent(new CustomEvent("sedes:cloud-status", {detail: {kind: "saving"}})));
   await expect(progress).toHaveText("sincronizando seu progresso");
-  await page.evaluate(() => window.dispatchEvent(new CustomEvent("sedes:cloud-status", {detail: {kind: "saved"}})));
-  await expect(progress).toHaveText("progresso sincronizado na conta");
+  await page.evaluate(() => window.dispatchEvent(new CustomEvent("sedes:cloud-status", {detail: {kind: "saved", lastSyncAt: Date.now()}})));
+  await expect(progress).toHaveText("progresso salvo na conta · agora");
   await page.evaluate(() => window.dispatchEvent(new CustomEvent("sedes:cloud-status", {detail: {kind: "error"}})));
   await expect(progress).toHaveText("progresso local; falha ao sincronizar");
   await page.evaluate(() => window.dispatchEvent(new CustomEvent("sedes:cloud-status", {detail: {kind: "offline"}})));
