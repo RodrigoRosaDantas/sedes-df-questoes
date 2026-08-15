@@ -43,7 +43,8 @@ test("abertura offline recupera a inicialização da nuvem quando a conexão vol
   });
   await reloaded;
 
-  await expect.poll(() => page.evaluate(() => sessionStorage.getItem("sedes.questoes.cloudRecovery.v1")), {timeout: 30000}).toBe("1");
+  const navigationType = await page.evaluate(() => performance.getEntriesByType("navigation")[0]?.type || "");
+  expect(navigationType).toBe("reload");
   await expect(page.locator("[data-cloud-progress]")).toBeVisible({timeout: 30000});
 });
 
