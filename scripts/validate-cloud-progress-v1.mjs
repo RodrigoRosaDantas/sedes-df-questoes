@@ -29,7 +29,7 @@ requireMarkers(builder, ["copy(\"assets\")"], "Build público");
 
 requireMarkers(cloud, [
   'const PLATFORM_ID = "sedes-df-questoes"',
-  'provider',
+  'const FIREBASE_APP_NAME = "sedes-df-questoes-progress"',
   '"users", String(uid), "apps", PLATFORM_ID',
   '"profiles", String(profileId)',
   'firestore.collection(profileRef, "state")',
