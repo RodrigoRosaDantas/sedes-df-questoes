@@ -1,4 +1,5 @@
 import "./build-edital-map-v1.mjs";
+import "./publish-study-by-role-v1.mjs";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -34,3 +35,4 @@ for (const relative of ["data/release/build-info.json", "data/release/release-me
 }
 
 console.log(`✓ Proveniência dos endurecimentos reconciliada em ${Object.keys(targets).length} arquivos SHA-256.`);
+await import("./validate-study-by-role-v1.mjs");
