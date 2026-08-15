@@ -16,6 +16,7 @@ const worker = read("service-worker.js");
 const cloud = read("assets/cloud-progress-v1.js");
 const queue = read("assets/question-report-queue-v2.js");
 const pdf = read("assets/pdf-fidelity-v2.js");
+const visuals = read("assets/question-images-v2-5.js");
 const rules = read("firebase/firestore.rules");
 const firebaseConfig = read("firebase.json");
 const workflow = read(".github/workflows/validate-public-release.yml");
@@ -45,12 +46,19 @@ requireMarkers(queue, [
   "serverQueuedAt",
 ], "Fila real de relatos");
 
+requireMarkers(visuals, [
+  "window.SEDES_QUESTION_VISUALS",
+  "forText(value)",
+  "visuals.get(String(value ?? \"\").trim())",
+], "Mapa canônico de imagens");
 requireMarkers(pdf, [
   "canvas.toBlob",
   "measureText",
   "drawImage",
   "/DCTDecode",
   "image/jpeg",
+  "SEDES_QUESTION_VISUALS?.forText",
+  "mapped?.src",
   "PDF fiel baixado com Unicode e imagens",
 ], "PDF fiel");
 forbidMarkers(pdf, ["WinAnsiEncoding", "replace(/[^\\x"], "PDF fiel");
@@ -74,4 +82,4 @@ requireMarkers(workflow, [
 ], "CI Firebase");
 requireMarkers(publicConfig, ["audit-hardening-v1.spec.js"], "Playwright público");
 
-console.log("✓ Achados da auditoria fechados estruturalmente: fila persistente, IDs estáveis, regras auditáveis, PDF fiel e teste autenticado entre aparelhos.");
+console.log("✓ Achados da auditoria fechados estruturalmente: fila persistente, IDs estáveis, regras auditáveis, PDF fiel com imagens canônicas e teste autenticado entre aparelhos.");
