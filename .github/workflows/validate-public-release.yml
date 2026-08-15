@@ -31,3 +31,4 @@ jobs:
         run: |
           set -euo pipefail
           RELEASE_SOURCE_SHA="$(git rev-parse HEAD)" npm run check
+          node scripts/validate-cloud-progress-v1.mjs
