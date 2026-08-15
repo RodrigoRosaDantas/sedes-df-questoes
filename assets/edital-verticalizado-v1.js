@@ -16,6 +16,7 @@ import {
 const MAP_URL = "./data/release/edital-map-v1.json";
 const TARGET_KEY = () => profileKey("editalVerticalizado.target.v1");
 let mapPromise = null;
+let verticalInjecting = false;
 
 function ensureStyles() {
   if (document.querySelector('link[data-edital-verticalizado-css]')) return;
@@ -166,47 +167,53 @@ function targetSummary(map, targetCode) {
 async function injectVerticalized() {
   if (currentRoute() !== "estudar") return;
   ensureStyles();
-  if (document.querySelector("[data-edital-verticalizado]")) return;
-  const map = await loadMap();
-  const targetAnchor = document.querySelector("[data-official-exam-card]") || document.querySelector("[data-ux-study-launcher]") || document.querySelector(".study-view-tabs") || document.querySelector(".page-heading") || document.querySelector("#app > *");
-  if (!targetAnchor) return;
-  const stored = readJSON(TARGET_KEY(), "202");
-  let targetCode = map.targets?.[stored] ? stored : "202";
-  const card = document.createElement("section");
-  card.className = "card edital-verticalizado";
-  card.dataset.editalVerticalizado = "";
-  card.innerHTML = `<div class="edital-head">
-      <div><p class="eyebrow">Edital verticalizado</p><h2>Estude pelo ponto exato do edital.</h2><p>Cada item oficial mostra a cobertura real do banco. O clique abre somente questões explicitamente mapeadas para aquele conteúdo.</p></div>
-      <span class="edital-source">Matriz canônica · item 20 do edital</span>
-    </div>
-    <div class="edital-targets" role="group" aria-label="Escolher cargo">
-      ${Object.entries(map.targets || {}).map(([code, target]) => `<button type="button" data-edital-target="${code}" class="${code === targetCode ? "active" : ""}"><strong>${esc(target.label)}</strong><small>${esc(target.subtitle)}</small></button>`).join("")}
-    </div>
-    <div class="edital-toolbar"><div><strong data-edital-summary></strong><small>Itens sem cobertura permanecem visíveis para mostrar o que ainda falta no acervo.</small></div><label><span>Filtrar edital</span><input type="search" data-edital-search placeholder="Ex.: ato administrativo, PNAS, AFO"></label></div>
-    <div class="edital-sections" data-edital-sections></div>`;
-  if (targetAnchor.matches?.("[data-official-exam-card]")) targetAnchor.insertAdjacentElement("beforebegin", card);
-  else targetAnchor.insertAdjacentElement("afterend", card);
+  if (verticalInjecting || document.querySelector("[data-edital-verticalizado]")) return;
+  verticalInjecting = true;
+  try {
+    const map = await loadMap();
+    if (currentRoute() !== "estudar" || document.querySelector("[data-edital-verticalizado]")) return;
+    const targetAnchor = document.querySelector("[data-official-exam-card]") || document.querySelector("[data-ux-study-launcher]") || document.querySelector(".study-view-tabs") || document.querySelector(".page-heading") || document.querySelector("#app > *");
+    if (!targetAnchor) return;
+    const stored = readJSON(TARGET_KEY(), "202");
+    let targetCode = map.targets?.[stored] ? stored : "202";
+    const card = document.createElement("section");
+    card.className = "card edital-verticalizado";
+    card.dataset.editalVerticalizado = "";
+    card.innerHTML = `<div class="edital-head">
+        <div><p class="eyebrow">Edital verticalizado</p><h2>Estude pelo ponto exato do edital.</h2><p>Cada item oficial mostra a cobertura real do banco. O clique abre somente questões explicitamente mapeadas para aquele conteúdo.</p></div>
+        <span class="edital-source">Matriz canônica · item 20 do edital</span>
+      </div>
+      <div class="edital-targets" role="group" aria-label="Escolher cargo">
+        ${Object.entries(map.targets || {}).map(([code, target]) => `<button type="button" data-edital-target="${code}" class="${code === targetCode ? "active" : ""}"><strong>${esc(target.label)}</strong><small>${esc(target.subtitle)}</small></button>`).join("")}
+      </div>
+      <div class="edital-toolbar"><div><strong data-edital-summary></strong><small>Itens sem cobertura permanecem visíveis para mostrar o que ainda falta no acervo.</small></div><label><span>Filtrar edital</span><input type="search" data-edital-search placeholder="Ex.: ato administrativo, PNAS, AFO"></label></div>
+      <div class="edital-sections" data-edital-sections></div>`;
+    if (targetAnchor.matches?.("[data-official-exam-card]")) targetAnchor.insertAdjacentElement("beforebegin", card);
+    else targetAnchor.insertAdjacentElement("afterend", card);
 
-  const repaint = () => {
-    card.querySelectorAll("[data-edital-target]").forEach(button => button.classList.toggle("active", button.dataset.editalTarget === targetCode));
-    const filter = card.querySelector("[data-edital-search]")?.value || "";
-    card.querySelector("[data-edital-sections]").innerHTML = renderSections(map, targetCode, filter);
-    card.querySelector("[data-edital-summary]").textContent = `${map.targets[targetCode].label} · ${targetSummary(map, targetCode)}`;
-  };
+    const repaint = () => {
+      card.querySelectorAll("[data-edital-target]").forEach(button => button.classList.toggle("active", button.dataset.editalTarget === targetCode));
+      const filter = card.querySelector("[data-edital-search]")?.value || "";
+      card.querySelector("[data-edital-sections]").innerHTML = renderSections(map, targetCode, filter);
+      card.querySelector("[data-edital-summary]").textContent = `${map.targets[targetCode].label} · ${targetSummary(map, targetCode)}`;
+    };
 
-  card.addEventListener("click", event => {
-    const targetButton = event.target.closest("[data-edital-target]");
-    if (targetButton) {
-      targetCode = targetButton.dataset.editalTarget;
-      saveJSON(TARGET_KEY(), targetCode);
-      repaint();
-      return;
-    }
-    const run = event.target.closest("[data-edital-run]");
-    if (run && !run.disabled) startItemSession(map, targetCode, run.dataset.editalRun, run.dataset.editalSize);
-  });
-  card.querySelector("[data-edital-search]")?.addEventListener("input", repaint);
-  repaint();
+    card.addEventListener("click", event => {
+      const targetButton = event.target.closest("[data-edital-target]");
+      if (targetButton) {
+        targetCode = targetButton.dataset.editalTarget;
+        saveJSON(TARGET_KEY(), targetCode);
+        repaint();
+        return;
+      }
+      const run = event.target.closest("[data-edital-run]");
+      if (run && !run.disabled) startItemSession(map, targetCode, run.dataset.editalRun, run.dataset.editalSize);
+    });
+    card.querySelector("[data-edital-search]")?.addEventListener("input", repaint);
+    repaint();
+  } finally {
+    verticalInjecting = false;
+  }
 }
 
 ensureData()
