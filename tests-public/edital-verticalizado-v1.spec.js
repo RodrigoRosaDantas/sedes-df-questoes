@@ -15,6 +15,18 @@ async function loadMap(page) {
   return response.json();
 }
 
+async function readStableStudyState(page) {
+  await expect(page.locator(".question-card")).toBeVisible({timeout: 30000});
+  await page.waitForFunction(() => {
+    const session = JSON.parse(localStorage.getItem("sedes.questoes.rodrigo.session.v3") || "null");
+    return Boolean(session?.questionIds?.length);
+  });
+  return page.evaluate(() => ({
+    session: JSON.parse(localStorage.getItem("sedes.questoes.rodrigo.session.v3") || "null"),
+    blueprint: JSON.parse(localStorage.getItem("sedes.questoes.rodrigo.officialBlueprint.v1") || "null"),
+  }));
+}
+
 test("edital verticalizado separa 202/400 e abre somente questões do item escolhido", async ({page}) => {
   await cleanStudyState(page);
   const map = await loadMap(page);
@@ -37,7 +49,7 @@ test("edital verticalizado separa 202/400 e abre somente questões do item escol
 
   await run.click();
   await page.waitForURL(/#\/resolver/);
-  const session = await page.evaluate(() => JSON.parse(localStorage.getItem("sedes.questoes.rodrigo.session.v3") || "null"));
+  const {session} = await readStableStudyState(page);
   expect(session).toBeTruthy();
   expect(session.material.codigo_cargo).toBe("202");
   expect(session.questionIds.length).toBeGreaterThan(0);
@@ -65,10 +77,7 @@ test("Prova Real usa matriz A–E do cargo e nunca faz fallback fora do edital",
     await expect(button).toBeEnabled();
     await button.click();
     await page.waitForURL(/#\/resolver/);
-    const data = await page.evaluate(() => ({
-      session: JSON.parse(localStorage.getItem("sedes.questoes.rodrigo.session.v3") || "null"),
-      blueprint: JSON.parse(localStorage.getItem("sedes.questoes.rodrigo.officialBlueprint.v1") || "null"),
-    }));
+    const data = await readStableStudyState(page);
     expect(data.session.material.codigo_cargo).toBe(code);
     expect(data.session.questionIds).toHaveLength(60);
     expect(new Set(data.session.questionIds).size).toBe(60);
