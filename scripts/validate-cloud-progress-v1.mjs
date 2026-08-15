@@ -14,6 +14,9 @@ const cloud = read("assets/cloud-progress-v1.js");
 const command = read("assets/work-command-center-v1.js");
 const css = read("assets/cloud-progress-v1.css");
 const builder = read("scripts/build-public.mjs");
+const provenance = read("scripts/reconcile-cloud-provenance-v1.mjs");
+const verifier = read("scripts/verify-public-release.mjs");
+const publicConfig = read("playwright.public.config.js");
 
 requireMarkers(index, [
   "cloud-progress-v1.css?v=1",
@@ -64,6 +67,12 @@ requireMarkers(command, [
   "Dados oficiais",
   "Seu progresso",
   "SEDES_CLOUD_PROGRESS",
+  "lastCloudKind",
+  'lastCloudKind === "saved"',
+  'lastCloudKind === "saving"',
+  'const startedOffline = !navigator.onLine || lastCloudKind === "offline"',
+  'window.addEventListener("online", recoverCloudAfterOfflineStart)',
+  "location.reload()",
   "if (node.textContent !== value) node.textContent = value",
 ], "Central de comando");
 if (/forEach\(node => \{\s*node\.textContent = cloudStateText\(\)/s.test(command)) {
@@ -71,4 +80,20 @@ if (/forEach\(node => \{\s*node\.textContent = cloudStateText\(\)/s.test(command
 }
 requireMarkers(css, ["cloud-progress-pill", "cloud-dialog-backdrop", "work-command-center", "work-command-grid"], "CSS cloud/work");
 
-console.log("✓ Firebase local-first e Central de comando validados estruturalmente: shell, PWA, namespace, auth, estados de sync, observer idempotente e separação entre catálogo oficial e progresso pessoal.");
+requireMarkers(provenance, [
+  'platform_cloud_progress_js: "assets/cloud-progress-v1.js"',
+  'platform_cloud_progress_css: "assets/cloud-progress-v1.css"',
+  'platform_work_command_center_js: "assets/work-command-center-v1.js"',
+  "source_files_sha256",
+  "cloud_progress_provenance",
+], "Proveniência Firebase");
+requireMarkers(verifier, [
+  '"scripts/reconcile-cloud-provenance-v1.mjs"',
+  '"scripts/validate-cloud-progress-v1.mjs"',
+  '"platform_cloud_progress_js"',
+  '"platform_cloud_progress_css"',
+  '"platform_work_command_center_js"',
+], "Auditoria reproduzível");
+requireMarkers(publicConfig, ["cloud-progress-v1.spec.js"], "Playwright público");
+
+console.log("✓ Firebase local-first e Central de comando validados: namespace, auth, estados de sync, recuperação pós-offline, observer idempotente, Playwright e proveniência SHA-256.");

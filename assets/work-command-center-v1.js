@@ -1,5 +1,9 @@
 import {activeSession, currentRoute, observeApp} from "./shared-v2-13.js?v=1";
 
+const CLOUD_RECOVERY_KEY = "sedes.questoes.cloudRecovery.v1";
+let lastCloudKind = document.querySelector("[data-cloud-progress]")?.dataset.cloudState || null;
+const startedOffline = !navigator.onLine || lastCloudKind === "offline";
+
 function routeTo(route) {
   location.hash = `#/${route}`;
 }
@@ -23,6 +27,11 @@ function startNow() {
 
 function cloudStateText() {
   const cloud = window.SEDES_CLOUD_PROGRESS?.getState?.();
+  if (lastCloudKind === "saved") return "progresso sincronizado na conta";
+  if (lastCloudKind === "saving") return "sincronizando seu progresso";
+  if (lastCloudKind === "error") return "progresso local; falha ao sincronizar";
+  if (lastCloudKind === "offline") return "offline; progresso salvo localmente";
+  if (lastCloudKind === "signed-out") return "progresso local; entre para sincronizar";
   if (!cloud?.signedIn) return "progresso local; entre para sincronizar";
   if (cloud.syncing) return "sincronizando seu progresso";
   return cloud.lastSyncAt ? "progresso sincronizado na conta" : "conta conectada";
@@ -32,6 +41,18 @@ function updateCloudCopy() {
   document.querySelectorAll("[data-work-cloud-state]").forEach(node => {
     if (node.textContent !== value) node.textContent = value;
   });
+}
+function handleCloudStatus(event) {
+  lastCloudKind = event.detail?.kind || document.querySelector("[data-cloud-progress]")?.dataset.cloudState || lastCloudKind;
+  updateCloudCopy();
+}
+function recoverCloudAfterOfflineStart() {
+  if (!startedOffline) return;
+  try {
+    if (sessionStorage.getItem(CLOUD_RECOVERY_KEY) === "1") return;
+    sessionStorage.setItem(CLOUD_RECOVERY_KEY, "1");
+  } catch {}
+  location.reload();
 }
 
 function injectCommandCenter() {
@@ -65,7 +86,11 @@ function injectCommandCenter() {
   section.querySelector("[data-work-search]").addEventListener("click", focusQuestionSearch);
 }
 
-window.addEventListener("sedes:cloud-status", updateCloudCopy);
+if (navigator.onLine) {
+  try { sessionStorage.removeItem(CLOUD_RECOVERY_KEY); } catch {}
+}
+window.addEventListener("sedes:cloud-status", handleCloudStatus);
+window.addEventListener("online", recoverCloudAfterOfflineStart);
 observeApp(() => {
   injectCommandCenter();
   updateCloudCopy();
