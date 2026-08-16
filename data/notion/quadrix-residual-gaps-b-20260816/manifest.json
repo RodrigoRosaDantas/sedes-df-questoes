@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "SEDES-QDX-RESIDUAL-GAPS-20260816-B",
+  "captured_at": "2026-08-16T14:06:00-03:00",
+  "expected_count": 2,
+  "expected_materials_added": 2,
+  "files": ["records.json"],
+  "expected_codes": [
+    "PROVA-QDX-CRFPR-2019-ANALISTA-RH-400-050",
+    "PROVA-QDX-CFP-2022-PSICOLOGIA-SOCIAL-400-037"
+  ],
+  "source": {
+    "name": "Banco Mestre — Provas e Simulados SEDES/DF",
+    "database_url": "https://app.notion.com/p/a1d5fc8f8e434105861faba90dc156d9",
+    "previous_master_total": 3508,
+    "master_total": 3510,
+    "previous_public_questions": 3506,
+    "expected_public_questions": 3508,
+    "previous_materials": 91,
+    "expected_materials": 93,
+    "previous_proofs": 52,
+    "expected_proofs": 54,
+    "simulations": 39,
+    "discursive_display_items": 2,
+    "expected_awaiting_audit": 0
+  },
+  "assignments": [
+    {"question_id": "prova-qdx-crfpr-2019-analista-rh-400-050", "item_id": "400-gp-5-8"},
+    {"question_id": "prova-qdx-cfp-2022-psicologia-social-400-037", "item_id": "edas-dir-4"}
+  ],
+  "expected_minimums": {
+    "400-gp-5-8": 3,
+    "edas-dir-4": 3
+  },
+  "protected_singletons": {
+    "edas-suas-4": 1,
+    "400-afo-4-5": 1
+  },
+  "expected_mapped_questions": 1309,
+  "expected_unmapped_questions": 2199,
+  "provenance": {
+    "crf_pr_2019": {
+      "official_contest": "https://quadrix.org.br/informacoes/1268/",
+      "original_number": 50,
+      "answer": "D",
+      "question_index": "Q1081106"
+    },
+    "cfp_2022": {
+      "official_contest": "https://quadrix.org.br/informacoes/1184/",
+      "original_number": 37,
+      "answer": "C",
+      "question_index": "Q2159826"
+    }
+  },
+  "quality_notes": [
+    "Somente duas questões reais Quadrix de aderência direta foram incluídas.",
+    "Tipificação Nacional e SIAFEM-DF permanecem protegidos em exatamente 1 questão.",
+    "CadÚnico/Protocolo de Gestão Integrada e MROSC não recebem associação artificial neste lote."
+  ]
+}
