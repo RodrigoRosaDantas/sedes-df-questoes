@@ -18,10 +18,18 @@ const matrix = JSON.parse(matrixText);
 const catalog = JSON.parse(fs.readFileSync(catalogPath, "utf8"));
 const sha256 = value => crypto.createHash("sha256").update(value).digest("hex");
 
+const MATERIAL_TOPIC_ALIASES = new Map([
+  ["sim-emilia-2026-tdas-prog01", ["cartão prato cheio", "prato cheio", "lei 7.009", "decreto 42.873"]],
+  ["sim-emilia-2026-tdas-prog02", ["cartão gás", "cartao gas", "lei 6.938", "decreto 42.376"]],
+  ["sim-emilia-2026-tdas-prog03", ["plano df social", "df social", "lei 7.008", "decreto 42.872"]],
+]);
+
 const normalize = value => String(value || "")
   .normalize("NFD")
   .replace(/[\u0300-\u036f]/g, "")
   .toLocaleLowerCase("pt-BR")
+  .replace(/\bn[.\s]*[º°]\s*/gu, "")
+  .replace(/\bpoliticas para as mulheres\b/gu, "politica para mulheres")
   .replace(/[–—]/g, "-")
   .replace(/\s+/g, " ")
   .trim();
@@ -35,16 +43,18 @@ const containsTerm = (value, rawTerm) => {
   return new RegExp(`(?:^|[^a-z0-9])${escaped}(?=$|[^a-z0-9])`, "u").test(normalized);
 };
 const matchesAny = (values, terms = []) => !terms.length || terms.some(term => values.some(value => containsTerm(value, term)));
+const normalizedValues = values => values.map(normalize).filter(Boolean);
 
-function matchesItem(question, item) {
+function matchesItem(question, item, material) {
   const match = item.match || {};
-  const discipline = normalize(question.disciplina);
-  const topic = normalize(question.assunto);
-  const subtopic = normalize(question.subassunto);
-  const all = [discipline, topic, subtopic];
-  if (match.discipline_any?.length && !matchesAny([discipline], match.discipline_any)) return false;
-  if (match.topic_any?.length && !matchesAny([topic, subtopic], match.topic_any)) return false;
-  if (match.subtopic_any?.length && !matchesAny([subtopic], match.subtopic_any)) return false;
+  const discipline = normalizedValues([question.disciplina, material?.disciplina]);
+  const topic = normalizedValues([question.assunto, material?.assunto]);
+  const subtopic = normalizedValues([question.subassunto, material?.subassunto]);
+  const materialAliases = normalizedValues(MATERIAL_TOPIC_ALIASES.get(material?.id) || []);
+  const all = [...discipline, ...topic, ...subtopic, ...materialAliases];
+  if (match.discipline_any?.length && !matchesAny(discipline, match.discipline_any)) return false;
+  if (match.topic_any?.length && !matchesAny([...topic, ...subtopic, ...materialAliases], match.topic_any)) return false;
+  if (match.subtopic_any?.length && !matchesAny([...subtopic, ...materialAliases], match.subtopic_any)) return false;
   if (match.any_any?.length && !matchesAny(all, match.any_any)) return false;
   return Boolean(match.discipline_any?.length || match.topic_any?.length || match.subtopic_any?.length || match.any_any?.length);
 }
@@ -74,16 +84,9 @@ for (const section of matrix.sections || []) {
   for (const item of section.items || []) {
     if (!item.id || items.has(item.id)) throw new Error(`ID de item do edital inválido ou duplicado: ${item.id || "ausente"}.`);
     items.set(item.id, {
-      id: item.id,
-      label: item.label,
-      section_id: section.id,
-      section_label: section.label,
-      scope: section.scope,
-      targets: section.targets || ["202", "400"],
-      question_ids: [],
-      ae_question_ids: [],
-      ce_question_ids: [],
-      exam_question_ids: [],
+      id: item.id, label: item.label, section_id: section.id, section_label: section.label,
+      scope: section.scope, targets: section.targets || ["202", "400"], question_ids: [],
+      ae_question_ids: [], ce_question_ids: [], exam_question_ids: [],
     });
   }
 }
@@ -107,7 +110,7 @@ for (const materialMeta of catalog.materials || []) {
     questionFormats[question.id] = ae ? "A–E" : ce ? "Certo/Errado" : "Outro";
     for (const section of matrix.sections || []) {
       for (const sourceItem of section.items || []) {
-        if (!matchesItem(question, sourceItem)) continue;
+        if (!matchesItem(question, sourceItem, material)) continue;
         const targetItem = items.get(sourceItem.id);
         targetItem.question_ids.push(question.id);
         if (ae) targetItem.ae_question_ids.push(question.id);
@@ -147,79 +150,49 @@ for (const [targetCode, target] of Object.entries(matrix.targets || {})) {
     maria_da_penha: Math.max(0, Number(blueprint.maria_da_penha_minimum_questions || 3) - mariaExamIds.length),
   };
   targets[targetCode] = {
-    label: target.label,
-    subtitle: target.subtitle,
-    general_item_ids: generalItemIds,
-    specific_item_ids: specificItemIds,
-    general_question_ids: generalIds,
-    general_ae_question_ids: generalAeIds,
-    general_ce_question_ids: generalCeIds,
-    general_exam_question_ids: generalExamIds,
-    specific_question_ids: specificIds,
-    specific_ae_question_ids: specificAeIds,
-    specific_ce_question_ids: specificCeIds,
-    specific_exam_question_ids: specificExamIds,
-    maria_da_penha_exam_question_ids: unique(mariaExamIds),
+    label: target.label, subtitle: target.subtitle, general_item_ids: generalItemIds,
+    specific_item_ids: specificItemIds, general_question_ids: generalIds,
+    general_ae_question_ids: generalAeIds, general_ce_question_ids: generalCeIds,
+    general_exam_question_ids: generalExamIds, specific_question_ids: specificIds,
+    specific_ae_question_ids: specificAeIds, specific_ce_question_ids: specificCeIds,
+    specific_exam_question_ids: specificExamIds, maria_da_penha_exam_question_ids: unique(mariaExamIds),
     readiness: {
       ready: deficits.general === 0 && deficits.specific === 0 && deficits.maria_da_penha === 0,
-      deficits,
-      general_exam: generalExamIds.length,
-      general_ae: generalAeIds.length,
-      general_ce: generalCeIds.length,
-      specific_exam: specificExamIds.length,
-      specific_ae: specificAeIds.length,
-      specific_ce: specificCeIds.length,
+      deficits, general_exam: generalExamIds.length, general_ae: generalAeIds.length,
+      general_ce: generalCeIds.length, specific_exam: specificExamIds.length,
+      specific_ae: specificAeIds.length, specific_ce: specificCeIds.length,
       maria_da_penha_exam: unique(mariaExamIds).length,
     },
   };
 }
 
 const publicSections = (matrix.sections || []).map(section => ({
-  id: section.id,
-  scope: section.scope,
-  targets: section.targets || ["202", "400"],
-  label: section.label,
+  id: section.id, scope: section.scope, targets: section.targets || ["202", "400"], label: section.label,
   items: (section.items || []).map(sourceItem => {
     const item = items.get(sourceItem.id);
     return {
-      id: item.id,
-      label: item.label,
-      question_count: item.question_ids.length,
-      ae_question_count: item.ae_question_ids.length,
-      ce_question_count: item.ce_question_ids.length,
-      exam_question_count: item.exam_question_ids.length,
-      question_ids: unique(item.question_ids),
-      ae_question_ids: unique(item.ae_question_ids),
-      ce_question_ids: unique(item.ce_question_ids),
+      id: item.id, label: item.label, question_count: item.question_ids.length,
+      ae_question_count: item.ae_question_ids.length, ce_question_count: item.ce_question_ids.length,
+      exam_question_count: item.exam_question_ids.length, question_ids: unique(item.question_ids),
+      ae_question_ids: unique(item.ae_question_ids), ce_question_ids: unique(item.ce_question_ids),
       exam_question_ids: unique(item.exam_question_ids),
     };
   }),
 }));
 
 const output = {
-  schema_version: "1.1",
-  matrix_version: matrix.matrix_version,
-  generated_at: new Date().toISOString(),
-  matrix_sha256: sha256(matrixText),
-  source: matrix.source,
-  objective_blueprint: matrix.objective_blueprint,
+  schema_version: "1.1", matrix_version: matrix.matrix_version, generated_at: new Date().toISOString(),
+  matrix_sha256: sha256(matrixText), source: matrix.source, objective_blueprint: matrix.objective_blueprint,
   simulation_policy: {
-    preserves_official_blocks_and_weights: true,
-    preserves_original_question_format: true,
+    preserves_official_blocks_and_weights: true, preserves_original_question_format: true,
     accepted_question_formats: ["multiple_choice_ae", "true_false"],
     note: "A prova oficial prevista no edital é A–E; a simulação aceita também Certo/Errado do acervo Quadrix para ampliar a prática de conteúdo sem converter a questão original.",
   },
-  general_section_ids: matrix.general_section_ids,
-  targets,
-  sections: publicSections,
-  question_formats: questionFormats,
+  general_section_ids: matrix.general_section_ids, targets, sections: publicSections, question_formats: questionFormats,
   summary: {
-    catalog_questions: allQuestionIds.size,
-    catalog_multiple_choice_ae: aeQuestionIds.size,
-    catalog_true_false: ceQuestionIds.size,
-    catalog_exam_eligible: new Set([...aeQuestionIds, ...ceQuestionIds]).size,
-    mapped_questions: mappedQuestionIds.size,
-    unmapped_questions: allQuestionIds.size - mappedQuestionIds.size,
+    catalog_questions: allQuestionIds.size, catalog_multiple_choice_ae: aeQuestionIds.size,
+    catalog_true_false: ceQuestionIds.size, catalog_exam_eligible: new Set([...aeQuestionIds, ...ceQuestionIds]).size,
+    mapped_questions: mappedQuestionIds.size, unmapped_questions: allQuestionIds.size - mappedQuestionIds.size,
     official_items: items.size,
   },
 };
