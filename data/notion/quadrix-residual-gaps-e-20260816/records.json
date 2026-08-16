@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "SEDES-QDX-RESIDUAL-GAPS-20260816-E",
+  "records": [
+    {
+      "source_board": "Instituto Quadrix",
+      "material_type": "Prova",
+      "year": 2021,
+      "organization": "Conselho Regional de Serviço Social da 18ª Região — CRESS-SE",
+      "cargo": "Assistente Social — Agente Fiscal",
+      "cargo_code": "400",
+      "format": "Certo / Errado",
+      "publication_lot": "SEDES-QDX-RESIDUAL-GAPS-20260816-E",
+      "released_for_export": true,
+      "annulled": false,
+      "has_image": false,
+      "code": "PROVA-QDX-CRESSSE-2021-AGENTE-FISCAL-400-119",
+      "notion_url": "https://app.notion.com/p/3becf5a2673181e0aa12f8a970cf7411?pvs=204",
+      "material_name": "Assistente Social — Agente Fiscal — CRESS-SE — Quadrix 2021",
+      "original_number": 119,
+      "block": "Conhecimentos Específicos",
+      "discipline": "Assistência Social / SUAS",
+      "subject": "Tipificação Nacional dos Serviços Socioassistenciais",
+      "subsubject": "PAIF — Proteção Social Básica",
+      "text_base": "Julgue o item, relativo à Lei Orgânica da Assistência Social (LOAS).",
+      "prompt": "O Serviço de Proteção e Atendimento Integral à Família (Paif) integra a proteção social básica e consiste na oferta de ações e serviços socioassistenciais de prestação continuada, nos Centros de Referência de Assistência Social, por meio do trabalho social com famílias em situação de vulnerabilidade social.",
+      "answer": "Certo",
+      "comment": "O item está certo. O PAIF integra a proteção social básica e é ofertado de forma continuada nos CRAS, por meio do trabalho social com famílias em situação de vulnerabilidade social.",
+      "alternative_comments": {},
+      "foundation": "Lei nº 8.742/1993 (LOAS), art. 24-A; Resolução CNAS nº 109/2009 — Tipificação Nacional de Serviços Socioassistenciais; gabarito definitivo do Instituto Quadrix.",
+      "trap": "Confundir o PAIF, da Proteção Social Básica e ofertado no CRAS, com o PAEFI, da Proteção Social Especial e referenciado ao CREAS.",
+      "observations": "Questão original 119 da prova de Assistente Social — Agente Fiscal do CRESS-SE; gabarito Certo.",
+      "source_url": "https://quadrix.org.br/informacoes/1230/",
+      "pdf_page": ""
+    }
+  ]
+}

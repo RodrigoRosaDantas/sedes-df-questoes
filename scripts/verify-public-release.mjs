@@ -49,6 +49,8 @@ run("scripts/apply-quadrix-residual-gaps-c-20260816.mjs", [], {GITHUB_SHA: reque
 run("scripts/derive-quadrix-residual-gaps-c-20260816.mjs", [], {GITHUB_SHA: requestedSha});
 run("scripts/apply-quadrix-residual-gaps-d-20260816.mjs", [], {GITHUB_SHA: requestedSha, RELEASE_DIR: "dist/data/release"});
 run("scripts/derive-quadrix-residual-gaps-d-20260816.mjs", [], {GITHUB_SHA: requestedSha});
+run("scripts/apply-quadrix-residual-gaps-e-20260816.mjs", [], {GITHUB_SHA: requestedSha, RELEASE_DIR: "dist/data/release"});
+run("scripts/derive-quadrix-residual-gaps-e-20260816.mjs", [], {GITHUB_SHA: requestedSha});
 for (const script of [
   "scripts/build-content-model-v1.mjs",
   "scripts/reconcile-discursive-release-meta.mjs",
@@ -80,6 +82,8 @@ const residualCReceipt = readJSON("dist/data/release/quadrix-residual-gaps-c-202
 const residualCMapReceipt = readJSON("dist/data/release/quadrix-residual-gaps-c-20260816-map-receipt.json");
 const residualDReceipt = readJSON("dist/data/release/quadrix-residual-gaps-d-20260816-receipt.json");
 const residualDMapReceipt = readJSON("dist/data/release/quadrix-residual-gaps-d-20260816-map-receipt.json");
+const residualEReceipt = readJSON("dist/data/release/quadrix-residual-gaps-e-20260816-receipt.json");
+const residualEMapReceipt = readJSON("dist/data/release/quadrix-residual-gaps-e-20260816-map-receipt.json");
 
 const questions = Object.keys(catalog.question_index || {}).length;
 const materials = Array.isArray(catalog.materials) ? catalog.materials.length : 0;
@@ -98,9 +102,9 @@ if (Number(format.question_count) !== questions || formatTotal !== questions) th
 if (Number(contentModel.schema) !== 1 || Number(contentModel.question_count) !== questions || Number(contentModel.material_count) !== materials) throw new Error("Modelo normalizado não fecha com o catálogo público.");
 if (!Array.isArray(contentModel.questions) || contentModel.questions.length !== questions || !Array.isArray(contentModel.materials) || contentModel.materials.length !== materials) throw new Error("Coleções normalizadas incompletas.");
 
-if (questions !== 3511 || materials !== 94 || bank !== 3513 || Number(release.proofs) !== 55 || Number(release.simulations) !== 39 || discursive !== 2 || awaiting !== 0)
+if (questions !== 3512 || materials !== 95 || bank !== 3514 || Number(release.proofs) !== 56 || Number(release.simulations) !== 39 || discursive !== 2 || awaiting !== 0)
   throw new Error(`Totais finais inesperados: banco ${bank}, questões ${questions}, materiais ${materials}, provas ${release.proofs}, simulados ${release.simulations}, discursivas ${discursive}, auditoria ${awaiting}.`);
-if (Number(format.summary?.["true-false"]) !== 2574 || Number(format.summary?.["multiple-choice"]) !== 937)
+if (Number(format.summary?.["true-false"]) !== 2575 || Number(format.summary?.["multiple-choice"]) !== 937)
   throw new Error("Distribuição final de formatos divergente do lote aprovado.");
 
 if (targetedReceipt.operation_id !== "SEDES-QDX-TARGETED-IMPORT-20260816" || targetedReceipt.status !== "success" || Number(targetedReceipt.total_questions) !== 3480 || Number(targetedReceipt.total_materials) !== 83 || !Array.isArray(targetedReceipt.codes) || targetedReceipt.codes.length !== 22)
@@ -120,11 +124,15 @@ if (residualCReceipt.operation_id !== "SEDES-QDX-RESIDUAL-GAPS-20260816-C" || re
 if (residualCMapReceipt.operation_id !== "SEDES-QDX-RESIDUAL-GAPS-20260816-C" || residualCMapReceipt.status !== "success" || Number(residualCMapReceipt.catalog_additions) !== 1 || Number(residualCMapReceipt.mapping_pairs) !== 5 || Number(residualCMapReceipt.distinct_questions) !== 5 || Number(residualCMapReceipt.newly_mapped_distinct_questions) !== 5 || Number(residualCMapReceipt.mapped_questions) !== 1314 || Number(residualCMapReceipt.unmapped_questions) !== 2195)
   throw new Error("Recibo histórico do mapa residual C inválido ou incompleto.");
 if (residualDReceipt.operation_id !== "SEDES-QDX-RESIDUAL-GAPS-20260816-D" || residualDReceipt.status !== "success" || Number(residualDReceipt.added_questions) !== 2 || Number(residualDReceipt.total_questions) !== 3511 || Number(residualDReceipt.total_materials) !== 94 || Number(residualDReceipt.total_proofs) !== 55 || !Array.isArray(residualDReceipt.codes) || residualDReceipt.codes.length !== 2)
-  throw new Error("Recibo do lote residual D inválido ou incompleto.");
+  throw new Error("Recibo histórico do lote residual D inválido ou incompleto.");
 if (residualDMapReceipt.operation_id !== "SEDES-QDX-RESIDUAL-GAPS-20260816-D" || residualDMapReceipt.status !== "success" || Number(residualDMapReceipt.catalog_additions) !== 2 || Number(residualDMapReceipt.mapping_pairs) !== 2 || Number(residualDMapReceipt.distinct_questions) !== 2 || Number(residualDMapReceipt.newly_mapped_distinct_questions) !== 2 || Number(residualDMapReceipt.mapped_questions) !== 1316 || Number(residualDMapReceipt.unmapped_questions) !== 2195)
-  throw new Error("Recibo do mapa residual D inválido ou incompleto.");
+  throw new Error("Recibo histórico do mapa residual D inválido ou incompleto.");
+if (residualEReceipt.operation_id !== "SEDES-QDX-RESIDUAL-GAPS-20260816-E" || residualEReceipt.status !== "success" || Number(residualEReceipt.added_questions) !== 1 || Number(residualEReceipt.total_questions) !== 3512 || Number(residualEReceipt.total_materials) !== 95 || Number(residualEReceipt.total_proofs) !== 56 || !Array.isArray(residualEReceipt.codes) || residualEReceipt.codes.length !== 1)
+  throw new Error("Recibo do lote residual E inválido ou incompleto.");
+if (residualEMapReceipt.operation_id !== "SEDES-QDX-RESIDUAL-GAPS-20260816-E" || residualEMapReceipt.status !== "success" || Number(residualEMapReceipt.catalog_additions) !== 1 || Number(residualEMapReceipt.mapping_pairs) !== 1 || Number(residualEMapReceipt.distinct_questions) !== 1 || Number(residualEMapReceipt.newly_mapped_distinct_questions) !== 1 || Number(residualEMapReceipt.mapped_questions) !== 1317 || Number(residualEMapReceipt.unmapped_questions) !== 2195)
+  throw new Error("Recibo do mapa residual E inválido ou incompleto.");
 
-for (const code of [...targetedReceipt.codes, ...cressReceipt.codes, ...gapsReceipt.codes, ...sparseReceipt.codes, ...residualBReceipt.codes, ...residualCReceipt.codes, ...residualDReceipt.codes]) {
+for (const code of [...targetedReceipt.codes, ...cressReceipt.codes, ...gapsReceipt.codes, ...sparseReceipt.codes, ...residualBReceipt.codes, ...residualCReceipt.codes, ...residualDReceipt.codes, ...residualEReceipt.codes]) {
   const publicId = String(code).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("pt-BR")
     .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 120);
   if (!catalog.question_index?.[publicId]) throw new Error(`Questão de recibo ausente do catálogo: ${code}.`);
@@ -161,4 +169,4 @@ const currentRelease = trackedReleaseDigest();
 if (currentRelease.sha256 !== frozenRelease.sha256 || currentRelease.files !== frozenRelease.files)
   throw new Error("A validação alterou a release canônica versionada.");
 
-console.log(`✓ Auditoria reproduzível concluída no commit ${requestedSha.slice(0, 8)}: ${bank} no Banco Mestre = ${questions} objetivas + ${discursive} discursivas + ${awaiting} em auditoria; ${materials} materiais; lotes 22/22 + 12/12 + 12/12 + sparse 2/2 + residual B 2/2 + residual C 1/1 + residual D 2/2; ${residualDMapReceipt.mapped_questions} mapeadas; Firebase/Work e endurecimentos protegidos por SHA-256; fontes canônicas preservadas em ${frozenRelease.files} arquivos.`);
+console.log(`✓ Auditoria reproduzível concluída no commit ${requestedSha.slice(0, 8)}: ${bank} no Banco Mestre = ${questions} objetivas + ${discursive} discursivas + ${awaiting} em auditoria; ${materials} materiais; lotes 22/22 + 12/12 + 12/12 + sparse 2/2 + residual B 2/2 + residual C 1/1 + residual D 2/2 + residual E 1/1; ${residualEMapReceipt.mapped_questions} mapeadas; Firebase/Work e endurecimentos protegidos por SHA-256; fontes canônicas preservadas em ${frozenRelease.files} arquivos.`);
