@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "SEDES-QDX-RESIDUAL-GAPS-20260816-E",
+  "captured_at": "2026-08-16T18:52:00-03:00",
+  "expected_count": 1,
+  "expected_materials_added": 1,
+  "files": ["records.json"],
+  "expected_codes": ["PROVA-QDX-CRESSSE-2021-AGENTE-FISCAL-400-119"],
+  "source": {
+    "name": "Banco Mestre — Provas e Simulados SEDES/DF",
+    "database_url": "https://app.notion.com/p/a1d5fc8f8e434105861faba90dc156d9",
+    "previous_master_total": 3513,
+    "master_total": 3514,
+    "previous_public_questions": 3511,
+    "expected_public_questions": 3512,
+    "previous_materials": 94,
+    "expected_materials": 95,
+    "previous_proofs": 55,
+    "expected_proofs": 56,
+    "simulations": 39,
+    "discursive_display_items": 2,
+    "expected_awaiting_audit": 0
+  },
+  "assignments": [
+    {
+      "question_id": "prova-qdx-cressse-2021-agente-fiscal-400-119",
+      "item_id": "edas-suas-4",
+      "format": "Certo/Errado",
+      "answer": "Certo",
+      "prompt_sha256": "ee301b2e717508b787f2011c93c4caa62204b3db2092a9970a01f6591fe108d5"
+    }
+  ],
+  "expected_minimums": {"edas-suas-4": 2},
+  "protected_exact": {"400-afo-4-5": 1, "edas-suas-6": 2},
+  "expected_mapped_questions": 1317,
+  "expected_unmapped_questions": 2195,
+  "expected_newly_mapped_distinct_questions": 1,
+  "provenance": {
+    "cress_se_2021": {
+      "official_contest": "https://quadrix.org.br/informacoes/1230/",
+      "proof_archive": "https://anexos.cdn.selecao.net.br/uploads/861/concursos/1230/anexos/78a8ed1a-5710-481b-b660-5e494c04572b.rar",
+      "definitive_key": "https://quadrix.org.br/uploads/861/concursos/1230/anexos/b541a82c374b5b4ab212967eed6c02b9.pdf?v060014=",
+      "original_number": 119,
+      "answer": "Certo",
+      "question_reference": "Q1840338"
+    }
+  },
+  "quality_notes": [
+    "Uma questão real Quadrix nova sobre PAIF foi incluída como aderência direta à Tipificação Nacional de Serviços Socioassistenciais.",
+    "Tipificação Nacional sobe de 1 para pelo menos 2 questões sem reutilizar questão ampla de NOB/SUAS.",
+    "SIAFEM-DF permanece em exatamente 1 e CadÚnico em exatamente 2; nenhuma equivalência artificial foi criada."
+  ]
+}
