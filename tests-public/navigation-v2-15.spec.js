@@ -44,7 +44,8 @@ test("página pública de estudo preserva recursos sem poluição", async ({page
   await page.goto("./#/estudar", {waitUntil: "domcontentloaded"});
   await expect(page.locator("[data-ux15-breadcrumb=estudar]")).toContainText("Início");
   await expect(page.locator("[data-ux15-breadcrumb=estudar]")).toContainText("Estudar");
-  await expect(page.locator(".mobile-nav a")).toHaveCount(4);
+  await expect(page.locator(".mobile-nav a")).toHaveCount(5);
+  await expect(page.locator('.mobile-nav [data-role-study-nav]')).toContainText("Por cargo");
   await expect(page.locator("[data-official-exam-card]")).toBeVisible({timeout: 30000});
   const roles = page.locator("[data-role-templates]");
   await expect(roles).toBeVisible({timeout: 30000});

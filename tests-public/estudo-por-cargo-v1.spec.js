@@ -32,6 +32,17 @@ test("Estudar oferece acesso à página filha por cargo", async ({page}) => {
   await expect(entry).toContainText("Matéria → tópico → questões");
   await expect(entry.locator('a[href*="estudo-por-cargo.html?cargo=202"]')).toBeVisible();
   await expect(entry.locator('a[href*="estudo-por-cargo.html?cargo=400"]')).toBeVisible();
+  await expect(page.locator('.desktop-nav [data-role-study-nav]')).toHaveText("Por cargo");
+});
+
+test("mobile mostra Por cargo na navegação sem exigir link direto", async ({page}) => {
+  await page.setViewportSize({width: 390, height: 844});
+  await page.goto("./#/estudar");
+  const navLink = page.locator('.mobile-nav [data-role-study-nav]');
+  await expect(navLink).toBeVisible({timeout: 30000});
+  await expect(navLink).toContainText("Por cargo");
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
 });
 
 test("página filha usa matérias reais do cargo e navega matéria → tópico → questão", async ({page}) => {
