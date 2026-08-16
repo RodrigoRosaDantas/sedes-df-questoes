@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "SEDES-QDX-CRESS-MG-DF-20260816",
+  "captured_at": "2026-08-16T01:20:00-03:00",
+  "source": {
+    "name": "Banco Mestre — Provas e Simulados SEDES/DF",
+    "database_url": "https://app.notion.com/p/a1d5fc8f8e434105861faba90dc156d9",
+    "previous_master_total": 3482,
+    "master_total": 3494,
+    "previous_public_questions": 3480,
+    "expected_public_questions": 3492,
+    "previous_materials": 83,
+    "expected_materials": 85,
+    "previous_proofs": 44,
+    "expected_proofs": 46,
+    "simulations": 39,
+    "discursive_display_items": 2,
+    "expected_awaiting_audit": 0
+  },
+  "files": [
+    "cress-mg-2024-assistente-social.json",
+    "cress-df-2021-agente-fiscal.json"
+  ],
+  "expected_count": 12,
+  "expected_materials_added": 2,
+  "expected_codes": [
+    "PROVA-QDX-CRESSMG-2024-ASSISTENTE-SOCIAL-400-011",
+    "PROVA-QDX-CRESSMG-2024-ASSISTENTE-SOCIAL-400-012",
+    "PROVA-QDX-CRESSMG-2024-ASSISTENTE-SOCIAL-400-013",
+    "PROVA-QDX-CRESSMG-2024-ASSISTENTE-SOCIAL-400-014",
+    "PROVA-QDX-CRESSMG-2024-ASSISTENTE-SOCIAL-400-015",
+    "PROVA-QDX-CRESSMG-2024-ASSISTENTE-SOCIAL-400-020",
+    "PROVA-QDX-CRESSDF-2021-AGENTE-FISCAL-400-038",
+    "PROVA-QDX-CRESSDF-2021-AGENTE-FISCAL-400-039",
+    "PROVA-QDX-CRESSDF-2021-AGENTE-FISCAL-400-040",
+    "PROVA-QDX-CRESSDF-2021-AGENTE-FISCAL-400-041",
+    "PROVA-QDX-CRESSDF-2021-AGENTE-FISCAL-400-042",
+    "PROVA-QDX-CRESSDF-2021-AGENTE-FISCAL-400-046"
+  ],
+  "source_artifacts": {
+    "cress_mg_2024": {
+      "official_page": "https://quadrix.org.br/informacoes/1105/",
+      "proof_archive": "https://anexos.cdn.selecao.net.br/uploads/861/concursos/1105/anexos/2fbd0732-ce5c-4df8-995a-f7582a89e4f2.zip",
+      "definitive_key": "https://quadrix.org.br/uploads/861/concursos/1105/anexos/9bff5871479d180ed90238e112ae2de9.pdf?v160708="
+    },
+    "cress_df_2021": {
+      "official_page": "https://quadrix.org.br/informacoes/1196/",
+      "proof_archive": "https://anexos.cdn.selecao.net.br/uploads/861/concursos/1196/anexos/52203bc9-e657-411b-8c05-156d996b418f.zip",
+      "definitive_key": "https://quadrix.org.br/uploads/861/concursos/1196/anexos/ef98b76c89685403f29109f25a72ffc0.pdf?v221546="
+    }
+  },
+  "excluded": [
+    {
+      "code": "PROVA-QDX-CRESSDF-2021-AGENTE-FISCAL-400-044",
+      "reason": "Questão anulada no gabarito definitivo; excluída da publicação."
+    }
+  ]
+}
