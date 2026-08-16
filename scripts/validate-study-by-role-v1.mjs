@@ -21,10 +21,12 @@ for (const marker of [
   "estudo-por-cargo-v1.js?v=1",
   "Voltar para Estudar",
   "Cargo → bloco → matéria → tópico → questões",
+  "Conhecimentos gerais",
   "Conhecimentos comuns — nível médio",
   "Conhecimentos comuns — nível superior",
   "Conhecimentos específicos — Técnico Administrativo (202)",
   "Conhecimentos específicos — Administrador (400)",
+  "LEVEL_COMMON_IDS",
   "data-role-knowledge-group",
 ]) must(sourcePage, marker, "Página filha");
 for (const marker of [
@@ -82,4 +84,4 @@ for (const code of ["202", "400"]) {
   if (rawSections.length < 3 || topics.length < 10 || ids.size < 60) throw new Error(`Cargo ${code} sem cobertura suficiente para a taxonomia de matérias.`);
 }
 
-console.log("✓ Estudo por Cargo validado: bloco comum por nível → bloco específico do cargo → matérias → tópicos → lista de questões, com progresso global e resolvedor compartilhado.");
+console.log("✓ Estudo por Cargo validado: conhecimentos gerais → comuns do nível/carreira → específicos do cargo → matérias → tópicos → questões, com progresso global e resolvedor compartilhado.");
