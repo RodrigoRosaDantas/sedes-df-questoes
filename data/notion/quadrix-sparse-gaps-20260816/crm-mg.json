@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "SEDES-QDX-SPARSE-GAPS-20260816",
+  "records": [
+    {
+      "code": "PROVA-QDX-CRMMG-2025-ANALISTA-LICITACAO-400-038",
+      "original_number": 38,
+      "material_name": "Analista de Licitação — CRM-MG — Quadrix 2025",
+      "material_type": "Prova",
+      "year": 2025,
+      "organization": "Conselho Regional de Medicina do Estado de Minas Gerais — CRM-MG",
+      "cargo": "Analista de Licitação",
+      "cargo_code": "400",
+      "source_board": "Instituto Quadrix",
+      "format": "Múltipla escolha A–E",
+      "block": "Conhecimentos Específicos",
+      "discipline": "Legislação Federal",
+      "subject": "MROSC",
+      "subsubject": "Princípios das parcerias com organizações da sociedade civil",
+      "text_base": "",
+      "prompt": "A Lei nº 13.019/2014 estabelece o regime jurídico das parcerias entre a Administração Pública e as organizações da sociedade civil. Com base nessa informação, assinale a opção correta.",
+      "alternatives": {
+        "A": "A Lei nº 13.019/2014 estabelece normas para parcerias entre a Administração Pública e as entidades privadas com fins lucrativos para a execução de atividades de interesse público.",
+        "B": "Os termos de colaboração e os termos de fomento são instrumentos jurídicos exclusivos para parcerias com organizações religiosas.",
+        "C": "A Lei nº 13.019/2014 não se aplica a convênios firmados com entidades sem fins lucrativos para a prestação de serviços públicos de saúde.",
+        "D": "As parcerias entre a Administração Pública e as organizações da sociedade civil devem seguir princípios como legalidade, impessoalidade, moralidade, publicidade e eficiência.",
+        "E": "A celebração de parcerias previstas na Lei nº 13.019/2014 dispensa a necessidade de chamamento público."
+      },
+      "answer": "D",
+      "comment": "A alternativa D reproduz princípios expressamente previstos no art. 5º do MROSC. As demais alternativas ampliam indevidamente exceções, restringem instrumentos sem base legal ou afastam o chamamento público de forma geral.",
+      "alternative_comments": {
+        "A": "Incorreta. O MROSC disciplina parcerias com organizações da sociedade civil, não entidades privadas com fins lucrativos em geral.",
+        "B": "Incorreta. Termos de colaboração e fomento não são instrumentos exclusivos de organizações religiosas.",
+        "C": "Incorreta no alcance formulado. A exceção legal é específica aos convênios e contratos celebrados com entidades filantrópicas e sem fins lucrativos nos termos do § 1º do art. 199 da Constituição.",
+        "D": "Correta. O art. 5º inclui legalidade, impessoalidade, moralidade, publicidade e eficiência, entre outros princípios.",
+        "E": "Incorreta. O chamamento público integra o regime ordinário, ressalvadas as exceções legais."
+      },
+      "foundation": "Lei nº 13.019/2014, especialmente arts. 2º, 3º e 5º e regras de chamamento público; gabarito definitivo do Instituto Quadrix no concurso CRM-MG 2025.",
+      "trap": "A alternativa C lembra a exceção do art. 3º, IV, mas generaliza a hipótese e omite a qualificação constitucional específica.",
+      "observations": "Questão 38 confirmada no caderno indexado; gabarito D corroborado pelo índice definitivo da prova.",
+      "notion_url": "https://app.notion.com/p/3becf5a267318127b092f708383bea11?pvs=204",
+      "source_url": "https://quadrix.org.br/informacoes/1041/",
+      "publication_lot": "SEDES-QDX-SPARSE-GAPS-20260816",
+      "released_for_export": true,
+      "annulled": false,
+      "has_image": false,
+      "pdf_page": ""
+    }
+  ]
+}
