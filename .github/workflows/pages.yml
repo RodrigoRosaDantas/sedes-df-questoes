@@ -1,7 +1,12 @@
-name: Publicar GitHub Pages — autorização manual
+name: Publicar GitHub Pages — autorização controlada
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/deploy-trigger
 
 permissions:
   contents: read
@@ -9,7 +14,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: github-pages-manual
+  group: github-pages-controlled
   cancel-in-progress: false
 
 env:
@@ -26,13 +31,13 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Confirmar autorização manual e fixar o commit
+      - name: Confirmar autorização controlada e fixar o commit
         shell: bash
         run: |
           set -euo pipefail
           test "${AUTHORIZED_REF}" = "main"
           [[ "${AUTHORIZED_SOURCE_SHA}" =~ ^[0-9a-f]{40}$ ]]
-          echo "✓ Clique manual autorizou a publicação da main ${AUTHORIZED_SOURCE_SHA}."
+          echo "✓ Publicação autorizada da main ${AUTHORIZED_SOURCE_SHA}."
       - name: Baixar exatamente o commit autorizado
         uses: actions/checkout@v6
         with:
