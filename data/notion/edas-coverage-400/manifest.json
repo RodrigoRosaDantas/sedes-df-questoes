@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "SEDES-EDAS-400-COVERAGE-20260815",
+  "captured_at": "2026-08-16T02:34:33Z",
+  "source": {
+    "name": "Banco Mestre — Provas e Simulados SEDES/DF",
+    "database_url": "https://app.notion.com/p/a1d5fc8f8e434105861faba90dc156d9?v=85b47b4a2e17461e9d3482724b13fab8",
+    "data_source_id": "784234ae-deca-4514-b60d-19524e122a89",
+    "master_total": 3460,
+    "previous_public_questions": 3447,
+    "expected_public_questions": 3458,
+    "discursive_display_items": 2,
+    "expected_awaiting_audit": 0
+  },
+  "expected_count": 11,
+  "files": ["s15.json", "s17.json", "s19.json", "s26.json"],
+  "expected_codes": [
+    "EDAS-S15-Q001", "EDAS-S15-Q002", "EDAS-S15-Q003",
+    "EDAS-S17-Q001", "EDAS-S17-Q022",
+    "EDAS-S19-Q022", "EDAS-S19-Q031", "EDAS-S19-Q032", "EDAS-S19-Q033",
+    "EDAS-S26-Q026", "EDAS-S26-Q031"
+  ]
+}

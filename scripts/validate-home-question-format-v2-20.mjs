@@ -35,10 +35,21 @@ requireText(css, /ux20-format-option/, "Estilos do filtro de formato ausentes.")
 requireText(css, /min-height:42px/, "Filtro precisa manter alvo de toque adequado.");
 requireText(publicConfig, /home-question-format-v2-21\.spec\.js/, "Regressão pública v2.21 precisa estar allowlisted.");
 const distIndex = new URL("../dist/data/release/question-format-index.json", import.meta.url);
+const distCatalog = new URL("../dist/data/release/catalogo.json", import.meta.url);
 if (fs.existsSync(distIndex)) {
   const payload = JSON.parse(fs.readFileSync(distIndex, "utf8"));
   const formats = payload.formats || {};
-  if (Number(payload.question_count) !== 3447 || Object.keys(formats).length !== 3447) throw new Error("Índice de formato não cobre as 3.447 questões.");
-  if (Number(payload.summary?.["true-false"]) !== 2538 || Number(payload.summary?.["multiple-choice"]) !== 909) throw new Error("Partição esperada é 2.538 C/E + 909 múltipla escolha.");
+  if (!fs.existsSync(distCatalog)) throw new Error("Catálogo público ausente para validar o índice de formatos.");
+  const catalog = JSON.parse(fs.readFileSync(distCatalog, "utf8"));
+  const expected = Object.keys(catalog.question_index || {}).length;
+  if (Number(payload.question_count) !== expected || Object.keys(formats).length !== expected) {
+    throw new Error(`Índice de formato não cobre o catálogo completo (${Object.keys(formats).length}/${expected}).`);
+  }
+  const actualTrueFalse = Object.values(formats).filter(value => value === "true-false").length;
+  const actualMultipleChoice = Object.values(formats).filter(value => value === "multiple-choice").length;
+  if (actualTrueFalse + actualMultipleChoice !== expected) throw new Error("Índice de formato contém classificação desconhecida.");
+  if (Number(payload.summary?.["true-false"]) !== actualTrueFalse || Number(payload.summary?.["multiple-choice"]) !== actualMultipleChoice) {
+    throw new Error("Resumo do índice de formatos diverge da classificação por questão.");
+  }
 }
 console.log("✓ Filtro v2.21: sem rerender concorrente, recuperação acessível e metadados por recortes ativos.");

@@ -38,9 +38,12 @@ const syntaxFiles = git(["ls-files"])
   .filter(file => !file.startsWith("data/"));
 for (const file of syntaxFiles) run("--check", [file]);
 
+run("scripts/build-question-search-index.mjs", [], {GITHUB_SHA: requestedSha});
+run("scripts/build-public.mjs", [], {GITHUB_SHA: requestedSha});
+run("scripts/apply-edas-coverage-400.mjs", [], {GITHUB_SHA: requestedSha, RELEASE_DIR: "dist/data/release"});
+run("scripts/build-edital-map-v1.mjs", [], {GITHUB_SHA: requestedSha});
+run("scripts/derive-edas-coverage-400.mjs", [], {GITHUB_SHA: requestedSha});
 for (const script of [
-  "scripts/build-question-search-index.mjs",
-  "scripts/build-public.mjs",
   "scripts/build-content-model-v1.mjs",
   "scripts/reconcile-discursive-release-meta.mjs",
   "scripts/reconcile-public-metadata.mjs",
@@ -69,6 +72,7 @@ for (const script of [
   "scripts/validate-dist-v2-10.mjs",
   "scripts/validate-governance-mode.mjs",
   "scripts/validate-public-metadata-consistency.mjs",
+  "scripts/validate-study-by-role-v1.mjs",
 ]) run(script);
 
 const catalog = readJSON("dist/data/release/catalogo.json");

@@ -30,11 +30,18 @@ async function prepare(page) {
 }
 
 test("site público filtra sessões por Certo/Errado e Múltipla escolha", async ({page, request}) => {
-  const response = await request.get("./data/release/question-format-index.json");
-  expect(response.ok()).toBeTruthy();
-  const index = await response.json();
-  expect(index.question_count).toBe(3447);
-  expect(index.summary["true-false"] + index.summary["multiple-choice"]).toBe(3447);
+  const [formatResponse, catalogResponse] = await Promise.all([
+    request.get("./data/release/question-format-index.json"),
+    request.get("./data/release/catalogo.json"),
+  ]);
+  expect(formatResponse.ok()).toBeTruthy();
+  expect(catalogResponse.ok()).toBeTruthy();
+  const index = await formatResponse.json();
+  const catalog = await catalogResponse.json();
+  const expected = Object.keys(catalog.question_index || {}).length;
+  expect(index.question_count).toBe(expected);
+  expect(Object.keys(index.formats || {})).toHaveLength(expected);
+  expect(index.summary["true-false"] + index.summary["multiple-choice"]).toBe(expected);
 
   for (const mode of ["true-false", "multiple-choice"]) {
     await prepare(page);

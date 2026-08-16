@@ -94,10 +94,8 @@ for (const code of ["202", "400"]) {
     if (!item || Number(item.question_count || 0) < 1) throw new Error(`Cargo ${code}: tópico crítico sem questões após o mapeamento: ${itemId}.`);
   }
 
-  if (code === "202") {
-    const emptyTopics = topics.filter(item => Number(item.question_count || 0) < 1).map(item => item.id);
-    if (emptyTopics.length) throw new Error(`Cargo 202 ainda possui tópicos sem questões: ${emptyTopics.join(", ")}.`);
-  }
+  const emptyTopics = topics.filter(item => Number(item.question_count || 0) < 1).map(item => item.id);
+  if (emptyTopics.length) throw new Error(`Cargo ${code} ainda possui tópicos sem questões: ${emptyTopics.join(", ")}.`);
 }
 
-console.log("✓ Estudo por Cargo validado: conhecimentos gerais → comuns do nível/carreira → específicos do cargo → matérias → tópicos → questões, com progresso global, resolvedor compartilhado e TDAS sem tópicos vazios.");
+console.log("✓ Estudo por Cargo validado: conhecimentos gerais → comuns do nível/carreira → específicos do cargo → matérias → tópicos → questões, com progresso global, resolvedor compartilhado e cargos 202/400 sem tópicos vazios.");
