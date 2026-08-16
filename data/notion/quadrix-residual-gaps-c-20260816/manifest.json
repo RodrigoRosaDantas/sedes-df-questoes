@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "SEDES-QDX-RESIDUAL-GAPS-20260816-C",
+  "captured_at": "2026-08-16T14:58:50-03:00",
+  "expected_count": 1,
+  "expected_materials_added": 1,
+  "files": ["records.json"],
+  "expected_codes": ["PROVA-QDX-CORENRS-2018-ANALISTA-JURIDICO-400-036"],
+  "source": {
+    "name": "Banco Mestre — Provas e Simulados SEDES/DF",
+    "database_url": "https://app.notion.com/p/a1d5fc8f8e434105861faba90dc156d9",
+    "previous_master_total": 3510,
+    "master_total": 3511,
+    "previous_public_questions": 3508,
+    "expected_public_questions": 3509,
+    "previous_materials": 93,
+    "expected_materials": 94,
+    "previous_proofs": 54,
+    "expected_proofs": 55,
+    "simulations": 39,
+    "discursive_display_items": 2,
+    "expected_awaiting_audit": 0
+  },
+  "assignments": [
+    {"question_id":"prova-qdx-corenrs-2018-analista-juridico-400-036","item_id":"edas-suas-7","format":"A–E","answer":"D","prompt_sha256":"2c44143ad1b2293d7a043011916075e3c80df71427c9012c6f6cec218792f3dc"},
+    {"question_id":"prova-qdx-crasp-2025-anacob-400-015","item_id":"edas-dir-3","format":"A–E","answer":"D","prompt_sha256":"9d49724c6c8f83146a23d49f9506d7788054993d41a1cba07b63d8747fcf75f2"},
+    {"question_id":"prova-qdx-seedf-2025-dir-a-108","item_id":"edas-dir-3","format":"Certo/Errado","answer":"Certo","prompt_sha256":"48b9b0deaaa1705a28aa32111e0c324764c20a38bc85b8040cba8eb4bb9318e0"},
+    {"question_id":"prova-qdx-seedf-2025-profadm-a-052","item_id":"edas-dir-3","format":"Certo/Errado","answer":"Certo","prompt_sha256":"ec1e079a35ef5ed5e47ee1dcf70843b453d3dfb0eedc6d539a1ce925999e0c6b"},
+    {"question_id":"prova-qdx-crbm6-2026-agente-administrativo-401-086","item_id":"400-proj-3-2","format":"Certo/Errado","answer":"Errado","prompt_sha256":"35b5d94f969c5ceaaf66c5efade07c94d8a645cb8dec1ef8627c037bdd04ba36"}
+  ],
+  "expected_minimums": {"edas-suas-7":3,"edas-dir-3":6,"400-proj-3-2":4},
+  "protected_exact": {"edas-suas-4":1,"400-afo-4-5":1,"edas-suas-6":2},
+  "expected_mapped_questions": 1314,
+  "expected_unmapped_questions": 2195,
+  "expected_newly_mapped_distinct_questions": 5,
+  "provenance": {
+    "coren_rs_2018": {
+      "official_contest": "https://quadrix.org.br/informacoes/1302/",
+      "original_number": 36,
+      "answer": "D",
+      "question_reference": "Quadrix 2018 — COREN-RS — Analista — Jurídico — questão 36"
+    }
+  },
+  "quality_notes": [
+    "Uma questão real Quadrix nova foi incluída; quatro questões já públicas foram apenas vinculadas a tópicos do edital.",
+    "Tipificação Nacional e SIAFEM-DF permanecem em exatamente uma questão.",
+    "CadÚnico permanece em exatamente duas questões; nenhuma equivalência artificial foi criada."
+  ]
+}
