@@ -2,11 +2,9 @@ name: Publicar GitHub Pages — autorização controlada
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - .github/deploy-trigger
+  issues:
+    types:
+      - opened
 
 permissions:
   contents: read
@@ -25,6 +23,12 @@ env:
 
 jobs:
   validate-deploy-verify:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issues' &&
+       github.event.action == 'opened' &&
+       github.event.issue.title == '[deploy-pages]' &&
+       github.actor == github.repository_owner)
     runs-on: ubuntu-latest
     timeout-minutes: 90
     environment:
