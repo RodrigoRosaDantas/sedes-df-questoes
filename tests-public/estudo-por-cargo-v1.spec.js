@@ -59,7 +59,7 @@ test("página filha mantém navegação completa no mobile e não prende o usuá
   await expect(quick).toContainText("Banco livre");
   await expect(quick).toContainText("Revisar");
   await expect(quick).toContainText("Desempenho");
-  await expect(page.locator("[data-role-study-context]")).toContainText("Cargo → matéria → tópico → questões");
+  await expect(page.locator("[data-role-study-context]")).toContainText("Cargo → bloco → matéria → tópico → questões");
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(1);
   await quick.getByText("Banco livre", {exact: true}).click();
