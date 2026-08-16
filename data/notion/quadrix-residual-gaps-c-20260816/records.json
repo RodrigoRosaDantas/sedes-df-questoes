@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "SEDES-QDX-RESIDUAL-GAPS-20260816-C",
+  "records": [
+    {
+      "source_board": "Instituto Quadrix",
+      "material_type": "Prova",
+      "year": 2018,
+      "organization": "Conselho Regional de Enfermagem do Rio Grande do Sul — COREN-RS",
+      "cargo": "Analista — Jurídico",
+      "cargo_code": "400",
+      "format": "Múltipla escolha A–E",
+      "publication_lot": "SEDES-QDX-RESIDUAL-GAPS-20260816-C",
+      "released_for_export": true,
+      "annulled": false,
+      "has_image": false,
+      "code": "PROVA-QDX-CORENRS-2018-ANALISTA-JURIDICO-400-036",
+      "notion_url": "https://app.notion.com/p/3becf5a267318130895ac4c1b4b662f9?pvs=204",
+      "material_name": "Analista — Jurídico — COREN-RS — Quadrix 2018",
+      "original_number": 36,
+      "block": "Conhecimentos Específicos",
+      "discipline": "Direito Administrativo",
+      "subject": "MROSC",
+      "subsubject": "Chamamento público — homologação e direito à celebração da parceria",
+      "text_base": "",
+      "prompt": "Nos dias atuais, é crescente o número de parcerias firmadas entre a Administração Pública e as organizações da sociedade civil, por meio de regime de mútua cooperação e para a consecução de finalidades de interesse público e recíproco. Sendo assim, assinale a alternativa correta com base no regime jurídico que rege tais parcerias.",
+      "alternatives": {
+        "A": "Independe da transferência de recursos financeiros a parceria formalizada, por meio de termo de fomento, quando solicitada pela organização da sociedade civil interessada e expressamente autorizada pela Administração Pública.",
+        "B": "Para se evitar qualquer forma de direcionamento, e mesmo nos casos de calamidade pública, o chamamento público é indispensável para a celebração de termo de colaboração.",
+        "C": "Nos editais de convocação para a formalização de termo de colaboração, é vedado à Administração Pública admitir cláusulas ou condições que restrinjam seu caráter competitivo, não sendo lícita, inclusive, a seleção de propostas apresentadas exclusivamente por concorrentes sediados ou com representação atuante e reconhecida na unidade da Federação onde será executado o objeto da parceria.",
+        "D": "Ainda que homologado o resultado do julgamento, a organização da sociedade civil selecionada não terá direito à celebração da parceria.",
+        "E": "É vedado à Administração Pública selecionar proposta que não seja a mais adequada ao valor de referência constante do chamamento público, ainda que devidamente justificado."
+      },
+      "answer": "D",
+      "comment": "A alternativa D reproduz a regra do art. 27, § 6º, da Lei nº 13.019/2014: a homologação do resultado do julgamento não gera direito para a organização da sociedade civil à celebração da parceria. A questão também explora exceções e regras do chamamento público e do julgamento das propostas.",
+      "alternative_comments": {
+        "A": "Incorreta. O termo de fomento pressupõe parceria com transferência de recursos financeiros e é utilizado para propostas de iniciativa da organização da sociedade civil.",
+        "B": "Incorreta. A Lei nº 13.019/2014 admite hipóteses legais de dispensa de chamamento público, inclusive em situações previstas no art. 30.",
+        "C": "Incorreta. A própria Lei nº 13.019/2014 admite, em determinadas condições, seleção de propostas de concorrentes sediados ou com representação atuante na unidade da Federação onde o objeto será executado.",
+        "D": "Correta. A homologação do resultado não gera direito subjetivo à celebração da parceria, conforme art. 27, § 6º, da Lei nº 13.019/2014.",
+        "E": "Incorreta. A seleção de proposta que não seja a mais adequada ao valor de referência pode ocorrer, desde que seja obrigatoriamente justificada, conforme art. 27, § 5º."
+      },
+      "foundation": "Lei nº 13.019/2014, especialmente arts. 24, 27, §§ 5º e 6º, e 30. Prova real do Instituto Quadrix para o COREN-RS em 2018; o concurso possui gabarito definitivo da prova objetiva publicado pela banca.",
+      "trap": "Confundir homologação do resultado do chamamento com direito adquirido da organização selecionada à celebração da parceria.",
+      "observations": "Questão original 36 da prova de Analista — Jurídico do COREN-RS; gabarito D.",
+      "source_url": "https://quadrix.org.br/informacoes/1302/",
+      "pdf_page": ""
+    }
+  ]
+}
