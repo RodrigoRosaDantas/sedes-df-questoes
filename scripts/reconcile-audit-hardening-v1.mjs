@@ -1,4 +1,4 @@
-import "./derive-quadrix-residual-gaps-d-20260816.mjs";
+import "./derive-quadrix-residual-gaps-e-20260816.mjs";
 import "./publish-study-by-role-v1.mjs";
 import crypto from "node:crypto";
 import fs from "node:fs";
