@@ -73,6 +73,12 @@ if (read("assets/estudo-por-cargo-v1.js") !== read("dist/assets/estudo-por-cargo
 if (read("assets/estudo-por-cargo-v1.css") !== read("dist/assets/estudo-por-cargo-v1.css")) throw new Error("CSS do Estudo por Cargo no dist diverge da fonte.");
 
 const map = JSON.parse(read("dist/data/release/edital-map-v1.json"));
+const itemById = new Map((map.sections || []).flatMap(section => (section.items || []).map(item => [item.id, item])));
+const requiredNonEmptyByTarget = {
+  "202": ["geral-df-2", "geral-df-4", "geral-df-6", "geral-df-7", "tdas-prog-1", "tdas-prog-2", "tdas-prog-3"],
+  "400": ["geral-df-2", "geral-df-4", "geral-df-6", "geral-df-7", "edas-prog-1", "edas-prog-2", "edas-prog-3"],
+};
+
 for (const code of ["202", "400"]) {
   const target = map.targets?.[code];
   if (!target) throw new Error(`Mapa sem cargo ${code}.`);
@@ -82,6 +88,16 @@ for (const code of ["202", "400"]) {
   const topics = rawSections.flatMap(section => (section.items || []).filter(item => generalSections.has(section.id) || specificItems.has(item.id)));
   const ids = new Set(topics.flatMap(item => item.question_ids || []));
   if (rawSections.length < 3 || topics.length < 10 || ids.size < 60) throw new Error(`Cargo ${code} sem cobertura suficiente para a taxonomia de matérias.`);
+
+  for (const itemId of requiredNonEmptyByTarget[code]) {
+    const item = itemById.get(itemId);
+    if (!item || Number(item.question_count || 0) < 1) throw new Error(`Cargo ${code}: tópico crítico sem questões após o mapeamento: ${itemId}.`);
+  }
+
+  if (code === "202") {
+    const emptyTopics = topics.filter(item => Number(item.question_count || 0) < 1).map(item => item.id);
+    if (emptyTopics.length) throw new Error(`Cargo 202 ainda possui tópicos sem questões: ${emptyTopics.join(", ")}.`);
+  }
 }
 
-console.log("✓ Estudo por Cargo validado: conhecimentos gerais → comuns do nível/carreira → específicos do cargo → matérias → tópicos → questões, com progresso global e resolvedor compartilhado.");
+console.log("✓ Estudo por Cargo validado: conhecimentos gerais → comuns do nível/carreira → específicos do cargo → matérias → tópicos → questões, com progresso global, resolvedor compartilhado e TDAS sem tópicos vazios.");
