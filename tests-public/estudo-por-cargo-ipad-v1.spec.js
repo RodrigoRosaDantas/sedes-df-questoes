@@ -62,12 +62,17 @@ async function visualSnapshot(page) {
   });
 }
 
-test("Estudo por Cargo preserva contraste no iPad em paisagem", async ({page}) => {
-  await page.setViewportSize({width: 1366, height: 1024});
-  await page.addInitScript(() => localStorage.setItem("sedes.questoes.theme", "dark"));
-  await page.goto("./estudo-por-cargo.html?cargo=400", {waitUntil: "domcontentloaded"});
+async function setThemeAndReload(page, theme) {
+  await page.evaluate(value => localStorage.setItem("sedes.questoes.theme", value), theme);
+  await page.reload({waitUntil: "domcontentloaded"});
   await expect(page.locator("[data-role-study-shell]")).toBeVisible({timeout: 30000});
   await expect(page.locator("[data-role-knowledge-group]")).toHaveCount(3);
+}
+
+test("Estudo por Cargo preserva contraste no iPad em paisagem", async ({page}) => {
+  await page.setViewportSize({width: 1366, height: 1024});
+  await page.goto("./estudo-por-cargo.html?cargo=400", {waitUntil: "domcontentloaded"});
+  await setThemeAndReload(page, "dark");
 
   const dark = await visualSnapshot(page);
   expect(dark.theme).toBe("dark");
@@ -85,9 +90,7 @@ test("Estudo por Cargo preserva contraste no iPad em paisagem", async ({page}) =
   expect(contrast(dark.kpiValue.color, dark.kpi.backgroundColor)).toBeGreaterThan(4.5);
   expect(contrast(dark.groupTitle.color, dark.group.backgroundColor)).toBeGreaterThan(4.5);
 
-  await page.evaluate(() => localStorage.setItem("sedes.questoes.theme", "light"));
-  await page.reload({waitUntil: "domcontentloaded"});
-  await expect(page.locator("[data-role-study-shell]")).toBeVisible({timeout: 30000});
+  await setThemeAndReload(page, "light");
   const light = await visualSnapshot(page);
   expect(light.theme).toBe("light");
   expect(light.loadingCount).toBe(0);
