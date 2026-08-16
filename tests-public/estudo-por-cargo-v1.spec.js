@@ -45,6 +45,27 @@ test("mobile mostra Por cargo na navegação sem exigir link direto", async ({pa
   expect(overflow).toBeLessThanOrEqual(1);
 });
 
+test("página filha mantém navegação completa no mobile e não prende o usuário", async ({page}) => {
+  await page.setViewportSize({width: 390, height: 844});
+  await page.goto("./estudo-por-cargo.html?cargo=202", {waitUntil: "domcontentloaded"});
+  await expect(page.locator("[data-role-study-shell]")).toBeVisible({timeout: 30000});
+  const mobile = page.locator(".role-study-mobile-nav");
+  await expect(mobile).toBeVisible();
+  await expect(mobile.locator("a")).toHaveCount(5);
+  await expect(mobile.locator('[data-role-study-nav]')).toContainText("Por cargo");
+  const quick = page.locator("[data-role-study-quicknav]");
+  await expect(quick).toBeVisible();
+  await expect(quick).toContainText("Matérias por cargo");
+  await expect(quick).toContainText("Banco livre");
+  await expect(quick).toContainText("Revisar");
+  await expect(quick).toContainText("Desempenho");
+  await expect(page.locator("[data-role-study-context]")).toContainText("Cargo → matéria → tópico → questões");
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+  await quick.getByText("Banco livre", {exact: true}).click();
+  await page.waitForURL(/index\.html#\/estudar$/);
+});
+
 test("página filha usa matérias reais do cargo e navega matéria → tópico → questão", async ({page}) => {
   test.setTimeout(90000);
   await clearState(page);
