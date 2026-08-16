@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "SEDES-QDX-RESIDUAL-DENSITY-20260816",
+  "captured_at": "2026-08-16T16:14:00.000Z",
+  "catalog_totals": {
+    "banco_mestre": 3508,
+    "public_questions": 3506,
+    "materials": 91,
+    "proofs": 52,
+    "simulations": 39,
+    "discursive_display_items": 2,
+    "awaiting_audit": 0
+  },
+  "mapping_count": 5,
+  "distinct_questions": 5,
+  "newly_mapped_distinct_questions": 4,
+  "expected_mapped_questions": 1307,
+  "expected_unmapped_questions": 2199,
+  "mappings": [
+    {
+      "question_id": "prova-qdx-altoparaiso-2023-as-035",
+      "item_id": "edas-suas-3",
+      "answer": "E",
+      "format": "A–E",
+      "prompt_sha256": "4fd7a8678d3c0d1fde4ee661f0852c2417c33e45d00e5280221f5fcd81f50b9f"
+    },
+    {
+      "question_id": "qdx-seedf-2022-gppgadm-a-086",
+      "item_id": "400-gp-5-10",
+      "answer": "Certo",
+      "format": "Certo/Errado",
+      "prompt_sha256": "c9d5ad589645f20d25842ccb0c253ef5091ad6804b2307ade9a55a3ac545e861"
+    },
+    {
+      "question_id": "qdx-seedf-2022-gppgadm-a-089",
+      "item_id": "400-gp-5-10",
+      "answer": "Certo",
+      "format": "Certo/Errado",
+      "prompt_sha256": "5a9e27c0fa4796fe20b410e3af45774084d769c82bdfa8ac6764c31f5613e212"
+    },
+    {
+      "question_id": "prova-qdx-crefito17-2026-auxiliar-administrativo-200-076",
+      "item_id": "400-gp-5-10",
+      "answer": "Errado",
+      "format": "Certo/Errado",
+      "prompt_sha256": "0e55af7eda69137a1ce709aa96d96d1944d069c966d6dcc1a107415d25726a16"
+    },
+    {
+      "question_id": "prova-qdx-crfdf-2026-assistente-i-200-076",
+      "item_id": "400-gp-5-11",
+      "answer": "Errado",
+      "format": "Certo/Errado",
+      "prompt_sha256": "078feb629e4888e1e787363e92b069b0e0da0d8758b60497aa3d2b48ddf6c5f6"
+    }
+  ],
+  "expected_minimums": {
+    "edas-suas-3": 3,
+    "400-gp-5-10": 6,
+    "400-gp-5-11": 3
+  },
+  "protected_singletons": {
+    "edas-suas-4": 1,
+    "400-afo-4-5": 1
+  },
+  "quality_notes": [
+    "Nenhuma questão nova é criada; o lote apenas acrescenta vínculos editoriais explícitos de questões reais Quadrix já publicadas.",
+    "A questão de Alto Paraíso/GO cobra diretamente gestão do trabalho no SUAS, valorização dos trabalhadores e educação permanente, aderindo ao núcleo da NOB-RH/SUAS.",
+    "As três questões adicionadas a desenvolvimento/capacitação cobram explicitamente capacitação, treinamento e desenvolvimento profissional.",
+    "A questão do CRF-DF já classificada em desenvolvimento menciona expressamente política de cargos, salários e benefícios, justificando vínculo adicional com administração de cargos, carreiras e salários.",
+    "Tipificação Nacional e SIAFEM-DF permanecem em 1; SIAFI federal e menções tangenciais à Tipificação continuam excluídos."
+  ]
+}
