@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#08131f">
-  <meta name="description" content="Estudo por Cargo da plataforma SEDES/DF: cargo, matérias, tópicos e questões com progresso integrado.">
+  <meta name="description" content="Estudo por Cargo da plataforma SEDES/DF: conhecimentos comuns por nível, específicos por cargo, matérias, tópicos e questões com progresso integrado.">
   <link rel="manifest" href="./manifest.webmanifest">
   <title>Estudo por Cargo · SEDES/DF Questões</title>
   <link rel="stylesheet" href="./assets/styles.css?v=2">
@@ -13,6 +13,11 @@
   <link rel="stylesheet" href="./assets/navigation-v2-15.css?v=1">
   <link rel="stylesheet" href="./assets/navigation-v2-15-polish.css?v=1">
   <link rel="stylesheet" href="./assets/estudo-por-cargo-v1.css?v=2">
+  <style>
+    .role-subject-grid.is-grouped{display:grid;grid-template-columns:1fr;gap:18px}.role-knowledge-groups{display:grid;gap:18px}.role-knowledge-group{display:grid;gap:12px;padding:17px;border:1px solid var(--border);border-radius:18px;background:color-mix(in srgb,var(--surface) 97%,transparent)}.role-knowledge-group.common{border-color:color-mix(in srgb,var(--accent) 32%,var(--border))}.role-knowledge-group-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}.role-knowledge-group-head>div{display:grid;gap:4px}.role-knowledge-group-head span,.role-knowledge-badge{display:inline-flex;width:max-content;max-width:100%;padding:4px 8px;border:1px solid var(--border);border-radius:999px;background:var(--surface-soft);font-size:.62rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}.role-knowledge-group-head h2{margin:0;font-size:1.08rem}.role-knowledge-group-head p{margin:0;color:var(--muted);font-size:.78rem;line-height:1.45}.role-knowledge-group-count{display:grid;place-items:center;min-width:70px;padding:9px 10px;border:1px solid var(--border);border-radius:12px;background:var(--surface-soft);text-align:center}.role-knowledge-group-count strong{font-size:1.15rem}.role-knowledge-group-count small{font-size:.62rem;color:var(--muted)}.role-knowledge-group-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.role-knowledge-badge{margin-bottom:7px;color:var(--accent);border-color:color-mix(in srgb,var(--accent) 42%,var(--border));background:color-mix(in srgb,var(--accent) 7%,var(--surface-soft))}.role-level-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.role-level-summary article{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--border);border-radius:14px;background:var(--surface-soft)}.role-level-summary article strong{font-size:.82rem}.role-level-summary article span{font-size:.68rem;color:var(--muted)}
+    @media(max-width:1080px){.role-knowledge-group-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:720px){.role-knowledge-group{padding:13px;border-radius:15px}.role-knowledge-group-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px}.role-knowledge-group-head p{grid-column:1/-1}.role-knowledge-group-grid{grid-template-columns:1fr}.role-level-summary{grid-template-columns:1fr}.role-knowledge-group-count{min-width:62px}.role-knowledge-group-head h2{font-size:1rem}}
+  </style>
 </head>
 <body data-estudo-por-cargo-page>
   <a class="skip" href="#cargo-study-app">Pular para o conteúdo</a>
@@ -40,7 +45,7 @@
   </nav>
 
   <div class="role-study-context" data-role-study-context>
-    <div><span class="role-study-context-kicker">Estudo por Cargo</span><strong>Cargo → matéria → tópico → questões</strong></div>
+    <div><span class="role-study-context-kicker">Estudo por Cargo</span><strong>Cargo → bloco → matéria → tópico → questões</strong></div>
     <div class="role-study-context-actions">
       <a href="./index.html#/estudar">Banco</a>
       <a href="./index.html#/revisar">Revisões</a>
@@ -70,6 +75,110 @@
   </footer>
 
   <script type="module" src="./assets/estudo-por-cargo-v1.js?v=1"></script>
+  <script>
+    (() => {
+      const COMMON_IDS = new Set(["lingua-portuguesa","realidade-df-ride","politica-mulheres-pdpm","lei-organica-df","lc-840-2011","lei-maria-da-penha","lei-7484-2024","primeiros-socorros"]);
+      const GROUPS = {
+        "202": {
+          common: {title: "Conhecimentos comuns — nível médio", subtitle: "Conteúdos comuns aos cargos de nível médio", badge: "Comum · nível médio"},
+          specific: {title: "Conhecimentos específicos — Técnico Administrativo (202)", subtitle: "Conteúdos próprios do cargo 202", badge: "Específico · cargo 202"},
+        },
+        "400": {
+          common: {title: "Conhecimentos comuns — nível superior", subtitle: "Conteúdos comuns aos cargos de nível superior", badge: "Comum · nível superior"},
+          specific: {title: "Conhecimentos específicos — Administrador (400)", subtitle: "Conteúdos próprios do cargo 400", badge: "Específico · cargo 400"},
+        },
+      };
+      let scheduled = false;
+      const schedule = () => {
+        if (scheduled) return;
+        scheduled = true;
+        requestAnimationFrame(() => { scheduled = false; enhance(); });
+      };
+      const groupInfo = (target, subjectId) => COMMON_IDS.has(subjectId) ? GROUPS[target]?.common : GROUPS[target]?.specific;
+      function groupCards(shell, target) {
+        const grid = shell.querySelector("[data-role-subject-grid]");
+        if (!grid || grid.dataset.groupedFor === target) return;
+        const cards = [...grid.querySelectorAll(":scope > [data-role-subject]")];
+        if (!cards.length) return;
+        grid.dataset.groupedFor = target;
+        grid.classList.add("is-grouped");
+        const buckets = {common: [], specific: []};
+        for (const card of cards) buckets[COMMON_IDS.has(card.dataset.roleSubject) ? "common" : "specific"].push(card);
+        const groupsWrap = document.createElement("div");
+        groupsWrap.className = "role-knowledge-groups";
+        for (const kind of ["common", "specific"]) {
+          const info = GROUPS[target]?.[kind];
+          const items = buckets[kind];
+          if (!info || !items.length) continue;
+          const section = document.createElement("section");
+          section.className = `role-knowledge-group ${kind}`;
+          section.dataset.roleKnowledgeGroup = kind;
+          const head = document.createElement("header");
+          head.className = "role-knowledge-group-head";
+          head.innerHTML = `<div><span>${kind === "common" ? "Bloco comum" : "Bloco específico"}</span><h2>${info.title}</h2><p>${info.subtitle}. Abra uma matéria para ver seus tópicos e questões.</p></div><div class="role-knowledge-group-count"><strong>${items.length}</strong><small>matérias</small></div>`;
+          const cardsGrid = document.createElement("div");
+          cardsGrid.className = "role-knowledge-group-grid";
+          items.forEach(card => {
+            const scope = card.querySelector(".role-scope");
+            if (scope) scope.textContent = info.badge;
+            cardsGrid.append(card);
+          });
+          section.append(head, cardsGrid);
+          groupsWrap.append(section);
+        }
+        grid.append(groupsWrap);
+        const intro = shell.querySelector(".role-section-intro");
+        const eyebrow = intro?.querySelector(".eyebrow");
+        const heading = intro?.querySelector("h2");
+        const paragraph = intro?.querySelector("p:not(.eyebrow)");
+        if (eyebrow) eyebrow.textContent = "1 · Blocos e matérias do cargo";
+        if (heading) heading.textContent = "Escolha primeiro o bloco e depois a matéria";
+        if (paragraph) paragraph.textContent = target === "202" ? "O cargo 202 combina conhecimentos comuns de nível médio com conhecimentos específicos do Técnico Administrativo." : "O cargo 400 combina conhecimentos comuns de nível superior com conhecimentos específicos do Administrador.";
+        const kpis = shell.querySelector("[data-role-kpis]");
+        if (kpis && !shell.querySelector("[data-role-level-summary]")) {
+          const summary = document.createElement("div");
+          summary.className = "role-level-summary";
+          summary.dataset.roleLevelSummary = "";
+          summary.innerHTML = `<article><strong>${GROUPS[target].common.title}</strong><span>${buckets.common.length} matérias</span></article><article><strong>${GROUPS[target].specific.title}</strong><span>${buckets.specific.length} matérias</span></article>`;
+          kpis.insertAdjacentElement("beforebegin", summary);
+        }
+      }
+      function annotateDrilldown(shell, target) {
+        const params = new URLSearchParams(location.search);
+        const subjectId = params.get("materia");
+        if (!subjectId) return;
+        const info = groupInfo(target, subjectId);
+        if (!info) return;
+        const panelHead = shell.querySelector(".role-panel-head > div");
+        if (panelHead && !panelHead.querySelector("[data-role-knowledge-badge]")) {
+          const badge = document.createElement("span");
+          badge.className = "role-knowledge-badge";
+          badge.dataset.roleKnowledgeBadge = "";
+          badge.textContent = info.title;
+          panelHead.prepend(badge);
+        }
+        const breadcrumb = shell.querySelector(".role-breadcrumb");
+        if (breadcrumb && !breadcrumb.querySelector("[data-role-knowledge-badge]")) {
+          const badge = document.createElement("span");
+          badge.className = "role-knowledge-badge";
+          badge.dataset.roleKnowledgeBadge = "";
+          badge.textContent = info.badge;
+          breadcrumb.prepend(badge);
+        }
+      }
+      function enhance() {
+        const shell = document.querySelector("[data-role-study-shell]");
+        if (!shell) return;
+        const target = shell.dataset.roleTargetCode;
+        if (!GROUPS[target]) return;
+        groupCards(shell, target);
+        annotateDrilldown(shell, target);
+      }
+      new MutationObserver(schedule).observe(document.querySelector("#cargo-study-app"), {childList:true, subtree:true});
+      addEventListener("popstate", schedule);
+      schedule();
+    })();
+  </script>
   <script type="module" src="./assets/pwa-v2-9.js?v=1"></script>
 </body>
 </html>
