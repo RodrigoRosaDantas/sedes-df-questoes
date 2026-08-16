@@ -27,7 +27,7 @@ for (const marker of [
   "Conhecimentos específicos — Técnico Administrativo (202)",
   "Conhecimentos específicos — Administrador (400)",
   "LEVEL_COMMON_IDS",
-  "data-role-knowledge-group",
+  "dataset.roleKnowledgeGroup",
 ]) must(sourcePage, marker, "Página filha");
 for (const marker of [
   "COMMON_STUDY_SUBJECTS",
