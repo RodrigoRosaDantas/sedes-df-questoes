@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "SEDES-QDX-SPARSE-GAPS-20260816",
+  "captured_at": "2026-08-16T05:22:00.000Z",
+  "expected_count": 2,
+  "expected_materials_added": 2,
+  "files": ["cress-ro.json", "crm-mg.json"],
+  "expected_codes": [
+    "PROVA-QDX-CRESSRO-2021-TECNICO-ADMINISTRATIVO-400-021",
+    "PROVA-QDX-CRMMG-2025-ANALISTA-LICITACAO-400-038"
+  ],
+  "mapping_only": [
+    {"question_id":"prova-qdx-altoparaiso-2023-as-037","item_id":"edas-suas-5"},
+    {"question_id":"prova-qdx-altoparaiso-2023-as-038","item_id":"edas-suas-5"},
+    {"question_id":"prova-qdx-altoparaiso-2023-as-039","item_id":"edas-suas-5"}
+  ],
+  "source": {
+    "name": "Banco Mestre — Provas e Simulados SEDES/DF",
+    "database_url": "https://app.notion.com/p/a1d5fc8f8e434105861faba90dc156d9",
+    "previous_public_questions": 3504,
+    "expected_public_questions": 3506,
+    "expected_materials": 91,
+    "expected_proofs": 52,
+    "simulations": 39,
+    "master_total": 3508,
+    "discursive_display_items": 2,
+    "expected_awaiting_audit": 0
+  },
+  "provenance": {
+    "cress_ro": {
+      "official_contest": "https://concursos.quadrix.org.br/informacoes/1229/",
+      "question_index": "Q1903379",
+      "original_number": 21,
+      "answer": "E"
+    },
+    "crm_mg": {
+      "official_contest": "https://quadrix.org.br/informacoes/1041/",
+      "question_index": "Q3326517",
+      "original_number": 38,
+      "answer": "D",
+      "law": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2014/lei/l13019compilado.htm"
+    }
+  },
+  "quality_notes": [
+    "CRESS-SE 2021 não incluído porque a numeração original do item de PAIF/Tipificação não foi comprovada com o mesmo nível de segurança.",
+    "Questões federais de SIAFI não foram mapeadas ao tópico específico SIAFEM-DF.",
+    "Os três itens de Alto Paraíso/GO 2023 já estavam publicados e recebem somente correção explícita de vínculo ao tópico de Conselhos e Conferências."
+  ]
+}
