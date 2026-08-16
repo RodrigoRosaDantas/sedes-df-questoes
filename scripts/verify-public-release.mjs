@@ -41,6 +41,7 @@ for (const file of syntaxFiles) run("--check", [file]);
 run("scripts/build-question-search-index.mjs", [], {GITHUB_SHA: requestedSha});
 run("scripts/build-public.mjs", [], {GITHUB_SHA: requestedSha});
 run("scripts/apply-edas-coverage-400.mjs", [], {GITHUB_SHA: requestedSha, RELEASE_DIR: "dist/data/release"});
+run("scripts/build-edital-map-v1.mjs", [], {GITHUB_SHA: requestedSha});
 run("scripts/derive-edas-coverage-400.mjs", [], {GITHUB_SHA: requestedSha});
 for (const script of [
   "scripts/build-content-model-v1.mjs",
