@@ -1,0 +1,68 @@
+/* Compatibilidade visual do Estudo por Cargo em Safari/iPad.
+   A página filha usa a paleta histórica da plataforma (--panel/--line/--green)
+   e expõe aliases explícitos para os componentes mais novos. */
+body[data-estudo-por-cargo-page]{
+  --surface:var(--panel);
+  --surface-soft:var(--panel-2);
+  --border:var(--line);
+  --accent:var(--green);
+  color:var(--text);
+  background-color:var(--bg);
+  color-scheme:dark;
+}
+html[data-theme="light"] body[data-estudo-por-cargo-page]{color-scheme:light}
+html[data-theme="dark"] body[data-estudo-por-cargo-page]{color-scheme:dark}
+
+/* Não permitir que um estado herdado deixe o módulo desbotado. */
+body[data-estudo-por-cargo-page] .role-study-page,
+body[data-estudo-por-cargo-page] .role-study-shell,
+body[data-estudo-por-cargo-page] .role-study-quicknav,
+body[data-estudo-por-cargo-page] .role-study-context{opacity:1!important;filter:none!important}
+
+/* Superfícies críticas ficam opacas e com contraste determinístico. */
+body[data-estudo-por-cargo-page] .role-study-quicknav a,
+body[data-estudo-por-cargo-page] .role-study-context,
+body[data-estudo-por-cargo-page] .role-profile,
+body[data-estudo-por-cargo-page] .role-targets button,
+body[data-estudo-por-cargo-page] .role-kpis article,
+body[data-estudo-por-cargo-page] .role-section-intro,
+body[data-estudo-por-cargo-page] .role-panel,
+body[data-estudo-por-cargo-page] .role-knowledge-group,
+body[data-estudo-por-cargo-page] .role-level-summary article,
+body[data-estudo-por-cargo-page] .role-subject-card,
+body[data-estudo-por-cargo-page] .role-topic-card,
+body[data-estudo-por-cargo-page] .role-question-row{background-color:var(--panel);color:var(--text)}
+
+body[data-estudo-por-cargo-page] .role-study-quicknav a>span,
+body[data-estudo-por-cargo-page] .role-scope,
+body[data-estudo-por-cargo-page] .role-knowledge-group-count,
+body[data-estudo-por-cargo-page] .role-knowledge-group-head span,
+body[data-estudo-por-cargo-page] .role-knowledge-badge,
+body[data-estudo-por-cargo-page] .role-topic-actions,
+body[data-estudo-por-cargo-page] .role-topic-score{background-color:var(--panel-2)}
+
+body[data-estudo-por-cargo-page] .role-hero{
+  color:var(--text);
+  background-color:var(--panel);
+  background-image:linear-gradient(135deg,color-mix(in srgb,var(--green) 9%,var(--panel)),var(--panel) 52%);
+}
+body[data-estudo-por-cargo-page] .role-hero h1,
+body[data-estudo-por-cargo-page] .role-targets strong,
+body[data-estudo-por-cargo-page] .role-kpis strong,
+body[data-estudo-por-cargo-page] .role-subject-card strong,
+body[data-estudo-por-cargo-page] .role-knowledge-group h2{color:var(--text)}
+body[data-estudo-por-cargo-page] .role-hero p,
+body[data-estudo-por-cargo-page] .role-targets span,
+body[data-estudo-por-cargo-page] .role-kpis span,
+body[data-estudo-por-cargo-page] .role-kpis small,
+body[data-estudo-por-cargo-page] .role-study-quicknav small,
+body[data-estudo-por-cargo-page] .role-knowledge-group p,
+body[data-estudo-por-cargo-page] .role-level-summary span{color:var(--muted)}
+
+/* Safari/iPad: evitar composição de backdrop-filter sobre grandes áreas. */
+@supports (-webkit-touch-callout:none){
+  body[data-estudo-por-cargo-page] .role-study-topbar{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none}
+  body[data-estudo-por-cargo-page] .role-study-quicknav,
+  body[data-estudo-por-cargo-page] .role-study-context,
+  body[data-estudo-por-cargo-page] .role-breadcrumb{-webkit-backdrop-filter:none;backdrop-filter:none;background-color:var(--panel)}
+}
