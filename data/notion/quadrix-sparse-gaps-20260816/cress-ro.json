@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "SEDES-QDX-SPARSE-GAPS-20260816",
+  "records": [
+    {
+      "code": "PROVA-QDX-CRESSRO-2021-TECNICO-ADMINISTRATIVO-400-021",
+      "original_number": 21,
+      "material_name": "Técnico Administrativo Executivo — CRESS-RO — Quadrix 2021",
+      "material_type": "Prova",
+      "year": 2021,
+      "organization": "Conselho Regional de Serviço Social da 23ª Região — CRESS-RO",
+      "cargo": "Técnico Administrativo Executivo",
+      "cargo_code": "400",
+      "source_board": "Instituto Quadrix",
+      "format": "Múltipla escolha A–E",
+      "block": "Conhecimentos Específicos",
+      "discipline": "Gestão de Pessoas",
+      "subject": "Administração de cargos, carreiras e salários",
+      "subsubject": "Avaliação de cargos — método por pontos",
+      "text_base": "",
+      "prompt": "A avaliação de cargos é parte essencial da elaboração do plano de cargos e salários. O objetivo é atribuir valor para cada posto a ser ocupado na organização, conforme o seu grau de relevância. Considerando essa informação, assinale a alternativa que apresenta o método que consiste na atribuição de valores aos fatores, de acordo com a quantidade de graus aplicados.",
+      "alternatives": {
+        "A": "escalonamento simples de cargos",
+        "B": "método por graus determinados",
+        "C": "classificação predeterminada",
+        "D": "avaliação quantitativa por comparação de fatores",
+        "E": "avaliação quantitativa por meio de pontos"
+      },
+      "answer": "E",
+      "comment": "O item cobra a distinção entre métodos de avaliação de cargos. A descrição corresponde ao método quantitativo por pontos, no qual fatores e respectivos graus recebem pontuações para determinar o valor relativo de cada cargo.",
+      "alternative_comments": {
+        "A": "O escalonamento simples ordena os cargos globalmente, sem atribuir pontos graduados a fatores de avaliação.",
+        "B": "O método por graus predeterminados enquadra cargos em classes ou graus previamente definidos.",
+        "C": "A classificação predeterminada agrupa cargos em categorias definidas previamente.",
+        "D": "A comparação de fatores é quantitativa, mas não corresponde à atribuição de pontos a graus de fatores descrita no enunciado.",
+        "E": "Correta. No método por pontos, fatores e graus recebem pontuações cuja soma expressa o valor relativo do cargo."
+      },
+      "foundation": "Gestão de Pessoas — avaliação de cargos e método quantitativo por pontos; prova real do Instituto Quadrix com gabarito definitivo publicado no concurso CRESS-RO.",
+      "trap": "Confundir comparação de fatores com método por pontos por ambos serem quantitativos.",
+      "observations": "Numeração original confirmada pela sequência da prova indexada de 50 questões; questão 21. Gabarito E corroborado pelo índice de respostas da prova.",
+      "notion_url": "https://app.notion.com/p/3becf5a267318141ac5eed939cffdb32?pvs=204",
+      "source_url": "https://concursos.quadrix.org.br/informacoes/1229/",
+      "publication_lot": "SEDES-QDX-SPARSE-GAPS-20260816",
+      "released_for_export": true,
+      "annulled": false,
+      "has_image": false,
+      "pdf_page": ""
+    }
+  ]
+}
