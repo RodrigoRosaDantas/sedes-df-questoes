@@ -14,7 +14,19 @@ const sourceCss = read("assets/estudo-por-cargo-v1.css");
 const sourceIndex = read("index.html");
 const sourceSw = read("service-worker.js");
 
-for (const marker of ["Estudo por Cargo", "data-estudo-por-cargo-page", "cargo-study-app", "estudo-por-cargo-v1.js?v=1", "Voltar para Estudar"]) must(sourcePage, marker, "Página filha");
+for (const marker of [
+  "Estudo por Cargo",
+  "data-estudo-por-cargo-page",
+  "cargo-study-app",
+  "estudo-por-cargo-v1.js?v=1",
+  "Voltar para Estudar",
+  "Cargo → bloco → matéria → tópico → questões",
+  "Conhecimentos comuns — nível médio",
+  "Conhecimentos comuns — nível superior",
+  "Conhecimentos específicos — Técnico Administrativo (202)",
+  "Conhecimentos específicos — Administrador (400)",
+  "data-role-knowledge-group",
+]) must(sourcePage, marker, "Página filha");
 for (const marker of [
   "COMMON_STUDY_SUBJECTS",
   "TARGET_STUDY_SUBJECTS",
@@ -70,4 +82,4 @@ for (const code of ["202", "400"]) {
   if (rawSections.length < 3 || topics.length < 10 || ids.size < 60) throw new Error(`Cargo ${code} sem cobertura suficiente para a taxonomia de matérias.`);
 }
 
-console.log("✓ Estudo por Cargo validado: matérias reais por cargo → tópicos → lista de questões, com progresso global e resolvedor compartilhado.");
+console.log("✓ Estudo por Cargo validado: bloco comum por nível → bloco específico do cargo → matérias → tópicos → lista de questões, com progresso global e resolvedor compartilhado.");
