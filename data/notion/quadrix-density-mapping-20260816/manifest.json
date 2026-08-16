@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "SEDES-QDX-DENSITY-MAPPING-20260816",
+  "captured_at": "2026-08-16T15:40:00.000Z",
+  "catalog_totals": {
+    "banco_mestre": 3508,
+    "public_questions": 3506,
+    "materials": 91,
+    "proofs": 52,
+    "simulations": 39,
+    "discursive_display_items": 2,
+    "awaiting_audit": 0
+  },
+  "mapping_count": 14,
+  "distinct_questions": 11,
+  "expected_mapped_questions": 1303,
+  "expected_unmapped_questions": 2203,
+  "mappings": [
+    {"question_id":"prova-qdx-crfa1-2026-analista-administrativo-400-071","item_id":"400-tga-1-1","answer":"Certo","prompt_sha256":"822d0ba94dffa08e7c2c3e62b468087b3f62a21af6f3cf34b713806e408f189e"},
+    {"question_id":"prova-qdx-seedf-2025-profadm-a-071","item_id":"400-tga-1-1","answer":"Errado","prompt_sha256":"d47a2d912e84f43fc3ff8cb48f671b308ef7f90b555bbf0f681ce653e471b47d"},
+    {"question_id":"prova-qdx-crefito17-2026-auxiliar-administrativo-200-087","item_id":"400-tga-1-1","answer":"Certo","prompt_sha256":"a1572fa375dfdbee7fe1687d44c8d861ebe4f5f5eb1d906e0ec11ee6de716e72"},
+    {"question_id":"prova-qdx-crmvrn-2026-agente-administrativo-200-082","item_id":"400-tga-1-1","answer":"Certo","prompt_sha256":"b0ce1ec47e74e3d657e401dc0cfa251c5dbfbd65e9e561336e3846bae3f9dca8"},
+    {"question_id":"prova-qdx-seedf-2025-profadm-a-099","item_id":"400-gp-5-1","answer":"Certo","prompt_sha256":"4e44ba465fc33da6ecbab7880efafbc98253a4dddbb7b1c3a2841f4f8f891629"},
+    {"question_id":"prova-qdx-seedf-2025-profadm-a-100","item_id":"400-gp-5-1","answer":"Certo","prompt_sha256":"d8d8e0fe2156f24df1fbe92b7ef95971dfd0b8c73cb1b5589166567c161f6c29"},
+    {"question_id":"prova-qdx-crefito17-2026-auxiliar-administrativo-200-087","item_id":"400-gp-5-2","answer":"Certo","prompt_sha256":"a1572fa375dfdbee7fe1687d44c8d861ebe4f5f5eb1d906e0ec11ee6de716e72"},
+    {"question_id":"prova-qdx-crmvrn-2026-agente-administrativo-200-082","item_id":"400-gp-5-2","answer":"Certo","prompt_sha256":"b0ce1ec47e74e3d657e401dc0cfa251c5dbfbd65e9e561336e3846bae3f9dca8"},
+    {"question_id":"prova-qdx-crfdf-2026-administrador-400-085","item_id":"400-gp-5-3","answer":"Errado","prompt_sha256":"51a7a8aaef6e9c1099016f5aa7481cc05f65da793ee8d881d66602821eeffdd8"},
+    {"question_id":"prova-qdx-crbm6-2026-agente-administrativo-401-090","item_id":"400-gp-5-3","answer":"Errado","prompt_sha256":"54ec18c9a444008ceab4274aa5b2bf2ff27b4962a0fee9fd8048d45c0556bdff"},
+    {"question_id":"prova-qdx-seedf-2025-profadm-a-102","item_id":"400-gp-5-6","answer":"Certo","prompt_sha256":"5eadc6c52bee900f294e3402b0f99984f45e7dcb38d79b5fa3dcb4eb16de4e34"},
+    {"question_id":"prova-qdx-seedf-2025-profadm-a-101","item_id":"400-gp-5-13","answer":"Errado","prompt_sha256":"e319affa6979c835bfc0b90e78c4d656c93dcf2ac9992fead6a1775dcb6ca9ed"},
+    {"question_id":"prova-qdx-seedf-2025-profadm-a-102","item_id":"400-gp-5-13","answer":"Certo","prompt_sha256":"5eadc6c52bee900f294e3402b0f99984f45e7dcb38d79b5fa3dcb4eb16de4e34"},
+    {"question_id":"prova-qdx-cresspr-2025-agente-fiscal-400-097","item_id":"edas-dir-3","answer":"Certo","prompt_sha256":"45a6b433d91c4f972f5ed54290f09eeccd89b0f1b024366e7f48f9e454788a10"}
+  ],
+  "expected_minimums": {
+    "400-tga-1-1": 6,
+    "400-gp-5-1": 4,
+    "400-gp-5-2": 4,
+    "400-gp-5-3": 4,
+    "400-gp-5-6": 3,
+    "400-gp-5-13": 4,
+    "edas-dir-3": 3
+  },
+  "protected_singletons": {
+    "edas-suas-4": 1,
+    "400-afo-4-5": 1
+  },
+  "quality_notes": [
+    "Nenhuma questão nova é criada; o lote apenas corrige vínculos editoriais explícitos de questões reais Quadrix já publicadas.",
+    "Tipificação Nacional permanece em 1 porque não foi comprovada uma segunda questão real Quadrix com aderência direta e numeração segura.",
+    "SIAFEM-DF permanece em 1; questões de SIAFI federal não são usadas como substituto.",
+    "Candidatos apenas tangenciais a cargos/salários e gestão da mudança foram deliberadamente excluídos para evitar sobreclassificação."
+  ]
+}
