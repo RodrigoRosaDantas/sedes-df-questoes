@@ -34,12 +34,15 @@ if (exists(generated)) {
   const expected = expectedIds.size;
   if (search.schema_version !== "1.0" || search.questions !== expected || search.items?.length !== expected || !sameIds(search.items, expectedIds)) throw new Error("Índice textual gerado diverge da identidade do catálogo.");
   if (exists("dist")) {
-    for (const required of ["dist/assets/ux-v2-14.js", "dist/assets/ux-v2-14-guardrails.js", "dist/assets/ux-v2-14.css", "dist/data/release/question-search-index.json", "dist/data/release/build-info.json", "dist/data/release/release-meta.json"]) {
+    for (const required of ["dist/assets/ux-v2-14.js", "dist/assets/ux-v2-14-guardrails.js", "dist/assets/ux-v2-14.css", "dist/data/release/question-search-index.json", "dist/data/release/catalogo.json", "dist/data/release/build-info.json", "dist/data/release/release-meta.json"]) {
       if (!exists(required)) throw new Error(`Pacote público sem recurso da UX v2.14: ${required}`);
     }
     if (read("assets/ux-v2-14.js") !== read("dist/assets/ux-v2-14.js") || read("assets/ux-v2-14-guardrails.js") !== read("dist/assets/ux-v2-14-guardrails.js") || read("assets/ux-v2-14.css") !== read("dist/assets/ux-v2-14.css")) throw new Error("O dist diverge das fontes da UX v2.14.");
+    const publicCatalog = JSON.parse(read("dist/data/release/catalogo.json"));
     const publicSearch = JSON.parse(read("dist/data/release/question-search-index.json"));
-    if (publicSearch.questions !== expected || publicSearch.items?.length !== expected || !sameIds(publicSearch.items, expectedIds)) throw new Error("Índice textual público diverge da identidade do catálogo.");
+    const publicExpectedIds = new Set(Object.keys(publicCatalog.question_index || {}));
+    const publicExpected = publicExpectedIds.size;
+    if (publicSearch.schema_version !== "1.0" || publicSearch.questions !== publicExpected || publicSearch.items?.length !== publicExpected || !sameIds(publicSearch.items, publicExpectedIds)) throw new Error("Índice textual público diverge da identidade do catálogo materializado.");
     const buildInfo = JSON.parse(read("dist/data/release/build-info.json"));
     const releaseMeta = JSON.parse(read("dist/data/release/release-meta.json"));
     for (const key of ["platform_ux_js", "platform_ux_guardrails_js", "platform_ux_css"]) {
