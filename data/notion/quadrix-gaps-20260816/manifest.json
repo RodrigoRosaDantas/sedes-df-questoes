@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "SEDES-QDX-GAPS-20260816",
+  "captured_at": "2026-08-16T01:43:00-03:00",
+  "source": {
+    "name": "Banco Mestre — Provas e Simulados SEDES/DF",
+    "database_url": "https://app.notion.com/p/a1d5fc8f8e434105861faba90dc156d9",
+    "previous_master_total": 3494,
+    "master_total": 3506,
+    "previous_public_questions": 3492,
+    "expected_public_questions": 3504,
+    "previous_materials": 85,
+    "expected_materials": 89,
+    "previous_proofs": 46,
+    "expected_proofs": 50,
+    "simulations": 39,
+    "discursive_display_items": 2,
+    "expected_awaiting_audit": 0
+  },
+  "files": ["records.json"],
+  "expected_count": 12,
+  "expected_materials_added": 4,
+  "expected_codes": [
+    "PROVA-QDX-CRESSPR-2018-ASSISTENTE-ADMINISTRATIVO-400-067",
+    "PROVA-QDX-CRESSPR-2018-ASSISTENTE-ADMINISTRATIVO-400-068",
+    "PROVA-QDX-CRESSPR-2018-ASSISTENTE-ADMINISTRATIVO-400-069",
+    "PROVA-QDX-CRESSPR-2018-ASSISTENTE-ADMINISTRATIVO-400-100",
+    "PROVA-QDX-CRESSPR-2018-ASSISTENTE-ADMINISTRATIVO-400-111",
+    "PROVA-QDX-CRESSPR-2018-ASSISTENTE-ADMINISTRATIVO-400-112",
+    "PROVA-QDX-CRESSPR-2018-AGENTE-FISCAL-400-073",
+    "PROVA-QDX-CRESSPR-2018-AGENTE-FISCAL-400-099",
+    "PROVA-QDX-CRABA-2021-ADMINISTRADOR-400-103",
+    "PROVA-QDX-CRABA-2021-ADMINISTRADOR-400-104",
+    "PROVA-QDX-CRABA-2021-TECNOLOGO-RH-400-071",
+    "PROVA-QDX-CRABA-2021-TECNOLOGO-RH-400-075"
+  ],
+  "source_artifacts": {
+    "cress_pr_2018": {
+      "official_page": "https://quadrix.org.br/informacoes/1308/",
+      "official_archive": "https://ajuda.quadrix.org.br/pt-BR/articles/8280897-provas-anteriores-realizadas-em-2018",
+      "definitive_key": "https://quadrix.org.br/uploads/861/concursos/1308/anexos/02def7241808347d45173a12f5757b53.pdf?v214523=",
+      "note": "O acervo oficial Quadrix lista CRESS-PR_2018.zip e a página do certame registra o gabarito definitivo de 06/06/2018."
+    },
+    "cra_ba_2021": {
+      "official_page": "https://ps-adm-861.selecao.net.br/informacoes/1221/",
+      "official_archive": "https://ajuda.quadrix.org.br/pt-BR/articles/8278846-2-000-provas-anteriores",
+      "note": "O certame CRA-BA consta no arquivo oficial Quadrix de 2020 e teve provas aplicadas em 06/11/2021; a página oficial registra provas aplicadas e gabarito definitivo em novembro de 2021."
+    }
+  },
+  "excluded": [
+    {
+      "source": "CRESS-PR 2018 — Assistente Administrativo",
+      "original_number": 110,
+      "reason": "Item anulado pela banca por redação que prejudicou o entendimento objetivo; não importado como questão válida."
+    },
+    {
+      "source": "CRESS-PR 2018 — Agente Fiscal",
+      "original_number": 72,
+      "reason": "Item histórico sobre prazo de reavaliação do acolhimento no ECA não foi importado por alteração normativa posterior e baixo valor para estudo vigente."
+    }
+  ]
+}
