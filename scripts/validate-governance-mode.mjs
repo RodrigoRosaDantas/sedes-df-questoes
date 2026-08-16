@@ -13,19 +13,32 @@ const forbidMarkers = (content, markers, context) => markers.forEach(marker => {
 });
 const triggerBlock = content => content.match(/^on:\s*\n((?:^[ \t].*(?:\n|$)|^\s*$)*)/m)?.[1] || "";
 
-const receipt = JSON.parse(read("data/operations/site-automations-governance-20260809.json"));
-if (receipt.status !== "active_limited" || receipt.mode !== "manual_deploy_read_only_ci") {
-  fail("Recibo de governança limitada ausente ou inválido.");
+const baseReceipt = JSON.parse(read("data/operations/site-automations-governance-20260809.json"));
+if (baseReceipt.status !== "active_limited" || baseReceipt.mode !== "manual_deploy_read_only_ci") {
+  fail("Recibo-base de governança limitada ausente ou inválido.");
+}
+
+const controlledReceipt = JSON.parse(read("data/operations/site-automations-governance-20260816.json"));
+if (
+  controlledReceipt.status !== "active_limited"
+  || controlledReceipt.mode !== "owner_authorized_issue_deploy_read_only_ci"
+  || controlledReceipt.authorized_by !== "user"
+) {
+  fail("Recibo de autorização controlada pelo proprietário ausente ou inválido.");
 }
 
 const pages = read(".github/workflows/pages.yml");
 const pagesTriggers = triggerBlock(pages);
-requireMarkers(pagesTriggers, ["workflow_dispatch:"], "Gatilhos de Pages");
+requireMarkers(pagesTriggers, ["workflow_dispatch:", "issues:"], "Gatilhos de Pages");
 forbidMarkers(pagesTriggers, ["push:", "pull_request:", "schedule:"], "Gatilhos de Pages");
 requireMarkers(pages, [
   "AUTHORIZED_SOURCE_SHA: ${{ github.sha }}",
   "AUTHORIZED_REF: ${{ github.ref_name }}",
   'test "${AUTHORIZED_REF}" = "main"',
+  "github.event.issue.title == '[deploy-pages]'",
+  "github.actor == github.repository_owner",
+  "ISSUE_BODY_SHA=",
+  'test "${ISSUE_BODY_SHA}" = "${AUTHORIZED_SOURCE_SHA}"',
   'ref: ${{ env.AUTHORIZED_SOURCE_SHA }}',
   "contents: read",
   "pages: write",
@@ -40,7 +53,7 @@ requireMarkers(pages, [
   "actions/upload-pages-artifact@v5",
   "actions/deploy-pages@v5",
   "verify-deployment.mjs",
-], "Publicação manual");
+], "Publicação controlada");
 forbidMarkers(pages, [
   "inputs:",
   "source_sha:",
@@ -52,7 +65,7 @@ forbidMarkers(pages, [
   "mark-notion-published.mjs",
   "rollback-deployment.mjs",
   "git push",
-], "Publicação manual");
+], "Publicação controlada");
 
 const validationFile = ".github/workflows/validate-public-release.yml";
 const validation = read(validationFile);
@@ -72,7 +85,11 @@ for (const file of workflows) {
   if (/^  (push|pull_request|schedule):/m.test(triggers)) fail(`${file}: rotina operacional ainda possui gatilho automático.`);
 }
 
+if (fs.existsSync(path.join(root, ".github", "deploy-trigger"))) {
+  fail("Arquivo-sentinela de deploy automático obsoleto ainda presente.");
+}
+
 console.log(
   `✓ Governança limitada validada em ${workflows.length} workflows: PR somente leitura, `
-  + "deploy manual por clique com SHA capturado no acionamento e rotinas de Notion/rastreabilidade sem gatilhos automáticos.",
+  + "Pages por workflow_dispatch ou autorização controlada do proprietário com SHA exato, sem push/schedule e sem escrita no Notion.",
 );
