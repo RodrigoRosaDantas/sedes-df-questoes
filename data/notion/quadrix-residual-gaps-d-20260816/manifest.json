@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "SEDES-QDX-RESIDUAL-GAPS-20260816-D",
+  "captured_at": "2026-08-16T15:47:00-03:00",
+  "expected_count": 2,
+  "expected_materials_added": 0,
+  "files": [
+    "records.json"
+  ],
+  "expected_codes": [
+    "PROVA-QDX-CRABA-2021-ADMINISTRADOR-400-114",
+    "PROVA-QDX-CRABA-2021-ADMINISTRADOR-400-115"
+  ],
+  "source": {
+    "name": "Banco Mestre — Provas e Simulados SEDES/DF",
+    "database_url": "https://app.notion.com/p/a1d5fc8f8e434105861faba90dc156d9",
+    "previous_master_total": 3511,
+    "master_total": 3513,
+    "previous_public_questions": 3509,
+    "expected_public_questions": 3511,
+    "previous_materials": 94,
+    "expected_materials": 94,
+    "previous_proofs": 55,
+    "expected_proofs": 55,
+    "simulations": 39,
+    "discursive_display_items": 2,
+    "expected_awaiting_audit": 0
+  },
+  "assignments": [
+    {
+      "question_id": "prova-qdx-craba-2021-administrador-400-114",
+      "item_id": "400-gp-5-6",
+      "format": "Certo/Errado",
+      "answer": "Certo",
+      "prompt_sha256": "a576cc483ac505e5d096bec21a621f9d6cc31515a379029808b01485e955a4b7"
+    },
+    {
+      "question_id": "prova-qdx-craba-2021-administrador-400-115",
+      "item_id": "400-gp-5-6",
+      "format": "Certo/Errado",
+      "answer": "Errado",
+      "prompt_sha256": "c93507f5cf42e969c47a5573cf6ccf4eee5c3a2bf088e2a9c4dfb0e9df180bbf"
+    }
+  ],
+  "expected_minimums": {
+    "400-gp-5-6": 5
+  },
+  "protected_exact": {
+    "edas-suas-4": 1,
+    "400-afo-4-5": 1,
+    "edas-suas-6": 2
+  },
+  "expected_mapped_questions": 1316,
+  "expected_unmapped_questions": 2195,
+  "expected_newly_mapped_distinct_questions": 2,
+  "provenance": {
+    "cra_ba_2021": {
+      "official_contest": "https://ps-adm-861.selecao.net.br/informacoes/1221/",
+      "original_numbers": [114, 115],
+      "answers": ["Certo", "Errado"],
+      "question_references": ["Q1922439", "Q1922440"]
+    }
+  },
+  "quality_notes": [
+    "Duas questões reais Quadrix novas foram incluídas no material CRA-BA 2021 já existente; nenhum material ou prova foi criado.",
+    "Gestão da mudança sobe de 3 para pelo menos 5 questões com cobrança direta do modelo de Lewin.",
+    "Tipificação Nacional e SIAFEM-DF permanecem em exatamente uma questão; CadÚnico permanece em exatamente duas."
+  ]
+}
