@@ -12,23 +12,41 @@
   <link rel="stylesheet" href="./assets/platform-v2-13.css?v=1">
   <link rel="stylesheet" href="./assets/navigation-v2-15.css?v=1">
   <link rel="stylesheet" href="./assets/navigation-v2-15-polish.css?v=1">
-  <link rel="stylesheet" href="./assets/estudo-por-cargo-v1.css?v=1">
+  <link rel="stylesheet" href="./assets/estudo-por-cargo-v1.css?v=2">
 </head>
 <body data-estudo-por-cargo-page>
   <a class="skip" href="#cargo-study-app">Pular para o conteúdo</a>
+
   <header class="topbar role-study-topbar">
-    <a class="brand" href="./index.html#/inicio" aria-label="Voltar ao início da plataforma">
+    <a class="brand" href="./index.html#/inicio" aria-label="SEDES/DF Questões — início">
       <span class="brand-mark">SQ</span>
-      <span><strong>SEDES/DF Questões</strong><small>Estudo por Cargo</small></span>
+      <span><strong>SEDES/DF Questões</strong><small>Preparação compartilhada</small></span>
     </a>
-    <nav class="desktop-nav" aria-label="Navegação do estudo por cargo">
+    <nav class="desktop-nav" aria-label="Navegação principal">
       <a href="./index.html#/inicio">Início</a>
-      <a href="./index.html#/estudar">Banco de questões</a>
-      <a href="./estudo-por-cargo.html" aria-current="page">Estudo por Cargo</a>
+      <a href="./index.html#/estudar">Estudar</a>
+      <a href="./estudo-por-cargo.html" aria-current="page" data-role-study-nav>Por cargo</a>
+      <a href="./index.html#/revisar">Revisar</a>
       <a href="./index.html#/desempenho">Desempenho</a>
     </nav>
-    <a class="btn secondary role-study-back" href="./index.html#/estudar">Voltar para Estudar</a>
+    <a class="btn secondary role-study-back" href="./index.html#/estudar">Banco de questões</a>
   </header>
+
+  <nav class="role-study-quicknav" data-role-study-quicknav aria-label="Atalhos do módulo de estudo">
+    <a class="active" href="./estudo-por-cargo.html" aria-current="page"><span aria-hidden="true">▦</span><strong>Matérias por cargo</strong><small>Seu mapa de estudo</small></a>
+    <a href="./index.html#/estudar"><span aria-hidden="true">▣</span><strong>Banco livre</strong><small>Filtros e sessões</small></a>
+    <a href="./index.html#/revisar"><span aria-hidden="true">◎</span><strong>Revisar</strong><small>Erros e pendências</small></a>
+    <a href="./index.html#/desempenho"><span aria-hidden="true">◔</span><strong>Desempenho</strong><small>Progresso e acertos</small></a>
+  </nav>
+
+  <div class="role-study-context" data-role-study-context>
+    <div><span class="role-study-context-kicker">Estudo por Cargo</span><strong>Cargo → matéria → tópico → questões</strong></div>
+    <div class="role-study-context-actions">
+      <a href="./index.html#/estudar">Banco</a>
+      <a href="./index.html#/revisar">Revisões</a>
+      <a href="./index.html#/desempenho">Meu desempenho</a>
+    </div>
+  </div>
 
   <main id="cargo-study-app" class="page role-study-page" tabindex="-1">
     <section class="card loading" data-role-study-loading>
@@ -37,6 +55,14 @@
       <p>Carregando o edital, o banco de questões e seu progresso.</p>
     </section>
   </main>
+
+  <nav class="mobile-nav role-study-mobile-nav" aria-label="Navegação móvel">
+    <a href="./index.html#/inicio"><b aria-hidden="true">⌂</b><span>Início</span></a>
+    <a href="./index.html#/estudar"><b aria-hidden="true">▣</b><span>Estudar</span></a>
+    <a href="./estudo-por-cargo.html" class="active" aria-current="page" data-role-study-nav><b aria-hidden="true">▦</b><span>Por cargo</span></a>
+    <a href="./index.html#/revisar"><b aria-hidden="true">◎</b><span>Revisar</span></a>
+    <a href="./index.html#/desempenho"><b aria-hidden="true">◔</b><span>Desempenho</span></a>
+  </nav>
 
   <footer class="footer role-study-footer">
     <span>SEDES/DF Questões · Estudo por Cargo</span>
