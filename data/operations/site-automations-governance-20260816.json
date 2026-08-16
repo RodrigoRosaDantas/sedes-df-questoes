@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "operation": "OWNER-AUTHORIZED-CONTROLLED-PAGES-DEPLOY",
+  "confirmed_at": "2026-08-16T02:06:00Z",
+  "authorized_by": "user",
+  "status": "active_limited",
+  "mode": "owner_authorized_issue_deploy_read_only_ci",
+  "scope": {
+    "pull_request_validation": "automatic_read_only",
+    "github_pages_deployment": "workflow_dispatch_or_owner_issue_exact_main_sha",
+    "owner_issue_title": "[deploy-pages]",
+    "public_browser_verification": "mandatory_before_and_after_deploy",
+    "deployment_receipt": "controlled_only"
+  },
+  "still_suspended": [
+    "push_triggered_deployment",
+    "scheduled_deployment",
+    "automatic_notion_sync",
+    "automatic_notion_writes",
+    "automatic_traceability_closure",
+    "automatic_editorial_mutation",
+    "automatic_rollback"
+  ],
+  "safety_contract": [
+    "Pages keeps workflow_dispatch as the manual fallback.",
+    "Push, pull_request and schedule triggers remain forbidden for Pages.",
+    "Issue-triggered deployment is accepted only when the repository owner opens an issue titled [deploy-pages].",
+    "The issue body must contain an authorized_sha line exactly equal to the main SHA captured by GitHub for the event.",
+    "The public artifact is generated from the exact authorized commit without a live Notion read.",
+    "The complete public browser suite runs locally before deploy and again against GitHub Pages after deploy.",
+    "No workflow in this scope writes to Notion or closes editorial traceability."
+  ],
+  "audit_basis": {
+    "previous_governance_receipt": "data/operations/site-automations-governance-20260809.json",
+    "first_controlled_public_workflow_run_id": 31920884529,
+    "first_controlled_public_source_sha": "c6ebccf1f41da584b76e4f80507bac1be98b34c0",
+    "reason": "Permitir operação técnica pelo assistente sem exigir que o usuário opere o GitHub, preservando autorização explícita, SHA exato e gates de validação."
+  }
+}

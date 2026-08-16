@@ -41,6 +41,10 @@ jobs:
           set -euo pipefail
           test "${AUTHORIZED_REF}" = "main"
           [[ "${AUTHORIZED_SOURCE_SHA}" =~ ^[0-9a-f]{40}$ ]]
+          if [[ "${GITHUB_EVENT_NAME}" == "issues" ]]; then
+            ISSUE_BODY_SHA="$(jq -r '.issue.body // ""' "${GITHUB_EVENT_PATH}" | sed -n 's/^authorized_sha=\([0-9a-f]\{40\}\)$/\1/p' | head -n1)"
+            test "${ISSUE_BODY_SHA}" = "${AUTHORIZED_SOURCE_SHA}"
+          fi
           echo "✓ Publicação autorizada da main ${AUTHORIZED_SOURCE_SHA}."
       - name: Baixar exatamente o commit autorizado
         uses: actions/checkout@v6
