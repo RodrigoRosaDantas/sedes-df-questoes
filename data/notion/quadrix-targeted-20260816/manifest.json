@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "SEDES-QDX-TARGETED-IMPORT-20260816",
+  "captured_at": "2026-08-16T00:45:00-03:00",
+  "source": {
+    "name": "Banco Mestre — Provas e Simulados SEDES/DF",
+    "database_url": "https://app.notion.com/p/a1d5fc8f8e434105861faba90dc156d9",
+    "previous_master_total": 3460,
+    "master_total": 3482,
+    "previous_public_questions": 3458,
+    "expected_public_questions": 3480,
+    "discursive_display_items": 2,
+    "expected_awaiting_audit": 0
+  },
+  "files": [
+    "novacap-2024-administrador.json",
+    "crm-to-2023-administrador.json",
+    "cress-pr-2025-agente-fiscal.json",
+    "cress-sc-2019-agente-fiscal.json"
+  ],
+  "expected_count": 22,
+  "expected_materials_added": 4,
+  "expected_codes": [
+    "PROVA-QDX-NOVACAP-2024-ADMINISTRADOR-400-086",
+    "PROVA-QDX-NOVACAP-2024-ADMINISTRADOR-400-087",
+    "PROVA-QDX-NOVACAP-2024-ADMINISTRADOR-400-088",
+    "PROVA-QDX-NOVACAP-2024-ADMINISTRADOR-400-089",
+    "PROVA-QDX-NOVACAP-2024-ADMINISTRADOR-400-090",
+    "PROVA-QDX-NOVACAP-2024-ADMINISTRADOR-400-096",
+    "PROVA-QDX-NOVACAP-2024-ADMINISTRADOR-400-097",
+    "PROVA-QDX-NOVACAP-2024-ADMINISTRADOR-400-098",
+    "PROVA-QDX-NOVACAP-2024-ADMINISTRADOR-400-099",
+    "PROVA-QDX-NOVACAP-2024-ADMINISTRADOR-400-100",
+    "PROVA-QDX-CRMTO-2023-ADMINISTRADOR-400-088",
+    "PROVA-QDX-CRMTO-2023-ADMINISTRADOR-400-089",
+    "PROVA-QDX-CRMTO-2023-ADMINISTRADOR-400-090",
+    "PROVA-QDX-CRMTO-2023-ADMINISTRADOR-400-091",
+    "PROVA-QDX-CRESSPR-2025-AGENTE-FISCAL-400-097",
+    "PROVA-QDX-CRESSPR-2025-AGENTE-FISCAL-400-098",
+    "PROVA-QDX-CRESSPR-2025-AGENTE-FISCAL-400-099",
+    "PROVA-QDX-CRESSPR-2025-AGENTE-FISCAL-400-100",
+    "PROVA-QDX-CRESSSC-2019-AGENTE-FISCAL-400-103",
+    "PROVA-QDX-CRESSSC-2019-AGENTE-FISCAL-400-104",
+    "PROVA-QDX-CRESSSC-2019-AGENTE-FISCAL-400-105",
+    "PROVA-QDX-CRESSSC-2019-AGENTE-FISCAL-400-106"
+  ],
+  "source_artifacts": {
+    "novacap_2024": {
+      "official_page": "https://quadrix.org.br/informacoes/1089/",
+      "proof_archive": "https://anexos.cdn.selecao.net.br/uploads/861/concursos/1089/anexos/38bb3263-d3de-4db5-a212-1a430973ae0a.zip",
+      "definitive_key": "https://quadrix.org.br/uploads/861/concursos/1089/anexos/91220513494971f34db9602ff30bfc78.pdf?v000243="
+    },
+    "crm_to_2023": {
+      "official_page": "https://quadrix.org.br/informacoes/1107/",
+      "proof_archive": "https://anexos.cdn.selecao.net.br/uploads/861/concursos/1107/anexos/93e25830-fd29-4bed-8d64-93e78d46cfe7.zip",
+      "definitive_key": "https://quadrix.org.br/uploads/861/concursos/1107/anexos/0b46c2452279df2c051b8bde5a4b78ec.pdf?v162151="
+    },
+    "cress_pr_2025": {
+      "official_page": "https://quadrix.org.br/informacoes/1069/",
+      "proof_archive": "https://anexos.cdn.selecao.net.br/uploads/861/concursos/1069/anexos/eb104ecc-fb3a-4124-94ee-9cd5d838d417.zip",
+      "definitive_key": "https://quadrix.org.br/uploads/861/concursos/1069/anexos/c59c765ed05de6661c396b3eef9ffc23.pdf?v211055="
+    },
+    "cress_sc_2019": {
+      "official_page": "https://quadrix.org.br/informacoes/1309/",
+      "definitive_key": "https://quadrix.org.br/uploads/861/concursos/1309/anexos/7705bd7f4260354a1f47bb0ad4657fd7.pdf?v214542="
+    }
+  }
+}
