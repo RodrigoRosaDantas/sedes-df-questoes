@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "SEDES-QDX-MROSC-20260817-F",
+  "records": [
+    {
+      "source_board": "Instituto Quadrix",
+      "material_type": "Prova",
+      "year": 2025,
+      "organization": "Conselho Regional de Administração de São Paulo — CRA-SP",
+      "cargo": "Analista I — Relações Externas",
+      "cargo_code": "400",
+      "format": "Múltipla escolha A–E",
+      "publication_lot": "SEDES-QDX-MROSC-20260817-F",
+      "released_for_export": true,
+      "annulled": false,
+      "has_image": false,
+      "code": "PROVA-QDX-CRASP-2025-ANALISTA-RELACOES-EXTERNAS-400-047",
+      "notion_url": "https://app.notion.com/p/3c0cf5a267318167b362e9d4e61547bb?pvs=204",
+      "material_name": "Analista I — Relações Externas — CRA-SP — Quadrix 2025",
+      "original_number": 47,
+      "block": "Conhecimentos Específicos",
+      "discipline": "Legislação Federal",
+      "subject": "MROSC",
+      "subsubject": "Acordo de cooperação — parceria sem transferência de recursos financeiros",
+      "text_base": "",
+      "prompt": "Por meio de determinado instrumento, são formalizadas as parcerias entre a Administração Pública Federal e as organizações da sociedade civil para a consecução de finalidades de interesse público e recíproco que não envolvam a transferência de recursos financeiros. Com base nessas informações, assinale a opção que apresenta a designação desse tipo de instrumento.",
+      "alternatives": {
+        "A": "convênio",
+        "B": "termo de fomento",
+        "C": "termo de colaboração",
+        "D": "contrato de gestão",
+        "E": "acordo de cooperação"
+      },
+      "answer": "E",
+      "comment": "A resposta correta é acordo de cooperação. O elemento decisivo é a ausência de transferência de recursos financeiros, exatamente como dispõe o art. 2º, VIII-A, da Lei nº 13.019/2014.",
+      "alternative_comments": {
+        "A": "Incorreta. Convênio não é a designação definida pelo MROSC para a parceria com organização da sociedade civil sem transferência de recursos financeiros.",
+        "B": "Incorreta. O termo de fomento envolve transferência de recursos financeiros e decorre de proposta da organização da sociedade civil.",
+        "C": "Incorreta. O termo de colaboração envolve transferência de recursos financeiros e decorre de proposta da Administração Pública.",
+        "D": "Incorreta. Contrato de gestão é instrumento próprio do regime das organizações sociais e não corresponde ao instrumento descrito no enunciado.",
+        "E": "Correta. O art. 2º, VIII-A, da Lei nº 13.019/2014 define acordo de cooperação como o instrumento para parcerias com organizações da sociedade civil destinadas a finalidades de interesse público e recíproco que não envolvam transferência de recursos financeiros."
+      },
+      "foundation": "Lei nº 13.019/2014, art. 2º, VIII-A, texto compilado vigente. Gabarito definitivo do Instituto Quadrix para o CRA-SP 2025, cargo 408 — Analista I — Relações Externas.",
+      "trap": "Confundir acordo de cooperação, que não envolve transferência de recursos financeiros, com termo de colaboração ou termo de fomento, que envolvem transferência.",
+      "observations": "Questão original 47 da prova de Analista I — Relações Externas do CRA-SP; gabarito E conferido no gabarito definitivo oficial da Quadrix para o cargo 408.",
+      "source_url": "https://www.quadrix.org.br/informacoes/1001/",
+      "pdf_page": ""
+    }
+  ]
+}
