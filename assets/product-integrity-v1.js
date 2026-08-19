@@ -110,7 +110,16 @@ function routeSignedInProfileChoice(profileId) {
   }, 0);
 }
 
-function captureSettingsActions(event) {
+function profileIdFromTarget(target) {
+  const settings = target.closest?.("[data-ux15-profile]");
+  if (settings?.dataset.ux15Profile) return settings.dataset.ux15Profile;
+  const button = target.closest?.("[data-activate-profile]");
+  if (button?.dataset.activateProfile) return button.dataset.activateProfile;
+  const card = target.closest?.(".profile-card-selectable[data-profile-id]");
+  return card?.dataset.profileId || "";
+}
+
+function captureActions(event) {
   const themeButton = event.target.closest?.("[data-ux15-theme]");
   if (themeButton) {
     event.preventDefault();
@@ -119,11 +128,20 @@ function captureSettingsActions(event) {
     return;
   }
 
-  const profileButton = event.target.closest?.("[data-ux15-profile]");
-  if (!profileButton || !accountIsSignedIn()) return;
+  const profileId = profileIdFromTarget(event.target);
+  if (!profileId || !accountIsSignedIn()) return;
   event.preventDefault();
   event.stopImmediatePropagation();
-  routeSignedInProfileChoice(profileButton.dataset.ux15Profile);
+  routeSignedInProfileChoice(profileId);
+}
+
+function captureProfileKeyboard(event) {
+  if (!["Enter", " "].includes(event.key) || !accountIsSignedIn()) return;
+  const profileId = profileIdFromTarget(event.target);
+  if (!profileId) return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  routeSignedInProfileChoice(profileId);
 }
 
 function enhance() {
@@ -133,7 +151,8 @@ function enhance() {
   hardenPerformanceDataActions();
 }
 
-document.addEventListener("click", captureSettingsActions, true);
+document.addEventListener("click", captureActions, true);
+document.addEventListener("keydown", captureProfileKeyboard, true);
 window.addEventListener("hashchange", () => window.setTimeout(enhance, 0));
 window.addEventListener("sedes:cloud-status", () => window.setTimeout(enhance, 0));
 window.addEventListener("sedes:account-binding", () => window.setTimeout(enhance, 0));
