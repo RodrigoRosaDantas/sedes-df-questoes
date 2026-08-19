@@ -120,6 +120,14 @@ function profileIdFromTarget(target) {
 }
 
 function captureActions(event) {
+  const headerThemeButton = event.target.closest?.("#theme-toggle");
+  if (headerThemeButton) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    synchronizeThemeChoice(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+    return;
+  }
+
   const themeButton = event.target.closest?.("[data-ux15-theme]");
   if (themeButton) {
     event.preventDefault();
