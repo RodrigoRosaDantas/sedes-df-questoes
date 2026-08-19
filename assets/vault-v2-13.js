@@ -87,9 +87,9 @@ async function storageText() {
 }
 async function injectVault() {
   if (currentRoute() !== "desempenho" || document.querySelector("[data-vault-tools]")) return;
-  const host = [...document.querySelectorAll(".performance-panel")].find(panel => /backup local/i.test(panel.textContent || ""));
+  const host = [...document.querySelectorAll(".performance-panel")].find(panel => /backup local|backup complementar/i.test(panel.textContent || ""));
   if (!host) return;
-  const vault = readJSON(vaultKey(), {snapshots: []});
+  const vault = readJSON(vaultKey(), {schema: VAULT_SCHEMA, snapshots: []});
   const section = document.createElement("div");
   section.className = "vault-tools"; section.dataset.vaultTools = "";
   section.innerHTML = `<hr><p class="eyebrow">Cofre local</p><h3>Pontos de restauração e backup protegido</h3><p class="muted" data-storage-diagnostic>Calculando armazenamento…</p><div class="vault-actions"><button class="btn" data-vault-snapshot>Criar ponto</button><button class="btn primary" data-vault-export>Backup com senha</button><label class="btn file-button">Importar protegido<input type="file" accept="application/json" data-vault-import></label></div><div class="vault-list">${(vault.snapshots || []).map(item => `<button class="vault-item" data-vault-restore="${item.id}"><strong>${new Date(item.createdAt).toLocaleString("pt-BR")}</strong><small>${item.reason}</small></button>`).join("") || "<p class=\"muted\">Nenhum ponto criado ainda.</p>"}</div>`;
