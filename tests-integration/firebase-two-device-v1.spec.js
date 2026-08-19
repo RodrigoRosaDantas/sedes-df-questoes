@@ -215,3 +215,50 @@ test("troca de perfil nas Configurações respeita e atualiza o vínculo da cont
     await context.close();
   }
 });
+
+test("Estudo por Cargo aberto diretamente restaura o progresso da conta", async ({browser}) => {
+  const suffix = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  const email = `sedes-role-direct-${suffix}@example.com`;
+  const context = await browser.newContext({serviceWorkers: "block"});
+  try {
+    const page = await context.newPage();
+    await openEmulated(page);
+    await authenticate(page, email, "signup");
+    const finishedAt = new Date().toISOString();
+    await page.evaluate(async ({historyKey, finishedAt}) => {
+      localStorage.setItem(historyKey, JSON.stringify([{
+        id: "attempt-role-direct-cloud",
+        materialId: "integration-role",
+        materialName: "Integração por cargo",
+        mode: "treino",
+        finishedAt,
+        total: 1,
+        answered: 1,
+        correct: 1,
+        wrong: 0,
+        blank: 0,
+        percent: 100,
+        accuracy: 100,
+        answeredQuestionIds: ["q-role-direct"],
+        questionResults: [{id: "q-role-direct", answer: "A", correct: true, materialId: "integration-role", discipline: "Teste", assunto: "Direto"}],
+        answers: {"q-role-direct": "A"},
+        questionTimes: {"q-role-direct": 12},
+      }]));
+      await window.SEDES_CLOUD_PROGRESS.sync();
+    }, {historyKey: HISTORY_KEY, finishedAt});
+    await expect(page.locator("[data-cloud-progress]")).toHaveAttribute("data-cloud-state", "saved", {timeout: 30000});
+
+    await page.evaluate(historyKey => localStorage.removeItem(historyKey), HISTORY_KEY);
+    await page.goto("./estudo-por-cargo.html?firebaseEmulator=1&cargo=202", {waitUntil: "domcontentloaded"});
+    await expect(page.locator("body[data-estudo-por-cargo-page]")).toBeVisible({timeout: 30000});
+    await expect(page.locator("[data-cloud-progress]")).toBeVisible({timeout: 30000});
+    await expect(page.locator("[data-cloud-progress]")).toHaveAttribute("data-cloud-state", "saved", {timeout: 30000});
+    await expect.poll(async () => page.evaluate(historyKey => {
+      const history = JSON.parse(localStorage.getItem(historyKey) || "[]");
+      return history.some(item => item.id === "attempt-role-direct-cloud");
+    }, HISTORY_KEY), {timeout: 30000}).toBe(true);
+    await expect.poll(() => page.evaluate(() => window.SEDES_WORK_CONVERGENCE?.getAccountState?.().boundProfile || null), {timeout: 30000}).toBe("rodrigo");
+  } finally {
+    await context.close();
+  }
+});
