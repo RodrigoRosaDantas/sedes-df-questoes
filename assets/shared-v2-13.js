@@ -76,9 +76,6 @@ export const createCompatibleSession = ({id, name, questionIds, questions = null
   };
   if (Array.isArray(questions) && questions.length === payload.questionIds.length) payload.questions = questions;
   if (!saveJSON(profileKey("session.v3"), payload)) return false;
-  // Troca o fragmento sem disparar hashchange antes do reload. Isso impede que a
-  // instância antiga do app entre em /resolver e persista estado da sessão anterior
-  // sobre o payload recém-gravado durante pagehide/visibilitychange.
   history.replaceState(history.state, "", "#/resolver");
   location.reload();
   return true;
@@ -126,3 +123,40 @@ export const observeApp = callback => {
   window.addEventListener("hashchange", run);
   run();
 };
+
+function bootstrapStandaloneRoleSync() {
+  if (!document.body?.matches("[data-estudo-por-cargo-page]")) return;
+  if (!document.querySelector('link[href*="cloud-progress-v1.css"]')) {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "./assets/cloud-progress-v1.css?v=1";
+    document.head.append(link);
+  }
+  if (!document.querySelector("#role-standalone-cloud-style")) {
+    const style = document.createElement("style");
+    style.id = "role-standalone-cloud-style";
+    style.textContent = "body[data-estudo-por-cargo-page] > .cloud-progress-pill{position:fixed;right:18px;bottom:18px;z-index:1100;box-shadow:0 10px 30px rgb(0 0 0/.2)}@media(max-width:720px){body[data-estudo-por-cargo-page] > .cloud-progress-pill{right:12px;bottom:calc(82px + env(safe-area-inset-bottom))}}";
+    document.head.append(style);
+  }
+
+  const profileAtLoad = activeProfileId();
+  const reloadKey = `sedes.questoes.roleDirectSyncReload.v1:${profileAtLoad}`;
+  let awaitingInitialCloudResult = true;
+  window.addEventListener("sedes:cloud-status", event => {
+    if (!awaitingInitialCloudResult || event.detail?.kind !== "saved") return;
+    awaitingInitialCloudResult = false;
+    const previous = Number(sessionStorage.getItem(reloadKey) || 0);
+    if (Date.now() - previous < 15000) return;
+    sessionStorage.setItem(reloadKey, String(Date.now()));
+    location.reload();
+  });
+
+  queueMicrotask(() => {
+    Promise.all([
+      import("./cloud-progress-v1.js?v=1"),
+      import("./work-convergence-v1.js?v=1"),
+    ]).catch(error => console.warn("Sincronização direta do Estudo por Cargo indisponível; mantendo progresso local.", error));
+  });
+}
+
+bootstrapStandaloneRoleSync();
