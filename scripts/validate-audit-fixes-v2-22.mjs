@@ -35,6 +35,7 @@ if (fs.existsSync(distReleaseDir)) {
     "home_study_subjects_css",
     "resolver_context_js",
     "resolver_context_css",
+    "product_integrity_js",
   ];
   for (const meta of [buildInfo, releaseMeta]) {
     if (meta.provenance_contract_version !== "2.22") throw new Error("Recibo público sem contrato de proveniência v2.22.");
@@ -46,4 +47,4 @@ if (fs.existsSync(distReleaseDir)) {
   }
 }
 
-console.log("✓ Auditoria v2.22: matching do edital protegido, cache offline canônico e proveniência UX completa.");
+console.log("✓ Auditoria v2.22: matching do edital protegido, cache offline canônico e proveniência UX completa, incluindo integridade de produto.");
