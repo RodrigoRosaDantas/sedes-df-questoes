@@ -169,6 +169,7 @@ function bootstrapStandaloneRoleSync() {
 
   queueMicrotask(async () => {
     try {
+      await import("./theme-preference-bridge-v1.js?v=1");
       await import("./cloud-progress-v1.js?v=1");
       await import("./work-convergence-v1.js?v=1");
       applyStandaloneProfileTheme();
