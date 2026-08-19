@@ -39,6 +39,9 @@ test("rotas principais não expõem IDs duplicados nem controles sem nome acess�
   for (const route of routes) {
     await page.goto(`./${route}`, {waitUntil: "domcontentloaded"});
     await expect(page.locator("#app h1").first()).toBeVisible({timeout: 30000});
+    if (route === "#/estudar") {
+      await expect(page.locator("[data-ux-question-search]")).toHaveAttribute("aria-label", "Buscar dentro das questões", {timeout: 30000});
+    }
     const result = await page.evaluate(() => {
       const idCounts = new Map();
       document.querySelectorAll("[id]").forEach(node => idCounts.set(node.id, (idCounts.get(node.id) || 0) + 1));
@@ -67,8 +70,9 @@ test("navegação por teclado mantém skip link funcional sem alterar a rota da 
   await expect(page.locator("#app h1").first()).toBeVisible({timeout: 30000});
   const beforeHash = await page.evaluate(() => location.hash);
   await page.evaluate(() => {
-    const active = document.activeElement;
-    if (active instanceof HTMLElement) active.blur();
+    document.body.setAttribute("tabindex", "-1");
+    document.body.focus();
+    document.body.removeAttribute("tabindex");
   });
   await page.keyboard.press("Tab");
   const skip = page.locator("a.skip");
