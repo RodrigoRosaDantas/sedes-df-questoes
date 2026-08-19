@@ -184,3 +184,34 @@ test("reset em um aparelho não pode ser desfeito por histórico antigo de outro
     await contextB.close();
   }
 });
+
+test("troca de perfil nas Configurações respeita e atualiza o vínculo da conta autenticada", async ({browser}) => {
+  const suffix = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  const email = `sedes-profile-binding-${suffix}@example.com`;
+  const context = await browser.newContext({serviceWorkers: "block"});
+  try {
+    const page = await context.newPage();
+    await openEmulated(page);
+    await authenticate(page, email, "signup");
+    await expect.poll(() => page.evaluate(() => window.SEDES_WORK_CONVERGENCE?.getAccountState?.().boundProfile || null), {timeout: 30000}).toBe("rodrigo");
+
+    await page.goto("./?firebaseEmulator=1#/perfil/configuracoes", {waitUntil: "domcontentloaded"});
+    const amanda = page.locator('[data-ux15-profile="amanda"]');
+    await expect(amanda).toBeVisible({timeout: 30000});
+    await amanda.click();
+
+    const dialog = page.locator("[data-work-account-profile-dialog]");
+    await expect(dialog).toBeVisible({timeout: 30000});
+    await expect(dialog.locator("[data-work-account-profile]")).toHaveValue("amanda");
+    await dialog.locator("[data-work-account-save]").click();
+
+    await expect.poll(() => page.evaluate(() => localStorage.getItem("sedes.questoes.activeProfile.v3")), {timeout: 30000}).toBe("amanda");
+    await expect.poll(() => page.evaluate(() => window.SEDES_WORK_CONVERGENCE?.getAccountState?.().boundProfile || null), {timeout: 30000}).toBe("amanda");
+
+    await page.reload({waitUntil: "domcontentloaded"});
+    await expect.poll(() => page.evaluate(() => localStorage.getItem("sedes.questoes.activeProfile.v3")), {timeout: 30000}).toBe("amanda");
+    await expect.poll(() => page.evaluate(() => window.SEDES_WORK_CONVERGENCE?.getAccountState?.().boundProfile || null), {timeout: 30000}).toBe("amanda");
+  } finally {
+    await context.close();
+  }
+});
