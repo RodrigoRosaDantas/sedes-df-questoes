@@ -198,7 +198,7 @@ test("troca de perfil nas Configurações respeita e atualiza o vínculo da cont
     await page.evaluate(() => { location.hash = "#/perfil/configuracoes"; });
     const amanda = page.locator('[data-ux15-profile="amanda"]');
     await expect(amanda).toBeVisible({timeout: 30000});
-    await amanda.click();
+    await amanda.evaluate(button => button.click());
 
     const dialog = page.locator("[data-work-account-profile-dialog]");
     await expect(dialog).toBeVisible({timeout: 30000});
