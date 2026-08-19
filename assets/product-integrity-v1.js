@@ -1,4 +1,5 @@
 const THEME_KEY = "sedes.questoes.theme";
+const ACTIVE_PROFILE_KEY = "sedes.questoes.activeProfile.v3";
 
 function setText(node, value) {
   if (node && node.textContent !== value) node.textContent = value;
@@ -8,6 +9,14 @@ function accountIsSignedIn() {
   const work = window.SEDES_WORK_CONVERGENCE?.getAccountState?.();
   const cloud = window.SEDES_CLOUD_PROGRESS?.getState?.();
   return Boolean(work?.signedIn || cloud?.signedIn);
+}
+
+function activeProfileId() {
+  return localStorage.getItem(ACTIVE_PROFILE_KEY) || "rodrigo";
+}
+
+function profileKey(suffix) {
+  return `sedes.questoes.${activeProfileId()}.${suffix}`;
 }
 
 function installSkipLinkGuard() {
@@ -67,6 +76,35 @@ function openSafeDataSettings() {
   window.setTimeout(open, 0);
 }
 
+function relabelImportControl(label) {
+  if (!label) return;
+  const text = [...label.childNodes].find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
+  if (text) text.textContent = "Importar e mesclar backup";
+}
+
+async function importCompatibleBackup(file) {
+  try {
+    const payload = JSON.parse(await file.text());
+    if (payload.schema_version !== "1.0" || !Array.isArray(payload.history) || !payload.errors || typeof payload.errors !== "object" || !payload.marked || typeof payload.marked !== "object") {
+      throw new Error("Formato de backup incompatível.");
+    }
+    const cloudNote = accountIsSignedIn()
+      ? " O conteúdo será aplicado neste aparelho e reconciliado com a nuvem; dados remotos que não estejam no arquivo não serão apagados automaticamente."
+      : " O conteúdo será aplicado neste aparelho.";
+    if (!confirm(`Importar este backup para o perfil ${activeProfileId()}?${cloudNote}`)) return;
+    localStorage.setItem(profileKey("history.v3"), JSON.stringify(payload.history));
+    localStorage.setItem(profileKey("errors.v3"), JSON.stringify(payload.errors));
+    localStorage.setItem(profileKey("marked.v3"), JSON.stringify(payload.marked));
+    if (payload.session) localStorage.setItem(profileKey("session.v3"), JSON.stringify(payload.session));
+    else localStorage.removeItem(profileKey("session.v3"));
+    if (accountIsSignedIn()) await window.SEDES_CLOUD_PROGRESS?.sync?.();
+    location.reload();
+  } catch (error) {
+    console.error("Falha ao importar backup:", error);
+    alert(error?.message || "O arquivo não é um backup válido desta plataforma.");
+  }
+}
+
 function hardenPerformanceDataActions() {
   const exportButton = document.querySelector("[data-export-profile]");
   if (!exportButton) return;
@@ -74,7 +112,7 @@ function hardenPerformanceDataActions() {
   if (!panel) return;
   const heading = panel.querySelector("h2");
   if (heading && /Backup local|Backup complementar/i.test(heading.textContent || "")) setText(heading, "Backup complementar");
-  setText(panel.querySelector("p.muted"), "Exporte uma cópia manual dos dados principais do perfil. Se você usa sincronização, a nuvem continua sendo a camada entre aparelhos.");
+  setText(panel.querySelector("p.muted"), "Exporte uma cópia manual dos dados principais do perfil. Ao importar, a cópia local é aplicada e, se houver sincronização, reconciliada com a nuvem.");
 
   const unsafe = panel.querySelector("[data-clear-profile]");
   if (unsafe) {
@@ -85,6 +123,22 @@ function hardenPerformanceDataActions() {
     safe.textContent = "Gerenciar dados com segurança";
     safe.addEventListener("click", openSafeDataSettings);
     unsafe.replaceWith(safe);
+  }
+
+  const legacyImport = panel.querySelector("[data-import-profile]");
+  if (legacyImport) {
+    const replacement = legacyImport.cloneNode();
+    replacement.removeAttribute("data-import-profile");
+    replacement.dataset.integrityImportProfile = "";
+    replacement.addEventListener("change", event => {
+      const file = event.target.files?.[0];
+      if (file) importCompatibleBackup(file);
+    });
+    const label = legacyImport.closest("label");
+    legacyImport.replaceWith(replacement);
+    relabelImportControl(label);
+  } else {
+    relabelImportControl(panel.querySelector("[data-integrity-import-profile]")?.closest("label"));
   }
 }
 
