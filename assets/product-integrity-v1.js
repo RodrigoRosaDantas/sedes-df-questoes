@@ -1,5 +1,9 @@
 const THEME_KEY = "sedes.questoes.theme";
 
+function setText(node, value) {
+  if (node && node.textContent !== value) node.textContent = value;
+}
+
 function accountIsSignedIn() {
   const work = window.SEDES_WORK_CONVERGENCE?.getAccountState?.();
   const cloud = window.SEDES_CLOUD_PROGRESS?.getState?.();
@@ -10,12 +14,11 @@ function updateSettingsDataCopy() {
   const page = document.querySelector('[data-ux15-settings-page][data-ux15-tab="dados"]');
   if (!page) return;
   const intro = page.querySelector(".ux15-settings-intro > p:last-child");
-  if (intro) intro.textContent = "O progresso funciona primeiro neste aparelho e, quando você entra na sincronização, acompanha sua conta entre dispositivos.";
+  setText(intro, "O progresso funciona primeiro neste aparelho e, quando você entra na sincronização, acompanha sua conta entre dispositivos.");
   const cards = [...page.querySelectorAll(".ux15-data-actions > .card")];
-  const storage = cards.find(card => /Armazenamento local/i.test(card.textContent || ""));
+  const storage = cards.find(card => /Armazenamento local|Local-first \+ nuvem/i.test(card.textContent || ""));
   if (storage) {
-    const title = storage.querySelector("strong");
-    if (title) title.textContent = "Local-first + nuvem";
+    setText(storage.querySelector("strong"), "Local-first + nuvem");
     const paragraph = storage.querySelector("p");
     if (paragraph && !paragraph.dataset.integrityCloudCopy) {
       paragraph.dataset.integrityCloudCopy = "true";
@@ -33,14 +36,12 @@ function updateLegacyProfileCopy() {
   if (!heading) return;
   const lead = heading.parentElement?.querySelector("p:last-child");
   if (lead && /neste aparelho/i.test(lead.textContent || "")) {
-    lead.textContent = "Cada perfil mantém histórico, erros, marcadas e progresso separados. O armazenamento é local-first e pode ser sincronizado com uma conta para uso entre aparelhos.";
+    setText(lead, "Cada perfil mantém histórico, erros, marcadas e progresso separados. O armazenamento é local-first e pode ser sincronizado com uma conta para uso entre aparelhos.");
   }
   const note = page.querySelector(".privacy-note");
   if (note) {
-    const title = note.querySelector("strong");
-    const paragraph = note.querySelector("p");
-    if (title) title.textContent = "Dados do perfil";
-    if (paragraph) paragraph.textContent = "A plataforma funciona sem login. Ao entrar na sincronização, o progresso do perfil principal é enviado ao Firebase para acompanhar sua conta entre aparelhos; o backup manual continua disponível como camada adicional de segurança.";
+    setText(note.querySelector("strong"), "Dados do perfil");
+    setText(note.querySelector("p"), "A plataforma funciona sem login. Ao entrar na sincronização, o progresso do perfil principal é enviado ao Firebase para acompanhar sua conta entre aparelhos; o backup manual continua disponível como camada adicional de segurança.");
   }
 }
 
@@ -61,9 +62,8 @@ function hardenPerformanceDataActions() {
   const panel = exportButton.closest(".performance-panel") || exportButton.closest(".card");
   if (!panel) return;
   const heading = panel.querySelector("h2");
-  if (heading && /Backup local/i.test(heading.textContent || "")) heading.textContent = "Backup complementar";
-  const copy = panel.querySelector("p.muted");
-  if (copy) copy.textContent = "Exporte uma cópia manual dos dados principais do perfil. Se você usa sincronização, a nuvem continua sendo a camada entre aparelhos.";
+  if (heading && /Backup local|Backup complementar/i.test(heading.textContent || "")) setText(heading, "Backup complementar");
+  setText(panel.querySelector("p.muted"), "Exporte uma cópia manual dos dados principais do perfil. Se você usa sincronização, a nuvem continua sendo a camada entre aparelhos.");
 
   const unsafe = panel.querySelector("[data-clear-profile]");
   if (unsafe) {
@@ -125,9 +125,14 @@ document.addEventListener("click", captureSettingsActions, true);
 window.addEventListener("hashchange", () => window.setTimeout(enhance, 0));
 window.addEventListener("sedes:cloud-status", () => window.setTimeout(enhance, 0));
 window.addEventListener("sedes:account-binding", () => window.setTimeout(enhance, 0));
+let enhanceScheduled = false;
 new MutationObserver(mutations => {
-  if (!mutations.some(mutation => mutation.addedNodes.length || mutation.removedNodes.length)) return;
-  window.requestAnimationFrame(enhance);
+  if (!mutations.some(mutation => mutation.addedNodes.length || mutation.removedNodes.length) || enhanceScheduled) return;
+  enhanceScheduled = true;
+  window.requestAnimationFrame(() => {
+    enhanceScheduled = false;
+    enhance();
+  });
 }).observe(document.querySelector("#app") || document.body, {childList: true, subtree: true});
 
 enhance();
