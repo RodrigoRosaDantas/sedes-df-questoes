@@ -135,7 +135,7 @@ test("reset em um aparelho não pode ser desfeito por histórico antigo de outro
     const pageB = await contextB.newPage();
     await openEmulated(pageB);
     await authenticate(pageB, email, "signin");
-    let before = await snapshotProgress(pageB);
+    const before = await snapshotProgress(pageB);
     expect(before.history.map(item => item.id)).toContain("attempt-before-reset");
     expect(before.errors["q-old"]).toBeTruthy();
     expect(before.marked["q-marked"]).toBeTruthy();
@@ -144,7 +144,7 @@ test("reset em um aparelho não pode ser desfeito por histórico antigo de outro
     await contextB.setOffline(true);
     const reset = await pageA.evaluate(async () => window.SEDES_PERFORMANCE_RESET.reset());
     expect(Number(reset.resetAt)).toBeGreaterThan(0);
-    let afterResetA = await snapshotProgress(pageA);
+    const afterResetA = await snapshotProgress(pageA);
     expect(afterResetA.history).toEqual([]);
     expect(afterResetA.errors).toEqual({});
     expect(afterResetA.marked["q-marked"]).toBeTruthy();
@@ -195,7 +195,7 @@ test("troca de perfil nas Configurações respeita e atualiza o vínculo da cont
     await authenticate(page, email, "signup");
     await expect.poll(() => page.evaluate(() => window.SEDES_WORK_CONVERGENCE?.getAccountState?.().boundProfile || null), {timeout: 30000}).toBe("rodrigo");
 
-    await page.goto("./?firebaseEmulator=1#/perfil/configuracoes", {waitUntil: "domcontentloaded"});
+    await page.evaluate(() => { location.hash = "#/perfil/configuracoes"; });
     const amanda = page.locator('[data-ux15-profile="amanda"]');
     await expect(amanda).toBeVisible({timeout: 30000});
     await amanda.click();
