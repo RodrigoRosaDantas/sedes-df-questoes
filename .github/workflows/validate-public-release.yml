@@ -95,3 +95,27 @@ jobs:
           done
           echo "Produção não convergiu para ${EXPECTED_SOURCE_SHA} dentro da janela de verificação." >&2
           exit 1
+
+  verify-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Baixar exatamente a main auditada
+        uses: actions/checkout@v6
+        with:
+          ref: 463db9c4f575bc73d50126ba61d342a9df7df72b
+          fetch-depth: 0
+      - name: Preparar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Construir referência e conferir o Pages real
+        env:
+          EXPECTED_SOURCE_SHA: 463db9c4f575bc73d50126ba61d342a9df7df72b
+          PUBLIC_BASE_URL: https://rodrigorosadantas.github.io/sedes-df-questoes/
+        shell: bash
+        run: |
+          set -euo pipefail
+          RELEASE_SOURCE_SHA="${EXPECTED_SOURCE_SHA}" npm run check
+          node scripts/verify-deployment.mjs "${PUBLIC_BASE_URL}" "${EXPECTED_SOURCE_SHA}"
