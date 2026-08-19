@@ -151,11 +151,13 @@ function bootstrapStandaloneRoleSync() {
     location.reload();
   });
 
-  queueMicrotask(() => {
-    Promise.all([
-      import("./cloud-progress-v1.js?v=1"),
-      import("./work-convergence-v1.js?v=1"),
-    ]).catch(error => console.warn("Sincronização direta do Estudo por Cargo indisponível; mantendo progresso local.", error));
+  queueMicrotask(async () => {
+    try {
+      await import("./cloud-progress-v1.js?v=1");
+      await import("./work-convergence-v1.js?v=1");
+    } catch (error) {
+      console.warn("Sincronização direta do Estudo por Cargo indisponível; mantendo progresso local.", error);
+    }
   });
 }
 
