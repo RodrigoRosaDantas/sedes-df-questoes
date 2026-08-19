@@ -23,6 +23,7 @@ const criticalSourceFiles = {
   home_study_subjects_css: "assets/home-study-subjects-v2-17.css",
   resolver_context_js: "assets/resolver-context-v2-19.js",
   resolver_context_css: "assets/resolver-context-v2-19.css",
+  product_integrity_js: "assets/product-integrity-v1.js",
 };
 const sha256 = value => crypto.createHash("sha256").update(value).digest("hex");
 const criticalHashes = {};
