@@ -13,6 +13,7 @@ const worker = read("service-worker.js");
 const cloud = read("assets/cloud-progress-v1.js");
 const reset = read("assets/performance-reset-v1.js");
 const integrity = read("assets/product-integrity-v1.js");
+const themeBridge = read("assets/theme-preference-bridge-v1.js");
 const shared = read("assets/shared-v2-13.js");
 const command = read("assets/work-command-center-v1.js");
 const css = read("assets/cloud-progress-v1.css");
@@ -25,19 +26,29 @@ const readme = read("README.md");
 
 requireMarkers(index, [
   "cloud-progress-v1.css?v=1",
+  "theme-preference-bridge-v1.js?v=1",
   "cloud-progress-v1.js?v=1",
   "performance-reset-v1.js?v=1",
   "work-command-center-v1.js?v=1",
   "product-integrity-v1.js?v=1",
 ], "Shell");
+if (index.indexOf("theme-preference-bridge-v1.js?v=1") > index.indexOf("work-convergence-v1.js?v=1")) throw new Error("Migração de tema precisa executar antes da camada Work.");
 requireMarkers(worker, [
   "cloud-progress-v1.css?v=1",
+  "theme-preference-bridge-v1.js?v=1",
   "cloud-progress-v1.js?v=1",
   "performance-reset-v1.js?v=1",
   "work-command-center-v1.js?v=1",
   "product-integrity-v1.js?v=1",
 ], "PWA");
 requireMarkers(builder, ["copy(\"assets\")"], "Build público");
+
+requireMarkers(themeBridge, [
+  "themeMigration.v1",
+  "stillLegacyManaged",
+  "theme-preference-migrated",
+  "preferences.v1",
+], "Migração de tema");
 
 requireMarkers(cloud, [
   'const PLATFORM_ID = "sedes-df-questoes"',
@@ -103,6 +114,7 @@ requireMarkers(integrity, [
 requireMarkers(shared, [
   "bootstrapStandaloneRoleSync",
   "data-estudo-por-cargo-page",
+  'await import("./theme-preference-bridge-v1.js?v=1")',
   'await import("./cloud-progress-v1.js?v=1")',
   'await import("./work-convergence-v1.js?v=1")',
   "roleDirectSyncReload.v1",
@@ -162,4 +174,4 @@ for (const obsolete of [
 }
 requireMarkers(readme, ["Firebase Authentication", "Firestore", "local-first", "reporte interno", "Configurações → Dados", "PBKDF2", "AES-GCM"], "README atual");
 
-console.log("✓ Firebase e integridade de produto validados: conta/perfil, temas, reset, importação por mescla, Por Cargo direto, offline, copy atual e regressões protegidas.");
+console.log("✓ Firebase e integridade de produto validados: conta/perfil, temas, migração legada, reset, importação por mescla, Por Cargo direto, offline, copy atual e regressões protegidas.");
