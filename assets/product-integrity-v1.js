@@ -20,11 +20,12 @@ function updateSettingsDataCopy() {
   if (storage) {
     setText(storage.querySelector("strong"), "Local-first + nuvem");
     const paragraph = storage.querySelector("p");
-    if (paragraph && !paragraph.dataset.integrityCloudCopy) {
-      paragraph.dataset.integrityCloudCopy = "true";
-      paragraph.insertAdjacentText("beforeend", accountIsSignedIn()
+    if (paragraph) {
+      if (!paragraph.dataset.integrityBaseCopy) paragraph.dataset.integrityBaseCopy = paragraph.textContent.replace(/ · (?:sincronização da conta ativa|entre na sincronização para manter uma cópia entre aparelhos)\.$/i, "");
+      const suffix = accountIsSignedIn()
         ? " · sincronização da conta ativa."
-        : " · entre na sincronização para manter uma cópia entre aparelhos.");
+        : " · entre na sincronização para manter uma cópia entre aparelhos.";
+      setText(paragraph, `${paragraph.dataset.integrityBaseCopy}${suffix}`);
     }
   }
 }
