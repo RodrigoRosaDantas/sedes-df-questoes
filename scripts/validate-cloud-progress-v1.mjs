@@ -105,7 +105,6 @@ requireMarkers(css, ["cloud-progress-pill", "cloud-dialog-backdrop", "work-comma
 requireMarkers(provenance, [
   'platform_cloud_progress_js: "assets/cloud-progress-v1.js"',
   'platform_cloud_progress_css: "assets/cloud-progress-v1.css"',
-  'platform_performance_reset_js: "assets/performance-reset-v1.js"',
   'platform_work_command_center_js: "assets/work-command-center-v1.js"',
   "source_files_sha256",
   "cloud_progress_provenance",
