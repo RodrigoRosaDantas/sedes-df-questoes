@@ -14,12 +14,15 @@ const META_KEY = "sedes.questoes.cloudSync.v1";
 
 const activeProfileId = () => localStorage.getItem(ACTIVE_PROFILE_KEY) || "rodrigo";
 const profileKey = (profileId, suffix) => `sedes.questoes.${profileId}.${suffix}`;
-const performanceState = profileId => new Map([
+const performanceResetKey = profileId => profileKey(profileId, "performanceReset.v1");
+const performanceState = (profileId, resetAt) => new Map([
   [profileKey(profileId, "errors.v3"), {}],
+  [profileKey(profileId, "errorReasons.v1"), {}],
   [profileKey(profileId, "reviewSchedule.v1"), {}],
   [profileKey(profileId, "reviewProcessedAttempts.v1"), []],
   [profileKey(profileId, "adaptiveReview.v1"), {}],
   [profileKey(profileId, "adaptiveProcessed.v1"), []],
+  [performanceResetKey(profileId), {at: resetAt, updatedAt: resetAt, schema: 1}],
 ]);
 const historyKey = profileId => profileKey(profileId, "history.v3");
 
@@ -37,7 +40,8 @@ const sleep = ms => new Promise(resolve => window.setTimeout(resolve, ms));
 async function waitForCloudIdle() {
   const cloud = window.SEDES_CLOUD_PROGRESS;
   if (!cloud?.getState) return;
-  for (let attempt = 0; attempt < 50 && cloud.getState().syncing; attempt += 1) await sleep(100);
+  for (let attempt = 0; attempt < 150 && cloud.getState().syncing; attempt += 1) await sleep(100);
+  if (cloud.getState().syncing) throw new Error("A sincronização ainda está em andamento. Aguarde alguns segundos e tente novamente.");
 }
 
 async function firebaseModules() {
@@ -61,9 +65,9 @@ function clearSyncMeta(uid, profileId) {
   }
 }
 
-function resetLocalPerformance(profileId) {
+function resetLocalPerformance(profileId, resetAt) {
   localStorage.setItem(historyKey(profileId), "[]");
-  for (const [key, value] of performanceState(profileId)) localStorage.setItem(key, JSON.stringify(value));
+  for (const [key, value] of performanceState(profileId, resetAt)) localStorage.setItem(key, JSON.stringify(value));
   if (profileId === "rodrigo") {
     localStorage.setItem("sedes.questoes.history.v2", "[]");
     localStorage.setItem("sedes.questoes.errorbook.v2", "{}");
@@ -89,7 +93,7 @@ async function deleteAttempts(refs, firestore, db) {
   return snapshot.size;
 }
 
-async function resetRemotePerformance(uid, profileId, firestore, db) {
+async function resetRemotePerformance(uid, profileId, resetAt, firestore, db) {
   const appRef = firestore.doc(db, "users", String(uid), "apps", PLATFORM_ID);
   const profileRef = firestore.doc(appRef, "profiles", String(profileId));
   const refs = {profileRef, state: firestore.collection(profileRef, "state"), attempts: firestore.collection(profileRef, "attempts")};
@@ -97,20 +101,20 @@ async function resetRemotePerformance(uid, profileId, firestore, db) {
 
   let batch = firestore.writeBatch(db);
   let writes = 0;
-  for (const [key, value] of performanceState(profileId)) {
+  for (const [key, value] of performanceState(profileId, resetAt)) {
     const serialized = JSON.stringify(value);
     batch.set(firestore.doc(refs.state, stateDocId(key)), {
       key,
       value: serialized,
       deleted: false,
       hash: fnv1a(serialized),
-      updatedAt: Date.now(),
+      updatedAt: resetAt,
       serverUpdatedAt: firestore.serverTimestamp(),
     }, {merge: true});
     writes += 1;
   }
   batch.set(profileRef, {
-    lastPerformanceResetAt: Date.now(),
+    lastPerformanceResetAt: resetAt,
     serverLastPerformanceResetAt: firestore.serverTimestamp(),
   }, {merge: true});
   writes += 1;
@@ -131,11 +135,12 @@ async function resetPerformance() {
   const user = authInstance.currentUser;
   if (!user) throw new Error("A sessão da nuvem ainda não está pronta. Abra a sincronização e tente novamente.");
 
-  const deletedAttempts = await resetRemotePerformance(user.uid, profileId, firestore, db);
-  resetLocalPerformance(profileId);
+  const resetAt = Date.now();
+  const deletedAttempts = await resetRemotePerformance(user.uid, profileId, resetAt, firestore, db);
+  resetLocalPerformance(profileId, resetAt);
   clearSyncMeta(user.uid, profileId);
   await window.SEDES_CLOUD_PROGRESS?.sync?.();
-  return {profileId, deletedAttempts};
+  return {profileId, deletedAttempts, resetAt};
 }
 
 function confirmationDialog() {
