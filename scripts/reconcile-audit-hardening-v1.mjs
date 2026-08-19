@@ -1,5 +1,3 @@
-import "./derive-quadrix-residual-gaps-e-20260816.mjs";
-import "./publish-study-by-role-v1.mjs";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -7,6 +5,11 @@ import {fileURLToPath} from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dist = path.join(root, "dist");
+const fReceipt = path.join(dist, "data", "release", "quadrix-mrosc-crasp-20260817-receipt.json");
+if (fs.existsSync(fReceipt)) await import("./derive-quadrix-mrosc-crasp-20260817.mjs");
+else await import("./derive-quadrix-residual-gaps-e-20260816.mjs");
+await import("./publish-study-by-role-v1.mjs");
+
 const targets = {
   platform_report_queue_js: "assets/question-report-queue-v2.js",
   platform_pdf_fidelity_js: "assets/pdf-fidelity-v2.js",

@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0",
+  "operation_id": "SEDES-QDX-MROSC-20260817-F",
+  "captured_at": "2026-08-17T22:10:00-03:00",
+  "expected_count": 1,
+  "expected_materials_added": 1,
+  "files": ["records.json"],
+  "expected_codes": ["PROVA-QDX-CRASP-2025-ANALISTA-RELACOES-EXTERNAS-400-047"],
+  "source": {
+    "name": "Banco Mestre — Provas e Simulados SEDES/DF",
+    "database_url": "https://app.notion.com/p/a1d5fc8f8e434105861faba90dc156d9",
+    "previous_master_total": 3514,
+    "master_total": 3515,
+    "previous_public_questions": 3512,
+    "expected_public_questions": 3513,
+    "previous_materials": 95,
+    "expected_materials": 96,
+    "previous_proofs": 56,
+    "expected_proofs": 57,
+    "simulations": 39,
+    "discursive_display_items": 2,
+    "expected_awaiting_audit": 0
+  },
+  "assignments": [
+    {
+      "question_id": "prova-qdx-crasp-2025-analista-relacoes-externas-400-047",
+      "item_id": "edas-suas-7",
+      "format": "A–E",
+      "answer": "E",
+      "prompt_sha256": "7c259aa577e1871ac9ec49f54e4080eaedf470a2081a06209c6915f89cf4567a"
+    }
+  ],
+  "expected_minimums": {"edas-suas-7": 4},
+  "protected_exact": {
+    "edas-suas-4": 2,
+    "400-afo-4-5": 1,
+    "edas-suas-6": 2
+  },
+  "expected_mapped_questions": 1318,
+  "expected_unmapped_questions": 2195,
+  "expected_newly_mapped_distinct_questions": 1,
+  "provenance": {
+    "cra_sp_2025_relacoes_externas": {
+      "official_contest": "https://www.quadrix.org.br/informacoes/1001/",
+      "official_archive_index": "https://ajuda.quadrix.org.br/pt-BR/articles/11198235-provas-anteriores-realizadas-em-2025",
+      "original_number": 47,
+      "answer": "E",
+      "question_reference": "Q2342407",
+      "cargo_code_in_contest": "408"
+    }
+  },
+  "quality_notes": [
+    "Uma questão real Quadrix nova sobre o Marco Regulatório das Organizações da Sociedade Civil foi incluída com número original e gabarito definitivo preservados.",
+    "MROSC sobe de 3 para pelo menos 4 questões por cobrança direta do acordo de cooperação previsto no art. 2º, VIII-A, da Lei nº 13.019/2014.",
+    "Tipificação Nacional permanece em exatamente 2, SIAFEM-DF em exatamente 1 e CadÚnico em exatamente 2; nenhuma equivalência artificial foi criada."
+  ]
+}
