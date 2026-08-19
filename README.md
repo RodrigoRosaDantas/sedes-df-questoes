@@ -55,7 +55,7 @@ O armazenamento local é a primeira camada: a plataforma continua utilizável se
 
 Os dados pessoais da plataforma ficam sob a árvore do UID autenticado. As regras do Firestore impedem leitura e escrita cruzadas entre usuários comuns e negam caminhos externos por padrão.
 
-A sincronização não substitui o backup manual. O backup continua disponível como camada adicional de recuperação. Ações destrutivas de aproveitamento devem usar o fluxo seguro em **Configurações → Dados**, que mantém um marco de reset sincronizado para impedir que outro aparelho restaure histórico anterior.
+A sincronização não substitui o backup manual. O backup continua disponível como camada adicional de recuperação. O backup protegido deriva a chave da senha com **PBKDF2** (210.000 iterações, SHA-256) e cifra o conteúdo com **AES-GCM** de 256 bits; a senha não é armazenada no arquivo. Ações destrutivas de aproveitamento devem usar o fluxo seguro em **Configurações → Dados**, que mantém um marco de reset sincronizado para impedir que outro aparelho restaure histórico anterior.
 
 ## Qualidade editorial e relatos
 
