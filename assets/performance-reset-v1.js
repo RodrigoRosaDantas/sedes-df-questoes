@@ -179,7 +179,13 @@ function confirmationDialog() {
 
 function injectResetAction() {
   const page = document.querySelector('[data-ux15-settings-page][data-ux15-tab="dados"]');
-  if (!page || page.querySelector("[data-performance-reset-card]")) return;
+  if (!page) return;
+  const intro = page.querySelector(".ux15-settings-intro > p:last-child");
+  if (intro && !intro.dataset.cloudCopyUpdated) {
+    intro.textContent = "O progresso funciona localmente neste navegador e, quando você entra na sincronização, acompanha sua conta entre aparelhos.";
+    intro.dataset.cloudCopyUpdated = "true";
+  }
+  if (page.querySelector("[data-performance-reset-card]")) return;
   const target = page.querySelector(".ux15-data-actions") || page;
   const card = document.createElement("article");
   card.className = "card";
