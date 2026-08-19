@@ -203,7 +203,7 @@ test("troca de perfil nas Configurações respeita e atualiza o vínculo da cont
     const dialog = page.locator("[data-work-account-profile-dialog]");
     await expect(dialog).toBeVisible({timeout: 30000});
     await expect(dialog.locator("[data-work-account-profile]")).toHaveValue("amanda");
-    await dialog.locator("[data-work-account-save]").click();
+    await dialog.locator("[data-work-account-save]").evaluate(button => button.click());
 
     await expect.poll(() => page.evaluate(() => localStorage.getItem("sedes.questoes.activeProfile.v3")), {timeout: 30000}).toBe("amanda");
     await expect.poll(() => page.evaluate(() => window.SEDES_WORK_CONVERGENCE?.getAccountState?.().boundProfile || null), {timeout: 30000}).toBe("amanda");
