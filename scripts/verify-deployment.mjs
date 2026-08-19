@@ -55,12 +55,13 @@ const canonicalHashKeys = [
   "platform_navigation_js",
   "platform_css",
   "product_integrity_js",
+  "theme_preference_bridge_js",
 ];
 
 let lastError;
 for (let attempt = 1; attempt <= 30; attempt += 1) {
   try {
-    const [buildInfo, releaseMeta, catalog, index, app, worker, pwa, reports, shared, release, vault, report, official, adaptive, navigation, platformCss, productIntegrity] = await Promise.all([
+    const [buildInfo, releaseMeta, catalog, index, app, worker, pwa, reports, shared, release, vault, report, official, adaptive, navigation, platformCss, productIntegrity, themeBridge] = await Promise.all([
       fetchJSON("data/release/build-info.json"),
       fetchJSON("data/release/release-meta.json"),
       fetchJSON("data/release/catalogo.json"),
@@ -78,6 +79,7 @@ for (let attempt = 1; attempt <= 30; attempt += 1) {
       fetchText("assets/navigation-v2-15.js"),
       fetchText("assets/platform-v2-13.css"),
       fetchText("assets/product-integrity-v1.js"),
+      fetchText("assets/theme-preference-bridge-v1.js"),
     ]);
     const questions = Object.keys(catalog.question_index || {}).length;
     const materials = Array.isArray(catalog.materials) ? catalog.materials.length : 0;
@@ -101,6 +103,7 @@ for (let attempt = 1; attempt <= 30; attempt += 1) {
       platform_navigation_js: navigation,
       platform_css: platformCss,
       product_integrity_js: productIntegrity,
+      theme_preference_bridge_js: themeBridge,
     };
     for (const hash of canonicalHashKeys) {
       const artifactHash = artifactReleaseMeta.source_files_sha256?.[hash];
@@ -127,7 +130,7 @@ for (let attempt = 1; attempt <= 30; attempt += 1) {
     if (!reports.includes("restoreBackupTransaction")) throw new Error("Relatórios e backup legado não foram publicados.");
 
     const moduleChecks = [
-      [shared, ["release-meta.json", "createCompatibleSession"]],
+      [shared, ["release-meta.json", "createCompatibleSession", "theme-preference-bridge-v1.js"]],
       [release, ["enhanceReleaseMetadata", "data-release-footer"]],
       [vault, ["sedes-protected-backup", "PBKDF2"]],
       [report, ["Reportar problema nesta questão"]],
@@ -135,6 +138,7 @@ for (let attempt = 1; attempt <= 30; attempt += 1) {
       [adaptive, ["Revisão adaptativa", "mastery"]],
       [navigation, ["Dados do projeto", "Aguardando auditoria", "America/Sao_Paulo"]],
       [productIntegrity, ["installSkipLinkGuard", "routeSignedInProfileChoice", "Local-first + nuvem", "data-clear-profile"]],
+      [themeBridge, ["themeMigration.v1", "theme-preference-migrated", "preferences.v1"]],
     ];
     for (const [content, markers] of moduleChecks) {
       for (const marker of markers) if (!content.includes(marker)) throw new Error(`Módulo 2.13 público sem ${marker}.`);
