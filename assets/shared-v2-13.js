@@ -124,6 +124,19 @@ export const observeApp = callback => {
   run();
 };
 
+function standaloneProfileTheme() {
+  const preferences = safeParse(localStorage.getItem(`sedes.questoes.${activeProfileId()}.preferences.v1`), {});
+  const explicit = preferences && typeof preferences === "object" && !Array.isArray(preferences) ? preferences.theme : "";
+  const global = localStorage.getItem("sedes.questoes.theme");
+  return ["dark", "light"].includes(explicit) ? explicit : (["dark", "light"].includes(global) ? global : "dark");
+}
+
+function applyStandaloneProfileTheme() {
+  const theme = standaloneProfileTheme();
+  localStorage.setItem("sedes.questoes.theme", theme);
+  document.documentElement.dataset.theme = theme;
+}
+
 function bootstrapStandaloneRoleSync() {
   if (!document.body?.matches("[data-estudo-por-cargo-page]")) return;
   if (!document.querySelector('link[href*="cloud-progress-v1.css"]')) {
@@ -139,10 +152,12 @@ function bootstrapStandaloneRoleSync() {
     document.head.append(style);
   }
 
+  applyStandaloneProfileTheme();
   const profileAtLoad = activeProfileId();
   const reloadKey = `sedes.questoes.roleDirectSyncReload.v1:${profileAtLoad}`;
   let awaitingInitialCloudResult = true;
   window.addEventListener("sedes:cloud-status", event => {
+    if (event.detail?.kind === "saved") window.setTimeout(applyStandaloneProfileTheme, 0);
     if (!awaitingInitialCloudResult || event.detail?.kind !== "saved") return;
     awaitingInitialCloudResult = false;
     const previous = Number(sessionStorage.getItem(reloadKey) || 0);
@@ -150,13 +165,16 @@ function bootstrapStandaloneRoleSync() {
     sessionStorage.setItem(reloadKey, String(Date.now()));
     location.reload();
   });
+  window.addEventListener("sedes:account-binding", () => window.setTimeout(applyStandaloneProfileTheme, 0));
 
   queueMicrotask(async () => {
     try {
       await import("./cloud-progress-v1.js?v=1");
       await import("./work-convergence-v1.js?v=1");
+      applyStandaloneProfileTheme();
     } catch (error) {
       console.warn("Sincronização direta do Estudo por Cargo indisponível; mantendo progresso local.", error);
+      applyStandaloneProfileTheme();
     }
   });
 }
