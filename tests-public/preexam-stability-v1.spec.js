@@ -18,11 +18,15 @@ async function expectNoHorizontalOverflow(page, label) {
   expect(dimensions.body, `${label}: body overflow`).toBeLessThanOrEqual(dimensions.viewport + 2);
 }
 
-test("rotas essenciais permanecem utilizáveis no iPad em retrato e paisagem", async ({page}) => {
+test("rotas essenciais permanecem utilizáveis no celular e iPad", async ({page}) => {
   const pageErrors = [];
   page.on("pageerror", error => pageErrors.push(error.message));
 
-  for (const viewport of [{width: 834, height: 1194}, {width: 1366, height: 1024}]) {
+  for (const viewport of [
+    {width: 390, height: 844},
+    {width: 834, height: 1194},
+    {width: 1366, height: 1024},
+  ]) {
     await page.setViewportSize(viewport);
     for (const [label, hash] of routes) {
       await page.goto(`./${hash}`, {waitUntil: "domcontentloaded"});
