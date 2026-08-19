@@ -53,11 +53,14 @@ test("Configurações de Dados descrevem local-first + nuvem sem mensagem legada
   await expectNoHorizontalOverflow(page, "configurações dados iPad retrato");
 });
 
-test("Desempenho usa gestão segura de dados e preserva o cofre de restauração", async ({page}) => {
+test("Desempenho usa gestão segura, importação por mescla e preserva o cofre", async ({page}) => {
   await page.goto("./#/desempenho", {waitUntil: "domcontentloaded"});
   await expect(page.locator("#app h1").first()).toBeVisible({timeout: 30000});
   await expect(page.locator("[data-clear-profile]")).toHaveCount(0);
+  await expect(page.locator("[data-import-profile]")).toHaveCount(0);
   await expect(page.locator("[data-integrity-manage-data]")).toBeVisible();
+  await expect(page.locator("[data-integrity-import-profile]")).toBeVisible();
+  await expect(page.locator("[data-integrity-import-profile]").locator("xpath=ancestor::label[1]")).toContainText("Importar e mesclar backup");
   await expect(page.locator("[data-export-profile]").locator("xpath=ancestor::*[contains(@class,'performance-panel')][1]")).toContainText("Backup complementar");
   await expect(page.locator("[data-vault-tools]")).toBeVisible({timeout: 30000});
   await expect(page.locator("[data-vault-export]")).toBeVisible();
