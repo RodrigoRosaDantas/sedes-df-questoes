@@ -27,8 +27,12 @@ test("Pages permanece utilizável offline com JSONs canônicos e controles de re
       "./data/release/study-index.json?release=legacy-probe",
       "./data/release/release-meta.json",
       "./data/release/release-meta.json?release=legacy-probe",
+      "./assets/theme-preference-bridge-v1.js?v=1",
       "./assets/cloud-progress-v1.js?v=1",
       "./assets/performance-reset-v1.js?v=1",
+      "./assets/work-convergence-v1.js?v=1",
+      "./assets/vault-v2-13.js?v=1",
+      "./assets/product-integrity-v1.js?v=1",
     ];
     const responses = await Promise.all(urls.map(url => fetch(url, {cache: "no-store"})));
     return responses.every(response => response.ok);
@@ -40,5 +44,6 @@ test("Pages permanece utilizável offline com JSONs canônicos e controles de re
   await page.locator('[data-ux15-settings-tab="dados"]').click();
   await expect(page.locator("[data-performance-reset-card]")).toBeVisible();
   await expect(page.locator("[data-cloud-progress]")).toHaveAttribute("data-cloud-state", "offline");
+  await expect(page.locator('[data-ux15-settings-page][data-ux15-tab="dados"]')).toContainText("Local-first + nuvem");
   expect(errors).toEqual([]);
 });

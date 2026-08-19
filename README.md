@@ -1,9 +1,10 @@
 # SEDES/DF Questões
 
-Plataforma estática e local-first para preparação do concurso SEDES/DF, publicada no GitHub Pages a partir da arquitetura:
+Plataforma de estudo local-first para preparação do concurso SEDES/DF, publicada no GitHub Pages a partir da arquitetura:
 
 ```text
 Notion → snapshot e plano explícito → GitHub Actions → GitHub Pages
+                         ↘ progresso local-first + Firebase opcional
 ```
 
 ## Fonte única da release
@@ -18,8 +19,8 @@ O aplicativo, o verificador público e os testes de build usam esse arquivo. Est
 
 ## Recursos principais
 
-- perfis locais independentes;
-- estudo por matéria, tópico, prova ou simulado;
+- perfis independentes;
+- estudo por matéria, tópico, prova, simulado e cargo;
 - modos treino e prova;
 - questões de múltipla escolha e Certo/Errado;
 - cronômetro total e por questão;
@@ -27,10 +28,13 @@ O aplicativo, o verificador público e os testes de build usam esse arquivo. Est
 - caderno de erros e questões marcadas;
 - revisão D0/D7/D20 e revisão adaptativa;
 - desempenho por matéria e assunto;
-- exportação, importação e limpeza do progresso;
+- backup manual do progresso;
+- reset seguro do aproveitamento, preservando marcações, anotações, preferências e sessão em andamento;
+- sincronização opcional entre aparelhos com Firebase Authentication e Firestore;
 - download de provas e simulados em PDF para responder ou comentado;
 - PWA com funcionamento offline controlado;
-- reporte estruturado de problema por questão.
+- reporte interno de problema por questão;
+- edital verticalizado e Prova Real para os cargos suportados.
 
 ## Prova Real SEDES/DF 2026
 
@@ -45,15 +49,19 @@ A plataforma monta uma simulação baseada no Edital nº 1/2026:
 
 A nota discursiva não é calculada nesse modo.
 
-## Segurança do progresso
+## Progresso, conta e privacidade
 
-Os dados continuam armazenados no navegador, sem envio automático a servidor. A versão 2.13 acrescenta pontos de restauração automáticos e manuais, restauração com cópia do estado anterior, diagnóstico de armazenamento e backup protegido por senha com PBKDF2 e AES-GCM.
+O armazenamento local é a primeira camada: a plataforma continua utilizável sem login e mantém o progresso no navegador para suportar uso offline. Quando o usuário entra na sincronização, os dados do perfil principal são associados à conta autenticada e reconciliados com o Firestore para permitir continuidade entre aparelhos.
 
-A sincronização automática entre aparelhos não é ativada porque o GitHub Pages não oferece autenticação ou armazenamento privado. Essa opção exigirá um serviço de backend separado e auditado.
+Os dados pessoais da plataforma ficam sob a árvore do UID autenticado. As regras do Firestore impedem leitura e escrita cruzadas entre usuários comuns e negam caminhos externos por padrão.
 
-## Qualidade editorial
+A sincronização não substitui o backup manual. O backup continua disponível como camada adicional de recuperação. O backup protegido deriva a chave da senha com **PBKDF2** (210.000 iterações, SHA-256) e cifra o conteúdo com **AES-GCM** de 256 bits; a senha não é armazenada no arquivo. Ações destrutivas de aproveitamento devem usar o fluxo seguro em **Configurações → Dados**, que mantém um marco de reset sincronizado para impedir que outro aparelho restaure histórico anterior.
 
-O botão **Reportar problema nesta questão** abre uma issue pré-preenchida no repositório, contendo código da questão, material, release, commit e ambiente. O relato não altera automaticamente o Notion nem o pacote público.
+## Qualidade editorial e relatos
+
+O relato de problema de uma questão é armazenado internamente no progresso do perfil e pode sincronizar com a conta. O fluxo não cria automaticamente uma issue pública no GitHub e não altera sozinho o Notion nem o pacote publicado.
+
+Conteúdo editorial, código da plataforma e publicação permanecem separados: correções técnicas não devem alterar gabaritos ou questões sem uma operação editorial específica.
 
 ## Validação
 
@@ -61,16 +69,18 @@ O botão **Reportar problema nesta questão** abre uma issue pré-preenchida no 
 npm run check
 ```
 
-Esse comando funciona em clone limpo e sem credenciais. Ele congela por hash todos os arquivos versionados da release, gera somente os índices derivados e o `dist`, valida sintaxe, catálogo, materiais, downloads, relevância dos editais, formatos, PWA, acessibilidade, navegação, prova real, discursivas, metadados e governança. Ao final, comprova que a fonte canônica permaneceu byte a byte inalterada.
+Esse comando funciona em clone limpo e sem credenciais. Ele congela por hash os arquivos versionados da release, gera somente os índices derivados e o `dist`, valida sintaxe, catálogo, materiais, downloads, relevância dos editais, formatos, PWA, acessibilidade, navegação, prova real, discursivas, metadados, sincronização e governança. Ao final, comprova que a fonte canônica permaneceu byte a byte inalterada.
+
+Os pull requests também executam Playwright contra o artefato local e, para a camada de progresso, testes com Firebase Emulator e regras do Firestore.
 
 O pipeline editorial completo continua disponível em `npm run check:release`, mas deve ser usado somente depois que uma operação autorizada gerar os arquivos transitórios de exportação do Notion. Ele não é o comando padrão de auditoria de um clone limpo.
 
 ## Governança de publicação
 
-- pull requests executam apenas a validação de leitura, com permissão `contents: read`;
-- o GitHub Pages só publica por acionamento manual, com o SHA exato da `main` e confirmação `PUBLICAR`;
-- a suíte pública completa roda contra o artefato local antes do deploy e novamente no endereço público depois dele;
-- sincronização, escrita e fechamento de rastreabilidade no Notion permanecem suspensos sem autorização operacional específica;
-- o recibo cumulativo do último deploy é registrado separadamente e distingue o commit da interface do recibo editorial que formou o acervo.
-
-Pull requests nunca publicam. Somente a `main`, depois da validação e de uma autorização manual explícita, pode gerar um novo deploy do GitHub Pages.
+- pull requests executam apenas validação de leitura e não publicam;
+- o GitHub Pages publica somente a partir da `main`, por autorização controlada presa a um SHA exato;
+- antes do deploy, a suíte pública completa roda contra o artefato local;
+- depois do deploy, a mesma suíte é repetida no endereço público;
+- o verificador final confirma metadados, PWA, catálogo e commit efetivamente servidos;
+- sincronização editorial, escrita e fechamento de rastreabilidade no Notion exigem autorização operacional específica;
+- o recibo cumulativo do último deploy distingue o commit da interface do recibo editorial que formou o acervo.

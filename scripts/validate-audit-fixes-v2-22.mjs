@@ -13,8 +13,8 @@ if (!worker.includes("cacheKey: canonicalKey, fallback: canonicalKey")) throw ne
 for (const stale of ["catalogo.json?release=", "study-index.json?release=", "build-info.json?release=", "release-meta.json?release="]) {
   if (worker.includes(stale)) throw new Error(`Service worker ainda pré-cacheia URL obsoleta: ${stale}`);
 }
-for (const required of ["./data/release/catalogo.json", "./data/release/study-index.json", "./data/release/build-info.json", "./data/release/release-meta.json"]) {
-  if (!worker.includes(required)) throw new Error(`JSON canônico ausente do shell offline: ${required}`);
+for (const required of ["./data/release/catalogo.json", "./data/release/study-index.json", "./data/release/build-info.json", "./data/release/release-meta.json", "./assets/theme-preference-bridge-v1.js?v=1"]) {
+  if (!worker.includes(required)) throw new Error(`Recurso canônico ausente do shell offline: ${required}`);
 }
 
 for (const [name, meta] of [["build-info fonte", sourceBuild], ["release-meta fonte", sourceRelease]]) {
@@ -35,6 +35,8 @@ if (fs.existsSync(distReleaseDir)) {
     "home_study_subjects_css",
     "resolver_context_js",
     "resolver_context_css",
+    "product_integrity_js",
+    "theme_preference_bridge_js",
   ];
   for (const meta of [buildInfo, releaseMeta]) {
     if (meta.provenance_contract_version !== "2.22") throw new Error("Recibo público sem contrato de proveniência v2.22.");
@@ -46,4 +48,4 @@ if (fs.existsSync(distReleaseDir)) {
   }
 }
 
-console.log("✓ Auditoria v2.22: matching do edital protegido, cache offline canônico e proveniência UX completa.");
+console.log("✓ Auditoria v2.22: matching do edital protegido, cache offline canônico e proveniência UX completa, incluindo integridade de produto e migração de tema.");

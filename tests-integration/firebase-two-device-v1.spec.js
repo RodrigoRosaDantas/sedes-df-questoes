@@ -135,7 +135,7 @@ test("reset em um aparelho não pode ser desfeito por histórico antigo de outro
     const pageB = await contextB.newPage();
     await openEmulated(pageB);
     await authenticate(pageB, email, "signin");
-    let before = await snapshotProgress(pageB);
+    const before = await snapshotProgress(pageB);
     expect(before.history.map(item => item.id)).toContain("attempt-before-reset");
     expect(before.errors["q-old"]).toBeTruthy();
     expect(before.marked["q-marked"]).toBeTruthy();
@@ -144,7 +144,7 @@ test("reset em um aparelho não pode ser desfeito por histórico antigo de outro
     await contextB.setOffline(true);
     const reset = await pageA.evaluate(async () => window.SEDES_PERFORMANCE_RESET.reset());
     expect(Number(reset.resetAt)).toBeGreaterThan(0);
-    let afterResetA = await snapshotProgress(pageA);
+    const afterResetA = await snapshotProgress(pageA);
     expect(afterResetA.history).toEqual([]);
     expect(afterResetA.errors).toEqual({});
     expect(afterResetA.marked["q-marked"]).toBeTruthy();
@@ -182,5 +182,83 @@ test("reset em um aparelho não pode ser desfeito por histórico antigo de outro
   } finally {
     await contextA.close();
     await contextB.close();
+  }
+});
+
+test("troca de perfil nas Configurações respeita e atualiza o vínculo da conta autenticada", async ({browser}) => {
+  const suffix = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  const email = `sedes-profile-binding-${suffix}@example.com`;
+  const context = await browser.newContext({serviceWorkers: "block"});
+  try {
+    const page = await context.newPage();
+    await openEmulated(page);
+    await authenticate(page, email, "signup");
+    await expect.poll(() => page.evaluate(() => window.SEDES_WORK_CONVERGENCE?.getAccountState?.().boundProfile || null), {timeout: 30000}).toBe("rodrigo");
+
+    await page.evaluate(() => { location.hash = "#/perfil/configuracoes"; });
+    const amanda = page.locator('[data-ux15-profile="amanda"]');
+    await expect(amanda).toBeVisible({timeout: 30000});
+    await amanda.evaluate(button => button.click());
+
+    const dialog = page.locator("[data-work-account-profile-dialog]");
+    await expect(dialog).toBeVisible({timeout: 30000});
+    await expect(dialog.locator("[data-work-account-profile]")).toHaveValue("amanda");
+    await dialog.locator("[data-work-account-save]").evaluate(button => button.click());
+
+    await expect.poll(() => page.evaluate(() => localStorage.getItem("sedes.questoes.activeProfile.v3")), {timeout: 30000}).toBe("amanda");
+    await expect.poll(() => page.evaluate(() => window.SEDES_WORK_CONVERGENCE?.getAccountState?.().boundProfile || null), {timeout: 30000}).toBe("amanda");
+
+    await page.reload({waitUntil: "domcontentloaded"});
+    await expect.poll(() => page.evaluate(() => localStorage.getItem("sedes.questoes.activeProfile.v3")), {timeout: 30000}).toBe("amanda");
+    await expect.poll(() => page.evaluate(() => window.SEDES_WORK_CONVERGENCE?.getAccountState?.().boundProfile || null), {timeout: 30000}).toBe("amanda");
+  } finally {
+    await context.close();
+  }
+});
+
+test("Estudo por Cargo aberto diretamente restaura o progresso da conta", async ({browser}) => {
+  const suffix = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  const email = `sedes-role-direct-${suffix}@example.com`;
+  const context = await browser.newContext({serviceWorkers: "block"});
+  try {
+    const page = await context.newPage();
+    await openEmulated(page);
+    await authenticate(page, email, "signup");
+    const finishedAt = new Date().toISOString();
+    await page.evaluate(async ({historyKey, finishedAt}) => {
+      localStorage.setItem(historyKey, JSON.stringify([{
+        id: "attempt-role-direct-cloud",
+        materialId: "integration-role",
+        materialName: "Integração por cargo",
+        mode: "treino",
+        finishedAt,
+        total: 1,
+        answered: 1,
+        correct: 1,
+        wrong: 0,
+        blank: 0,
+        percent: 100,
+        accuracy: 100,
+        answeredQuestionIds: ["q-role-direct"],
+        questionResults: [{id: "q-role-direct", answer: "A", correct: true, materialId: "integration-role", discipline: "Teste", assunto: "Direto"}],
+        answers: {"q-role-direct": "A"},
+        questionTimes: {"q-role-direct": 12},
+      }]));
+      await window.SEDES_CLOUD_PROGRESS.sync();
+    }, {historyKey: HISTORY_KEY, finishedAt});
+    await expect(page.locator("[data-cloud-progress]")).toHaveAttribute("data-cloud-state", "saved", {timeout: 30000});
+
+    await page.evaluate(historyKey => localStorage.removeItem(historyKey), HISTORY_KEY);
+    await page.goto("./estudo-por-cargo.html?firebaseEmulator=1&cargo=202", {waitUntil: "domcontentloaded"});
+    await expect(page.locator("body[data-estudo-por-cargo-page]")).toBeVisible({timeout: 30000});
+    await expect(page.locator("[data-cloud-progress]")).toBeVisible({timeout: 30000});
+    await expect(page.locator("[data-cloud-progress]")).toHaveAttribute("data-cloud-state", "saved", {timeout: 30000});
+    await expect.poll(async () => page.evaluate(historyKey => {
+      const history = JSON.parse(localStorage.getItem(historyKey) || "[]");
+      return history.some(item => item.id === "attempt-role-direct-cloud");
+    }, HISTORY_KEY), {timeout: 30000}).toBe(true);
+    await expect.poll(() => page.evaluate(() => window.SEDES_WORK_CONVERGENCE?.getAccountState?.().boundProfile || null), {timeout: 30000}).toBe("rodrigo");
+  } finally {
+    await context.close();
   }
 });
