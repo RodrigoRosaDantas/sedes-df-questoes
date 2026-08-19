@@ -84,6 +84,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          RELEASE_SOURCE_SHA="${EXPECTED_SOURCE_SHA}" npm run check
           for attempt in $(seq 1 20); do
             if node scripts/verify-deployment.mjs "${PUBLIC_BASE_URL}" "${EXPECTED_SOURCE_SHA}"; then
               echo "✓ Produção confirma ${EXPECTED_SOURCE_SHA}."
