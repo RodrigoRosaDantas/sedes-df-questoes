@@ -13,12 +13,14 @@ const worker = read("service-worker.js");
 const cloud = read("assets/cloud-progress-v1.js");
 const reset = read("assets/performance-reset-v1.js");
 const integrity = read("assets/product-integrity-v1.js");
+const shared = read("assets/shared-v2-13.js");
 const command = read("assets/work-command-center-v1.js");
 const css = read("assets/cloud-progress-v1.css");
 const builder = read("scripts/build-public.mjs");
 const provenance = read("scripts/reconcile-cloud-provenance-v1.mjs");
 const verifier = read("scripts/verify-public-release.mjs");
 const publicConfig = read("playwright.public.config.js");
+const firebaseTest = read("tests-integration/firebase-two-device-v1.spec.js");
 const readme = read("README.md");
 
 requireMarkers(index, [
@@ -87,11 +89,29 @@ requireMarkers(integrity, [
   "Local-first + nuvem",
   "data-clear-profile",
   "data.integrityManageData",
+  "data.integrityImportProfile",
+  "Importar e mesclar backup",
+  "reconciliado com a nuvem",
   "SEDES_WORK_CONVERGENCE?.savePreferences?.({theme})",
   "routeSignedInProfileChoice",
   "data-work-account-profile",
+  "#theme-toggle",
+  "installSkipLinkGuard",
   "acompanha sua conta entre dispositivos",
 ], "Integridade de produto");
+
+requireMarkers(shared, [
+  "bootstrapStandaloneRoleSync",
+  "data-estudo-por-cargo-page",
+  'await import("./cloud-progress-v1.js?v=1")',
+  'await import("./work-convergence-v1.js?v=1")',
+  "roleDirectSyncReload.v1",
+], "Sincronização direta Estudo por Cargo");
+requireMarkers(firebaseTest, [
+  "reset em um aparelho não pode ser desfeito",
+  "troca de perfil nas Configurações respeita",
+  "Estudo por Cargo aberto diretamente restaura o progresso da conta",
+], "Firebase Emulator");
 
 requireMarkers(command, [
   "Central de comando",
@@ -131,7 +151,7 @@ requireMarkers(verifier, [
   '"platform_cloud_progress_css"',
   '"platform_work_command_center_js"',
 ], "Auditoria reproduzível");
-requireMarkers(publicConfig, ["cloud-progress-v1.spec.js", "preexam-stability-v1.spec.js"], "Playwright público");
+requireMarkers(publicConfig, ["cloud-progress-v1.spec.js", "preexam-stability-v1.spec.js", "full-site-integrity-v1.spec.js"], "Playwright público");
 
 for (const obsolete of [
   "A sincronização automática entre aparelhos não é ativada",
@@ -140,6 +160,6 @@ for (const obsolete of [
 ]) {
   if (readme.includes(obsolete)) throw new Error(`README preservou contrato obsoleto: ${obsolete}`);
 }
-requireMarkers(readme, ["Firebase Authentication", "Firestore", "local-first", "reporte interno", "Configurações → Dados"], "README atual");
+requireMarkers(readme, ["Firebase Authentication", "Firestore", "local-first", "reporte interno", "Configurações → Dados", "PBKDF2", "AES-GCM"], "README atual");
 
-console.log("✓ Firebase, reset e integridade de produto validados: conta/perfil, tema, dados destrutivos, offline, copy atual e regressões Playwright protegidas.");
+console.log("✓ Firebase e integridade de produto validados: conta/perfil, temas, reset, importação por mescla, Por Cargo direto, offline, copy atual e regressões protegidas.");
