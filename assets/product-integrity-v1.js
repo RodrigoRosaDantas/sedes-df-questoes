@@ -1,5 +1,6 @@
 const THEME_KEY = "sedes.questoes.theme";
 const ACTIVE_PROFILE_KEY = "sedes.questoes.activeProfile.v3";
+let accountBindingEventSeen = false;
 
 function setText(node, value) {
   if (node && node.textContent !== value) node.textContent = value;
@@ -9,6 +10,17 @@ function accountIsSignedIn() {
   const work = window.SEDES_WORK_CONVERGENCE?.getAccountState?.();
   const cloud = window.SEDES_CLOUD_PROGRESS?.getState?.();
   return Boolean(work?.signedIn || cloud?.signedIn);
+}
+
+function accountResolutionKind() {
+  const work = window.SEDES_WORK_CONVERGENCE?.getAccountState?.();
+  if (work?.resolving) return "pending";
+  if (work?.signedIn) return "signed-in";
+  const cloud = window.SEDES_CLOUD_PROGRESS?.getState?.();
+  if (cloud?.signedIn) return "pending";
+  const cloudState = document.querySelector("[data-cloud-progress]")?.dataset.cloudState || "";
+  if (accountBindingEventSeen || cloudState === "signed-out") return "signed-out";
+  return "pending";
 }
 
 function activeProfileId() {
@@ -161,19 +173,11 @@ function synchronizeThemeChoice(theme) {
 function routeSignedInProfileChoice(profileId, attempt = 0) {
   const work = window.SEDES_WORK_CONVERGENCE;
   const state = work?.getAccountState?.();
-  if (!work?.manageProfile) {
-    if (attempt < 60) {
+  if (!work?.manageProfile || state?.resolving || !state?.signedIn) {
+    if (attempt < 100) {
       window.setTimeout(() => routeSignedInProfileChoice(profileId, attempt + 1), 50);
       return;
     }
-    window.SEDES_CLOUD_PROGRESS?.open?.();
-    return;
-  }
-  if (state?.resolving) {
-    if (attempt < 60) window.setTimeout(() => routeSignedInProfileChoice(profileId, attempt + 1), 50);
-    return;
-  }
-  if (!state?.signedIn) {
     window.SEDES_CLOUD_PROGRESS?.open?.();
     return;
   }
@@ -182,6 +186,28 @@ function routeSignedInProfileChoice(profileId, attempt = 0) {
     const select = document.querySelector("[data-work-account-profile]");
     if (select && [...select.options].some(option => option.value === profileId)) select.value = profileId;
   }, 0);
+}
+
+function routeProfileChoice(profileId, attempt = 0) {
+  const kind = accountResolutionKind();
+  if (kind === "signed-in") {
+    routeSignedInProfileChoice(profileId);
+    return;
+  }
+  if (kind === "signed-out") {
+    localStorage.setItem(ACTIVE_PROFILE_KEY, profileId);
+    location.reload();
+    return;
+  }
+  if (attempt < 100) {
+    window.setTimeout(() => routeProfileChoice(profileId, attempt + 1), 50);
+    return;
+  }
+  if (accountIsSignedIn()) routeSignedInProfileChoice(profileId);
+  else {
+    localStorage.setItem(ACTIVE_PROFILE_KEY, profileId);
+    location.reload();
+  }
 }
 
 function profileIdFromTarget(target) {
@@ -211,19 +237,19 @@ function captureActions(event) {
   }
 
   const profileId = profileIdFromTarget(event.target);
-  if (!profileId || !accountIsSignedIn()) return;
+  if (!profileId) return;
   event.preventDefault();
   event.stopImmediatePropagation();
-  routeSignedInProfileChoice(profileId);
+  routeProfileChoice(profileId);
 }
 
 function captureProfileKeyboard(event) {
-  if (!["Enter", " "].includes(event.key) || !accountIsSignedIn()) return;
+  if (!["Enter", " "].includes(event.key)) return;
   const profileId = profileIdFromTarget(event.target);
   if (!profileId) return;
   event.preventDefault();
   event.stopImmediatePropagation();
-  routeSignedInProfileChoice(profileId);
+  routeProfileChoice(profileId);
 }
 
 function enhance() {
@@ -238,7 +264,10 @@ document.addEventListener("click", captureActions, true);
 document.addEventListener("keydown", captureProfileKeyboard, true);
 window.addEventListener("hashchange", () => window.setTimeout(enhance, 0));
 window.addEventListener("sedes:cloud-status", () => window.setTimeout(enhance, 0));
-window.addEventListener("sedes:account-binding", () => window.setTimeout(enhance, 0));
+window.addEventListener("sedes:account-binding", () => {
+  accountBindingEventSeen = true;
+  window.setTimeout(enhance, 0);
+});
 let enhanceScheduled = false;
 new MutationObserver(mutations => {
   if (!mutations.some(mutation => mutation.addedNodes.length || mutation.removedNodes.length) || enhanceScheduled) return;
