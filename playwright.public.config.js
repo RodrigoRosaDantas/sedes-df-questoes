@@ -25,6 +25,7 @@ export default defineConfig({
     "estudo-por-cargo-v1.spec.js",
     "estudo-por-cargo-blocos-v1.spec.js",
     "estudo-por-cargo-ipad-v1.spec.js",
+    "preexam-stability-v1.spec.js",
   ],
   timeout: 240000,
   retries: 1,

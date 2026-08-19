@@ -1,6 +1,11 @@
 import {test, expect} from "@playwright/test";
 
 const SESSION_KEY = "sedes.questoes.rodrigo.session.v3";
+const HISTORY_KEY = "sedes.questoes.rodrigo.history.v3";
+const ERRORS_KEY = "sedes.questoes.rodrigo.errors.v3";
+const MARKED_KEY = "sedes.questoes.rodrigo.marked.v3";
+const NOTES_KEY = "sedes.questoes.rodrigo.notes.v1";
+const RESET_KEY = "sedes.questoes.rodrigo.performanceReset.v1";
 const PASSWORD = "Teste123!";
 
 async function openEmulated(page) {
@@ -17,6 +22,16 @@ async function authenticate(page, email, mode) {
   await dialog.locator("[data-cloud-password]").fill(PASSWORD);
   await dialog.locator(mode === "signup" ? "[data-cloud-signup]" : "[data-cloud-signin]").click();
   await expect(cloud).toHaveAttribute("data-cloud-state", "saved", {timeout: 30000});
+}
+
+async function waitAndSync(page) {
+  await page.evaluate(async () => {
+    for (let attempt = 0; attempt < 150 && window.SEDES_CLOUD_PROGRESS.getState().syncing; attempt += 1) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    await window.SEDES_CLOUD_PROGRESS.sync();
+  });
+  await expect(page.locator("[data-cloud-progress]")).toHaveAttribute("data-cloud-state", "saved", {timeout: 30000});
 }
 
 async function writeSession(page, device, savedAt) {
@@ -37,6 +52,36 @@ async function writeSession(page, device, savedAt) {
 
 async function readSession(page) {
   return page.evaluate(key => JSON.parse(localStorage.getItem(key) || "null"), SESSION_KEY);
+}
+
+async function seedOldPerformance(page) {
+  const oldAt = new Date(Date.now() - 86400000).toISOString();
+  await page.evaluate(({historyKey, errorsKey, markedKey, notesKey, oldAt}) => {
+    localStorage.setItem(historyKey, JSON.stringify([{
+      id: "attempt-before-reset",
+      materialId: "integration",
+      finishedAt: oldAt,
+      correct: 0,
+      answeredQuestionIds: ["q-old"],
+      questionResults: [{id: "q-old", answer: "A", correct: false, materialId: "integration", discipline: "Teste", assunto: "Antes"}],
+      answers: {"q-old": "A"},
+      questionTimes: {"q-old": 30},
+    }]));
+    localStorage.setItem(errorsKey, JSON.stringify({"q-old": {id: "q-old", count: 1, open: true, updatedAt: oldAt}}));
+    localStorage.setItem(markedKey, JSON.stringify({"q-marked": {id: "q-marked", updatedAt: oldAt}}));
+    localStorage.setItem(notesKey, JSON.stringify({"q-note": {text: "preservar", updatedAt: oldAt}}));
+  }, {historyKey: HISTORY_KEY, errorsKey: ERRORS_KEY, markedKey: MARKED_KEY, notesKey: NOTES_KEY, oldAt});
+  await waitAndSync(page);
+}
+
+async function snapshotProgress(page) {
+  return page.evaluate(({historyKey, errorsKey, markedKey, notesKey, resetKey}) => ({
+    history: JSON.parse(localStorage.getItem(historyKey) || "[]"),
+    errors: JSON.parse(localStorage.getItem(errorsKey) || "{}"),
+    marked: JSON.parse(localStorage.getItem(markedKey) || "{}"),
+    notes: JSON.parse(localStorage.getItem(notesKey) || "{}"),
+    reset: JSON.parse(localStorage.getItem(resetKey) || "null"),
+  }), {historyKey: HISTORY_KEY, errorsKey: ERRORS_KEY, markedKey: MARKED_KEY, notesKey: NOTES_KEY, resetKey: RESET_KEY});
 }
 
 test("mesma conta sincroniza ida e volta entre dois aparelhos e outra conta permanece isolada", async ({browser}) => {
@@ -60,8 +105,7 @@ test("mesma conta sincroniza ida e volta entre dois aparelhos e outra conta perm
     expect(receivedOnB?.device).toBe("A");
 
     await writeSession(pageB, "B", "2026-08-15T21:01:00.000Z");
-    await pageA.evaluate(() => window.SEDES_CLOUD_PROGRESS.sync());
-    await expect(pageA.locator("[data-cloud-progress]")).toHaveAttribute("data-cloud-state", "saved", {timeout: 30000});
+    await waitAndSync(pageA);
     const receivedBackOnA = await readSession(pageA);
     expect(receivedBackOnA?.device).toBe("B");
 
@@ -74,5 +118,69 @@ test("mesma conta sincroniza ida e volta entre dois aparelhos e outra conta perm
     await contextA.close();
     await contextB.close();
     await contextC.close();
+  }
+});
+
+test("reset em um aparelho não pode ser desfeito por histórico antigo de outro aparelho", async ({browser}) => {
+  const suffix = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  const email = `sedes-reset-two-device-${suffix}@example.com`;
+  const contextA = await browser.newContext({serviceWorkers: "block"});
+  const contextB = await browser.newContext({serviceWorkers: "block"});
+  try {
+    const pageA = await contextA.newPage();
+    await openEmulated(pageA);
+    await authenticate(pageA, email, "signup");
+    await seedOldPerformance(pageA);
+
+    const pageB = await contextB.newPage();
+    await openEmulated(pageB);
+    await authenticate(pageB, email, "signin");
+    let before = await snapshotProgress(pageB);
+    expect(before.history.map(item => item.id)).toContain("attempt-before-reset");
+    expect(before.errors["q-old"]).toBeTruthy();
+    expect(before.marked["q-marked"]).toBeTruthy();
+    expect(before.notes["q-note"]).toBeTruthy();
+
+    await contextB.setOffline(true);
+    const reset = await pageA.evaluate(async () => window.SEDES_PERFORMANCE_RESET.reset());
+    expect(Number(reset.resetAt)).toBeGreaterThan(0);
+    let afterResetA = await snapshotProgress(pageA);
+    expect(afterResetA.history).toEqual([]);
+    expect(afterResetA.errors).toEqual({});
+    expect(afterResetA.marked["q-marked"]).toBeTruthy();
+    expect(afterResetA.notes["q-note"]).toBeTruthy();
+    expect(Number(afterResetA.reset?.at)).toBe(Number(reset.resetAt));
+
+    const postResetAt = new Date(Number(reset.resetAt) + 1000).toISOString();
+    await pageA.evaluate(({historyKey, postResetAt}) => {
+      localStorage.setItem(historyKey, JSON.stringify([{
+        id: "attempt-after-reset",
+        materialId: "integration",
+        finishedAt: postResetAt,
+        correct: 1,
+        answeredQuestionIds: ["q-new"],
+        questionResults: [{id: "q-new", answer: "B", correct: true, materialId: "integration", discipline: "Teste", assunto: "Depois"}],
+        answers: {"q-new": "B"},
+        questionTimes: {"q-new": 20},
+      }]));
+    }, {historyKey: HISTORY_KEY, postResetAt});
+    await waitAndSync(pageA);
+
+    await contextB.setOffline(false);
+    await waitAndSync(pageB);
+    const afterB = await snapshotProgress(pageB);
+    expect(afterB.history.map(item => item.id)).toEqual(["attempt-after-reset"]);
+    expect(afterB.errors).toEqual({});
+    expect(afterB.marked["q-marked"]).toBeTruthy();
+    expect(afterB.notes["q-note"]).toBeTruthy();
+    expect(Number(afterB.reset?.at)).toBe(Number(reset.resetAt));
+
+    await waitAndSync(pageA);
+    const finalA = await snapshotProgress(pageA);
+    expect(finalA.history.map(item => item.id)).toEqual(["attempt-after-reset"]);
+    expect(finalA.errors).toEqual({});
+  } finally {
+    await contextA.close();
+    await contextB.close();
   }
 });

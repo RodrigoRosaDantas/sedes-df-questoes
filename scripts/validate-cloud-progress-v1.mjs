@@ -11,6 +11,7 @@ const requireMarkers = (content, markers, context) => markers.forEach(marker => 
 const index = read("index.html");
 const worker = read("service-worker.js");
 const cloud = read("assets/cloud-progress-v1.js");
+const reset = read("assets/performance-reset-v1.js");
 const command = read("assets/work-command-center-v1.js");
 const css = read("assets/cloud-progress-v1.css");
 const builder = read("scripts/build-public.mjs");
@@ -21,11 +22,13 @@ const publicConfig = read("playwright.public.config.js");
 requireMarkers(index, [
   "cloud-progress-v1.css?v=1",
   "cloud-progress-v1.js?v=1",
+  "performance-reset-v1.js?v=1",
   "work-command-center-v1.js?v=1",
 ], "Shell");
 requireMarkers(worker, [
   "cloud-progress-v1.css?v=1",
   "cloud-progress-v1.js?v=1",
+  "performance-reset-v1.js?v=1",
   "work-command-center-v1.js?v=1",
 ], "PWA");
 requireMarkers(builder, ["copy(\"assets\")"], "Build público");
@@ -48,13 +51,32 @@ requireMarkers(cloud, [
   "Falha ao sincronizar",
   "sedes:cloud-status",
   "window.SEDES_CLOUD_PROGRESS",
+  "performanceResetKey",
+  "performanceResetAt",
+  "syncPerformanceResetMarker",
+  "staleRemoteIds",
+  "sanitizePerformanceSerialized",
+  "await syncPerformanceResetMarker(profileId, refs, firestore, db);",
+  "await syncAttempts(profileId, refs, firestore);",
+  "await syncState(profileId, refs, firestore, db, currentUser.uid);",
 ], "Firebase progress");
 
 for (const forbidden of ["BEGIN PRIVATE KEY", '"private_key"', "serviceAccount", "client_email"]) {
-  if (cloud.includes(forbidden)) throw new Error(`Firebase progress contém material de credencial proibido: ${forbidden}`);
+  if (cloud.includes(forbidden) || reset.includes(forbidden)) throw new Error(`Camada Firebase contém material de credencial proibido: ${forbidden}`);
 }
 if (!cloud.includes('EXCLUDED_SUFFIXES = ["vault.v1"]')) throw new Error("O cofre criptografado local não foi excluído da sincronização em nuvem.");
 if (!cloud.includes("collectAttempts") || !cloud.includes("historyKey")) throw new Error("Histórico não possui caminho dedicado de sincronização.");
+
+requireMarkers(reset, [
+  "performanceResetKey",
+  "performanceReset.v1",
+  "errorReasons.v1",
+  "resetAt = Date.now()",
+  "resetRemotePerformance(user.uid, profileId, resetAt",
+  "resetLocalPerformance(profileId, resetAt)",
+  "A sincronização ainda está em andamento",
+  "questões marcadas, anotações, preferências, perfis, banco de questões e tentativa em andamento",
+], "Reset seguro do aproveitamento");
 
 requireMarkers(command, [
   "Central de comando",
@@ -96,4 +118,4 @@ requireMarkers(verifier, [
 ], "Auditoria reproduzível");
 requireMarkers(publicConfig, ["cloud-progress-v1.spec.js"], "Playwright público");
 
-console.log("✓ Firebase local-first e Central de comando validados: namespace, auth, estados de sync, recuperação pós-offline, observer idempotente, Playwright e proveniência SHA-256.");
+console.log("✓ Firebase local-first e Central de comando validados: namespace, auth, reset durável, estados de sync, recuperação pós-offline, observer idempotente, Playwright e proveniência SHA-256.");

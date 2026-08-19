@@ -44,6 +44,7 @@ const stableSerialize = value => {
 const activeProfileId = () => localStorage.getItem(ACTIVE_PROFILE_KEY) || "rodrigo";
 const profilePrefix = profileId => `sedes.questoes.${profileId}.`;
 const historyKey = profileId => `${profilePrefix(profileId)}history.v3`;
+const performanceResetKey = profileId => `${profilePrefix(profileId)}performanceReset.v1`;
 const stateDocId = key => encodeURIComponent(key);
 const canonicalAttemptPayload = attempt => stableSerialize(Object.fromEntries(Object.entries(attempt || {}).filter(([key]) => key !== "id")));
 const stableAttemptId = attempt => String(attempt?.id || `legacy-v2-${attempt?.finishedAt || attempt?.savedAt || attempt?.startedAt || "attempt"}-${fnv1a(canonicalAttemptPayload(attempt))}`);
@@ -57,6 +58,12 @@ const timestampOf = value => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 const attemptTimestamp = attempt => Math.max(timestampOf(attempt?.finishedAt), timestampOf(attempt?.savedAt), timestampOf(attempt?.startedAt));
+const performanceResetAt = profileId => {
+  const marker = safeJSON(localStorage.getItem(performanceResetKey(profileId)), null);
+  return Math.max(timestampOf(marker?.at), timestampOf(marker?.updatedAt));
+};
+const performanceObjectStateKey = key => /(?:errors\.v3|errorReasons\.v1|reviewSchedule\.v1|adaptiveReview\.v1)$/.test(key);
+const performanceProcessedStateKey = key => /(?:reviewProcessedAttempts\.v1|adaptiveProcessed\.v1)$/.test(key);
 
 function readMeta() {
   return safeJSON(localStorage.getItem(META_KEY), {schema: 1, accounts: {}}) || {schema: 1, accounts: {}};
@@ -92,6 +99,35 @@ function collectState(profileId) {
 function collectAttempts(profileId) {
   const parsed = safeJSON(localStorage.getItem(historyKey(profileId)), []);
   return Array.isArray(parsed) ? parsed : [];
+}
+function postResetAttemptIds(profileId, resetAt) {
+  if (!resetAt) return new Set();
+  return new Set(collectAttempts(profileId)
+    .map(normalizeAttempt)
+    .filter(attempt => attempt && attemptTimestamp(attempt) > resetAt)
+    .map(attempt => String(attempt.id)));
+}
+function sanitizePerformanceSerialized(key, value, resetAt, validAttemptIds) {
+  if (!resetAt || value == null || key === performanceResetKey(key.split(".")[2] || "")) return value;
+  const parsed = safeJSON(value, undefined);
+  if (parsed === undefined) return value;
+  if (performanceObjectStateKey(key) && parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+    const filtered = {};
+    for (const [id, item] of Object.entries(parsed)) {
+      const changedAt = Math.max(
+        timestampOf(item?.updatedAt),
+        timestampOf(item?.lastResultAt),
+        timestampOf(item?.savedAt),
+        timestampOf(item?.finishedAt),
+      );
+      if (changedAt > resetAt) filtered[id] = item;
+    }
+    return JSON.stringify(filtered);
+  }
+  if (performanceProcessedStateKey(key) && Array.isArray(parsed)) {
+    return JSON.stringify(parsed.filter(id => validAttemptIds.has(String(id))));
+  }
+  return value;
 }
 
 async function firebaseModules() {
@@ -217,14 +253,50 @@ async function readRemoteAttempts(refs, firestore) {
   return map;
 }
 
+async function syncPerformanceResetMarker(profileId, refs, firestore, db) {
+  const key = performanceResetKey(profileId);
+  const localValue = localStorage.getItem(key);
+  const localMarker = safeJSON(localValue, null);
+  const localAt = Math.max(timestampOf(localMarker?.at), timestampOf(localMarker?.updatedAt));
+  const ref = firestore.doc(refs.state, stateDocId(key));
+  const snapshot = await firestore.getDoc(ref);
+  const remoteRecord = snapshot.exists() ? snapshot.data() || {} : null;
+  const remoteValue = remoteRecord?.deleted ? null : (remoteRecord?.value ?? null);
+  const remoteMarker = safeJSON(remoteValue, null);
+  const remoteAt = Math.max(timestampOf(remoteMarker?.at), timestampOf(remoteMarker?.updatedAt));
+
+  if (remoteAt > localAt && remoteValue != null) {
+    localStorage.setItem(key, remoteValue);
+    return remoteAt;
+  }
+  if (localAt > remoteAt && localValue != null) {
+    await firestore.setDoc(ref, {
+      key,
+      value: localValue,
+      deleted: false,
+      hash: fnv1a(localValue),
+      updatedAt: localAt,
+      serverUpdatedAt: firestore.serverTimestamp(),
+    }, {merge: true});
+    return localAt;
+  }
+  return Math.max(localAt, remoteAt);
+}
+
 async function syncAttempts(profileId, refs, firestore) {
+  const resetAt = performanceResetAt(profileId);
   const localRaw = collectAttempts(profileId);
-  const local = localRaw.map(normalizeAttempt).filter(Boolean);
+  const local = localRaw.map(normalizeAttempt).filter(Boolean).filter(attempt => !resetAt || attemptTimestamp(attempt) > resetAt);
   const remote = await readRemoteAttempts(refs, firestore);
   const remoteCanonical = new Map();
+  const staleRemoteIds = [];
 
   for (const [remoteDocId, item] of remote) {
     const attempt = normalizeAttempt(item.attempt);
+    if (resetAt && attemptTimestamp(attempt) <= resetAt) {
+      staleRemoteIds.push(remoteDocId);
+      continue;
+    }
     const canonicalId = attemptDocId(attempt);
     const existing = remoteCanonical.get(canonicalId);
     const aliases = [...(existing?.aliases || []), remoteDocId];
@@ -254,6 +326,12 @@ async function syncAttempts(profileId, refs, firestore) {
     batch = firestore.writeBatch(db);
     writes = 0;
   };
+
+  for (const staleId of staleRemoteIds) {
+    batch.delete(firestore.doc(refs.attempts, staleId));
+    writes += 1;
+    if (writes >= 380) await flush();
+  }
 
   for (const attempt of merged) {
     const id = attemptDocId(attempt);
@@ -286,6 +364,8 @@ async function syncAttempts(profileId, refs, firestore) {
 async function syncState(profileId, refs, firestore, db, uid) {
   const local = collectState(profileId);
   const remote = await readRemoteState(refs, firestore);
+  const resetAt = performanceResetAt(profileId);
+  const validAttemptIds = postResetAttemptIds(profileId, resetAt);
   const {entry} = metaFor(uid, profileId);
   const previous = entry.hashes || {};
   const nextHashes = {...previous};
@@ -293,11 +373,13 @@ async function syncState(profileId, refs, firestore, db, uid) {
   const pushes = [];
 
   for (const key of allKeys) {
-    const localValue = local.has(key) ? local.get(key) : null;
+    const rawLocalValue = local.has(key) ? local.get(key) : null;
     const remoteRecord = remote.get(key) || null;
-    const remoteValue = remoteRecord?.deleted ? null : (remoteRecord?.value ?? null);
+    const rawRemoteValue = remoteRecord?.deleted ? null : (remoteRecord?.value ?? null);
+    const localValue = sanitizePerformanceSerialized(key, rawLocalValue, resetAt, validAttemptIds);
+    const remoteValue = sanitizePerformanceSerialized(key, rawRemoteValue, resetAt, validAttemptIds);
     const localHash = localValue == null ? null : fnv1a(localValue);
-    const remoteHash = remoteRecord ? (remoteRecord.deleted ? null : (remoteRecord.hash || fnv1a(remoteValue || ""))) : null;
+    const remoteHash = remoteRecord ? (remoteRecord.deleted ? null : (remoteValue == null ? null : fnv1a(remoteValue))) : null;
     const previousKnown = Object.prototype.hasOwnProperty.call(previous, key);
     const previousHash = previousKnown ? previous[key] : undefined;
 
@@ -351,6 +433,7 @@ async function syncProfile(profileId = activeProfileId()) {
     const refs = profileRefs(db, firestore, currentUser.uid, profileId);
     await firestore.setDoc(refs.appRef, {platform: PLATFORM_ID, updatedAt: Date.now(), serverUpdatedAt: firestore.serverTimestamp()}, {merge: true});
     await firestore.setDoc(refs.profileRef, {profileId, updatedAt: Date.now(), serverUpdatedAt: firestore.serverTimestamp()}, {merge: true});
+    await syncPerformanceResetMarker(profileId, refs, firestore, db);
     await syncAttempts(profileId, refs, firestore);
     await syncState(profileId, refs, firestore, db, currentUser.uid);
     lastSyncAt = Date.now();
@@ -478,7 +561,7 @@ syncTimer = window.setInterval(() => {
 window.SEDES_CLOUD_PROGRESS = Object.freeze({
   sync: () => syncProfile(),
   open: openCloudDialog,
-  getState: () => ({signedIn: Boolean(currentUser), email: currentUser?.email || null, profile: activeProfileId(), lastSyncAt, syncing}),
+  getState: () => ({signedIn: Boolean(currentUser), email: currentUser?.email || null, profile: activeProfileId(), lastSyncAt, syncing, resetAt: performanceResetAt(activeProfileId())}),
 });
 
 initializeCloudProgress();
