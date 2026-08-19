@@ -78,6 +78,22 @@ test("tema escolhido em Configurações também atualiza a preferência sincroni
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light", {timeout: 30000});
 });
 
+test("atalho de tema do cabeçalho grava a mesma preferência e sobrevive ao reload", async ({page}) => {
+  await page.goto("./#/inicio", {waitUntil: "domcontentloaded"});
+  await expect(page.locator("#theme-toggle")).toBeVisible({timeout: 30000});
+  const before = await page.locator("html").getAttribute("data-theme");
+  const expected = before === "dark" ? "light" : "dark";
+  await page.locator("#theme-toggle").click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", expected);
+  const stored = await page.evaluate(() => {
+    const profile = localStorage.getItem("sedes.questoes.activeProfile.v3") || "rodrigo";
+    return JSON.parse(localStorage.getItem(`sedes.questoes.${profile}.preferences.v1`) || "{}");
+  });
+  expect(stored.theme).toBe(expected);
+  await page.reload({waitUntil: "domcontentloaded"});
+  await expect(page.locator("html")).toHaveAttribute("data-theme", expected, {timeout: 30000});
+});
+
 test("ativos críticos de estudo e recuperação são servidos pelo pacote público", async ({request}) => {
   for (const relative of [
     "assets/app-v4.js?v=13",
