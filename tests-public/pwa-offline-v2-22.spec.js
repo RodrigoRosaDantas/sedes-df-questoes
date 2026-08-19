@@ -27,6 +27,7 @@ test("Pages permanece utilizável offline com JSONs canônicos e controles de re
       "./data/release/study-index.json?release=legacy-probe",
       "./data/release/release-meta.json",
       "./data/release/release-meta.json?release=legacy-probe",
+      "./assets/theme-preference-bridge-v1.js?v=1",
       "./assets/cloud-progress-v1.js?v=1",
       "./assets/performance-reset-v1.js?v=1",
       "./assets/work-convergence-v1.js?v=1",
