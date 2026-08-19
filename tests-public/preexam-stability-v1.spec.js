@@ -49,12 +49,14 @@ test("Configurações de Dados descrevem local-first + nuvem sem mensagem legada
   await expectNoHorizontalOverflow(page, "configurações dados iPad retrato");
 });
 
-test("Desempenho não oferece exclusão local capaz de ressuscitar dados da nuvem", async ({page}) => {
+test("Desempenho usa gestão segura de dados e preserva o cofre de restauração", async ({page}) => {
   await page.goto("./#/desempenho", {waitUntil: "domcontentloaded"});
   await expect(page.locator("#app h1").first()).toBeVisible({timeout: 30000});
   await expect(page.locator("[data-clear-profile]")).toHaveCount(0);
   await expect(page.locator("[data-integrity-manage-data]")).toBeVisible();
   await expect(page.locator("[data-export-profile]").locator("xpath=ancestor::*[contains(@class,'performance-panel')][1]")).toContainText("Backup complementar");
+  await expect(page.locator("[data-vault-tools]")).toBeVisible({timeout: 30000});
+  await expect(page.locator("[data-vault-export]")).toBeVisible();
 });
 
 test("tema escolhido em Configurações também atualiza a preferência sincronizável", async ({page}) => {
@@ -80,6 +82,7 @@ test("ativos críticos de estudo e recuperação são servidos pelo pacote públ
     "assets/cloud-progress-v1.js?v=1",
     "assets/performance-reset-v1.js?v=1",
     "assets/product-integrity-v1.js?v=1",
+    "assets/vault-v2-13.js?v=1",
     "service-worker.js",
     "data/release/catalogo.json",
     "data/release/study-index.json",
