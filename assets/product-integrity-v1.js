@@ -10,6 +10,16 @@ function accountIsSignedIn() {
   return Boolean(work?.signedIn || cloud?.signedIn);
 }
 
+function installSkipLinkGuard() {
+  const skip = document.querySelector("a.skip");
+  if (!skip || skip.dataset.integritySkip === "1") return;
+  skip.dataset.integritySkip = "1";
+  skip.addEventListener("click", event => {
+    event.preventDefault();
+    document.querySelector("#app")?.focus({preventScroll: false});
+  });
+}
+
 function updateSettingsDataCopy() {
   const page = document.querySelector('[data-ux15-settings-page][data-ux15-tab="dados"]');
   if (!page) return;
@@ -117,6 +127,7 @@ function captureSettingsActions(event) {
 }
 
 function enhance() {
+  installSkipLinkGuard();
   updateSettingsDataCopy();
   updateLegacyProfileCopy();
   hardenPerformanceDataActions();
