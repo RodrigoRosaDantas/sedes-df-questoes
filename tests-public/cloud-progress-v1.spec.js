@@ -25,6 +25,43 @@ test("controle de nuvem e Central de comando expõem estados coerentes", async (
   await expect(progress).toHaveText("offline; progresso salvo localmente");
 });
 
+test("reset de aproveitamento aparece em Dados e não apaga nada sem autenticação", async ({page}) => {
+  const historyKey = "sedes.questoes.rodrigo.history.v3";
+  const markedKey = "sedes.questoes.rodrigo.marked.v3";
+  const notesKey = "sedes.questoes.rodrigo.notes.v1";
+  const sessionKey = "sedes.questoes.rodrigo.session.v3";
+  const fixture = [{id: "attempt-preserve", finishedAt: "2026-08-18T20:00:00-03:00", correct: 1, answeredQuestionIds: ["q1"]}];
+  await page.goto("./#/inicio", {waitUntil: "domcontentloaded"});
+  await page.evaluate(({historyKey, markedKey, notesKey, sessionKey, fixture}) => {
+    localStorage.setItem(historyKey, JSON.stringify(fixture));
+    localStorage.setItem(markedKey, JSON.stringify({q1: {id: "q1"}}));
+    localStorage.setItem(notesKey, JSON.stringify({q1: "nota preservada"}));
+    localStorage.setItem(sessionKey, JSON.stringify({version: 4, savedAt: new Date().toISOString(), questionIds: ["q1"], current: 0, answers: {}}));
+  }, {historyKey, markedKey, notesKey, sessionKey, fixture});
+
+  await page.goto("./#/perfil/configuracoes", {waitUntil: "domcontentloaded"});
+  await expect(page.locator('[data-ux15-settings-tab="dados"]')).toBeVisible({timeout: 30000});
+  await page.locator('[data-ux15-settings-tab="dados"]').click();
+  await expect(page.locator("[data-performance-reset-card]")).toBeVisible({timeout: 30000});
+  await page.locator("[data-performance-reset-open]").click();
+  const resetDialog = page.locator("[data-performance-reset-dialog]");
+  await expect(resetDialog).toBeVisible();
+  await expect(resetDialog).toContainText("questões marcadas, anotações, preferências, perfis, banco de questões e tentativa em andamento");
+  await resetDialog.locator("[data-performance-reset-confirm]").click();
+  await expect(resetDialog.locator("[data-performance-reset-status]")).toContainText("Entre na sincronização", {timeout: 15000});
+
+  const preserved = await page.evaluate(({historyKey, markedKey, notesKey, sessionKey}) => ({
+    history: JSON.parse(localStorage.getItem(historyKey) || "[]"),
+    marked: JSON.parse(localStorage.getItem(markedKey) || "{}"),
+    notes: JSON.parse(localStorage.getItem(notesKey) || "{}"),
+    session: JSON.parse(localStorage.getItem(sessionKey) || "null"),
+  }), {historyKey, markedKey, notesKey, sessionKey});
+  expect(preserved.history).toHaveLength(1);
+  expect(preserved.marked.q1).toBeTruthy();
+  expect(preserved.notes.q1).toBe("nota preservada");
+  expect(preserved.session?.questionIds).toEqual(["q1"]);
+});
+
 test("abertura offline recupera a inicialização da nuvem quando a conexão volta", async ({page}) => {
   await page.addInitScript(() => {
     if (sessionStorage.getItem("sedes.test.navigatorOnline") == null) sessionStorage.setItem("sedes.test.navigatorOnline", "0");
@@ -48,7 +85,7 @@ test("abertura offline recupera a inicialização da nuvem quando a conexão vol
   await expect(page.locator("[data-cloud-progress]")).toBeVisible({timeout: 30000});
 });
 
-test("release publica hashes SHA-256 das camadas Firebase, Work e reporte", async ({request}) => {
+test("release publica hashes SHA-256 das camadas Firebase, reset, Work e reporte", async ({request}) => {
   const releaseResponse = await request.get("./data/release/release-meta.json?cloud-audit=1");
   const buildResponse = await request.get("./data/release/build-info.json?cloud-audit=1");
   expect(releaseResponse.ok()).toBeTruthy();
@@ -58,6 +95,7 @@ test("release publica hashes SHA-256 das camadas Firebase, Work e reporte", asyn
   const targets = {
     platform_cloud_progress_js: "assets/cloud-progress-v1.js",
     platform_cloud_progress_css: "assets/cloud-progress-v1.css",
+    platform_performance_reset_js: "assets/performance-reset-v1.js",
     platform_work_command_center_js: "assets/work-command-center-v1.js",
     platform_work_convergence_js: "assets/work-convergence-v1.js",
     platform_work_convergence_css: "assets/work-convergence-v1.css",
@@ -74,4 +112,10 @@ test("release publica hashes SHA-256 das camadas Firebase, Work e reporte", asyn
   const protectedFiles = Object.keys(targets).length;
   expect(release.cloud_progress_provenance?.files).toBe(protectedFiles);
   expect(build.cloud_progress_provenance?.files).toBe(protectedFiles);
+
+  const cloud = await (await request.get("./assets/cloud-progress-v1.js?reset-boundary=1")).text();
+  expect(cloud).toContain("syncPerformanceResetMarker");
+  expect(cloud).toContain("staleRemoteIds");
+  expect(cloud).toContain("sanitizePerformanceSerialized");
+  expect(cloud.indexOf("syncPerformanceResetMarker(profileId")).toBeLessThan(cloud.indexOf("syncAttempts(profileId"));
 });
