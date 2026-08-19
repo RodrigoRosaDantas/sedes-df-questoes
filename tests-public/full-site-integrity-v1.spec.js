@@ -62,12 +62,18 @@ test("rotas principais não expõem IDs duplicados nem controles sem nome acess�
   expect(findings, findings.join("\n")).toEqual([]);
 });
 
-test("navegação por teclado mantém foco visível e skip link alcança o conteúdo", async ({page}) => {
+test("navegação por teclado mantém skip link funcional sem alterar a rota da SPA", async ({page}) => {
   await page.goto("./#/inicio", {waitUntil: "domcontentloaded"});
   await expect(page.locator("#app h1").first()).toBeVisible({timeout: 30000});
+  const beforeHash = await page.evaluate(() => location.hash);
+  await page.evaluate(() => {
+    const active = document.activeElement;
+    if (active instanceof HTMLElement) active.blur();
+  });
   await page.keyboard.press("Tab");
   const skip = page.locator("a.skip");
   await expect(skip).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(page.locator("#app")).toBeFocused();
+  expect(await page.evaluate(() => location.hash)).toBe(beforeHash);
 });
