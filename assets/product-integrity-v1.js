@@ -158,9 +158,22 @@ function synchronizeThemeChoice(theme) {
   document.querySelectorAll("[data-ux15-theme]").forEach(button => button.classList.toggle("primary", button.dataset.ux15Theme === theme));
 }
 
-function routeSignedInProfileChoice(profileId) {
+function routeSignedInProfileChoice(profileId, attempt = 0) {
   const work = window.SEDES_WORK_CONVERGENCE;
+  const state = work?.getAccountState?.();
   if (!work?.manageProfile) {
+    if (attempt < 60) {
+      window.setTimeout(() => routeSignedInProfileChoice(profileId, attempt + 1), 50);
+      return;
+    }
+    window.SEDES_CLOUD_PROGRESS?.open?.();
+    return;
+  }
+  if (state?.resolving) {
+    if (attempt < 60) window.setTimeout(() => routeSignedInProfileChoice(profileId, attempt + 1), 50);
+    return;
+  }
+  if (!state?.signedIn) {
     window.SEDES_CLOUD_PROGRESS?.open?.();
     return;
   }
