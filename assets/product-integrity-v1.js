@@ -29,6 +29,13 @@ function installSkipLinkGuard() {
   });
 }
 
+function ensureAccessibleNames() {
+  const questionSearch = document.querySelector("[data-ux-question-search]");
+  if (questionSearch && !questionSearch.getAttribute("aria-label") && !questionSearch.getAttribute("aria-labelledby")) {
+    questionSearch.setAttribute("aria-label", "Buscar dentro das questões");
+  }
+}
+
 function updateSettingsDataCopy() {
   const page = document.querySelector('[data-ux15-settings-page][data-ux15-tab="dados"]');
   if (!page) return;
@@ -208,6 +215,7 @@ function captureProfileKeyboard(event) {
 
 function enhance() {
   installSkipLinkGuard();
+  ensureAccessibleNames();
   updateSettingsDataCopy();
   updateLegacyProfileCopy();
   hardenPerformanceDataActions();
