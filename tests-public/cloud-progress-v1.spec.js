@@ -85,7 +85,7 @@ test("abertura offline recupera a inicialização da nuvem quando a conexão vol
   await expect(page.locator("[data-cloud-progress]")).toBeVisible({timeout: 30000});
 });
 
-test("release publica hashes SHA-256 das camadas Firebase, reset, Work e reporte", async ({request}) => {
+test("release publica hashes SHA-256 das camadas Firebase, Work e reporte", async ({request}) => {
   const releaseResponse = await request.get("./data/release/release-meta.json?cloud-audit=1");
   const buildResponse = await request.get("./data/release/build-info.json?cloud-audit=1");
   expect(releaseResponse.ok()).toBeTruthy();
@@ -95,7 +95,6 @@ test("release publica hashes SHA-256 das camadas Firebase, reset, Work e reporte
   const targets = {
     platform_cloud_progress_js: "assets/cloud-progress-v1.js",
     platform_cloud_progress_css: "assets/cloud-progress-v1.css",
-    platform_performance_reset_js: "assets/performance-reset-v1.js",
     platform_work_command_center_js: "assets/work-command-center-v1.js",
     platform_work_convergence_js: "assets/work-convergence-v1.js",
     platform_work_convergence_css: "assets/work-convergence-v1.css",
@@ -113,9 +112,18 @@ test("release publica hashes SHA-256 das camadas Firebase, reset, Work e reporte
   expect(release.cloud_progress_provenance?.files).toBe(protectedFiles);
   expect(build.cloud_progress_provenance?.files).toBe(protectedFiles);
 
-  const cloud = await (await request.get("./assets/cloud-progress-v1.js?reset-boundary=1")).text();
+  const [cloudResponse, resetResponse] = await Promise.all([
+    request.get("./assets/cloud-progress-v1.js?reset-boundary=1"),
+    request.get("./assets/performance-reset-v1.js?reset-boundary=1"),
+  ]);
+  expect(cloudResponse.ok()).toBeTruthy();
+  expect(resetResponse.ok()).toBeTruthy();
+  const cloud = await cloudResponse.text();
+  const reset = await resetResponse.text();
   expect(cloud).toContain("syncPerformanceResetMarker");
   expect(cloud).toContain("staleRemoteIds");
   expect(cloud).toContain("sanitizePerformanceSerialized");
-  expect(cloud.indexOf("syncPerformanceResetMarker(profileId")).toBeLessThan(cloud.indexOf("syncAttempts(profileId"));
+  expect(cloud).toContain("await syncPerformanceResetMarker(profileId, refs, firestore, db);\n    await syncAttempts(profileId, refs, firestore);\n    await syncState(profileId, refs, firestore, db, currentUser.uid);");
+  expect(reset).toContain("performanceReset.v1");
+  expect(reset).toContain("errorReasons.v1");
 });
