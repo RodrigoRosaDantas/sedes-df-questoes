@@ -1,4 +1,4 @@
-const CACHE_VERSION = "sedes-questoes-v2-13-0-r7";
+const CACHE_VERSION = "sedes-questoes-v2-13-0-r6";
 const INDEX_URL = new URL("./index.html", self.location.href).toString();
 const STUDY_BY_ROLE_URL = new URL("./estudo-por-cargo.html", self.location.href).toString();
 const SHELL = [
