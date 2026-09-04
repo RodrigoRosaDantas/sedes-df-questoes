@@ -17,6 +17,7 @@ const css = read("assets/navigation-v2-15.css");
 const polishCss = read("assets/navigation-v2-15-polish.css");
 const builder = read("scripts/build-public.mjs");
 const publicVerifier = read("scripts/verify-public-release.mjs");
+const growthVerifier = read("scripts/verify-public-release-growth.mjs");
 const deploymentVerifier = read("scripts/verify-deployment.mjs");
 const publicPlaywright = read("playwright.public.config.js");
 const packageData = read("package.json");
@@ -75,8 +76,9 @@ requireMarkers(css, ["ux15-home-active", "ux15-home-grid", "ux15-settings-page",
 requireMarkers(polishCss, ["ux15-clean-home", "ux15-settings-route", "ux15-sync-age", "ux15-sync-age.catalog", "ux15-breadcrumb", "ux15-role-templates", "data-ux15-open-question", ".brand strong{display:none}", ".top-actions{gap:6px}"], "CSS de polimento v2.15");
 requireMarkers(builder, ["platform_navigation_js", "platform_navigation_css", "platform_navigation_polish_js", "platform_navigation_polish_css", "navigation-v2-15-polish.js", "navigation-v2-15-polish.css", "relativeCatalogAge", "Catálogo oficial atualizado em"], "Build público");
 requireMarkers(publicPlaywright, ["release-contract.spec.js", "dashboard-card.spec.js", "material-downloads.spec.js", "platform-v2-13.spec.js", "ux-v2-14.spec.js", "navigation-v2-15.spec.js"], "Playwright público");
-requireMarkers(packageData, ['"check": "node scripts/verify-public-release.mjs"'], "npm check");
+requireMarkers(packageData, ['"check": "node scripts/verify-public-release-growth.mjs"'], "npm check");
 requireMarkers(publicVerifier, ['const syntaxFiles = git(["ls-files"])', 'run("--check", [file])'], "Auditoria de sintaxe");
+requireMarkers(growthVerifier, ["questions < 3512", "materials < 95", "bank < 3514", "verify-public-release.mjs"], "Auditoria de crescimento do catálogo");
 requireMarkers(deploymentVerifier, ["enhanceReleaseMetadata", "data-release-footer", "Dados do projeto", "Aguardando auditoria"], "Verificador público atual");
 if (deploymentVerifier.includes("Integridade da publicação")) throw new Error("Verificador público ainda depende do cartão técnico removido da Home.");
 requireMarkers(publicReleaseContract, ["arquitetura v2.15", "perfil/configuracoes", "[data-ux15-home]", "[data-official-exam-card]", "[data-adaptive-review]"], "Contrato público da release");
