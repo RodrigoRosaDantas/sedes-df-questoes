@@ -1,16 +1,89 @@
-name: Sincronizar Banco Mestre do Notion — SUSPENSO
+name: Preparar sincronização controlada do Banco Mestre do Notion
 
 on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sedes-df-notion-sync-controlled
+  cancel-in-progress: false
 
 jobs:
-  suspended:
+  prepare-sync-pr:
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
-      - name: Informar suspensão
+      - name: Baixar a main vigente
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Configurar autoria da sincronização
         run: |
-          echo "Workflow suspenso por solicitação do responsável pelo projeto."
-          echo "Nenhuma sincronização, publicação ou atualização do Notion será executada."
+          git config user.name 'sedes-df-notion-sync[bot]'
+          git config user.email 'sedes-df-notion-sync[bot]@users.noreply.github.com'
+
+      - name: Ler o Banco Mestre do Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: node scripts/export-notion-snapshot.mjs
+
+      - name: Gerar o plano de publicação
+        run: node scripts/create-publication-plan.mjs
+
+      - name: Materializar o snapshot na release rastreada
+        run: npm run build
+
+      - name: Validar snapshot, plano e crescimento da release
+        run: |
+          node scripts/validate-notion-snapshot.mjs
+          node scripts/validate-publication-plan.mjs
+          npm run check
+
+      - name: Restringir alterações ao contrato de dados
+        shell: bash
+        run: |
+          set -euo pipefail
+          UNEXPECTED="$(git status --porcelain | awk '{print $2}' | grep -Ev '^(data/notion/(published|publication-plan)\.json|data/release/)' || true)"
+          if [ -n "${UNEXPECTED}" ]; then
+            echo 'A sincronização tentou alterar arquivos fora do contrato permitido:'
+            echo "${UNEXPECTED}"
+            exit 1
+          fi
+
+      - name: Criar PR somente quando houver mudança semântica
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add data/notion/published.json data/notion/publication-plan.json data/release
+          if git diff --cached --quiet; then
+            echo '✓ Banco Mestre sem mudança semântica publicável; nenhum PR necessário.'
+            exit 0
+          fi
+
+          BRANCH="notion-sync/run-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          QUESTIONS="$(node -e "const x=require('./data/notion/published.json'); console.log(x.totals?.published ?? 0)")"
+          MATERIALS="$(node -e "const x=require('./data/notion/published.json'); console.log(x.totals?.materials ?? 0)")"
+          PENDING="$(node -e "const x=require('./data/notion/published.json'); console.log(x.totals?.pending ?? 0)")"
+
+          git switch -c "${BRANCH}"
+          git commit -m "Sincronizar Banco Mestre do Notion"
+          git push origin "HEAD:${BRANCH}"
+
+          gh pr create \
+            --base main \
+            --head "${BRANCH}" \
+            --title "[notion-sync] Atualizar Banco Mestre" \
+            --body "Sincronização controlada preparada a partir do Banco Mestre do Notion.\n\n- questões publicáveis no snapshot: ${QUESTIONS}\n- materiais no snapshot: ${MATERIALS}\n- registros fora do site: ${PENDING}\n\nO workflow apenas lê o Notion e prepara este PR. Não publica o GitHub Pages e não escreve no Notion. Após revisão e merge, a publicação continua exigindo autorização explícita por SHA no workflow de Pages."
