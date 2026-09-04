@@ -21,6 +21,28 @@ test("preferências do perfil são restauradas no estudo personalizado", async (
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
 });
 
+test("central de comando do Work é visível, completa e responsiva", async ({page}) => {
+  await page.addInitScript(() => localStorage.setItem("sedes.questoes.activeProfile.v3", "rodrigo"));
+  await page.setViewportSize({width: 1280, height: 900});
+  await page.goto("./#/inicio", {waitUntil: "domcontentloaded"});
+  const center = page.locator("[data-work-command-center]");
+  await expect(center).toBeVisible({timeout: 30000});
+  await expect(center.locator(".work-command-action")).toHaveCount(6);
+  await expect(center.locator("[data-work-now]")).toContainText(/Faça agora/i);
+  await expect(center.locator("[data-work-bank]")).toContainText(/Banco de questões/i);
+  await expect(center.locator("[data-work-review]")).toContainText(/Revisões/i);
+  await expect(center.locator("[data-work-errors]")).toContainText(/Caderno de erros/i);
+  await expect(center.locator("[data-work-performance]")).toContainText(/Desempenho/i);
+  await expect(center.locator("[data-work-search]")).toContainText(/Buscar questões/i);
+  await expect(center.locator("[data-work-cloud-state]")).not.toHaveText("");
+  await expect(center.locator(".work-command-grid")).toHaveCSS("display", "grid");
+
+  await page.setViewportSize({width: 390, height: 844});
+  await expect(center).toBeVisible();
+  const columns = await center.locator(".work-command-grid").evaluate(node => getComputedStyle(node).gridTemplateColumns.split(" ").length);
+  expect(columns).toBe(2);
+});
+
 test("relato de problema é interno e não abre GitHub Issue", async ({request}) => {
   const response = await request.get("./assets/report-v2-13.js?v=2", {headers: {"cache-control": "no-cache, no-store"}});
   expect(response.ok()).toBeTruthy();
