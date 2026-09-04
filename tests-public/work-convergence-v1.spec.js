@@ -21,7 +21,7 @@ test("preferências do perfil são restauradas no estudo personalizado", async (
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
 });
 
-test("central de comando do Work é visível, completa e responsiva", async ({page}) => {
+test("central de comando do Work é visível, completa, legível e responsiva", async ({page}) => {
   await page.addInitScript(() => localStorage.setItem("sedes.questoes.activeProfile.v3", "rodrigo"));
   await page.setViewportSize({width: 1280, height: 900});
   await page.goto("./#/inicio", {waitUntil: "domcontentloaded"});
@@ -37,10 +37,19 @@ test("central de comando do Work é visível, completa e responsiva", async ({pa
   await expect(center.locator("[data-work-cloud-state]")).not.toHaveText("");
   await expect(center.locator(".work-command-grid")).toHaveCSS("display", "grid");
 
+  const desktopFontSizes = await center.locator(".work-command-action b, .work-command-action small, .work-data-separation strong").evaluateAll(nodes => nodes.map(node => parseFloat(getComputedStyle(node).fontSize)));
+  expect(Math.min(...desktopFontSizes)).toBeGreaterThanOrEqual(12);
+  const dataLabelSizes = await center.locator(".work-data-separation small").evaluateAll(nodes => nodes.map(node => parseFloat(getComputedStyle(node).fontSize)));
+  expect(Math.min(...dataLabelSizes)).toBeGreaterThanOrEqual(11);
+
   await page.setViewportSize({width: 390, height: 844});
   await expect(center).toBeVisible();
   const columns = await center.locator(".work-command-grid").evaluate(node => getComputedStyle(node).gridTemplateColumns.split(" ").length);
   expect(columns).toBe(2);
+  const mobileFontSizes = await center.locator(".work-command-action b, .work-command-action small, .work-data-separation strong").evaluateAll(nodes => nodes.map(node => parseFloat(getComputedStyle(node).fontSize)));
+  expect(Math.min(...mobileFontSizes)).toBeGreaterThanOrEqual(11.5);
+  const buttonHeights = await center.locator(".work-command-action").evaluateAll(nodes => nodes.map(node => node.getBoundingClientRect().height));
+  expect(Math.min(...buttonHeights)).toBeGreaterThanOrEqual(44);
 });
 
 test("relato de problema é interno e não abre GitHub Issue", async ({request}) => {
