@@ -2,6 +2,9 @@ name: Preparar sincronização controlada do Banco Mestre do Notion
 
 on:
   workflow_dispatch:
+  issues:
+    types:
+      - opened
 
 permissions:
   contents: write
@@ -13,9 +16,29 @@ concurrency:
 
 jobs:
   prepare-sync-pr:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issues' &&
+       github.event.action == 'opened' &&
+       github.event.issue.title == '[sync-notion]' &&
+       github.actor == github.repository_owner &&
+       github.event.issue.body == 'prepare_sync=true')
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
+      - name: Confirmar autorização explícita quando acionado por issue
+        if: github.event_name == 'issues'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${ISSUE_TITLE}" = '[sync-notion]'
+          test "${ISSUE_BODY}" = 'prepare_sync=true'
+          test "${GITHUB_ACTOR}" = "${GITHUB_REPOSITORY_OWNER}"
+          echo '✓ Sincronização autorizada explicitamente pelo proprietário.'
+        env:
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+
       - name: Baixar a main vigente
         uses: actions/checkout@v6
         with:
