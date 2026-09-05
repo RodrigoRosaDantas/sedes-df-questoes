@@ -64,13 +64,17 @@ jobs:
       - name: Gerar o plano de publicação
         run: node scripts/create-publication-plan.mjs
 
-      - name: Materializar o snapshot sobre a release vigente
+      - name: Materializar e auditar o snapshot sobre a release vigente
         shell: bash
         run: |
           set -euo pipefail
           BEFORE_QUESTIONS="$(node -e "const x=require('./data/release/catalogo.json'); console.log(Object.keys(x.question_index || {}).length)")"
           BEFORE_MATERIALS="$(node -e "const x=require('./data/release/catalogo.json'); console.log((x.materials || []).length)")"
           echo "Release vigente antes do Notion: ${BEFORE_QUESTIONS} questões em ${BEFORE_MATERIALS} materiais."
+
+          BEFORE_RELEASE="${RUNNER_TEMP}/release-before-notion"
+          rm -rf "${BEFORE_RELEASE}"
+          cp -R data/release "${BEFORE_RELEASE}"
 
           # A sincronização incremental parte da release pública já rastreada.
           # Não executamos `npm run build` aqui porque esse comando recompõe
@@ -80,6 +84,7 @@ jobs:
           node scripts/reconcile-notion-snapshot-provenance.mjs
           node --import=./scripts/fixed-build-time.mjs scripts/build-study-index.mjs
           node scripts/build-question-search-index.mjs
+          node scripts/audit-notion-release-delta.mjs "${BEFORE_RELEASE}" data/release
 
           AFTER_QUESTIONS="$(node -e "const x=require('./data/release/catalogo.json'); console.log(Object.keys(x.question_index || {}).length)")"
           AFTER_MATERIALS="$(node -e "const x=require('./data/release/catalogo.json'); console.log((x.materials || []).length)")"
