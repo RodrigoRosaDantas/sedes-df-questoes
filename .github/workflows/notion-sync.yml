@@ -64,8 +64,34 @@ jobs:
       - name: Gerar o plano de publicação
         run: node scripts/create-publication-plan.mjs
 
-      - name: Materializar o snapshot na release rastreada
-        run: npm run build
+      - name: Materializar o snapshot sobre a release vigente
+        shell: bash
+        run: |
+          set -euo pipefail
+          BEFORE_QUESTIONS="$(node -e "const x=require('./data/release/catalogo.json'); console.log(Object.keys(x.question_index || {}).length)")"
+          BEFORE_MATERIALS="$(node -e "const x=require('./data/release/catalogo.json'); console.log((x.materials || []).length)")"
+          echo "Release vigente antes do Notion: ${BEFORE_QUESTIONS} questões em ${BEFORE_MATERIALS} materiais."
+
+          # A sincronização incremental parte da release pública já rastreada.
+          # Não executamos `npm run build` aqui porque esse comando recompõe
+          # operações editoriais históricas que dependiam de arquivos temporários
+          # de agosto e não fazem parte do contrato atual Notion -> release.
+          node --import=./scripts/fixed-build-time.mjs scripts/apply-notion-snapshot.mjs
+          node --import=./scripts/fixed-build-time.mjs scripts/build-study-index.mjs
+          node scripts/build-question-search-index.mjs
+
+          AFTER_QUESTIONS="$(node -e "const x=require('./data/release/catalogo.json'); console.log(Object.keys(x.question_index || {}).length)")"
+          AFTER_MATERIALS="$(node -e "const x=require('./data/release/catalogo.json'); console.log((x.materials || []).length)")"
+          echo "Release candidata após o Notion: ${AFTER_QUESTIONS} questões em ${AFTER_MATERIALS} materiais."
+
+          if [ "${AFTER_QUESTIONS}" -lt "${BEFORE_QUESTIONS}" ]; then
+            echo "Regressão bloqueada: questões ${BEFORE_QUESTIONS} -> ${AFTER_QUESTIONS}."
+            exit 1
+          fi
+          if [ "${AFTER_MATERIALS}" -lt "${BEFORE_MATERIALS}" ]; then
+            echo "Regressão bloqueada: materiais ${BEFORE_MATERIALS} -> ${AFTER_MATERIALS}."
+            exit 1
+          fi
 
       - name: Validar snapshot, plano e crescimento da release
         run: |
@@ -100,6 +126,8 @@ jobs:
           QUESTIONS="$(node -e "const x=require('./data/notion/published.json'); console.log(x.totals?.published ?? 0)")"
           MATERIALS="$(node -e "const x=require('./data/notion/published.json'); console.log(x.totals?.materials ?? 0)")"
           PENDING="$(node -e "const x=require('./data/notion/published.json'); console.log(x.totals?.pending ?? 0)")"
+          PUBLIC_QUESTIONS="$(node -e "const x=require('./data/release/catalogo.json'); console.log(Object.keys(x.question_index || {}).length)")"
+          PUBLIC_MATERIALS="$(node -e "const x=require('./data/release/catalogo.json'); console.log((x.materials || []).length)")"
 
           git switch -c "${BRANCH}"
           git commit -m "Sincronizar Banco Mestre do Notion"
@@ -109,4 +137,4 @@ jobs:
             --base main \
             --head "${BRANCH}" \
             --title "[notion-sync] Atualizar Banco Mestre" \
-            --body "Sincronização controlada preparada a partir do Banco Mestre do Notion.\n\n- questões publicáveis no snapshot: ${QUESTIONS}\n- materiais no snapshot: ${MATERIALS}\n- registros fora do site: ${PENDING}\n\nO workflow apenas lê o Notion e prepara este PR. Não publica o GitHub Pages e não escreve no Notion. Após revisão e merge, a publicação continua exigindo autorização explícita por SHA no workflow de Pages."
+            --body "Sincronização controlada preparada a partir do Banco Mestre do Notion.\n\n- questões publicáveis no snapshot: ${QUESTIONS}\n- materiais no snapshot: ${MATERIALS}\n- registros fora do site: ${PENDING}\n- questões preservadas/materializadas na release candidata: ${PUBLIC_QUESTIONS}\n- materiais preservados/materializados na release candidata: ${PUBLIC_MATERIALS}\n\nO workflow apenas lê o Notion e prepara este PR. Não publica o GitHub Pages e não escreve no Notion. A release pública vigente é a base da mesclagem e qualquer redução de questões ou materiais é bloqueada. Após revisão e merge, a publicação continua exigindo autorização explícita por SHA no workflow de Pages."
