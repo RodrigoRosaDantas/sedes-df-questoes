@@ -77,6 +77,7 @@ jobs:
           # operações editoriais históricas que dependiam de arquivos temporários
           # de agosto e não fazem parte do contrato atual Notion -> release.
           node --import=./scripts/fixed-build-time.mjs scripts/apply-notion-snapshot.mjs
+          node scripts/reconcile-notion-snapshot-provenance.mjs
           node --import=./scripts/fixed-build-time.mjs scripts/build-study-index.mjs
           node scripts/build-question-search-index.mjs
 
